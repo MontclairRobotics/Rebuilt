@@ -29,4 +29,17 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+  public static class TurretConstants{
+//  TODO find?
+
+    public static final int kTurret1To1CANCoder = 0;
+	  public static final int kTurret3To1CANCoder = 0;
+  	public static final double k1To1TurretCancoderOffset = 0;
+    public static final double k3To1TurretCancoderOffset = 0;
+    public static final double kTurretGearRatio = 0;
+    public static final int kTurretTalonCanID = 0;
+	public static final double kTurretMinPositionRadians = 0;
+    public static final double kTurretMaxPositionRadians = 0;
+
+  }
 }
