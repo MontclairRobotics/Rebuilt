@@ -1,3 +1,5 @@
 package frc.robot.util;
 
-public class Auto {}
+public class Auto {
+    
+}
