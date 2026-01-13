@@ -26,7 +26,26 @@ import org.littletonrobotics.junction.Logger;
 public class Limelight extends SubsystemBase {
 
   /* CONSTANTS */
+  public static final double hubTagHeightMeters = 1.12395; 
+  public static final double trenchTagHeightMeters = 0.889;
+  public static final double towerTagHeightMeters = 0.55245; 
+  public static final double outpostTagHeightMeters = 0.55245;
 
+  public static final int[] hubIDsRed = { 2, 3, 4, 5, 8, 9, 10, 11 };
+  public static final int[] hubIDsBlue = { 18, 19, 20, 21, 24, 25, 26, 27 };
+  public static final int[] reefIDs = { 2, 3, 4, 5, 8, 9, 10, 11, 18, 19, 20, 21, 24, 25, 26, 27 };
+
+  public static final int[] towerIDsRed = { 15, 16 };
+  public static final int[] towerIDsBlue = { 31, 32 };
+  public static final int[] towerStationIDs = { 15, 16, 31, 32 };
+
+  public static final int[] trenchIDsRed = { 1, 6, 7, 12};
+  public static final int[] trenchIDsBlue = { 17, 22, 23, 28 };
+  public static final int[] trenchStationIDs = { 1, 6, 7, 12, 17, 22, 23, 28};
+
+  public static final int[] outpostIDsRed = { 15, 16 };
+  public static final int[] outpostIDsBlue = { 31, 32 };
+  public static final int[] outpostStationIDs = { 15, 16, 31, 32 };
 
   public static final double TARGET_DEBOUNCE_TIME = 0.2;
 
@@ -256,7 +275,7 @@ public class Limelight extends SubsystemBase {
   public int getTagID() {
     return (int) LimelightHelpers.getFiducialID(cameraName);
   }
-
+  
   public void periodic() {
 
     if (Math.abs(RobotContainer.drivetrain.getPigeon2().getPitch().getValueAsDouble()) > 0.3
