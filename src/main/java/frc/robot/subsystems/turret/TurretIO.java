@@ -1,55 +1,25 @@
 package frc.robot.subsystems.turret;
 
-import com.ctre.phoenix6.BaseStatusSignal;
-
-import edu.wpi.first.math.geometry.Rotation2d;
+import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import java.util.Arrays;
-import java.util.List;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 
-/**
- * The {@code TurretIO} interface defines the methods and input structures
- * required for controlling
- * the turret subsystem. It manages the reading of inputs such as turret
- * position,
- * velocity, and electrical signals, as well as setting control modes like
- * open-loop duty cycle
- * and position-based setpoints.
- * <p>
- * The {@code TurretIO} interface is designed for both real-time sensor data
- * acquisition and
- * status signal management, providing a flexible mechanism to control and
- * monitor the turret.
- */
 public interface TurretIO {
     @AutoLog
-    class TurretInputs {
-        public Rotation2d turretPositionAbsolute = new Rotation2d();
-        public double positionRad = 0.0;
-        public double velocityRadPerSec = 0.0;
-        public double appliedVolts = 0.0;
-        public double currentStatorAmps = 0.0;
-        public double currentSupplyAmps = 0.0;
-        public double cancoder1AbsolutePosition = 0.0;
-        public double cancoder2AbsolutePosition = 0.0;
+    public static class TurretInputs{
+        public AngularVelocity currentVelocity;
+        public Voltage currentVoltage;
     }
-
-    default List<BaseStatusSignal> getStatusSignals() {
-        return Arrays.asList();
-    };
-
-    // Read Inputs
-    default void updateInputs(TurretInputs inputs) {
-    };
-
-
-    // Set open loop duty cycle
-    default void setOpenLoopDutyCycle(double dutyCycle) {
-    }
-
-    default void setPositionSetpoint(double radiansFromCenter, double radsPerSecond) {
-    }
+    public void updateInputs(TurretInputs input);
+    public void setRobotRelativeAngle(Rotation2d angle); 
+    public Rotation2d getRobotRelativeAngle();//encoders are relative
+    public void zeroRelativeEncoder(); //make command variant too
+    public void setContinuousAngle(DoubleSupplier supplier);
+    public void setVoltage(double voltage); // maybe double?
+    public void stop(); // also command w/ binding, especially for testing
 
 }
