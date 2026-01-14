@@ -19,14 +19,11 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     }
     @Override
     public void updateInputs(FlywheelIOInputs inputs){
-        inputs.appliedVoltage = talonFX.getMotorVoltage().getValueAsDouble();
-        inputs.tempC = talonFX.getDeviceTemp().getValueAsDouble();
-        inputs.currentVelocity = talonFX.getVelocity().getValueAsDouble();
+        inputs.appliedVoltageRPM = talonFX.getMotorVoltage().getValueAsDouble();
+        inputs.tempCelcius = talonFX.getDeviceTemp().getValueAsDouble();
+        inputs.currentVelocityRPM = talonFX.getVelocity().getValueAsDouble();
         inputs.isShooting = isShooting();
     }
-
-    //@Override
-    //public boolean isShooting() {}
     
     @Override
     public void stop(){
@@ -34,12 +31,19 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     }
     
     @Override
-    public void setVoltage(double appliedVoltage){
-        talonFX.setVoltage(appliedVoltage);
+    public void setVoltage(double appliedVoltageRPM){
+        talonFX.setVoltage(appliedVoltageRPM);
     }
- 
-    public void shoot(){
-         
+    public void shootVelocity(double currentVelocityRPM){
+        motorFeedForward.calculate(currentVelocityRPM);
+    }
+
+    public void setPID(double kP, double kI, double kD){
+        talonFX.s();
     }
     
+    @Override
+    public boolean isShooting(boolean isShooting){
+         return isShooting;
+    }
 }
