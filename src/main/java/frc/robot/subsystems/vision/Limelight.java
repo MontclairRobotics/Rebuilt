@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.math.geometry.Translation2d;
 
 public class Limelight extends SubsystemBase {
 
@@ -276,6 +277,28 @@ public class Limelight extends SubsystemBase {
     return (int) LimelightHelpers.getFiducialID(cameraName);
   }
   
+  public double getDistanceToHub(){
+    Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+    Translation2d hubLocation = new Translation2d(8.27, 4.105);
+    //TODO:Set alliance translations to their true locations
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+      hubLocation = new Translation2d(8.27, 4.105);
+    } 
+    Pose2d hubPose = new Pose2d(hubLocation, Rotation2d.fromDegrees(0));
+    return robotPose.getTranslation().getDistance(hubPose.getTranslation());
+  }
+
+  public double getAngleToHub(){
+    Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+    Translation2d hubLocation = new Translation2d(8.27, 4.105);
+    //TODO:Set alliance translations to their true locations
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+      hubLocation = new Translation2d(8.27, 4.105);
+    } 
+    Translation2d robotToHub = hubLocation.minus(robotPose.getTranslation());
+    return robotToHub.getAngle().getDegrees();
+  }
+
   public void periodic() {
 
     if (Math.abs(RobotContainer.drivetrain.getPigeon2().getPitch().getValueAsDouble()) > 0.3
