@@ -1,18 +1,17 @@
 package frc.robot.subsystems.turret;
 
 import java.util.function.DoubleSupplier;
-
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.constants.TurretConstants;
 
-public class TurretIOHardware implements TurretIO{
-    public TalonFX turretMotor;
-    
+public class TurretIOTalonFX implements TurretIO{
+    public TalonFX turretMotor = new TalonFX(TurretConstants.TURRET_MOTOR_CAN_ID);
     @Override
     public void updateInputs(TurretInputs input) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateInputs'");
+        input.currentVelocity = turretMotor.getVelocity().getValue();
+        input.currentVoltage = turretMotor.getMotorVoltage().getValue();
+
     }
 
     @Override
@@ -23,20 +22,17 @@ public class TurretIOHardware implements TurretIO{
 
     @Override
     public Rotation2d getRobotRelativeAngle() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getRobotRelativeAngle'");
+        return Rotation2d.fromRotations(turretMotor.getRotorPosition().getValueAsDouble()*TurretConstants.ENCODER_RATIO);
     }
 
     @Override
     public void zeroRelativeEncoder() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'zeroRelativeEncoder'");
+        turretMotor.setPosition(0); //TODO: check if this is the right function
     }
 
     @Override
     public void setContinuousAngle(DoubleSupplier supplier) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setContinuousAngle'");
+        setRobotRelativeAngle(Rotation2d.fromRadians(supplier.getAsDouble()));
     }
 
     @Override

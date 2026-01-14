@@ -17,7 +17,7 @@ public interface TurretIO {
     public void updateInputs(TurretInputs input);
     public void setRobotRelativeAngle(Rotation2d angle); 
     public Rotation2d getRobotRelativeAngle();//encoders are relative
-    public void zeroRelativeEncoder(); //make command variant too
+    public void zeroRelativeEncoder(); //make command variant
     public void setContinuousAngle(DoubleSupplier supplier);
     public void setVoltage(double voltage); // maybe double?
     public void stop(); // also command w/ binding, especially for testing
