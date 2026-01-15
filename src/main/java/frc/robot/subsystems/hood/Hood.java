@@ -53,7 +53,7 @@ public class Hood {
         this.setVoltage(voltage);
     }
 
-    public void angleToOutpost() { //Sets the angle to whatever gets us to score in the outpost
+    public void angleToHub() { //Sets the angle to whatever gets us to score in the outpost
         //TODO: Use vision stuffs later to accomplish this task
     }
 }
