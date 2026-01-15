@@ -6,6 +6,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -15,38 +16,36 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.util.PoseUtils;
 import frc.robot.subsystems.vision.LimelightHelpers.RawFiducial;
-import java.util.HashMap;
+import frc.robot.util.PoseUtils;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.math.geometry.Translation2d;
 
 public class Limelight extends SubsystemBase {
 
   /* CONSTANTS */
-  public static final double hubTagHeightMeters = 1.12395; 
+  public static final double hubTagHeightMeters = 1.12395;
   public static final double trenchTagHeightMeters = 0.889;
-  public static final double towerTagHeightMeters = 0.55245; 
+  public static final double towerTagHeightMeters = 0.55245;
   public static final double outpostTagHeightMeters = 0.55245;
 
-  public static final int[] hubIDsRed = { 2, 3, 4, 5, 8, 9, 10, 11 };
-  public static final int[] hubIDsBlue = { 18, 19, 20, 21, 24, 25, 26, 27 };
-  public static final int[] reefIDs = { 2, 3, 4, 5, 8, 9, 10, 11, 18, 19, 20, 21, 24, 25, 26, 27 };
+  public static final int[] hubIDsRed = {2, 3, 4, 5, 8, 9, 10, 11};
+  public static final int[] hubIDsBlue = {18, 19, 20, 21, 24, 25, 26, 27};
+  public static final int[] reefIDs = {2, 3, 4, 5, 8, 9, 10, 11, 18, 19, 20, 21, 24, 25, 26, 27};
 
-  public static final int[] towerIDsRed = { 15, 16 };
-  public static final int[] towerIDsBlue = { 31, 32 };
-  public static final int[] towerStationIDs = { 15, 16, 31, 32 };
+  public static final int[] towerIDsRed = {15, 16};
+  public static final int[] towerIDsBlue = {31, 32};
+  public static final int[] towerStationIDs = {15, 16, 31, 32};
 
-  public static final int[] trenchIDsRed = { 1, 6, 7, 12};
-  public static final int[] trenchIDsBlue = { 17, 22, 23, 28 };
-  public static final int[] trenchStationIDs = { 1, 6, 7, 12, 17, 22, 23, 28};
+  public static final int[] trenchIDsRed = {1, 6, 7, 12};
+  public static final int[] trenchIDsBlue = {17, 22, 23, 28};
+  public static final int[] trenchStationIDs = {1, 6, 7, 12, 17, 22, 23, 28};
 
-  public static final int[] outpostIDsRed = { 15, 16 };
-  public static final int[] outpostIDsBlue = { 31, 32 };
-  public static final int[] outpostStationIDs = { 15, 16, 31, 32 };
+  public static final int[] outpostIDsRed = {15, 16};
+  public static final int[] outpostIDsBlue = {31, 32};
+  public static final int[] outpostStationIDs = {15, 16, 31, 32};
 
   public static final double TARGET_DEBOUNCE_TIME = 0.2;
 
@@ -139,7 +138,8 @@ public class Limelight extends SubsystemBase {
 
     double angle = (RobotContainer.drivetrain.getWrappedHeading().getDegrees() + 360) % 360;
     LimelightHelpers.SetRobotOrientation(cameraName, angle, 0, 0, 0, 0, 0);
-    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
+    LimelightHelpers.PoseEstimate mt2 =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
 
     boolean shouldRejectUpdate = false;
 
@@ -191,7 +191,7 @@ public class Limelight extends SubsystemBase {
         shouldRejectUpdate = true;
         rejectReason = 5;
       }
-    
+
       // adds vision measurement if conditions are met
       if (!shouldRejectUpdate) {
         Logger.recordOutput(cameraName + "/mt2Pose", mt2.pose);
@@ -243,7 +243,6 @@ public class Limelight extends SubsystemBase {
     return 0;
   }
 
-
   @AutoLogOutput
   public double getTX() {
     return tx * angleMult;
@@ -272,31 +271,25 @@ public class Limelight extends SubsystemBase {
 
   // TODO: Do we need these / check if the trig is right
 
-
   public int getTagID() {
     return (int) LimelightHelpers.getFiducialID(cameraName);
   }
-  
-  public double getDistanceToHub(){
+
+  public double getDistanceToHub() {
     Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
-    Translation2d hubLocation = new Translation2d(8.27, 4.105);
-    //TODO:Set alliance translations to their true locations
-    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-      hubLocation = new Translation2d(8.27, 4.105);
-    } 
+    Translation2d hubLocation = new Translation2d(4.6245018, 4.105);
     Pose2d hubPose = new Pose2d(hubLocation, Rotation2d.fromDegrees(0));
+    hubPose = PoseUtils.flipPoseAlliance(hubPose);
     return robotPose.getTranslation().getDistance(hubPose.getTranslation());
   }
 
-  public double getAngleToHub(){
+  public double getAngleToHub() {
     Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
-    Translation2d hubLocation = new Translation2d(8.27, 4.105);
-    //TODO:Set alliance translations to their true locations
-    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-      hubLocation = new Translation2d(8.27, 4.105);
-    } 
-    Translation2d robotToHub = hubLocation.minus(robotPose.getTranslation());
-    return robotToHub.getAngle().getDegrees();
+    Translation2d hubLocation = new Translation2d(4.6245018, 4.105);
+    Pose2d hubPose = new Pose2d(hubLocation, Rotation2d.fromDegrees(0));
+    hubPose = PoseUtils.flipPoseAlliance(hubPose);
+    Translation2d robotToHub = hubPose.getTranslation().minus(robotPose.getTranslation());
+    return robotToHub.getAngle().getRotations();
   }
 
   public void periodic() {
