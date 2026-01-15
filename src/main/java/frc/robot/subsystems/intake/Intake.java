@@ -1,34 +1,70 @@
 package frc.robot.subsystems.intake;
 
-import java.lang.System.Logger;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
-//import edu.wpi.first.wpilibj2.command.Command;
-//import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.Constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
-    private final IntakeIO io;
-    public IntakeIOInputsAutoLogged = new IntakeIOInputsAutoLogged(); 
-    private final Debouncer isStalledDebouncer = new Debouncer(0.05, DebounceType.kRising);
-    
-    public Intake(IntakeIO io){
-        this.io = io; 
-    }
+  private final IntakeIO io;
+  private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged(); 
+  private final Debouncer isStalledDebouncer = new Debouncer(
+    0.05, DebounceType.kRising);
+  public Intake(IntakeIO io) {
+    this.io = io;
+  }
 
-  public Debouncer isStalled() {
+  public boolean isStalled() {
     return isStalledDebouncer.calculate(
-        inputs.Current > RollerConstants.ROLLER_STALL_CURRENT);
+      inputs.current > IntakeConstants.INTAKE_STALL_CURRENT);
   }
 
   @Override
   public void periodic() {
-    io.updateInputs(inputs);
-    Logger.processInputs("Rollers", inputs);
+   io.updateInputs(inputs);
+   Logger.processInputs("Intake", inputs);
+
+   
+    
   }
 
+  // --------------------------COMMANDS--------------------------
+
+  public Command stopCommands() {
+    return Commands.runOnce(() -> io.stop(), this);
+  }
+
+  public Command intakeCommand() {
+    return Commands.run(() -> io.set(
+      IntakeConstants.INTAKE_FUEL_SPEED), 
+      this).withTimeout(2).finallyDo(() -> {
+      io.stop();
+    }); 
+  }
+
+  public Command outtakeCommand() {
+    return Commands.run(() -> io.set(
+      IntakeConstants.OUTTAKE_FUEL_SPEED), 
+      this);
+  }
+
+  public Command unjamCommand() {
+    return Commands.run(() -> io.set(IntakeConstants.INTAKE_FUEL_SPEED), this)
+      .until(this::isStalled)
+      .andThen(
+        Commands.sequence(
+          Commands.run(() -> io.set(-0.1), this)
+              .withTimeout(0.1)
+              .andThen(intakeCommand())))
+              .andThen(
+          Commands.sequence(
+            Commands.run(() -> io.set(-0.1), this)
+              .withTimeout(0.1)
+              .andThen(outtakeCommand())));
+  }
 }
-
-
-

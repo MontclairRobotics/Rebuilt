@@ -5,42 +5,42 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 
 public class IntakeIOTalonFX implements IntakeIO {
-    private TalonFX motor;
-    TalonFXConfiguration config;
+  private TalonFX motor;
+  TalonFXConfiguration config;
 
-    public IntakeIOTalonFX() {
-        //define motor
-        motor = new TalonFX(0); 
+  public IntakeIOTalonFX() {
+    // define motor
+    motor = new TalonFX(0);
 
-        //define config
-        config = new TalonFXConfiguration();   
-        
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        motor.getConfigurator().apply(config);
-    }
+    // define config
+    config = new TalonFXConfiguration();
 
-    @Override
-    public void updateInputs(IntakeIOInputs inputs) {
-        //get double (ints) as outputs
-        inputs.current = motor.getStatorCurrent().getValueAsDouble();
-        inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
-    }
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    motor.getConfigurator().apply(config);
+  }
 
-    @Override
-    public void set(double speed) {
-        //set the speed
-        motor.set(speed);
-    }
+  @Override
+  public void updateInputs(IntakeIOInputs inputs) {
+    // get double (ints) as outputs
+    inputs.current = motor.getStatorCurrent().getValueAsDouble();
+    inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
+  }
 
-    @Override
-    public void stop() {
-        //stop
-        motor.stopMotor();
-    }
+  @Override
+  public void set(double speed) {
+    // set the speed
+    motor.set(speed);
+  }
 
-    @Override
-    public void setVoltage(double voltage) {
-        //set voltage
-        motor.setVoltage(voltage);
-    }
+  @Override
+  public void stop() {
+    // stop
+    motor.stopMotor();
+  }
+
+  @Override
+  public void setVoltage(double voltage) {
+    // set voltage (same as speed?)
+    motor.setVoltage(voltage);
+  }
 }
