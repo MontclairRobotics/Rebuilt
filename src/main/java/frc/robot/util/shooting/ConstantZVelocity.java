@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.shooting;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
@@ -8,8 +8,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 
-public class ShootingUtils {
-	
+public class ConstantZVelocity {
 	public double vyTurret; //radial velocity component of the turret relative to the goal
 	public double vxTurret; //velocity component along the axis towards the goal
 	public double vz; //upward velocity of the ball, CONSTANT
@@ -42,3 +41,4 @@ public class ShootingUtils {
 		return RotationsPerSecond.of(0); //TODO: Make this actually work
 	}
 }
+
