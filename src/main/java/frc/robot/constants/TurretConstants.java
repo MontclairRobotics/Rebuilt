@@ -2,7 +2,7 @@ package frc.robot.constants;
 
 public class TurretConstants {
     // TODO: IMPLEMENT 
-    public static final int TURRET_MOTOR_CAN_ID = -1;
-    public static final int TURRET_MAX_ANGLE = 360;
-    public static final double ENCODER_RATIO = 0;
+    public static final int CAN_ID = -1;
+    public static final int MAX_ANGLE = 360;
+    public static final double GEAR_RATIO = 0; //how many rotations of the output shaft per rotation of the turret
 }

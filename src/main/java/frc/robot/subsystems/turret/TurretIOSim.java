@@ -1,23 +1,33 @@
 package frc.robot.subsystems.turret;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.constants.TurretConstants;
+
 import java.util.function.DoubleSupplier;
 public class TurretIOSim implements TurretIO{
 
+    TurretIOSim() {
+
+    }
+    DCMotor gearbox = DCMotor.getKrakenX60(0);
+    private SingleJointedArmSim sim = new SingleJointedArmSim(gearbox,0,0,0,0, 0, false, 0, 0);
     @Override
-    public void updateInputs(TurretInputs input) {
+    public void updateInputs(TurretIOInputs input) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'updateInputs'");
     }
 
     @Override
-    public void setRobotRelativeAngle(Rotation2d angle) {
+    public void setRobotRelativeAngle(double angle) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setRobotRelativeAngle'");
     }
 
     @Override
-    public Rotation2d getRobotRelativeAngle() {
+    public double getRobotRelativeAngle() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getRobotRelativeAngle'");
     }
@@ -29,7 +39,7 @@ public class TurretIOSim implements TurretIO{
     }
 
     @Override
-    public void setContinuousAngle(DoubleSupplier supplier) {
+    public void setRobotRelativeAngle(DoubleSupplier supplier) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setContinuousAngle'");
     }
@@ -45,5 +55,16 @@ public class TurretIOSim implements TurretIO{
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'stop'");
     }
+	@Override
+	public void setFieldRelativeAngle(double angle) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setFieldRelativeAngle'");
+	}
+
+	@Override
+	public void setFieldRelativeAngle(DoubleSupplier supplier) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setFieldRelativeAngle'");
+	}
 
 }
