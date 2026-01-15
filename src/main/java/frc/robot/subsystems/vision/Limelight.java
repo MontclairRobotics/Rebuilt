@@ -26,6 +26,9 @@ import org.littletonrobotics.junction.Logger;
 public class Limelight extends SubsystemBase {
 
   /* CONSTANTS */
+  public static final double hubCenterX = 4.6245018;
+  public static final double hubCenterY = 4.105;
+
   public static final double hubTagHeightMeters = 1.12395;
   public static final double trenchTagHeightMeters = 0.889;
   public static final double towerTagHeightMeters = 0.55245;
@@ -277,7 +280,7 @@ public class Limelight extends SubsystemBase {
 
   public double getDistanceToHub() {
     Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
-    Translation2d hubLocation = new Translation2d(4.6245018, 4.105);
+    Translation2d hubLocation = new Translation2d(hubCenterX, hubCenterY);
     Pose2d hubPose = new Pose2d(hubLocation, Rotation2d.fromDegrees(0));
     hubPose = PoseUtils.flipPoseAlliance(hubPose);
     return robotPose.getTranslation().getDistance(hubPose.getTranslation());
@@ -285,7 +288,7 @@ public class Limelight extends SubsystemBase {
 
   public double getAngleToHub() {
     Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
-    Translation2d hubLocation = new Translation2d(4.6245018, 4.105);
+    Translation2d hubLocation = new Translation2d(hubCenterX, hubCenterY);
     Pose2d hubPose = new Pose2d(hubLocation, Rotation2d.fromDegrees(0));
     hubPose = PoseUtils.flipPoseAlliance(hubPose);
     Translation2d robotToHub = hubPose.getTranslation().minus(robotPose.getTranslation());
