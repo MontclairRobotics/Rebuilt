@@ -1,49 +1,46 @@
 package frc.robot.subsystems.flywheel;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.revrobotics.spark.config.FeedForwardConfig;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import frc.robot.constants.FlywheelConstants;
 
 public class FlywheelIOTalonFX implements FlywheelIO {
 
     private TalonFX talonFX;
-    public PIDController pidController;
-    public SimpleMotorFeedforward motorFeedForward; 
+    private PIDController pidController;
+    private SimpleMotorFeedforward motorFeedForward; 
 
-    public FlywheelIOTalonFX(){
-        talonFX = new TalonFX(0);
-        pidController = new PIDController(0, 0, 0);
-        motorFeedForward = new SimpleMotorFeedforward(0, 0);
+    public FlywheelIOTalonFX() {
+        talonFX = new TalonFX(FlywheelConstants.FLYWHEEL_TALON_FX_PORT);
+        pidController = new PIDController(FlywheelConstants.SLOT0_CONFIGS.kP, FlywheelConstants.SLOT0_CONFIGS.kI, FlywheelConstants.SLOT0_CONFIGS.kD);
+        motorFeedForward = new SimpleMotorFeedforward(FlywheelConstants.SLOT0_CONFIGS.kS, FlywheelConstants.SLOT0_CONFIGS.kV);
     }
-    @Override
-    public void updateInputs(FlywheelIOInputs inputs){
-        inputs.appliedVoltageRPM = talonFX.getMotorVoltage().getValueAsDouble();
+
+    public void updateInputs(FlywheelIOInputs inputs) {
+        inputs.appliedVoltage = talonFX.getMotorVoltage().getValueAsDouble();
         inputs.tempCelcius = talonFX.getDeviceTemp().getValueAsDouble();
-        inputs.currentVelocityRPM = talonFX.getVelocity().getValueAsDouble();
-        inputs.isShooting = isShooting();
+        inputs.velocity = talonFX.getVelocity().getValueAsDouble(); //RPS
     }
     
-    @Override
-    public void stop(){
-        talonFX.setVoltage(0);
+    public void stop() {
+        talonFX.stopMotor();
     }
     
-    @Override
-    public void setVoltage(double appliedVoltageRPM){
-        talonFX.setVoltage(appliedVoltageRPM);
-    }
-    public void shootVelocity(double currentVelocityRPM){
-        motorFeedForward.calculate(currentVelocityRPM);
+    public void setVoltage(double voltage) {
+        talonFX.setVoltage(voltage);
     }
 
-    public void setPID(double kP, double kI, double kD){
-        talonFX.s();
+    public void setVelocityRPM(double targetRPM){
+        double pidOutput = pidController.calculate(getMotorVelocity(), targetRPM);
+        double ffVolts = motorFeedForward.calculate(targetRPM);
+        double totalOutput = pidOutput + ffVolts;
+        setVoltage(totalOutput);
     }
     
-    @Override
-    public boolean isShooting(boolean isShooting){
-         return isShooting;
+    public double getMotorVelocity(){
+        return talonFX.getVelocity().getValueAsDouble();    
     }
+  
 }
