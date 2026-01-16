@@ -2,14 +2,10 @@ package frc.robot.subsystems.hood;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -20,56 +16,37 @@ import java.util.function.DoubleSupplier;
 public class HoodIOSim implements HoodIO {
 
   public DCMotor motor;
-  public ProfiledPIDController pidController;
+  public PIDController pidController;
   public ArmFeedforward feedforward;
   public SingleJointedArmSim sim;
 
   public DutyCycleEncoder realEncoder;
   public DutyCycleEncoderSim encoder;
-  
+
   private double appliedVoltage;
 
   public HoodIOSim() {
     motor = DCMotor.getKrakenX44(1);
-    
-    // sim = new SingleJointedArmSim(
-    // 	motor,
-    // 	HoodConstants.GEAR_RATIO,
-    // 	HoodConstants.MOMENT_OF_INERTIA,
-    // 	getAngle(),
-    // 	getAngle(),
-    // 	getAngle(),
-    // 	true,
-    // 	getAngle(),
-    // 	null)
 
-    pidController =
-        new ProfiledPIDController(
-            0,
-            0,
-            0,
-            new Constraints(
-                HoodConstants.MAX_VELOCITY.in(RotationsPerSecond),
-                HoodConstants.MAX_ACCELERATION.in(RotationsPerSecondPerSecond)));
-
+    pidController = new PIDController(0, 0, 0);
     feedforward = new ArmFeedforward(0, 0, 0);
 
-    realEncoder = new DutyCycleEncoder(5, 1, HoodConstants.HOOD_ENCODER_OFFSET.getRotations());
+    realEncoder = new DutyCycleEncoder(5, 1, HoodConstants.HOOD_ENCODER_OFFSET.in(Rotations));
     encoder = new DutyCycleEncoderSim(realEncoder);
     encoder.setConnected(true);
 
     sim =
-      new SingleJointedArmSim(
-        motor,
-        HoodConstants.GEAR_RATIO,
-        1,
-        HoodConstants.HOOD_LENGTH,
-        HoodConstants.MIN_ANGLE.in(Radians),
-        HoodConstants.MAX_ANGLE.in(Radians),
-        true,
-        0,
-        0.0,
-        0.0);
+        new SingleJointedArmSim(
+            motor,
+            HoodConstants.GEAR_RATIO,
+            HoodConstants.MOMENT_OF_INERTIA,
+            HoodConstants.HOOD_LENGTH,
+            HoodConstants.MIN_ANGLE.in(Radians),
+            HoodConstants.MAX_ANGLE.in(Radians),
+            true,
+            0,
+            0.0,
+            0.0);
   }
 
   @Override
@@ -79,16 +56,15 @@ public class HoodIOSim implements HoodIO {
     // inputs.current = motor.getStatorCurrent().getValueAsDouble();
     // inputs.tempCelsius = motor.getDeviceTemp().getValueAsDouble();
     inputs.angle = getAngle();
-    inputs.angleSetpoint = pidController.getSetpoint().position;
+    inputs.angleSetpoint = pidController.getSetpoint();
 
-    encoder.set(sim.getAngleRads()); 
+    encoder.set(Radians.of(sim.getAngleRads()).in(Rotations));
   }
 
   @Override
   public void setVoltage(double voltage) {
-    
     sim.setInputVoltage(voltage);
-    encoder.set(sim.getAngleRads());
+    encoder.set(Radians.of(sim.getAngleRads()).in(Rotations));
   }
 
   // @Override
@@ -98,14 +74,8 @@ public class HoodIOSim implements HoodIO {
 
   @Override
   public void setAngle(double goal) {
-    goal = MathUtil.clamp(
-      goal,
-      HoodConstants.MIN_ANGLE.in(Rotations),
-      HoodConstants.MAX_ANGLE.in(Rotations));
-
     double pidVoltage = pidController.calculate(getAngle(), goal);
     double feedforwardVoltage = feedforward.calculate(Rotations.of(getAngle()).in(Radians), 0);
-    MathUtil.clamp(pidVoltage + feedforwardVoltage, -HoodConstants.VOLTAGE_LIMIT, HoodConstants.VOLTAGE_LIMIT);
     setVoltage(pidVoltage + feedforwardVoltage);
   }
 
@@ -117,23 +87,16 @@ public class HoodIOSim implements HoodIO {
 
   @Override
   public void stop() {
-    sim.setInputVoltage(0);
+    setVoltage(0);
   }
 
   @Override
   public boolean atSetpoint() {
-    return pidController.atGoal();
+    return pidController.atSetpoint();
   }
 
   @Override
   public double getAngle() {
-    
-    throw new UnsupportedOperationException("Unimplemented method 'getAngle'");
+    return Radians.of(sim.getAngleRads()).in(Rotations);
   }
-
-  //@Override
- // public void stop() {
-    // TODO Auto-generated method stub
-  //  throw new UnsupportedOperationException("Unimplemented method 'stop'");
-  //}
 }

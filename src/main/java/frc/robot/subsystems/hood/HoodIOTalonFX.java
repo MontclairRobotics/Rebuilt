@@ -2,34 +2,21 @@ package frc.robot.subsystems.hood;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import frc.robot.constants.HoodConstants;
+import edu.wpi.first.math.controller.PIDController;
 import java.util.function.DoubleSupplier;
 
 public class HoodIOTalonFX implements HoodIO {
 
   public TalonFX motor;
-  public ProfiledPIDController pidController;
+  public PIDController pidController;
   public ArmFeedforward feedforward;
 
   public HoodIOTalonFX() {
     motor = new TalonFX(0);
-
-    pidController =
-        new ProfiledPIDController(
-            0,
-            0,
-            0,
-            new Constraints(
-                HoodConstants.MAX_VELOCITY.in(RotationsPerSecond),
-                HoodConstants.MAX_ACCELERATION.in(RotationsPerSecondPerSecond)));
-
+    pidController = new PIDController(0, 0, 0);
     feedforward = new ArmFeedforward(0, 0, 0);
   }
 
@@ -39,7 +26,7 @@ public class HoodIOTalonFX implements HoodIO {
     inputs.current = motor.getStatorCurrent().getValueAsDouble();
     inputs.tempCelsius = motor.getDeviceTemp().getValueAsDouble();
     inputs.angle = getAngle();
-    inputs.angleSetpoint = pidController.getSetpoint().position;
+    inputs.angleSetpoint = pidController.getSetpoint();
   }
 
   @Override
@@ -72,6 +59,6 @@ public class HoodIOTalonFX implements HoodIO {
 
   @Override
   public boolean atSetpoint() {
-    return pidController.atGoal();
+    return pidController.atSetpoint();
   }
 }
