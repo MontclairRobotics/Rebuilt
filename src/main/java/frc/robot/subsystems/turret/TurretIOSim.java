@@ -1,70 +1,79 @@
 package frc.robot.subsystems.turret;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.RobotContainer;
 import frc.robot.constants.TurretConstants;
-
 import java.util.function.DoubleSupplier;
-public class TurretIOSim implements TurretIO{
 
-    TurretIOSim() {
+public class TurretIOSim implements TurretIO {
 
-    }
-    DCMotor gearbox = DCMotor.getKrakenX60(0);
-    private SingleJointedArmSim sim = new SingleJointedArmSim(gearbox,0,0,0,0, 0, false, 0, 0);
-    @Override
-    public void updateInputs(TurretIOInputs input) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateInputs'");
-    }
+  TurretIOSim() {}
 
-    @Override
-    public void setRobotRelativeAngle(double angle) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setRobotRelativeAngle'");
-    }
+  DCMotor gearbox = DCMotor.getKrakenX60(0);
+  private SingleJointedArmSim sim =
+      new SingleJointedArmSim(
+          gearbox,
+          TurretConstants.GEAR_RATIO,
+          TurretConstants.MOMENT_OF_INERTIA,
+          TurretConstants.LENGTH,
+          0,
+          (TurretConstants.MAX_ANGLE / 180) * Math.PI,
+          false,
+          0,
+          0);
+  double appliedVoltage = 0;
+  PIDController pid =
+      new PIDController(TurretConstants.SIM_KP, TurretConstants.SIM_KI, TurretConstants.SIM_KD);
+  double encoderOffset = 0;
 
-    @Override
-    public double getRobotRelativeAngle() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getRobotRelativeAngle'");
-    }
+  @Override
+  public void updateInputs(TurretIOInputs input) {
+    input.velocity = sim.getVelocityRadPerSec() / (2 * Math.PI);
+    input.appliedVoltage = appliedVoltage;
+  }
 
-    @Override
-    public void zeroRelativeEncoder() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'zeroRelativeEncoder'");
-    }
+  @Override
+  public void setRobotRelativeAngle(double angle) {
+    pid.setSetpoint(angle);
+    setVoltage(pid.calculate(getRobotRelativeAngle()));
+  }
 
-    @Override
-    public void setRobotRelativeAngle(DoubleSupplier supplier) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setContinuousAngle'");
-    }
+  @Override
+  public double getRobotRelativeAngle() {
+    return (sim.getAngleRads() / (2 * Math.PI)) + encoderOffset;
+  }
 
-    @Override
-    public void setVoltage(double voltage) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setVoltage'");
-    }
+  @Override
+  public void zeroRelativeEncoder() {
+    encoderOffset = -getRobotRelativeAngle();
+  }
 
-    @Override
-    public void stop() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stop'");
-    }
-	@Override
-	public void setFieldRelativeAngle(double angle) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'setFieldRelativeAngle'");
-	}
+  @Override
+  public void setRobotRelativeAngle(DoubleSupplier supplier) {
+    setRobotRelativeAngle(supplier.getAsDouble());
+  }
 
-	@Override
-	public void setFieldRelativeAngle(DoubleSupplier supplier) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'setFieldRelativeAngle'");
-	}
+  @Override
+  public void setVoltage(double voltage) {
+    appliedVoltage = voltage;
+    sim.setInputVoltage(voltage);
+  }
 
+  @Override
+  public void stop() {
+    setVoltage(0);
+  }
+
+  @Override
+  public void setFieldRelativeAngle(double angle) {
+    double robotRelativeAngle = angle - RobotContainer.drivetrain.odometryHeading.getRotations();
+    setRobotRelativeAngle(robotRelativeAngle);
+  }
+
+  @Override
+  public void setFieldRelativeAngle(DoubleSupplier supplier) {
+    setFieldRelativeAngle(supplier.getAsDouble());
+  }
 }
