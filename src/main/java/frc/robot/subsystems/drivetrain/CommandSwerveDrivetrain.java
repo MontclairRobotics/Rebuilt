@@ -171,6 +171,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             ? MapleSimSwerveDrivetrain.regulateModuleConstantsForSimulation(modules)
             : modules);
 
+    odometryHeading = Rotation2d.fromRotations(0);
+
     if (Utils.isSimulation()) {
       startSimThread();
     }
@@ -249,7 +251,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   public double getVelocityYFromController() {
-    double yInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.06);
+    double yInput = MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.06);
     return Math.pow(yInput, 3) * DriveConstants.MAX_SPEED.in(MetersPerSecond);
   }
 
@@ -258,8 +260,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     double rotVelocity =
         Math.pow(rotInput, 3) * DriveConstants.MAX_ANGULAR_SPEED.in(RadiansPerSecond);
     drive(
-        getVelocityXFromController(),
         getVelocityYFromController(),
+        getVelocityXFromController(),
         rotVelocity,
         fieldRelative,
         true); // drives

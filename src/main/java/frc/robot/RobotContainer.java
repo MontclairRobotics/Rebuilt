@@ -70,10 +70,8 @@ public class RobotContainer {
    */
   public void resetSimulation() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
-
     drivetrain.resetPose(new Pose2d(3, 2, new Rotation2d()));
     SimulatedArena.getInstance().resetFieldForAuto();
-    // AlgaeHandler.getInstance().reset();
   }
 
   /** Updates Simulated Arena; to be called from Robot.simulationPeriodic() */
@@ -85,9 +83,5 @@ public class RobotContainer {
     // See https://www.chiefdelphi.com/t/simulated-robot-goes-through-walls-with-maplesim/508663.
     Logger.recordOutput(
         "FieldSimulation/Pose", new Pose3d(driveSimulation.getSimulatedDriveTrainPose()));
-    Logger.recordOutput(
-        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-    Logger.recordOutput(
-        "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
   }
 }
