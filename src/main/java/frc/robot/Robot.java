@@ -7,6 +7,13 @@
 
 package frc.robot;
 
+import dev.doglog.DogLog;
+import dev.doglog.DogLogOptions;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -22,7 +29,14 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
+
+  private Command autonomousCommand;
+  private RobotContainer robotContainer;
+
   public Robot() {
+
+    robotContainer = new RobotContainer();
+
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -63,13 +77,33 @@ public class Robot extends LoggedRobot {
     Logger.start();
   }
 
+  @Override
+  public void robotInit() {
+    DogLog.setOptions(
+        new DogLogOptions()
+            .withLogExtras(true)
+            .withCaptureDs(true)
+            .withNtPublish(true)
+            .withCaptureNt(true));
+    DogLog.setPdh(new PowerDistribution());
+    if (isSimulation()) {
+      // Do not spam the logs with "Button x on port y not available" log messages.
+      DriverStation.silenceJoystickConnectionWarning(true);
+    }
+  }
   /** This function is called periodically during all modes. */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    if (!RobotBase.isReal()) {
+      robotContainer.resetSimulation();
+    }
+  }
 
   /** This function is called periodically when disabled. */
   @Override
@@ -77,7 +111,14 @@ public class Robot extends LoggedRobot {
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    autonomousCommand = robotContainer.getAutonomousCommand();
+
+    // schedule the autonomous command (example)
+    if (autonomousCommand != null) {
+      autonomousCommand.schedule();
+    }
+  }
 
   /** This function is called periodically during autonomous. */
   @Override
@@ -85,7 +126,11 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
+    }
+  }
 
   /** This function is called periodically during operator control. */
   @Override
@@ -93,7 +138,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when test mode is enabled. */
   @Override
-  public void testInit() {}
+  public void testInit() {
+    CommandScheduler.getInstance().cancelAll();
+  }
 
   /** This function is called periodically during test mode. */
   @Override
@@ -105,5 +152,8 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+    RobotContainer.drivetrain.mapleSimSwerveDrivetrain.update();
+    robotContainer.displaySimFieldToAdvantageScope();
+  }
 }
