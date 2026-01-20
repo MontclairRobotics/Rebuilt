@@ -7,6 +7,11 @@
 
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Pounds;
+
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -29,4 +34,7 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
+  public static final Mass ROBOT_MASS = Pounds.of(135);
+  public static final Distance BUMPER_WIDTH = Inches.of(30);
 }
