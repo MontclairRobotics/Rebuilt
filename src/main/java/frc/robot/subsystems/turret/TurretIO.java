@@ -8,7 +8,7 @@ public interface TurretIO {
   public static class TurretIOInputs {
     public double velocity;
     public double appliedVoltage;
-    public double robotRelativeAngle; //angles are in rotations
+    public double robotRelativeAngle; // angles are in rotations
     public double robotRelativeAngleSetpoint;
     public double fieldRelativeAngle;
     public double fieldRelativeAngleSetpoint;
@@ -21,7 +21,7 @@ public interface TurretIO {
   public double getFieldRelativeAngle();
 
   public boolean atSetpoint();
-  
+
   public double wrapAngleSetpoint(double angle);
 
   public void zeroRelativeEncoder();

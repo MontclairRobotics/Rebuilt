@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.turret.Turret;
+import frc.robot.subsystems.turret.TurretIO;
+import frc.robot.subsystems.turret.TurretIOSim;
 
 public class RobotContainer {
 
@@ -17,12 +20,18 @@ public class RobotContainer {
 
   // Subsystems
   public static CommandSwerveDrivetrain drivetrain;
+  public static Turret turret;
 
   public RobotContainer() {
+    TurretIO turretInput = new TurretIOSim();
+    turret = new Turret(turretInput);
     configureBindings();
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    operatorController.povRight().onTrue(turret.setPositiveVoltageCommand());
+    operatorController.povLeft().onTrue(turret.setPositiveVoltageCommand());
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
