@@ -9,6 +9,7 @@ package frc.robot;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -79,6 +80,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {
+    RobotContainer.drivetrain.resetPose(new Pose2d());
     DogLog.setOptions(
         new DogLogOptions()
             .withLogExtras(true)

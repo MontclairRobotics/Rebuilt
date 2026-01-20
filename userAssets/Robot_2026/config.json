@@ -8,13 +8,13 @@
     },
     {
       "axis": "z",
-      "degrees": -90
+      "degrees": 90
     }
   ],
   "position": [
     0,
     0,
-    0
+    0.1
   ],
   "cameras": [],
   "components": [
