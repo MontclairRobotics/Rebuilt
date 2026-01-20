@@ -9,7 +9,4 @@ public class FlywheelConstants {
 
   public static final double MOMENT_OF_INERTIA = 0;
   public static final double GEARING = 1;
-  public static final double FOWARD = 1;
-  public static final double BACKWARD = -1;
 }
-

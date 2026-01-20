@@ -1,15 +1,15 @@
 package frc.robot.subsystems.flywheel;
 
-import java.util.function.DoubleSupplier;
-
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import frc.robot.constants.FlywheelConstants;
+import java.util.function.DoubleSupplier;
 
 public class FlywheelIOTalonFX implements FlywheelIO {
 
-  private TalonFX motor;
+  public static TalonFX motor;
   private PIDController pidController;
   private SimpleMotorFeedforward motorFeedForward;
 
@@ -27,8 +27,9 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
   public void updateInputs(FlywheelIOInputs inputs) {
     inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
-    inputs.tempCelcius = motor.getDeviceTemp().getValueAsDouble(); //celsius
+    inputs.tempCelcius = motor.getDeviceTemp().getValueAsDouble(); // celsius
     inputs.velocity = motor.getVelocity().getValueAsDouble(); // RPS
+    inputs.velocitySetpoint = pidController.getSetpoint();
   }
 
   public void stop() {
@@ -43,13 +44,18 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     double pidOutput = pidController.calculate(getMotorVelocity(), targetVelocity);
     double ffVolts = motorFeedForward.calculate(targetVelocity);
     double totalOutput = pidOutput + ffVolts;
-    setVoltage(totalOutput);
+    setVoltage(MathUtil.clamp(totalOutput, 12.0, -12.0));
   }
+
+  public boolean atSetPoint() {
+    return pidController.atSetpoint();
+  }
+
   public double getMotorVelocity() {
-    return motor.getVelocity().getValueAsDouble();
+    return motor.getVelocity().getValueAsDouble() / FlywheelConstants.GEARING;
   }
-  
-  public void setVelocityRPS(DoubleSupplier targetVelocitySupplier){
+
+  public void setVelocityRPS(DoubleSupplier targetVelocitySupplier) {
     setVelocityRPS(targetVelocitySupplier.getAsDouble());
   }
 }

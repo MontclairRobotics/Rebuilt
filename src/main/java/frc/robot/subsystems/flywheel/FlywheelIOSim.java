@@ -1,7 +1,6 @@
 package frc.robot.subsystems.flywheel;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -10,6 +9,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.constants.FlywheelConstants;
+import java.util.function.DoubleSupplier;
 
 public class FlywheelIOSim implements FlywheelIO {
   private PIDController pidController;
@@ -37,8 +37,9 @@ public class FlywheelIOSim implements FlywheelIO {
 
   public void updateInputs(FlywheelIOInputs inputs) {
     inputs.appliedVoltage = sim.getInputVoltage();
-    inputs.velocity = sim.getAngularVelocityRadPerSec();
-    inputs.tempCelcius = 0; //TODO: maybe figure out how to do this?
+    inputs.velocity = (sim.getAngularVelocityRadPerSec()/2*Math.PI);
+    inputs.tempCelcius = 0; // TODO: maybe figure out how to do this?
+     inputs.velocitySetpoint = pidController.getSetpoint();
   }
 
   @Override
@@ -51,13 +52,20 @@ public class FlywheelIOSim implements FlywheelIO {
   }
 
   public void setVelocityRPS(double targetVelocity) {
-      double pidOutput = pidController.calculate((sim.getAngularVelocity()).in(RotationsPerSecond), targetVelocity); //converted radians/sec->rotations.sec
-      double ffVolts = motorFeedForward.calculate(targetVelocity);
-      double totalOutput = pidOutput + ffVolts;
-      sim.setInputVoltage(MathUtil.clamp(totalOutput, -12.0, 12.0));
+    double pidOutput =
+        pidController.calculate(
+            (sim.getAngularVelocity()).in(RotationsPerSecond),
+            targetVelocity); // converted radians/sec->rotations.sec
+    double ffVolts = motorFeedForward.calculate(targetVelocity);
+    double totalOutput = pidOutput + ffVolts;
+    sim.setInputVoltage(MathUtil.clamp(totalOutput, -12.0, 12.0));
   }
 
-  public void setVelocityRPS(DoubleSupplier targetVelocitySupplier){
+  public void setVelocityRPS(DoubleSupplier targetVelocitySupplier) {
     setVelocityRPS(targetVelocitySupplier.getAsDouble());
+  }
+
+  public boolean atSetPoint(){
+    return pidController.atSetpoint();
   }
 }
