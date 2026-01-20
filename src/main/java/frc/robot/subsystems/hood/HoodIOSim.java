@@ -28,10 +28,12 @@ public class HoodIOSim implements HoodIO {
   public HoodIOSim() {
     motor = DCMotor.getKrakenX44(1);
 
-    pidController = new PIDController(0, 0, 0);
-    feedforward = new ArmFeedforward(0, 0, 0);
+    pidController = new PIDController(HoodConstants.kP, HoodConstants.kI, HoodConstants.kD);
+    feedforward = new ArmFeedforward(HoodConstants.kS, HoodConstants.kG, HoodConstants.kV);
 
-    realEncoder = new DutyCycleEncoder(5, 1, HoodConstants.HOOD_ENCODER_OFFSET.in(Rotations));
+    realEncoder =
+        new DutyCycleEncoder(
+            HoodConstants.ENCODER_PORT, 1, HoodConstants.HOOD_ENCODER_OFFSET.in(Rotations));
     encoder = new DutyCycleEncoderSim(realEncoder);
     encoder.setConnected(true);
 
@@ -63,14 +65,10 @@ public class HoodIOSim implements HoodIO {
 
   @Override
   public void setVoltage(double voltage) {
+    appliedVoltage = voltage;
     sim.setInputVoltage(voltage);
     encoder.set(Radians.of(sim.getAngleRads()).in(Rotations));
   }
-
-  // @Override
-  // public double getAngle() {
-  // 	// return motor.getPosition().getValueAsDouble();
-  // }
 
   @Override
   public void setAngle(double goal) {

@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import frc.robot.constants.HoodConstants;
 import java.util.function.DoubleSupplier;
 
 public class HoodIOTalonFX implements HoodIO {
@@ -15,9 +16,9 @@ public class HoodIOTalonFX implements HoodIO {
   public ArmFeedforward feedforward;
 
   public HoodIOTalonFX() {
-    motor = new TalonFX(0);
-    pidController = new PIDController(0, 0, 0);
-    feedforward = new ArmFeedforward(0, 0, 0);
+    motor = new TalonFX(HoodConstants.CAN_ID);
+    pidController = new PIDController(HoodConstants.kP, HoodConstants.kI, HoodConstants.kD);
+    feedforward = new ArmFeedforward(HoodConstants.kS, HoodConstants.kG, HoodConstants.kV);
   }
 
   @Override
@@ -36,7 +37,7 @@ public class HoodIOTalonFX implements HoodIO {
 
   @Override
   public double getAngle() {
-    return motor.getPosition().getValueAsDouble();
+    return motor.getPosition().getValueAsDouble() / HoodConstants.GEAR_RATIO;
   }
 
   @Override

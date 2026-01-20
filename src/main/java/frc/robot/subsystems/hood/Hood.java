@@ -5,70 +5,47 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.hood.HoodIO.HoodIOInputs;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
 
 public class Hood extends SubsystemBase {
   private HoodIO io;
-  private HoodIOInputs inputs;
+  private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 
-  public Hood(HoodIO hoodIO, HoodIOInputs hoodIOInputs) {
+  public Hood(HoodIO hoodIO) {
     this.io = hoodIO;
-    this.inputs = hoodIOInputs;
   }
 
   public void periodic() {
     io.updateInputs(inputs);
-    // Logger.processInputs("Hood", inputs);
+    Logger.processInputs("Hood", inputs);
   }
 
-  public void setVoltage(double voltage) {
+  public void applyJoystickInput() {
+    double voltage =
+        Math.pow(MathUtil.applyDeadband(RobotContainer.operatorController.getRightY(), 0.04), 3)
+            * 12;
+    // Getting the y value of the joystick and then applies a deadban to ensure the value isn't too
+    // high.
+    // It's cubed to make the controls smoother, and it's multiplied by 12 to convnert to voltage
+    // for our 12v battery
     io.setVoltage(voltage);
   }
 
-  /** Gets the angle in Rotations from the relative encoder */
-  public double getAngle() {
-    return io.getAngle();
-  }
-
-  public void setAngle(double goal) {
-    io.setAngle(goal);
-  }
-
-  public void setAngle(DoubleSupplier goalSupplier) {
-    io.setAngle(goalSupplier);
-  }
-
-  public void stop() {
-    io.stop();
-  }
-
-  public boolean atSetpoint() {
-    return io.atSetpoint();
-  }
-
-  public void doJoystickControls() {
-    double voltage =
-        Math.pow(MathUtil.applyDeadband(RobotContainer.operatorController.getRightY(), 0.04), 3);
-    voltage = MathUtil.clamp(voltage, -1, 1); // TODO: Use real clamp values -1, 1 is temporary
-    // Maybe do feedforward?
-    this.setVoltage(voltage);
-  }
-
-  public void angleToHub() { // Sets the angle to whatever gets us to score in the outpost
+  public void angleToHub() { // Sets the angle to whatever gets us to score in the hub
     // TODO: Use vision stuffs later to accomplish this task
 
   }
 
   public Command setAngleCommand(DoubleSupplier supplier) {
-    return Commands.run(() -> setAngle(supplier), this);
+    return Commands.run(() -> io.setAngle(supplier), this);
   }
 
   public Command setAngleCommand(double angle) {
-    return Commands.run(() -> setAngle(angle), this).until(() -> atSetpoint());
+    return Commands.run(() -> io.setAngle(angle), this).until(() -> io.atSetpoint());
   }
 
   public Command joystickCommand() {
-    return Commands.run(this::doJoystickControls, this);
+    return Commands.run(this::applyJoystickInput, this);
   }
 }
