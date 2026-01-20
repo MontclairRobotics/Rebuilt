@@ -28,17 +28,18 @@ public class Intake extends SubsystemBase {
   public void periodic() {
    io.updateInputs(inputs);
    Logger.processInputs("Intake", inputs);
-
-   
-    
   }
 
   // --------------------------COMMANDS--------------------------
 
+  //TODO: intake class for SparkMax?
+
+  //stop all commands
   public Command stopCommands() {
     return Commands.runOnce(() -> io.stop(), this);
   }
 
+  //power intake
   public Command intakeCommand() {
     return Commands.run(() -> io.set(
       IntakeConstants.INTAKE_FUEL_SPEED), 
@@ -47,24 +48,24 @@ public class Intake extends SubsystemBase {
     }); 
   }
 
+  //used for unjamming
   public Command outtakeCommand() {
     return Commands.run(() -> io.set(
       IntakeConstants.OUTTAKE_FUEL_SPEED), 
       this);
   }
 
+  //unjam command
   public Command unjamCommand() {
-    return Commands.run(() -> io.set(IntakeConstants.INTAKE_FUEL_SPEED), this)
-      .until(this::isStalled)
-      .andThen(
-        Commands.sequence(
-          Commands.run(() -> io.set(-0.1), this)
-              .withTimeout(0.1)
-              .andThen(intakeCommand())))
-              .andThen(
-          Commands.sequence(
-            Commands.run(() -> io.set(-0.1), this)
-              .withTimeout(0.1)
-              .andThen(outtakeCommand())));
+    return Commands.run(() -> io.set(IntakeConstants.INTAKE_FUEL_SPEED), 
+    this
+    )
+    .until(this::isStalled)
+    .withTimeout(1.0)
+    .andThen(
+        Commands.run(() -> io.set(-0.1), this)
+          .withTimeout(0.1)
+    )
+    .andThen(intakeCommand());
   }
 }

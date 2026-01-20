@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import frc.robot.constants.Constants.IntakeConstants;
 
 public class IntakeIOTalonFX implements IntakeIO {
   private TalonFX motor;
@@ -10,11 +11,12 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   public IntakeIOTalonFX() {
     // define motor
-    motor = new TalonFX(0);
+    motor = new TalonFX(IntakeConstants.MOTOR_ID);
 
     // define config
     config = new TalonFXConfiguration();
 
+    //motor setup and inverted setting
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     motor.getConfigurator().apply(config);
   }
