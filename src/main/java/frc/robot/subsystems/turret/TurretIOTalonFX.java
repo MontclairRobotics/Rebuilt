@@ -7,63 +7,70 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.RobotContainer;
 import frc.robot.constants.TurretConstants;
+
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static frc.robot.constants.TurretConstants.*;
 import java.util.function.DoubleSupplier;
 
 public class TurretIOTalonFX implements TurretIO {
 
-  private TalonFX motor;
-  private MotionMagicVoltage mm_req;
+    private TalonFX motor;
+    private MotionMagicVoltage mm_req;
+	private double robotRelativeSetpoint;
+	private double fieldRelativeSetpoint;
+    public TurretIOTalonFX() {
 
-  public TurretIOTalonFX() {
-    motor = new TalonFX(TurretConstants.CAN_ID);
-    TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
-    Slot0Configs slot0Configs = talonFXConfigs.Slot0;
+		robotRelativeSetpoint = 0;
+		fieldRelativeSetpoint = 0;
 
-    slot0Configs.kS = 0.25; //TODO: UPDATE THESE AND MAKE CONSTANTS PROBABLY
-    slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
-    slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
-    slot0Configs.kP = 4.8; // A position error of 2.5 rotations results in 12 V output
-    slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
+		motor = new TalonFX(CAN_ID);
+		TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
+		Slot0Configs slot0Configs = talonFXConfigs.Slot0;
 
-    mm_req = new MotionMagicVoltage(0);
+		slot0Configs.kS = TALON_KS;
+		slot0Configs.kV = TALON_KV;
+		slot0Configs.kA = TALON_KA;
+		slot0Configs.kP = TALON_KP;
+		slot0Configs.kI = TALON_KI;
+		slot0Configs.kD = TALON_KD;
 
-    MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
-    motionMagicConfigs.MotionMagicCruiseVelocity = 4; // Target cruise velocity of 80 rps
-    motionMagicConfigs.MotionMagicAcceleration =
-        16; // Target acceleration of 160 rps/s (0.5 seconds)
-    motionMagicConfigs.MotionMagicJerk = 160; // Target jerk of 1600 rps/s/s (0.1 seconds)
-    motor.getConfigurator().apply(talonFXConfigs);
+		mm_req = new MotionMagicVoltage(0);
+
+		MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
+		motionMagicConfigs.MotionMagicCruiseVelocity = TURRET_CRUISE_VELOCITY.in(RotationsPerSecond)*GEAR_RATIO;
+		motionMagicConfigs.MotionMagicAcceleration = TURRET_ACCELERATION.in(RotationsPerSecondPerSecond)*GEAR_RATIO; 
+		motionMagicConfigs.MotionMagicJerk = TURRET_JERK*GEAR_RATIO;
+		motor.getConfigurator().apply(talonFXConfigs);
   }
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
     inputs.velocity = motor.getVelocity().getValueAsDouble(); // rps
     inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
+    inputs.robotRelativeAngle = getRobotRelativeAngle();
+    inputs.robotRelativeAngleSetpoint = robotRelativeSetpoint;
+    inputs.fieldRelativeAngle = getFieldRelativeAngle();
+    inputs.fieldRelativeAngleSetpoint = fieldRelativeSetpoint;
   }
 
   @Override
   public void setRobotRelativeAngle(double angle) {
-    double adjustedAngle;
-
-    if (angle > 1) {
-      angle -= 1;
-    } else if (angle < 0) {
-      angle += 1;
-    }
-
-    adjustedAngle = angle * TurretConstants.GEAR_RATIO; // converts to motor output shaft rotations
-    motor.setControl(mm_req.withPosition(angle).withSlot(0).withEnableFOC(false));
+	robotRelativeSetpoint = angle;
+     // converts to motor output shaft rotations and makes request to motion magic for a new setpoint.
+    motor.setControl(mm_req.withPosition(wrapAngleSetpoint(angle)*GEAR_RATIO).withSlot(0).withEnableFOC(false));
   }
 
   @Override
   public double getRobotRelativeAngle() {
-    return motor.getRotorPosition().getValueAsDouble() / TurretConstants.GEAR_RATIO;
+    return motor.getRotorPosition().getValue().in(Rotations) / GEAR_RATIO;
   }
 
   @Override
   public void zeroRelativeEncoder() {
-    motor.setPosition(0); // TODO: check if this is the right function
+    motor.setPosition(0);
   }
 
   @Override
@@ -83,12 +90,34 @@ public class TurretIOTalonFX implements TurretIO {
 
   @Override
   public void setFieldRelativeAngle(double angle) {
-    double robotRelativeAngle = angle - RobotContainer.drivetrain.odometryHeading.getRotations();
-    setRobotRelativeAngle(robotRelativeAngle);
+	fieldRelativeSetpoint = angle;
+    double robotRelativeAngleSetpoint = angle - RobotContainer.drivetrain.odometryHeading.getRotations();
+    setRobotRelativeAngle(robotRelativeAngleSetpoint);
   }
 
   @Override
   public void setFieldRelativeAngle(DoubleSupplier supplier) {
     setFieldRelativeAngle(supplier.getAsDouble());
   }
+
+  @Override
+  public double getFieldRelativeAngle() {
+    return getRobotRelativeAngle()+RobotContainer.drivetrain.odometryHeading.getRotations();
+  }
+
+  @Override
+  public boolean atSetpoint() {
+    return Math.abs(getRobotRelativeAngle() - mm_req.getPositionMeasure().in(Rotations)) < ANGLE_TOLERANCE.in(Rotations);
+  }
+
+  @Override
+  public double wrapAngleSetpoint(double angle) {
+		if(angle>MAX_ANGLE.in(Rotations)) {
+			return angle-1;
+		}else if(angle<0){
+			return angle+1;
+		}else {
+			return angle;
+		}
+	}
 }
