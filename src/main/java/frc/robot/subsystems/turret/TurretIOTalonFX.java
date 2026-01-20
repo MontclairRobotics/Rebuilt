@@ -107,7 +107,7 @@ public class TurretIOTalonFX implements TurretIO {
 
   @Override
   public boolean atSetpoint() {
-    return Math.abs(getRobotRelativeAngle() - mm_req.getPositionMeasure().in(Rotations)) < ANGLE_TOLERANCE.in(Rotations);
+    return Math.abs(getRobotRelativeAngle() - mm_req.getPositionMeasure().in(Rotations)/GEAR_RATIO) < ANGLE_TOLERANCE.in(Rotations);
   }
 
   @Override

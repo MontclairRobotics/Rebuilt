@@ -21,7 +21,7 @@ public class Turret extends SubsystemBase {
     this.io = io;
   }
   public Command stopCommand(){
-    return Commands.runOnce(()->{io.stop();});
+    return Commands.runOnce(() -> io.stop());
   }
   public Command setRobotRelativeAngleCommand(double target){
     return Commands.run(() -> io.setRobotRelativeAngle(target), this).until(() -> io.atSetpoint());

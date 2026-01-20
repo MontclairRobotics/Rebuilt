@@ -1,6 +1,8 @@
 package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -24,8 +26,8 @@ public class TurretConstants {
     public static final double TALON_KP = 0;
     public static final double TALON_KI = 0;
     public static final double TALON_KD = 0;
-    public static final AngularVelocity TURRET_CRUISE_VELOCITY = new ImmutableAngularVelocity(0, 0, null); // target cruise velocity of the turret, 4 rps
-    public static final AngularAcceleration TURRET_ACCELERATION = new ImmutableAngularAcceleration(0,0,null);// target acceleration of the turret, 16 rps^2
-    public static final double TURRET_JERK = 0; // target jerk of the turret, _160 rps^3 -> there's no AngularJerk sadly
-    public static final Angle ANGLE_TOLERANCE = Rotations.of(0.1);
+    public static final AngularVelocity TURRET_CRUISE_VELOCITY = RotationsPerSecond.of(4); // target cruise velocity of the turret, 4 rps
+    public static final AngularAcceleration TURRET_ACCELERATION = RotationsPerSecondPerSecond.of(16);// target acceleration of the turret, 16 rps^2
+    public static final double TURRET_JERK = 160; // target jerk of the turret, _160 rps^3 -> there's no AngularJerk sadly
+    public static final Angle ANGLE_TOLERANCE = Rotations.of(0.001);
 }
