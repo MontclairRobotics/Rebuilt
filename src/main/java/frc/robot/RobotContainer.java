@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.turret.Turret;
+import frc.robot.subsystems.turret.TurretIOSim;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import org.ironmaple.simulation.SimulatedArena;
@@ -32,9 +34,11 @@ public class RobotContainer {
 
   // Subsystems
   public static CommandSwerveDrivetrain drivetrain;
+  public static Turret turret;
 
   public RobotContainer() {
-
+    TurretIOSim turretIO = new TurretIOSim();
+    ;
     switch (Constants.currentMode) {
       case REAL:
         drivetrain = TunerConstants.createDrivetrain();
@@ -44,18 +48,18 @@ public class RobotContainer {
       case SIM:
         drivetrain = TunerConstants.createDrivetrain();
         driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
-
         break;
 
       default:
     }
-
+    turret = new Turret(turretIO);
     configureBindings();
   }
 
   private void configureBindings() {
     drivetrain.setDefaultCommand(drivetrain.driveJoystickInputCommand());
     drivetrain.registerTelemetry(logger::telemeterize);
+    operatorController.cross().onTrue(turret.setPositiveVoltageCommand());
   }
 
   public Command getAutonomousCommand() {
