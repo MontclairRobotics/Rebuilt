@@ -37,9 +37,9 @@ public class FlywheelIOSim implements FlywheelIO {
 
   public void updateInputs(FlywheelIOInputs inputs) {
     inputs.appliedVoltage = sim.getInputVoltage();
-    inputs.velocity = (sim.getAngularVelocityRadPerSec()/2*Math.PI);
+    inputs.velocity = (sim.getAngularVelocityRadPerSec() / 2 * Math.PI);
     inputs.tempCelcius = 0; // TODO: maybe figure out how to do this?
-     inputs.velocitySetpoint = pidController.getSetpoint();
+    inputs.velocitySetpoint = pidController.getSetpoint();
   }
 
   @Override
@@ -65,7 +65,7 @@ public class FlywheelIOSim implements FlywheelIO {
     setVelocityRPS(targetVelocitySupplier.getAsDouble());
   }
 
-  public boolean atSetPoint(){
+  public boolean atSetPoint() {
     return pidController.atSetpoint();
   }
 }
