@@ -9,6 +9,7 @@ import frc.robot.subsystems.turret.TurretIO.TurretIOInputs;
 import org.littletonrobotics.junction.Logger;
 
 public class TurretVisualization {
+  static int number = 0;
   public Pose2d turretPose;
 
   public void update(TurretIOInputs inputs) {
@@ -16,6 +17,8 @@ public class TurretVisualization {
   }
 
   public void log() {
+    Logger.recordOutput("Turret/turret_internal", "turret logging" + number);
+    number++;
     Logger.recordOutput(
         "Turret/TurretPose",
         new Pose3d(

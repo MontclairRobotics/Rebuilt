@@ -34,6 +34,7 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public void updateInputs(TurretIOInputs input) {
+    sim.update(0.02);
     input.velocity = sim.getVelocityRadPerSec() / (2 * Math.PI);
     input.appliedVoltage = appliedVoltage;
     input.robotRelativeAngle = getRobotRelativeAngle();

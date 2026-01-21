@@ -17,6 +17,7 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretIOSim;
+import frc.robot.subsystems.turret.TurretIOTalonFX;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import org.ironmaple.simulation.SimulatedArena;
@@ -37,22 +38,21 @@ public class RobotContainer {
   public static Turret turret;
 
   public RobotContainer() {
-    TurretIOSim turretIO = new TurretIOSim();
-    ;
+
     switch (Constants.currentMode) {
       case REAL:
         drivetrain = TunerConstants.createDrivetrain();
-
+        turret = new Turret(new TurretIOTalonFX());
         break;
 
       case SIM:
         drivetrain = TunerConstants.createDrivetrain();
         driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
+        turret = new Turret(new TurretIOSim());
         break;
 
       default:
     }
-    turret = new Turret(turretIO);
     configureBindings();
   }
 
@@ -60,6 +60,7 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(drivetrain.driveJoystickInputCommand());
     drivetrain.registerTelemetry(logger::telemeterize);
     operatorController.cross().onTrue(turret.setPositiveVoltageCommand());
+    operatorController.square().onTrue(turret.setNegativeVoltageCommand());
   }
 
   public Command getAutonomousCommand() {

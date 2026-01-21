@@ -19,6 +19,7 @@ public class Turret extends SubsystemBase {
   private TurretVisualization turretVisualization;
 
   public Turret(TurretIO io) {
+    Logger.recordOutput("Turret/turret_internal", "turret initialized");
     this.io = io;
     turretVisualization = new TurretVisualization();
   }
@@ -44,7 +45,8 @@ public class Turret extends SubsystemBase {
   }
 
   public Command setPositiveVoltageCommand() {
-    return Commands.run(() -> io.setVoltage(2));
+    Logger.recordOutput("Turret/turret_internal", "voltage command posted");
+    return Commands.run(() -> io.setVoltage(70));
   }
 
   public Command setNegativeVoltageCommand() {
