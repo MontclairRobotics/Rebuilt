@@ -15,6 +15,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.spindexer.Spindexer;
+import frc.robot.subsystems.spindexer.SpindexerIOSim;
+import frc.robot.subsystems.spindexer.SpindexerIOTalonFX;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import org.ironmaple.simulation.SimulatedArena;
@@ -32,16 +35,19 @@ public class RobotContainer {
 
   // Subsystems
   public static CommandSwerveDrivetrain drivetrain;
+  public static Spindexer spindexer;
 
   public RobotContainer() {
 
     switch (Constants.currentMode) {
       case REAL:
+        spindexer = new Spindexer(new SpindexerIOTalonFX());
         drivetrain = TunerConstants.createDrivetrain();
-
+        
         break;
 
       case SIM:
+        spindexer = new Spindexer(new SpindexerIOSim());
         drivetrain = TunerConstants.createDrivetrain();
         driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 
