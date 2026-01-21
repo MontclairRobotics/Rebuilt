@@ -49,425 +49,422 @@ import org.littletonrobotics.junction.Logger;
 
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
 
-	private static final double kSimLoopPeriod = 0.002; // 2 ms
-	private Notifier m_simNotifier = null;
+  private static final double kSimLoopPeriod = 0.002; // 2 ms
+  private Notifier m_simNotifier = null;
 
-	/* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
-	private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
-	/* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
-	private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
-	/* Keep track if we've ever applied the operator perspective before or not */
-	private boolean m_hasAppliedOperatorPerspective = false;
+  /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
+  private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
+  /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
+  private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
+  /* Keep track if we've ever applied the operator perspective before or not */
+  private boolean m_hasAppliedOperatorPerspective = false;
 
-	/** Swerve request to apply during robot-centric path following */
-	private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds =
-		new SwerveRequest.ApplyRobotSpeeds();
+  /** Swerve request to apply during robot-centric path following */
+  private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds =
+      new SwerveRequest.ApplyRobotSpeeds();
 
-	/* Swerve requests to apply during SysId characterization */
-	private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization =
-		new SwerveRequest.SysIdSwerveTranslation();
-	private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization =
-		new SwerveRequest.SysIdSwerveSteerGains();
-	private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization =
-		new SwerveRequest.SysIdSwerveRotation();
+  /* Swerve requests to apply during SysId characterization */
+  private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization =
+      new SwerveRequest.SysIdSwerveTranslation();
+  private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization =
+      new SwerveRequest.SysIdSwerveSteerGains();
+  private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization =
+      new SwerveRequest.SysIdSwerveRotation();
 
-	/* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
-	private final SysIdRoutine m_sysIdRoutineTranslation =
-		new SysIdRoutine(
-			new SysIdRoutine.Config(
-				null, // Use default ramp rate (1 V/s)
-				Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent brownout
-				null, // Use default timeout (10 s)
-				// Log state with SignalLogger class
-				state -> SignalLogger.writeString("SysIdTranslation_State", state.toString())),
-			new SysIdRoutine.Mechanism(
-				output -> setControl(m_translationCharacterization.withVolts(output)), null, this));
+  /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
+  private final SysIdRoutine m_sysIdRoutineTranslation =
+      new SysIdRoutine(
+          new SysIdRoutine.Config(
+              null, // Use default ramp rate (1 V/s)
+              Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent brownout
+              null, // Use default timeout (10 s)
+              // Log state with SignalLogger class
+              state -> SignalLogger.writeString("SysIdTranslation_State", state.toString())),
+          new SysIdRoutine.Mechanism(
+              output -> setControl(m_translationCharacterization.withVolts(output)), null, this));
 
-	/* SysId routine for characterizing steer. This is used to find PID gains for the steer motors. */
-	private final SysIdRoutine m_sysIdRoutineSteer =
-		new SysIdRoutine(
-			new SysIdRoutine.Config(
-				null, // Use default ramp rate (1 V/s)
-				Volts.of(7), // Use dynamic voltage of 7 V
-				null, // Use default timeout (10 s)
-				// Log state with SignalLogger class
-				state -> SignalLogger.writeString("SysIdSteer_State", state.toString())),
-			new SysIdRoutine.Mechanism(
-				volts -> setControl(m_steerCharacterization.withVolts(volts)), null, this));
+  /* SysId routine for characterizing steer. This is used to find PID gains for the steer motors. */
+  private final SysIdRoutine m_sysIdRoutineSteer =
+      new SysIdRoutine(
+          new SysIdRoutine.Config(
+              null, // Use default ramp rate (1 V/s)
+              Volts.of(7), // Use dynamic voltage of 7 V
+              null, // Use default timeout (10 s)
+              // Log state with SignalLogger class
+              state -> SignalLogger.writeString("SysIdSteer_State", state.toString())),
+          new SysIdRoutine.Mechanism(
+              volts -> setControl(m_steerCharacterization.withVolts(volts)), null, this));
 
-	/*
-	* SysId routine for characterizing rotation.
-	* This is used to find PID gains for the FieldCentricFacingAngle HeadingController.
-	* See the documentation of SwerveRequest.SysIdSwerveRotation for info on importing the log to SysId.
-	*/
-	private final SysIdRoutine m_sysIdRoutineRotation =
-		new SysIdRoutine(
-			new SysIdRoutine.Config(
-				/* This is in radians per second², but SysId only supports "volts per second" */
-				Volts.of(Math.PI / 6).per(Second),
-				/* This is in radians per second, but SysId only supports "volts" */
-				Volts.of(Math.PI),
-				null, // Use default timeout (10 s)
-				// Log state with SignalLogger class
-				state -> SignalLogger.writeString("SysIdRotation_State", state.toString())
-			),
-			new SysIdRoutine.Mechanism(
-				output -> {
-					/* output is actually radians per second, but SysId only supports "volts" */
-					setControl(m_rotationCharacterization.withRotationalRate(output.in(Volts)));
-					/* also log the requested output for SysId */
-					SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
-				},
-				null,
-				this
-			)	
-		);
+  /*
+   * SysId routine for characterizing rotation.
+   * This is used to find PID gains for the FieldCentricFacingAngle HeadingController.
+   * See the documentation of SwerveRequest.SysIdSwerveRotation for info on importing the log to SysId.
+   */
+  private final SysIdRoutine m_sysIdRoutineRotation =
+      new SysIdRoutine(
+          new SysIdRoutine.Config(
+              /* This is in radians per second², but SysId only supports "volts per second" */
+              Volts.of(Math.PI / 6).per(Second),
+              /* This is in radians per second, but SysId only supports "volts" */
+              Volts.of(Math.PI),
+              null, // Use default timeout (10 s)
+              // Log state with SignalLogger class
+              state -> SignalLogger.writeString("SysIdRotation_State", state.toString())),
+          new SysIdRoutine.Mechanism(
+              output -> {
+                /* output is actually radians per second, but SysId only supports "volts" */
+                setControl(m_rotationCharacterization.withRotationalRate(output.in(Volts)));
+                /* also log the requested output for SysId */
+                SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
+              },
+              null,
+              this));
 
-	/* The SysId routine to test */
-	private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
+  /* The SysId routine to test */
+  private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
 
-	public AprilTagFieldLayout tagLayout =
-		AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded); // TODO: SET
+  public AprilTagFieldLayout tagLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded); // TODO: SET
 
-	/* Heading PID Controller for things like automatic alignment buttons */
-	public PIDController thetaController = new PIDController(5, 0, 0.1);
+  /* Heading PID Controller for things like automatic alignment buttons */
+  public PIDController thetaController = new PIDController(5, 0, 0.1);
 
-	/* variable to store our heading */
-	public Rotation2d odometryHeading = new Rotation2d();
+  /* variable to store our heading */
+  public Rotation2d odometryHeading = new Rotation2d();
 
-	private boolean isRobotAtAngleSetPoint; // for angle turning
-	private boolean fieldRelative;
+  private boolean isRobotAtAngleSetPoint; // for angle turning
+  private boolean fieldRelative;
 
-	public RobotConfig config;
+  public RobotConfig config;
 
-	/**
-	 * Constructs a CTRE SwerveDrivetrain using the specified constants.
-	 *
-	 * <p>This constructs the underlying hardware devices, so users should not construct the devices
-	 * themselves. If they need the devices, they can access them through getters in the classes.
-	 *
-	 * @param drivetrainConstants Drivetrain-wide constants for the swerve drive
-	 * @param odometryUpdateFrequency The frequency to run the odometry loop. If unspecified or set to
-	 *     0 Hz, this is 250 Hz on CAN FD, and 100 Hz on CAN 2.0.
-	 * @param odometryStandardDeviation The standard deviation for odometry calculation in the form
-	 *     [x, y, theta]ᵀ, with units in meters and radians
-	 * @param visionStandardDeviation The standard deviation for vision calculation in the form [x, y,
-	 *     theta]ᵀ, with units in meters and radians
-	 * @param modules Constants for each specific module
-	 */
-	public CommandSwerveDrivetrain(
-		SwerveDrivetrainConstants drivetrainConstants,
-		double odometryUpdateFrequency,
-		Matrix<N3, N1> odometryStandardDeviation,
-		Matrix<N3, N1> visionStandardDeviation,
-		SwerveModuleConstants<?, ?, ?>... modules) {
-		
-		super(
-			drivetrainConstants,
-			odometryUpdateFrequency,
-			odometryStandardDeviation,
-			visionStandardDeviation,
-			Constants.currentMode == Constants.Mode.SIM ? MapleSimSwerveDrivetrain.regulateModuleConstantsForSimulation(modules) : modules
-		);
+  /**
+   * Constructs a CTRE SwerveDrivetrain using the specified constants.
+   *
+   * <p>This constructs the underlying hardware devices, so users should not construct the devices
+   * themselves. If they need the devices, they can access them through getters in the classes.
+   *
+   * @param drivetrainConstants Drivetrain-wide constants for the swerve drive
+   * @param odometryUpdateFrequency The frequency to run the odometry loop. If unspecified or set to
+   *     0 Hz, this is 250 Hz on CAN FD, and 100 Hz on CAN 2.0.
+   * @param odometryStandardDeviation The standard deviation for odometry calculation in the form
+   *     [x, y, theta]ᵀ, with units in meters and radians
+   * @param visionStandardDeviation The standard deviation for vision calculation in the form [x, y,
+   *     theta]ᵀ, with units in meters and radians
+   * @param modules Constants for each specific module
+   */
+  public CommandSwerveDrivetrain(
+      SwerveDrivetrainConstants drivetrainConstants,
+      double odometryUpdateFrequency,
+      Matrix<N3, N1> odometryStandardDeviation,
+      Matrix<N3, N1> visionStandardDeviation,
+      SwerveModuleConstants<?, ?, ?>... modules) {
 
-		odometryHeading = Rotation2d.fromRotations(0);
+    super(
+        drivetrainConstants,
+        odometryUpdateFrequency,
+        odometryStandardDeviation,
+        visionStandardDeviation,
+        Constants.currentMode == Constants.Mode.SIM
+            ? MapleSimSwerveDrivetrain.regulateModuleConstantsForSimulation(modules)
+            : modules);
 
-		if (Utils.isSimulation()) {
-			startSimThread();
-		}
+    odometryHeading = Rotation2d.fromRotations(0);
 
-		try {
-			config = RobotConfig.fromGUISettings();
-		} catch (Exception e) {}
+    if (Utils.isSimulation()) {
+      startSimThread();
+    }
 
-		tagLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
-		fieldRelative = true;
-		configureAutoBuilder();
-		
-		thetaController.setTolerance(Degrees.of(1).in(Radians));
-		thetaController.enableContinuousInput(-Math.PI, Math.PI);
-	}
+    try {
+      config = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+    }
 
-	private void configureAutoBuilder() {
-		try {
-		var config = RobotConfig.fromGUISettings();
-		AutoBuilder.configure(
-			() -> getState().Pose, // Supplier of current robot pose
-			this::resetPose, // Consumer for seeding pose against auto
-			() -> getState().Speeds, // Supplier of current robot speeds
-			// Consumer of ChassisSpeeds and feedforwards to drive the robot
-			(speeds, feedforwards) ->
-				setControl(
-					m_pathApplyRobotSpeeds
-						.withSpeeds(speeds)
-						.withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-						.withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-			new PPHolonomicDriveController(
-				// PID constants for translation
-				new PIDConstants(10, 0, 0),
-				// PID constants for rotation
-				new PIDConstants(7, 0, 0)),
-			config,
-			// Assume the path needs to be flipped for Red vs Blue, this is normally the case
-			() -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-			this // Subsystem for requirements
-			);
-		} catch (Exception ex) {
-		DriverStation.reportError(
-			"Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
-		}
-	}
+    tagLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+    fieldRelative = true;
+    configureAutoBuilder();
 
-	public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
-		return run(() -> this.setControl(requestSupplier.get()));
-	}
+    thetaController.setTolerance(Degrees.of(1).in(Radians));
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+  }
 
-	public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-		return m_sysIdRoutineToApply.quasistatic(direction);
-	}
+  private void configureAutoBuilder() {
+    try {
+      var config = RobotConfig.fromGUISettings();
+      AutoBuilder.configure(
+          () -> getState().Pose, // Supplier of current robot pose
+          this::resetPose, // Consumer for seeding pose against auto
+          () -> getState().Speeds, // Supplier of current robot speeds
+          // Consumer of ChassisSpeeds and feedforwards to drive the robot
+          (speeds, feedforwards) ->
+              setControl(
+                  m_pathApplyRobotSpeeds
+                      .withSpeeds(speeds)
+                      .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                      .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
+          new PPHolonomicDriveController(
+              // PID constants for translation
+              new PIDConstants(10, 0, 0),
+              // PID constants for rotation
+              new PIDConstants(7, 0, 0)),
+          config,
+          // Assume the path needs to be flipped for Red vs Blue, this is normally the case
+          () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+          this // Subsystem for requirements
+          );
+    } catch (Exception ex) {
+      DriverStation.reportError(
+          "Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
+    }
+  }
 
-	public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-		return m_sysIdRoutineToApply.dynamic(direction);
-	}
+  public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
+    return run(() -> this.setControl(requestSupplier.get()));
+  }
 
-	public static Rotation2d wrapAngle(Rotation2d ang) {
-		double angle = ang.getDegrees();
-		angle = (angle + 180) % 360; // Step 1 and 2
-		if (angle < 0) {
-		angle += 360; // Make sure it's positive
-		}
-		return Rotation2d.fromDegrees(angle - 180); // Step 3
-	}
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutineToApply.quasistatic(direction);
+  }
 
-	public Rotation2d getWrappedHeading() {
-		return wrapAngle(odometryHeading);
-	}
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutineToApply.dynamic(direction);
+  }
 
-	public double getVelocityXFromController() {
-		double xInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.06);
-		return Math.pow(xInput, 3) * MAX_SPEED.in(MetersPerSecond);
-	}
+  public static Rotation2d wrapAngle(Rotation2d ang) {
+    double angle = ang.getDegrees();
+    angle = (angle + 180) % 360; // Step 1 and 2
+    if (angle < 0) {
+      angle += 360; // Make sure it's positive
+    }
+    return Rotation2d.fromDegrees(angle - 180); // Step 3
+  }
 
-	public double getVelocityYFromController() {
-		double yInput = MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.06);
-		return Math.pow(yInput, 3) * MAX_SPEED.in(MetersPerSecond);
-	}
+  public Rotation2d getWrappedHeading() {
+    return wrapAngle(odometryHeading);
+  }
 
-	public void driveJoystick() {
-		double rotInput = -MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.06);
-		double rotVelocity = Math.pow(rotInput, 3) * MAX_ANGULAR_SPEED.in(RadiansPerSecond);
-		
-		drive(
-			getVelocityYFromController(),
-			getVelocityXFromController(),
-			rotVelocity,
-			fieldRelative,
-			true
-		); // drives
-	}
+  public double getVelocityXFromController() {
+    double xInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.06);
+    return Math.pow(xInput, 3) * MAX_SPEED.in(MetersPerSecond);
+  }
 
-	public void drive(ChassisSpeeds speeds, boolean fieldRelative, boolean respectOperatorPerspective) {
-		drive(
-			speeds.vxMetersPerSecond,
-			speeds.vyMetersPerSecond,
-			speeds.omegaRadiansPerSecond,
-			fieldRelative,
-			respectOperatorPerspective
-		);
-	}
+  public double getVelocityYFromController() {
+    double yInput = MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.06);
+    return Math.pow(yInput, 3) * MAX_SPEED.in(MetersPerSecond);
+  }
 
-	public void drive(
-		double xSpeed,
-		double ySpeed,
-		double thetaSpeed,
-		boolean fieldRelative,
-		boolean respectOperatorPerspective) {
+  public void driveJoystick() {
+    double rotInput = -MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.06);
+    double rotVelocity = Math.pow(rotInput, 3) * MAX_ANGULAR_SPEED.in(RadiansPerSecond);
 
-		if (respectOperatorPerspective) {
-			if (DriverStation.getAlliance().isPresent()
-				&& DriverStation.getAlliance().get() == Alliance.Red
-				&& fieldRelative) {
-				xSpeed *= -1;
-				ySpeed *= -1;
-			}
-		}
+    drive(
+        getVelocityYFromController(),
+        getVelocityXFromController(),
+        rotVelocity,
+        fieldRelative,
+        true); // drives
+  }
 
-		ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed);
+  public void drive(
+      ChassisSpeeds speeds, boolean fieldRelative, boolean respectOperatorPerspective) {
+    drive(
+        speeds.vxMetersPerSecond,
+        speeds.vyMetersPerSecond,
+        speeds.omegaRadiansPerSecond,
+        fieldRelative,
+        respectOperatorPerspective);
+  }
 
-		if (fieldRelative) {
-			speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getWrappedHeading());
-		}
+  public void drive(
+      double xSpeed,
+      double ySpeed,
+      double thetaSpeed,
+      boolean fieldRelative,
+      boolean respectOperatorPerspective) {
 
-		SwerveRequest req =
-			new SwerveRequest.ApplyRobotSpeeds()
-				.withSpeeds(speeds)
-				.withDriveRequestType(DriveRequestType.Velocity)
-				.withSteerRequestType(SteerRequestType.Position);
+    if (respectOperatorPerspective) {
+      if (DriverStation.getAlliance().isPresent()
+          && DriverStation.getAlliance().get() == Alliance.Red
+          && fieldRelative) {
+        xSpeed *= -1;
+        ySpeed *= -1;
+      }
+    }
 
-		setControl(req); //actually drives
-	}
+    ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed);
 
-	public void setRobotRelativeAngle(Rotation2d angDeg) {
-		double wrappedSetPoint = wrapAngle(odometryHeading.plus(angDeg)).getRadians();
-		thetaController.setSetpoint(wrappedSetPoint);
-	}
+    if (fieldRelative) {
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getWrappedHeading());
+    }
 
-	public void alignToAngleRobotRelative(boolean lockDrive) {
-		double response = thetaController.calculate(odometryHeading.getRadians());
-		if (lockDrive) {
-			drive(0, 0, response, false, true); // perspective doesn't matter in robot relative
-		} else {
-			drive(getVelocityYFromController(), getVelocityXFromController(), response, false, true);
-		}
-	}
+    SwerveRequest req =
+        new SwerveRequest.ApplyRobotSpeeds()
+            .withSpeeds(speeds)
+            .withDriveRequestType(DriveRequestType.Velocity)
+            .withSteerRequestType(SteerRequestType.Position);
 
-	public void setFieldRelativeAngle(Rotation2d angle) {
-		double wrappedAngle = wrapAngle(angle).getRadians();
-		thetaController.setSetpoint(wrappedAngle);
-	}
+    setControl(req); // actually drives
+  }
 
-	public void alignToAngleFieldRelative(boolean lockDrive) {
-		double response = thetaController.calculate(odometryHeading.getRadians());
-		if (lockDrive) {
-			drive(0, 0, response, true, true);
-		} else {
-			drive(getVelocityYFromController(), getVelocityXFromController(), response, true, true);
-		}
-	}
+  public void setRobotRelativeAngle(Rotation2d angDeg) {
+    double wrappedSetPoint = wrapAngle(odometryHeading.plus(angDeg)).getRadians();
+    thetaController.setSetpoint(wrappedSetPoint);
+  }
 
-	public void alignToAngleRobotRelativeContinuous(
-		Supplier<Rotation2d> angleSup, boolean lockDrive) {
-		setRobotRelativeAngle(angleSup.get());
-		alignToAngleRobotRelative(lockDrive);
-	}
+  public void alignToAngleRobotRelative(boolean lockDrive) {
+    double response = thetaController.calculate(odometryHeading.getRadians());
+    if (lockDrive) {
+      drive(0, 0, response, false, true); // perspective doesn't matter in robot relative
+    } else {
+      drive(getVelocityYFromController(), getVelocityXFromController(), response, false, true);
+    }
+  }
 
-	public void toRobotRelative() {
-		fieldRelative = false;
-	}
+  public void setFieldRelativeAngle(Rotation2d angle) {
+    double wrappedAngle = wrapAngle(angle).getRadians();
+    thetaController.setSetpoint(wrappedAngle);
+  }
 
-	public void toFieldRelative() {
-		fieldRelative = true;
-	}
+  public void alignToAngleFieldRelative(boolean lockDrive) {
+    double response = thetaController.calculate(odometryHeading.getRadians());
+    if (lockDrive) {
+      drive(0, 0, response, true, true);
+    } else {
+      drive(getVelocityYFromController(), getVelocityXFromController(), response, true, true);
+    }
+  }
 
-	@AutoLogOutput
-	public Pose2d getRobotPose() {
-		return this.getState().Pose;
-	}
+  public void alignToAngleRobotRelativeContinuous(
+      Supplier<Rotation2d> angleSup, boolean lockDrive) {
+    setRobotRelativeAngle(angleSup.get());
+    alignToAngleRobotRelative(lockDrive);
+  }
 
-	public void zeroGyro() {
-		resetRotation(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)));
-	}
+  public void toRobotRelative() {
+    fieldRelative = false;
+  }
 
-	public Command driveJoystickInputCommand() {
-		return Commands.run(() -> driveJoystick(), this);
-	}
+  public void toFieldRelative() {
+    fieldRelative = true;
+  }
 
-	public Command zeroGyroCommand() {
-		return Commands.runOnce(() -> zeroGyro(), RobotContainer.drivetrain);
-	}
+  @AutoLogOutput
+  public Pose2d getRobotPose() {
+    return this.getState().Pose;
+  }
 
-	public Command toRobotRelativeCommand() {
-		return Commands.runOnce(() -> toRobotRelative(), RobotContainer.drivetrain);
-	}
+  public void zeroGyro() {
+    resetRotation(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)));
+  }
 
-	public Command toFieldRelativeCommand() {
-		return Commands.runOnce(() -> toFieldRelative(), RobotContainer.drivetrain);
-	}
+  public Command driveJoystickInputCommand() {
+    return Commands.run(() -> driveJoystick(), this);
+  }
 
-	public Command alignToAngleRobotRelativeCommand(Rotation2d angle, boolean lockDrive) {
-		return Commands.sequence(
-			Commands.runOnce(() -> setRobotRelativeAngle(angle), RobotContainer.drivetrain),
-			Commands.run(() -> alignToAngleRobotRelative(lockDrive), RobotContainer.drivetrain)
-				.until(() -> isRobotAtAngleSetPoint));
-	}
+  public Command zeroGyroCommand() {
+    return Commands.runOnce(() -> zeroGyro(), RobotContainer.drivetrain);
+  }
 
-	public Command alignToAngleRobotRelativeContinuousCommand(
-		Supplier<Rotation2d> angle, boolean lockDrive) {
-		return Commands.run(() -> alignToAngleRobotRelativeContinuous(angle, lockDrive), this)
-			.until(() -> isRobotAtAngleSetPoint);
-	}
+  public Command toRobotRelativeCommand() {
+    return Commands.runOnce(() -> toRobotRelative(), RobotContainer.drivetrain);
+  }
 
-	public Command alignToAngleFieldRelativeCommand(Rotation2d angle, boolean lockDrive) {
-		return Commands.sequence(
-			Commands.runOnce(() -> setFieldRelativeAngle(angle), RobotContainer.drivetrain),
-			Commands.run(() -> alignToAngleFieldRelative(lockDrive), this)
-				.until(() -> isRobotAtAngleSetPoint));
-	}
+  public Command toFieldRelativeCommand() {
+    return Commands.runOnce(() -> toFieldRelative(), RobotContainer.drivetrain);
+  }
 
-	@Override
-	public void periodic() {
+  public Command alignToAngleRobotRelativeCommand(Rotation2d angle, boolean lockDrive) {
+    return Commands.sequence(
+        Commands.runOnce(() -> setRobotRelativeAngle(angle), RobotContainer.drivetrain),
+        Commands.run(() -> alignToAngleRobotRelative(lockDrive), RobotContainer.drivetrain)
+            .until(() -> isRobotAtAngleSetPoint));
+  }
 
-		odometryHeading = getRobotPose().getRotation();
-		fieldRelative = !RobotContainer.driverController.L2().getAsBoolean();
-		Logger.recordOutput("DriveState/FieldRelative", fieldRelative);
-		isRobotAtAngleSetPoint = thetaController.atSetpoint();
+  public Command alignToAngleRobotRelativeContinuousCommand(
+      Supplier<Rotation2d> angle, boolean lockDrive) {
+    return Commands.run(() -> alignToAngleRobotRelativeContinuous(angle, lockDrive), this)
+        .until(() -> isRobotAtAngleSetPoint);
+  }
 
-		/*
-		* Periodically try to apply the operator perspective.
-		* If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
-		* This allows us to correct the perspective in case the robot code restarts mid-match.
-		* Otherwise, only check and apply the operator perspective if the DS is disabled.
-		* This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
-		*/
+  public Command alignToAngleFieldRelativeCommand(Rotation2d angle, boolean lockDrive) {
+    return Commands.sequence(
+        Commands.runOnce(() -> setFieldRelativeAngle(angle), RobotContainer.drivetrain),
+        Commands.run(() -> alignToAngleFieldRelative(lockDrive), this)
+            .until(() -> isRobotAtAngleSetPoint));
+  }
 
-		if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
-		DriverStation.getAlliance()
-			.ifPresent(
-				allianceColor -> {
-					setOperatorPerspectiveForward(
-						allianceColor == Alliance.Red
-							? kRedAlliancePerspectiveRotation
-							: kBlueAlliancePerspectiveRotation);
-					m_hasAppliedOperatorPerspective = true;
-				});
-		}
+  @Override
+  public void periodic() {
 
-		DogLog.log("BatteryVoltage", RobotController.getBatteryVoltage());
-		DogLog.log("Drive/OdometryPose", getState().Pose);
-		DogLog.log("Drive/TargetStates", getState().ModuleTargets);
-		DogLog.log("Drive/MeasuredStates", getState().ModuleStates);
-		DogLog.log("Drive/MeasuredSpeeds", getState().Speeds);
-		
-		if (mapleSimSwerveDrivetrain != null) {
-			DogLog.log(
-				"Drive/SimulationPose",
-				mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose()
-			);
-		}
-	}
+    odometryHeading = getRobotPose().getRotation();
+    fieldRelative = !RobotContainer.driverController.L2().getAsBoolean();
+    Logger.recordOutput("DriveState/FieldRelative", fieldRelative);
+    isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
-	public MapleSimSwerveDrivetrain mapleSimSwerveDrivetrain = null;
+    /*
+     * Periodically try to apply the operator perspective.
+     * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
+     * This allows us to correct the perspective in case the robot code restarts mid-match.
+     * Otherwise, only check and apply the operator perspective if the DS is disabled.
+     * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
+     */
 
-	@SuppressWarnings("unchecked")
-	private void startSimThread() {
-		mapleSimSwerveDrivetrain =
-			new MapleSimSwerveDrivetrain(
-				Seconds.of(kSimLoopPeriod),
-				// TODO: modify the following constants according to our robot
-				ROBOT_MASS, // robot weight
-				BUMPER_WIDTH, // bumper length
-				BUMPER_WIDTH, // bumper width
-				DCMotor.getKrakenX60Foc(1), // drive motor type
-				DCMotor.getKrakenX60Foc(1), // steer motor type
-				1.2, // wheel COF
-				getModuleLocations(),
-				getPigeon2(),
-				getModules(),
-				TunerConstants.FrontLeft,
-				TunerConstants.FrontRight,
-				TunerConstants.BackLeft,
-				TunerConstants.BackRight);
-		/* Run simulation at a faster rate so PID gains behave more reasonably */
-		m_simNotifier = new Notifier(mapleSimSwerveDrivetrain::update);
-		m_simNotifier.startPeriodic(kSimLoopPeriod);
-	}
+    if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
+      DriverStation.getAlliance()
+          .ifPresent(
+              allianceColor -> {
+                setOperatorPerspectiveForward(
+                    allianceColor == Alliance.Red
+                        ? kRedAlliancePerspectiveRotation
+                        : kBlueAlliancePerspectiveRotation);
+                m_hasAppliedOperatorPerspective = true;
+              });
+    }
 
-	@Override
-	public void resetPose(Pose2d pose) {
-		if (this.mapleSimSwerveDrivetrain != null) {
-			mapleSimSwerveDrivetrain.mapleSimDrive.setSimulationWorldPose(pose);
-			Timer.delay(0.1); // wait for simulation to update
-		}
-		super.resetPose(pose);
-	}
+    DogLog.log("BatteryVoltage", RobotController.getBatteryVoltage());
+    DogLog.log("Drive/OdometryPose", getState().Pose);
+    DogLog.log("Drive/TargetStates", getState().ModuleTargets);
+    DogLog.log("Drive/MeasuredStates", getState().ModuleStates);
+    DogLog.log("Drive/MeasuredSpeeds", getState().Speeds);
+
+    if (mapleSimSwerveDrivetrain != null) {
+      DogLog.log(
+          "Drive/SimulationPose",
+          mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose());
+    }
+  }
+
+  public MapleSimSwerveDrivetrain mapleSimSwerveDrivetrain = null;
+
+  @SuppressWarnings("unchecked")
+  private void startSimThread() {
+    mapleSimSwerveDrivetrain =
+        new MapleSimSwerveDrivetrain(
+            Seconds.of(kSimLoopPeriod),
+            // TODO: modify the following constants according to our robot
+            ROBOT_MASS, // robot weight
+            BUMPER_WIDTH, // bumper length
+            BUMPER_WIDTH, // bumper width
+            DCMotor.getKrakenX60Foc(1), // drive motor type
+            DCMotor.getKrakenX60Foc(1), // steer motor type
+            1.2, // wheel COF
+            getModuleLocations(),
+            getPigeon2(),
+            getModules(),
+            TunerConstants.FrontLeft,
+            TunerConstants.FrontRight,
+            TunerConstants.BackLeft,
+            TunerConstants.BackRight);
+    /* Run simulation at a faster rate so PID gains behave more reasonably */
+    m_simNotifier = new Notifier(mapleSimSwerveDrivetrain::update);
+    m_simNotifier.startPeriodic(kSimLoopPeriod);
+  }
+
+  @Override
+  public void resetPose(Pose2d pose) {
+    if (this.mapleSimSwerveDrivetrain != null) {
+      mapleSimSwerveDrivetrain.mapleSimDrive.setSimulationWorldPose(pose);
+      Timer.delay(0.1); // wait for simulation to update
+    }
+    super.resetPose(pose);
+  }
 }
