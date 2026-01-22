@@ -5,9 +5,9 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package frc.robot.subsystems.vision2;
+package frc.robot.subsystems.vision;
 
-import static frc.robot.subsystems.vision2.VisionConstants.aprilTagLayout;
+import static frc.robot.subsystems.vision.VisionConstants.aprilTagLayout;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
