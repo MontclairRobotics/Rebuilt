@@ -1,6 +1,5 @@
 package frc.robot.subsystems.pivot;
 
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -33,8 +32,6 @@ public interface PivotIO {
   public boolean atSetpoint();
 
   public double getPercentRotation();
-
-  public void setIdleMode(IdleMode mode);
 
   public void resetPIDController();
 }

@@ -46,6 +46,9 @@ public final class Constants {
         Rotation2d.fromRadians(0); // TODO: set this number
     public static final Rotation2d SHOULDER_ENCODER_OFFSET =
         Rotation2d.fromDegrees(1 + 2); // TODO set this number
-    public static final double PIVOT_TO_MOTOR = 0.0; //TODO: set this number
+    public static final double PIVOT_TO_MOTOR = 0.0; // TODO: set this number
+    public static final int PIVOT_MOTOR_ID = 0; // TODO: set THIS device id
+    public static final int TBD = 0; // TODO: PLEASE SET THIS LATER
+    public static final double VOLTAGE_LIMIT = 0.0;
   }
 }

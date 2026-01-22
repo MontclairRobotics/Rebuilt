@@ -15,10 +15,10 @@ import frc.robot.util.PoseUtils;
 
 public class PivotIOSim implements PivotIO {
   private DutyCycleEncoderSim encoder;
-  private DutyCycleEncoder realEncoder; // TODO: fix this
+  private DutyCycleEncoder realEncoder;
 
-  private SingleJointedArmSim
-      sim; // representing our double jointed arm as a single jointed arm sim of the first joint,
+  private SingleJointedArmSim sim;
+  // representing our double jointed arm as a single jointed arm sim of the first joint,
   // and chose to ignore the second joint :)
 
   private PIDController pidController;
@@ -34,18 +34,18 @@ public class PivotIOSim implements PivotIO {
     encoder = new DutyCycleEncoderSim(realEncoder);
     encoder.setConnected(true);
 
-        sim =
-            new SingleJointedArmSim(
-                DCMotor.getNEO(1),
-                PivotConstants.PIVOT_TO_MOTOR,
-                10.0,
-                0.0,
-                1.0,
-                1.0,
-                true,
-                1.0,
-                0.0,
-                0.0);
+    sim =
+        new SingleJointedArmSim(
+            DCMotor.getNEO(1),
+            PivotConstants.PIVOT_TO_MOTOR,
+            10.0,
+            0.0,
+            1.0,
+            1.0,
+            true,
+            1.0,
+            0.0,
+            0.0);
   }
 
   public void updateInputs(PivotIOInputs inputs) {

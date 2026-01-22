@@ -1,6 +1,5 @@
 package frc.robot.subsystems.pivot;
 
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotState;
@@ -21,7 +20,6 @@ public class Pivot extends SubsystemBase {
     this.io = io;
   }
 
-  // TODO: WHY PIVOTIOINPUTS NOT WORKING
   @Override
   public void periodic() {
     io.updateInputs(inputs);
@@ -54,10 +52,6 @@ public class Pivot extends SubsystemBase {
 
   public double getPercentRotation() {
     return io.getPercentRotation();
-  }
-
-  public void setIdleMode(IdleMode mode) {
-    io.setIdleMode(mode);
   }
 
   public Rotation2d getPivotAngle() {
@@ -108,9 +102,5 @@ public class Pivot extends SubsystemBase {
 
   public Command joystickControlCommand() {
     return Commands.run(this::joystickControl, this);
-  }
-
-  public Command setIdleModeCommand(IdleMode mode) {
-    return Commands.runOnce(() -> setIdleMode(mode)).ignoringDisable(true);
   }
 }
