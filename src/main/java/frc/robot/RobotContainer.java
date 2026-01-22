@@ -43,7 +43,7 @@ public class RobotContainer {
       case REAL:
         spindexer = new Spindexer(new SpindexerIOTalonFX());
         drivetrain = TunerConstants.createDrivetrain();
-        
+
         break;
 
       case SIM:
