@@ -5,6 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -17,6 +18,10 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import org.ironmaple.simulation.SimulatedArena;
@@ -45,6 +50,12 @@ public class RobotContainer {
         flywheel = new Flywheel(new FlywheelIOTalonFX());
         drivetrain = TunerConstants.createDrivetrain();
 
+        vision =
+            new Vision(
+                drivetrain::addVisionMeasurement,
+                new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
+                new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading));
+
         break;
 
       case SIM:
@@ -52,9 +63,18 @@ public class RobotContainer {
         drivetrain = TunerConstants.createDrivetrain();
         driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 
+        vision =
+            new Vision(
+                drivetrain::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(
+                    "camera0Name", robotToCamera0, drivetrain::getRobotPose),
+                new VisionIOPhotonVisionSim(
+                    "camera1Name", robotToCamera1, drivetrain::getRobotPose));
+
         break;
 
       default:
+        vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
     }
 
     configureBindings();

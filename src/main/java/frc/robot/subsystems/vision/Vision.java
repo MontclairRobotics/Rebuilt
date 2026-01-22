@@ -24,7 +24,8 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
-  private final VisionConsumer consumer; //lamda expression that takes in values and records a vision measurement
+  private final VisionConsumer
+      consumer; // lamda expression that takes in values and records a vision measurement
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
@@ -33,7 +34,8 @@ public class Vision extends SubsystemBase {
     this.consumer = consumer;
     this.io = io;
 
-	//for loops serve the purpose of intitializing inputs for all cameras, as the ios are stored in an array
+    // for loops serve the purpose of intitializing inputs for all cameras, as the ios are stored in
+    // an array
     // Initialize inputs
     this.inputs = new VisionIOInputsAutoLogged[io.length];
     for (int i = 0; i < inputs.length; i++) {
@@ -96,7 +98,7 @@ public class Vision extends SubsystemBase {
         boolean rejectPose =
             observation.tagCount() == 0 // Must have at least one tag
                 || (observation.tagCount() == 1
-				//ambiguity is 0 for megatag2
+                    // ambiguity is 0 for megatag2
                     && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
                 || Math.abs(observation.pose().getZ())
                     > maxZError // Must have realistic Z coordinate
