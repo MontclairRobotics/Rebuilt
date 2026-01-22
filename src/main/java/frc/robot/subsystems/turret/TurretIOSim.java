@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.RobotContainer;
+import frc.robot.util.Tunable;
 import java.util.function.DoubleSupplier;
 
 public class TurretIOSim implements TurretIO {
@@ -16,7 +17,14 @@ public class TurretIOSim implements TurretIO {
   double appliedVoltage = 0;
   double fieldRelativeSetpoint = 0;
 
+  private Tunable kp, ki, kd;
+
   public TurretIOSim() {
+
+    Tunable kp = new Tunable("turret kP", SIM_KP, (value) -> pidController.setP(value));
+    Tunable ki = new Tunable("turret kI", SIM_KI, (value) -> pidController.setI(value));
+    Tunable kd = new Tunable("turret kD", SIM_KD, (value) -> pidController.setD(value));
+
     sim =
         new SingleJointedArmSim(
             DCMotor.getKrakenX60(1),
@@ -34,7 +42,6 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public void updateInputs(TurretIOInputs input) {
-    sim.update(0.02);
     input.velocity = sim.getVelocityRadPerSec() / (2 * Math.PI);
     input.appliedVoltage = appliedVoltage;
     input.robotRelativeAngle = getRobotRelativeAngle();
@@ -51,7 +58,7 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public double getRobotRelativeAngle() {
-    return Radians.of(sim.getAngleRads()).in(Rotations);
+    return wrapAngleSetpoint(Radians.of(sim.getAngleRads()).in(Rotations));
   }
 
   @Override
@@ -73,6 +80,7 @@ public class TurretIOSim implements TurretIO {
   public void setVoltage(double voltage) {
     appliedVoltage = voltage;
     sim.setInputVoltage(voltage);
+    sim.update(0.02);
   }
 
   @Override

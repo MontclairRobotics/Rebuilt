@@ -33,6 +33,8 @@ public class RobotContainer {
   private SwerveDriveSimulation driveSimulation = null;
   private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
 
+  public static final boolean debugMode = true;
+
   // Subsystems
   public static CommandSwerveDrivetrain drivetrain;
   public static Turret turret;
@@ -59,8 +61,10 @@ public class RobotContainer {
   private void configureBindings() {
     drivetrain.setDefaultCommand(drivetrain.driveJoystickInputCommand());
     drivetrain.registerTelemetry(logger::telemeterize);
-    operatorController.cross().onTrue(turret.setPositiveVoltageCommand());
-    operatorController.square().onTrue(turret.setNegativeVoltageCommand());
+    // driverController.cross().whileTrue(turret.setPositiveVoltageCommand());
+    // driverController.square().whileTrue(turret.setNegativeVoltageCommand());
+    driverController.L1().onTrue(turret.setRobotRelativeAngleCommand(0.25));
+    driverController.L2().whileTrue(turret.setFieldRelativeAngleContinuousCommand(() -> 0));
   }
 
   public Command getAutonomousCommand() {

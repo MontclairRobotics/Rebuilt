@@ -14,7 +14,7 @@ import org.littletonrobotics.junction.Logger;
  */
 public class Turret extends SubsystemBase {
 
-  private TurretIO io;
+  TurretIO io;
   public TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
   private TurretVisualization turretVisualization;
 
@@ -44,21 +44,21 @@ public class Turret extends SubsystemBase {
     return Commands.run(() -> io.setFieldRelativeAngle(target), this);
   }
 
-  public Command setPositiveVoltageCommand() {
-    Logger.recordOutput("Turret/turret_internal", "voltage command posted");
-    return Commands.run(() -> io.setVoltage(70));
-  }
+  //   public Command setPositiveVoltageCommand() {
+  //     Logger.recordOutput("Turret/turret_internal", "voltage command posted");
+  //     return Commands.run(() -> io.setVoltage(2), this).finallyDo(io::stop);
+  //   }
 
-  public Command setNegativeVoltageCommand() {
-    return Commands.run(() -> io.setVoltage(-2));
-  }
+  //   public Command setNegativeVoltageCommand() {
+  //     return Commands.run(() -> io.setVoltage(-2), this).finallyDo(io::stop);
+  //   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Turret", inputs);
     Logger.recordOutput("RobotPose", new Pose3d(2, 5, 0, Rotation3d.kZero));
-    turretVisualization.update(inputs);
+    turretVisualization.update();
     turretVisualization.log();
   }
 }
