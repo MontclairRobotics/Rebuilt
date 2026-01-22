@@ -4,12 +4,14 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public class TurretConstants {
   // TODO: IMPLEMENT
+  private Translation2d hubLocation = new Translation2d(4.6245018, 4.105);
   public static final int CAN_ID = -1;
   public static final Angle MAX_ANGLE = Rotations.of(1);
   public static final double GEAR_RATIO =
