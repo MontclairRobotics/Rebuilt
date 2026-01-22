@@ -25,6 +25,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
 
+  private final Vision vision;
+
   // Controllers
   public static CommandPS5Controller driverController = new CommandPS5Controller(0);
   public static CommandPS5Controller operatorController = new CommandPS5Controller(1);
