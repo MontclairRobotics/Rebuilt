@@ -61,6 +61,7 @@ public class HoodIOSim implements HoodIO {
     inputs.angleSetpoint = pidController.getSetpoint();
 
     encoder.set(Radians.of(sim.getAngleRads()).in(Rotations));
+    sim.update(0.02);
   }
 
   @Override

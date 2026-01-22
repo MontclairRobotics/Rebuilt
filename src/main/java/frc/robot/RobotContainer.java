@@ -7,7 +7,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import frc.robot.constants.Constants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.hood.HoodIOSim;
+import frc.robot.subsystems.hood.HoodIOTalonFX;
 
 public class RobotContainer {
 
@@ -17,8 +21,22 @@ public class RobotContainer {
 
   // Subsystems
   public static CommandSwerveDrivetrain drivetrain;
+  public static Hood hood;
 
   public RobotContainer() {
+    switch (Constants.currentMode) {
+      case SIM:
+        hood = new Hood(new HoodIOSim());
+
+        break;
+
+      case REAL:
+        hood = new Hood(new HoodIOTalonFX());
+        break;
+
+      default:
+        break;
+    }
     configureBindings();
   }
 
