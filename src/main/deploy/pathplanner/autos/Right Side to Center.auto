@@ -13,25 +13,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "trenchLeft-centerLeft"
+            "pathName": "trenchRight-centerRight"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "centerLeft-trenchLeft"
+            "pathName": "centerRight-trenchRight"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "trenchLeft-towerLeft"
           }
         }
       ]

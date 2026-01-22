@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "trenchLeft-centerLeft"
+            "pathName": "trenchRight-outpost"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "centerLeft-trenchLeft"
+            "pathName": "outpost-trenchRight"
           }
         },
         {
@@ -31,7 +31,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "trenchLeft-towerLeft"
+            "pathName": "trenchRight-centerRight"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "centerRight-trenchRight"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
           }
         }
       ]
