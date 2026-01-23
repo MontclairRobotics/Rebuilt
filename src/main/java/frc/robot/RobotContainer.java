@@ -65,6 +65,7 @@ public class RobotContainer {
     // driverController.square().whileTrue(turret.setNegativeVoltageCommand());
     driverController.L1().onTrue(turret.setRobotRelativeAngleCommand(0.25));
     driverController.L2().whileTrue(turret.setFieldRelativeAngleContinuousCommand(() -> 0));
+    driverController.R2().whileTrue(turret.goToHubCommand());
   }
 
   public Command getAutonomousCommand() {

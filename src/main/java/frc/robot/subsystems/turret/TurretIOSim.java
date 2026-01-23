@@ -1,11 +1,16 @@
 package frc.robot.subsystems.turret;
 
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.RobotContainer;
 import frc.robot.util.Tunable;
@@ -13,7 +18,7 @@ import java.util.function.DoubleSupplier;
 
 public class TurretIOSim implements TurretIO {
   private SingleJointedArmSim sim;
-  PIDController pidController;
+  ProfiledPIDController pidController;
   double appliedVoltage = 0;
   double fieldRelativeSetpoint = 0;
 
@@ -37,28 +42,47 @@ public class TurretIOSim implements TurretIO {
             0,
             0,
             0);
-    pidController = new PIDController(SIM_KP, SIM_KI, SIM_KD);
+
+    pidController =
+        new ProfiledPIDController(
+            SIM_KP,
+            SIM_KI,
+            SIM_KD,
+            new TrapezoidProfile.Constraints(
+                TURRET_CRUISE_VELOCITY.in(RotationsPerSecond),
+                TURRET_ACCELERATION.in(RotationsPerSecondPerSecond)));
+
+    pidController.disableContinuousInput();
   }
 
   @Override
   public void updateInputs(TurretIOInputs input) {
+
+    sim.setInputVoltage(appliedVoltage);
+    sim.update(0.02);
+
     input.velocity = sim.getVelocityRadPerSec() / (2 * Math.PI);
     input.appliedVoltage = appliedVoltage;
     input.robotRelativeAngle = getRobotRelativeAngle();
-    input.robotRelativeAngleSetpoint = pidController.getSetpoint();
+    input.robotRelativeAngleSetpoint = pidController.getSetpoint().position;
     input.fieldRelativeAngle = getFieldRelativeAngle();
     input.fieldRelativeAngleSetpoint = fieldRelativeSetpoint;
   }
 
   @Override
   public void setRobotRelativeAngle(double angle) {
-    pidController.setSetpoint(wrapAngleSetpoint(angle));
+    pidController.setGoal(
+        new TrapezoidProfile.State(
+            wrapAngleSetpoint(angle),
+            -RadiansPerSecond.of(RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond)
+                .in(RotationsPerSecond)));
+    ;
     setVoltage(pidController.calculate(getRobotRelativeAngle()));
   }
 
   @Override
   public double getRobotRelativeAngle() {
-    return wrapAngleSetpoint(Radians.of(sim.getAngleRads()).in(Rotations));
+    return Radians.of(sim.getAngleRads()).in(Rotations);
   }
 
   @Override
@@ -78,9 +102,7 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public void setVoltage(double voltage) {
-    appliedVoltage = voltage;
-    sim.setInputVoltage(voltage);
-    sim.update(0.02);
+    appliedVoltage = MathUtil.clamp(voltage, -12, 12);
   }
 
   @Override

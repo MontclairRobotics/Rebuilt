@@ -251,7 +251,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   public double getVelocityYFromController() {
-    double yInput = MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.06);
+    double yInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.06);
     return Math.pow(yInput, 3) * DriveConstants.MAX_SPEED.in(MetersPerSecond);
   }
 
