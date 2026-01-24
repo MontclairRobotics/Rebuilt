@@ -16,6 +16,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.turret.Turret;
+import frc.robot.subsystems.turret.TurretIOSim;
+import frc.robot.subsystems.turret.TurretIOTalonFX;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
@@ -39,9 +42,12 @@ public class RobotContainer {
   private SwerveDriveSimulation driveSimulation = null;
   private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
 
+  public static final boolean debugMode = true;
+
   // Subsystems
   public static CommandSwerveDrivetrain drivetrain;
   public static Flywheel flywheel;
+  public static Turret turret;
 
   public RobotContainer() {
 
@@ -49,7 +55,7 @@ public class RobotContainer {
       case REAL:
         flywheel = new Flywheel(new FlywheelIOTalonFX());
         drivetrain = TunerConstants.createDrivetrain();
-
+        turret = new Turret(new TurretIOTalonFX());
         vision =
             new Vision(
                 drivetrain::addVisionMeasurement,
@@ -62,7 +68,7 @@ public class RobotContainer {
         flywheel = new Flywheel(new FlywheelIOTalonFX());
         drivetrain = TunerConstants.createDrivetrain();
         driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
-
+        turret = new Turret(new TurretIOSim());
         vision =
             new Vision(
                 drivetrain::addVisionMeasurement,
@@ -76,13 +82,17 @@ public class RobotContainer {
       default:
         vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
     }
-
     configureBindings();
   }
 
   private void configureBindings() {
     drivetrain.setDefaultCommand(drivetrain.driveJoystickInputCommand());
     drivetrain.registerTelemetry(logger::telemeterize);
+    // driverController.cross().whileTrue(turret.setPositiveVoltageCommand());
+    // driverController.square().whileTrue(turret.setNegativeVoltageCommand());
+    driverController.L1().onTrue(turret.setRobotRelativeAngleCommand(0.25));
+    driverController.L2().whileTrue(turret.setFieldRelativeAngleContinuousCommand(() -> 0));
+    driverController.R2().whileTrue(turret.goToHubCommand());
   }
 
   public Command getAutonomousCommand() {

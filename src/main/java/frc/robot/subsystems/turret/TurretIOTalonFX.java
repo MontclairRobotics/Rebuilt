@@ -5,11 +5,15 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static frc.robot.constants.TurretConstants.*;
+
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.robot.RobotContainer;
 import java.util.function.DoubleSupplier;
 
@@ -19,6 +23,8 @@ public class TurretIOTalonFX implements TurretIO {
   private MotionMagicVoltage mm_req;
   private double robotRelativeSetpoint;
   private double fieldRelativeSetpoint;
+  private ProfiledPIDController pidController;
+  private double voltageToUse;
 
   public TurretIOTalonFX() {
 
@@ -26,25 +32,14 @@ public class TurretIOTalonFX implements TurretIO {
     fieldRelativeSetpoint = 0;
 
     motor = new TalonFX(CAN_ID);
-    TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
-    Slot0Configs slot0Configs = talonFXConfigs.Slot0;
-
-    slot0Configs.kS = TALON_KS;
-    slot0Configs.kV = TALON_KV;
-    slot0Configs.kA = TALON_KA;
-    slot0Configs.kP = TALON_KP;
-    slot0Configs.kI = TALON_KI;
-    slot0Configs.kD = TALON_KD;
-
-    mm_req = new MotionMagicVoltage(0);
-
-    MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
-    motionMagicConfigs.MotionMagicCruiseVelocity =
-        TURRET_CRUISE_VELOCITY.in(RotationsPerSecond) * GEAR_RATIO;
-    motionMagicConfigs.MotionMagicAcceleration =
-        TURRET_ACCELERATION.in(RotationsPerSecondPerSecond) * GEAR_RATIO;
-    motionMagicConfigs.MotionMagicJerk = TURRET_JERK * GEAR_RATIO;
-    motor.getConfigurator().apply(talonFXConfigs);
+    pidController =
+        new ProfiledPIDController(
+            TALON_KP,
+            TALON_KI,
+            TALON_KD,
+            new TrapezoidProfile.Constraints(
+                TURRET_CRUISE_VELOCITY.in(RotationsPerSecond),
+                TURRET_ACCELERATION.in(RotationsPerSecondPerSecond)));
   }
 
   @Override
@@ -62,11 +57,8 @@ public class TurretIOTalonFX implements TurretIO {
     robotRelativeSetpoint = angle;
     // converts to motor output shaft rotations and makes request to motion magic for a new
     // setpoint.
-    motor.setControl(
-        mm_req
-            .withPosition(wrapAngleSetpoint(angle) * GEAR_RATIO)
-            .withSlot(0)
-            .withEnableFOC(false));
+    pidController.setGoal(new TrapezoidProfile.State());
+    setVoltage(pidController.calculate(getRobotRelativeAngle()));
   }
 
   @Override

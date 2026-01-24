@@ -11,16 +11,17 @@ import edu.wpi.first.units.measure.AngularVelocity;
 
 public class TurretConstants {
   // TODO: IMPLEMENT
-  private Translation2d hubLocation = new Translation2d(4.6245018, 4.105);
+  public static final Translation2d HUB_LOCATION =
+      new Translation2d(4.6245018, 4.105); // TODO fix Y value (ask nick)
   public static final int CAN_ID = -1;
   public static final Angle MAX_ANGLE = Rotations.of(1);
   public static final double GEAR_RATIO =
-      0; // how many rotations of the output shaft per rotation of the turret
-  public static final double MOMENT_OF_INERTIA = 0;
-  public static final double LENGTH = 0;
-  public static final double SIM_KP = 0;
-  public static final double SIM_KI = 0;
-  public static final double SIM_KD = 0;
+      12; // how many rotations of the output shaft per rotation of the turret
+  public static final double MOMENT_OF_INERTIA = 0.35;
+  public static final double LENGTH = 0.3;
+  public static double SIM_KP = 100;
+  public static double SIM_KI = 10;
+  public static double SIM_KD = 5;
   public static final double TALON_KS = 0;
   public static final double TALON_KV = 0;
   public static final double TALON_KA = 0;
