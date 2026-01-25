@@ -1,7 +1,9 @@
 package frc.robot.subsystems.hood;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
+import static frc.robot.constants.HoodConstants.*;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -11,6 +13,7 @@ import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.constants.HoodConstants;
 import frc.robot.subsystems.hood.HoodIO.HoodIOInputs;
+import frc.robot.util.Tunable;
 import java.util.function.DoubleSupplier;
 
 public class HoodIOSim implements HoodIO {
@@ -28,6 +31,13 @@ public class HoodIOSim implements HoodIO {
   public HoodIOSim() {
     motor = DCMotor.getKrakenX44(1);
 
+    Tunable kp = new Tunable("hood kP", kP, (value) -> pidController.setP(value));
+    Tunable ki = new Tunable("hood kI", kI, (value) -> pidController.setI(value));
+    Tunable kd = new Tunable("hood kD", kD, (value) -> pidController.setD(value));
+    Tunable ks = new Tunable("hood ks", kS, (value) -> feedforward.setKs(value));
+    Tunable kg = new Tunable("hood kg", kG, (value) -> feedforward.setKg(value));
+    Tunable kv = new Tunable("hood kv", kV, (value) -> feedforward.setKv(value));
+
     pidController = new PIDController(HoodConstants.kP, HoodConstants.kI, HoodConstants.kD);
     feedforward = new ArmFeedforward(HoodConstants.kS, HoodConstants.kG, HoodConstants.kV);
 
@@ -40,34 +50,35 @@ public class HoodIOSim implements HoodIO {
     sim =
         new SingleJointedArmSim(
             motor,
-            HoodConstants.GEAR_RATIO,
-            HoodConstants.MOMENT_OF_INERTIA,
-            HoodConstants.HOOD_LENGTH,
-            HoodConstants.MIN_ANGLE.in(Radians),
-            HoodConstants.MAX_ANGLE.in(Radians),
+            GEAR_RATIO,
+            MOMENT_OF_INERTIA,
+            HOOD_LENGTH.in(Meters),
+            MIN_ANGLE.in(Radians),
+            MAX_ANGLE.in(Radians),
             true,
-            0,
+            MIN_ANGLE.in(Radians),
             0.0,
             0.0);
   }
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
+
+    sim.setInputVoltage(appliedVoltage);
+    sim.update(0.02);
+
     inputs.appliedVoltage = appliedVoltage;
     inputs.current = sim.getCurrentDrawAmps();
-    // inputs.current = motor.getStatorCurrent().getValueAsDouble();
-    // inputs.tempCelsius = motor.getDeviceTemp().getValueAsDouble();
     inputs.angle = getAngle();
     inputs.angleSetpoint = pidController.getSetpoint();
 
-    encoder.set(Radians.of(sim.getAngleRads()).in(Rotations));
+    // encoder.set(Radians.of(sim.getAngleRads()).in(Rotations));
   }
 
   @Override
   public void setVoltage(double voltage) {
     appliedVoltage = voltage;
-    sim.setInputVoltage(voltage);
-    encoder.set(Radians.of(sim.getAngleRads()).in(Rotations));
+    // encoder.set(Radians.of(sim.getAngleRads()).in(Rotations));
   }
 
   @Override

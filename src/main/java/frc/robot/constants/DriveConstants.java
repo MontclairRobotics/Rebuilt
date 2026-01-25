@@ -21,7 +21,8 @@ public class DriveConstants {
   public static final LinearAcceleration MAX_ACCELERATION =
       MetersPerSecondPerSecond.of(12); // TODO: set
 
-  public static final AngularVelocity MAX_ANGULAR_SPEED = RotationsPerSecond.of(4); // TODO: set
+  public static final double joystickInputGain = 2;
+  public static final AngularVelocity MAX_ANGULAR_SPEED = RotationsPerSecond.of(1.5); // TODO: set
   public static final AngularAcceleration MAX_ANGULAR_ACCELERATION =
       RotationsPerSecondPerSecond.of(9); // TODO: set
 

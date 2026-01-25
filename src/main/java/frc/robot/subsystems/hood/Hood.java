@@ -9,16 +9,21 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Hood extends SubsystemBase {
-  private HoodIO io;
+  public HoodIO io;
   private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
+
+  private HoodVisualization visualization;
 
   public Hood(HoodIO hoodIO) {
     this.io = hoodIO;
+    this.visualization = new HoodVisualization();
   }
 
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Hood", inputs);
+    visualization.update();
+    visualization.log();
   }
 
   public void applyJoystickInput() {

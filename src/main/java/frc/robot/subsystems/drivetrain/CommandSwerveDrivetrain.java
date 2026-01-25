@@ -29,6 +29,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -135,7 +137,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   public Rotation2d odometryHeading = new Rotation2d();
 
   private boolean isRobotAtAngleSetPoint; // for angle turning
-  private boolean fieldRelative;
+  public boolean fieldRelative;
 
   public RobotConfig config;
 
@@ -244,26 +246,50 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     return wrapAngle(odometryHeading);
   }
 
-  public double getVelocityXFromController() {
-    double xInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.06);
-    return Math.pow(xInput, 3) * MAX_SPEED.in(MetersPerSecond);
+  public AngularVelocity getSimAngularVelocity() {
+    return RadiansPerSecond.of(
+        mapleSimSwerveDrivetrain.mapleSimDrive.getDriveTrainSimulatedChassisSpeedsRobotRelative()
+            .omegaRadiansPerSecond);
   }
 
-  public double getVelocityYFromController() {
+  public Angle getSimYaw() {
+    var pose = mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose();
+    var omega =
+        mapleSimSwerveDrivetrain.mapleSimDrive.getDriveTrainSimulatedChassisSpeedsRobotRelative()
+            .omegaRadiansPerSecond;
+
+    // ≈ 76 ms gyro latency compensation
+    return Radians.of(pose.getRotation().getRadians() + omega * 0.076);
+  }
+
+  public double getStrafeVelocityFromController() {
+    double xInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.06);
+    return MathUtil.copyDirectionPow(xInput, joystickInputGain) * MAX_SPEED.in(MetersPerSecond);
+  }
+
+  public double getForwardVelocityFromController() {
     double yInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.06);
-    return Math.pow(yInput, 3) * DriveConstants.MAX_SPEED.in(MetersPerSecond);
+    return MathUtil.copyDirectionPow(yInput, joystickInputGain) * MAX_SPEED.in(MetersPerSecond);
   }
 
   public void driveJoystick() {
     double rotInput = -MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.06);
-    double rotVelocity = Math.pow(rotInput, 3) * MAX_ANGULAR_SPEED.in(RadiansPerSecond);
+    double rotVelocity =
+        MathUtil.copyDirectionPow(rotInput, joystickInputGain)
+            * MAX_ANGULAR_SPEED.in(RadiansPerSecond);
 
     drive(
-        getVelocityYFromController(),
-        getVelocityXFromController(),
+        getForwardVelocityFromController(),
+        getStrafeVelocityFromController(),
         rotVelocity,
         fieldRelative,
         true); // drives
+  }
+
+  public Rotation2d getSnakeDriveAngle() {
+    double y = getForwardVelocityFromController();
+    double x = -getStrafeVelocityFromController();
+    return new Rotation2d(x, y).plus(Rotation2d.kCW_90deg);
   }
 
   public void drive(
@@ -317,7 +343,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (lockDrive) {
       drive(0, 0, response, false, true); // perspective doesn't matter in robot relative
     } else {
-      drive(getVelocityYFromController(), getVelocityXFromController(), response, false, true);
+      drive(
+          getForwardVelocityFromController(),
+          getStrafeVelocityFromController(),
+          response,
+          false,
+          true);
     }
   }
 
@@ -331,7 +362,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (lockDrive) {
       drive(0, 0, response, true, true);
     } else {
-      drive(getVelocityYFromController(), getVelocityXFromController(), response, true, true);
+      drive(
+          getForwardVelocityFromController(),
+          getStrafeVelocityFromController(),
+          response,
+          true,
+          true);
     }
   }
 
@@ -359,7 +395,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   public Command driveJoystickInputCommand() {
-    return Commands.run(() -> driveJoystick(), this);
+    return Commands.run(() -> driveJoystick(), RobotContainer.drivetrain);
+  }
+
+  public Command snakeDriveCommand() {
+    return alignToAngleFieldRelativeContinuousCommand(() -> getSnakeDriveAngle(), false);
   }
 
   public Command zeroGyroCommand() {
@@ -392,6 +432,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Commands.runOnce(() -> setFieldRelativeAngle(angle), RobotContainer.drivetrain),
         Commands.run(() -> alignToAngleFieldRelative(lockDrive), this)
             .until(() -> isRobotAtAngleSetPoint));
+  }
+
+  public Command alignToAngleFieldRelativeContinuousCommand(
+      Supplier<Rotation2d> angle, boolean lockDrive) {
+    return alignToAngleFieldRelativeCommand(angle.get(), lockDrive);
   }
 
   @Override

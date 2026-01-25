@@ -13,18 +13,23 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import frc.robot.commands.SnakeDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.flywheel.Flywheel;
+import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
+import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.hood.HoodIOSim;
+import frc.robot.subsystems.hood.HoodIOTalonFX;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretIOSim;
 import frc.robot.subsystems.turret.TurretIOTalonFX;
-import frc.robot.subsystems.flywheel.Flywheel;
-import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.PoseUtils;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import org.ironmaple.simulation.SimulatedArena;
@@ -32,8 +37,6 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
-
-  private final Vision vision;
 
   // Controllers
   public static CommandPS5Controller driverController = new CommandPS5Controller(0);
@@ -45,9 +48,11 @@ public class RobotContainer {
   public static final boolean debugMode = true;
 
   // Subsystems
+  public static Vision vision;
   public static CommandSwerveDrivetrain drivetrain;
   public static Flywheel flywheel;
   public static Turret turret;
+  public static Hood hood;
 
   public RobotContainer() {
 
@@ -56,6 +61,7 @@ public class RobotContainer {
         flywheel = new Flywheel(new FlywheelIOTalonFX());
         drivetrain = TunerConstants.createDrivetrain();
         turret = new Turret(new TurretIOTalonFX());
+        hood = new Hood(new HoodIOTalonFX());
         vision =
             new Vision(
                 drivetrain::addVisionMeasurement,
@@ -69,6 +75,7 @@ public class RobotContainer {
         drivetrain = TunerConstants.createDrivetrain();
         driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
         turret = new Turret(new TurretIOSim());
+        hood = new Hood(new HoodIOSim());
         vision =
             new Vision(
                 drivetrain::addVisionMeasurement,
@@ -82,17 +89,41 @@ public class RobotContainer {
       default:
         vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
     }
+
+    drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
+
     configureBindings();
   }
 
   private void configureBindings() {
+    hood.setDefaultCommand(hood.joystickCommand());
     drivetrain.setDefaultCommand(drivetrain.driveJoystickInputCommand());
     drivetrain.registerTelemetry(logger::telemeterize);
     // driverController.cross().whileTrue(turret.setPositiveVoltageCommand());
     // driverController.square().whileTrue(turret.setNegativeVoltageCommand());
-    driverController.L1().onTrue(turret.setRobotRelativeAngleCommand(0.25));
-    driverController.L2().whileTrue(turret.setFieldRelativeAngleContinuousCommand(() -> 0));
+    // driverController.L1().onTrue(turret.setRobotRelativeAngleCommand(0.25));
+    driverController.L1().whileTrue(new SnakeDriveCommand(drivetrain));
     driverController.R2().whileTrue(turret.goToHubCommand());
+
+    driverController
+        .triangle()
+        .onTrue(
+            drivetrain.alignToAngleFieldRelativeCommand(
+                PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
+    driverController
+        .square()
+        .onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
+    driverController
+        .cross()
+        .onTrue(
+            drivetrain.alignToAngleFieldRelativeCommand(
+                PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
+    driverController
+        .circle()
+        .onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
+
+    // zeros gyro
+    driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
   }
 
   public Command getAutonomousCommand() {
@@ -107,7 +138,7 @@ public class RobotContainer {
    */
   public void resetSimulation() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
-    drivetrain.resetPose(new Pose2d(3, 2, new Rotation2d()));
+    drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 

@@ -127,11 +127,23 @@ public class MapleSimSwerveDrivetrain {
    */
   public void update() {
     SimulatedArena.getInstance().simulationPeriodic();
-    pigeonSim.setRawYaw(mapleSimDrive.getSimulatedDriveTrainPose().getRotation().getMeasure());
+    // pigeonSim.setRawYaw(mapleSimDrive.getSimulatedDriveTrainPose().getRotation().getMeasure());
+
+    pigeonSim.setRawYaw(Radians.of(getCompensatedYawRad()));
+
     pigeonSim.setAngularVelocityZ(
         RadiansPerSecond.of(
             mapleSimDrive.getDriveTrainSimulatedChassisSpeedsRobotRelative()
                 .omegaRadiansPerSecond));
+  }
+
+  public double getCompensatedYawRad() {
+    var pose = mapleSimDrive.getSimulatedDriveTrainPose();
+    var omega =
+        mapleSimDrive.getDriveTrainSimulatedChassisSpeedsRobotRelative().omegaRadiansPerSecond;
+
+    // ≈ 76 ms gyro latency compensation
+    return pose.getRotation().getRadians() + omega * 0.076;
   }
 
   /**
