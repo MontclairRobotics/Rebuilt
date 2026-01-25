@@ -6,27 +6,17 @@ import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 
 public class SnakeDriveCommand extends Command {
 
-  private CommandSwerveDrivetrain drive;
+	private CommandSwerveDrivetrain drive;
 
-  public SnakeDriveCommand(CommandSwerveDrivetrain drive) {
-    this.drive = drive;
-    addRequirements(drive);
-  }
+	public SnakeDriveCommand(CommandSwerveDrivetrain drive) {
+		this.drive = drive;
+		addRequirements(drive);
+	}
 
-  @Override
-  public void initialize() {}
-
-  @Override
-  public void execute() {
-    Rotation2d targetAngle = drive.getSnakeDriveAngle();
-    drive.setFieldRelativeAngle(targetAngle);
-    drive.alignToAngleFieldRelative(false);
-  }
-
-  @Override
-  public void end(boolean interrupted) {}
-
-  //   public boolean isFinished() {
-  // 	return Math.abs(MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.1)) > 0;
-  //   }
+	@Override
+	public void execute() {
+		Rotation2d targetAngle = drive.getSnakeDriveAngle();
+		drive.setFieldRelativeAngle(targetAngle);
+		drive.alignToAngleFieldRelative(false);
+	}
 }

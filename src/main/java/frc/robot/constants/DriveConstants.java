@@ -15,17 +15,25 @@ import frc.robot.util.TunerConstants;
 
 public class DriveConstants {
 
-  public static final Distance bumperWidth = Inches.of(0); // TODO: set
+	public static final LinearVelocity MAX_SPEED = TunerConstants.kSpeedAt12Volts; 
+	public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(12); 
 
-  public static final LinearVelocity MAX_SPEED = TunerConstants.kSpeedAt12Volts; // TODO: set
-  public static final LinearAcceleration MAX_ACCELERATION =
-      MetersPerSecondPerSecond.of(12); // TODO: set
+	/*
+	 * Power that the joystick input is raised to -> controls how smooth or snappy driving is
+	 * Between 1.5 and 2.5 is ideal
+	 * higher = less mid speed control, more precision
+	 * lower = more mid speed control, less precision
+	 */
+	public static final double joystickInputGain = 2; 
 
-  public static final double joystickInputGain = 2;
-  public static final AngularVelocity MAX_ANGULAR_SPEED = RotationsPerSecond.of(1.5); // TODO: set
-  public static final AngularAcceleration MAX_ANGULAR_ACCELERATION =
-      RotationsPerSecondPerSecond.of(9); // TODO: set
+	public static final AngularVelocity MAX_ANGULAR_SPEED = RotationsPerSecond.of(1.5);
+	public static final AngularAcceleration MAX_ANGULAR_ACCELERATION = RotationsPerSecondPerSecond.of(9); 
 
-  public static final PathConstraints DEFAULT_CONSTRAINTS =
-      new PathConstraints(MAX_SPEED, MAX_ACCELERATION, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION);
+	public static final PathConstraints DEFAULT_CONSTRAINTS =
+		new PathConstraints(
+			MAX_SPEED, 
+			MAX_ACCELERATION, 
+			MAX_ANGULAR_SPEED, 
+			MAX_ANGULAR_ACCELERATION
+		);
 }

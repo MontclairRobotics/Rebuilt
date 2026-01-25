@@ -11,61 +11,61 @@ import java.util.function.Consumer;
 
 public class Tunable extends SubsystemBase {
 
-  public static final NetworkTableInstance INST = NetworkTableInstance.getDefault();
-  public static final NetworkTable TUNABLES = INST.getTable("Tunables");
+	public static final NetworkTableInstance INST = NetworkTableInstance.getDefault();
+	public static final NetworkTable TUNABLES = INST.getTable("Tunables");
 
-  private String key;
-  private double defaultVal;
-  private double previousVal;
-  private DoubleTopic topic;
-  private DoubleEntry entry;
-  private Consumer<Double> updateCallback;
+	private String key;
+	private double defaultVal;
+	private double previousVal;
+	private DoubleTopic topic;
+	private DoubleEntry entry;
+	private Consumer<Double> updateCallback;
 
-  public Tunable(String key, double defaultVal, Consumer<Double> updateCallback) {
-    this.key = key;
-    this.defaultVal = defaultVal;
-    this.previousVal = defaultVal;
-    this.updateCallback = updateCallback;
-    publish();
-  }
+	public Tunable(String key, double defaultVal, Consumer<Double> updateCallback) {
+		this.key = key;
+		this.defaultVal = defaultVal;
+		this.previousVal = defaultVal;
+		this.updateCallback = updateCallback;
+		publish();
+	}
 
-  public double getDefault() {
-    return this.defaultVal;
-  }
+	public double getDefault() {
+		return this.defaultVal;
+	}
 
-  public String getKey() {
-    return this.key;
-  }
+	public String getKey() {
+		return this.key;
+	}
 
-  public double getValue() {
-    return entry.getAsDouble();
-  }
+	public double getValue() {
+		return entry.getAsDouble();
+	}
 
-  public void setDefault(double defaultVal) {
-    this.defaultVal = defaultVal;
-    publish();
-  }
+	public void setDefault(double defaultVal) {
+		this.defaultVal = defaultVal;
+		publish();
+	}
 
-  public void updateValue() {
-    if (previousVal != getValue()) {
-      previousVal = getValue();
+	public void updateValue() {
+		if (previousVal != getValue()) {
+		previousVal = getValue();
 
-      updateCallback.accept(getValue());
-    }
-  }
+		updateCallback.accept(getValue());
+		}
+	}
 
-  public void publish() {
-    this.topic = TUNABLES.getDoubleTopic(key);
-    this.entry = topic.getEntry(defaultVal);
-    topic.setRetained(true);
-    entry.set(defaultVal);
-  }
+	public void publish() {
+		this.topic = TUNABLES.getDoubleTopic(key);
+		this.entry = topic.getEntry(defaultVal);
+		topic.setRetained(true);
+		entry.set(defaultVal);
+	}
 
-  @Override
-  public void periodic() {
+	@Override
+	public void periodic() {
 
-    if (RobotContainer.debugMode && !DriverStation.isFMSAttached()) {
-      updateValue();
-    }
-  }
+		if (RobotContainer.debugMode && !DriverStation.isFMSAttached()) {
+		updateValue();
+		}
+	}
 }

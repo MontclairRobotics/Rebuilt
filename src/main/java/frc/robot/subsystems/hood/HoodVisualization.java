@@ -11,16 +11,16 @@ import org.littletonrobotics.junction.Logger;
 
 public class HoodVisualization {
 
-  public Pose3d hoodPose = new Pose3d();
+	public Pose3d hoodPose = new Pose3d();
 
-  public void update() {
-    hoodPose =
-        new Pose3d(
-            Translation3d.kZero,
-            new Rotation3d(0, Rotations.of(RobotContainer.hood.io.getAngle()).in(Radians), 0));
-  }
+	public void update() {
+		hoodPose =
+			new Pose3d(
+				Translation3d.kZero,
+				new Rotation3d(0, Rotations.of(RobotContainer.hood.io.getAngle()).in(Radians), 0));
+	}
 
-  public void log() {
-    Logger.recordOutput("Hood/Hood Pose", hoodPose);
-  }
+	public void log() {
+		Logger.recordOutput("Hood/Hood Pose", hoodPose);
+	}
 }

@@ -20,62 +20,53 @@ import org.littletonrobotics.junction.Logger;
  */
 public class Turret extends SubsystemBase {
 
-  TurretIO io;
-  public TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
-  private TurretVisualization turretVisualization;
+	TurretIO io;
+	public TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+	private TurretVisualization turretVisualization;
 
-  public Turret(TurretIO io) {
-    Logger.recordOutput("Turret/turret_internal", "turret initialized");
-    this.io = io;
-    turretVisualization = new TurretVisualization();
-  }
+	public Turret(TurretIO io) {
+		Logger.recordOutput("Turret/turret_internal", "turret initialized");
+		this.io = io;
+		turretVisualization = new TurretVisualization();
+	}
 
-  public Command stopCommand() {
-    return Commands.runOnce(() -> io.stop());
-  }
+	public Command stopCommand() {
+		return Commands.runOnce(() -> io.stop());
+	}
 
-  public Command setRobotRelativeAngleCommand(double target) {
-    return Commands.run(() -> io.setRobotRelativeAngle(target), this).until(() -> io.atSetpoint());
-  }
+	public Command setRobotRelativeAngleCommand(double target) {
+		return Commands.run(() -> io.setRobotRelativeAngle(target), this).until(() -> io.atSetpoint());
+	}
 
-  public Command setRobotRelativeAngleContinuousCommand(DoubleSupplier target) {
-    return Commands.run(() -> io.setRobotRelativeAngle(target), this);
-  }
+	public Command setRobotRelativeAngleContinuousCommand(DoubleSupplier target) {
+		return Commands.run(() -> io.setRobotRelativeAngle(target), this);
+	}
 
-  public Command setFieldRelativeAngleCommand(double target) {
-    return Commands.run(() -> io.setFieldRelativeAngle(target), this).until(() -> io.atSetpoint());
-  }
+	public Command setFieldRelativeAngleCommand(double target) {
+		return Commands.run(() -> io.setFieldRelativeAngle(target), this).until(() -> io.atSetpoint());
+	}
 
-  public Command setFieldRelativeAngleContinuousCommand(DoubleSupplier target) {
-    return Commands.run(() -> io.setFieldRelativeAngle(target), this);
-  }
+	public Command setFieldRelativeAngleContinuousCommand(DoubleSupplier target) {
+		return Commands.run(() -> io.setFieldRelativeAngle(target), this);
+	}
 
-  public Command goToHubCommand() {
-    return Commands.run(() -> io.setFieldRelativeAngle(() -> getAngleToHub()), this);
-  }
+	public Command goToHubCommand() {
+		return Commands.run(() -> io.setFieldRelativeAngle(() -> getAngleToHub()), this);
+	}
 
-  public double getAngleToHub() {
-    Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
-    Translation2d hublocation = PoseUtils.flipTranslationAlliance(HUB_LOCATION);
-    Translation2d robotToHub = hublocation.minus(robotPose.getTranslation());
-    return robotToHub.getAngle().getRotations();
-  }
+	public double getAngleToHub() {
+		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+		Translation2d hublocation = PoseUtils.flipTranslationAlliance(HUB_LOCATION);
+		Translation2d robotToHub = hublocation.minus(robotPose.getTranslation());
+		return robotToHub.getAngle().getRotations();
+	}
 
-  //   public Command setPositiveVoltageCommand() {
-  //     Logger.recordOutput("Turret/turret_internal", "voltage command posted");
-  //     return Commands.run(() -> io.setVoltage(2), this).finallyDo(io::stop);
-  //   }
-
-  //   public Command setNegativeVoltageCommand() {
-  //     return Commands.run(() -> io.setVoltage(-2), this).finallyDo(io::stop);
-  //   }
-
-  @Override
-  public void periodic() {
-    io.updateInputs(inputs);
-    Logger.processInputs("Turret", inputs);
-    Logger.recordOutput("RobotPose", new Pose3d(2, 5, 0, Rotation3d.kZero));
-    turretVisualization.update();
-    turretVisualization.log();
-  }
+	@Override
+	public void periodic() {
+		io.updateInputs(inputs);
+		Logger.processInputs("Turret", inputs);
+		Logger.recordOutput("RobotPose", new Pose3d(2, 5, 0, Rotation3d.kZero));
+		turretVisualization.update();
+		turretVisualization.log();
+	}
 }
