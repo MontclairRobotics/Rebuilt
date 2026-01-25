@@ -14,22 +14,22 @@ import edu.wpi.first.units.measure.Distance;
 public class HoodConstants {
 
 	// ports
-	public static final int CAN_ID = 37; 
-	public static final int ENCODER_PORT = 4; 
+	public static final int CAN_ID = 37;
+	public static final int ENCODER_PORT = 4;
 
 	// constraints
-	public static final Angle MIN_ANGLE = Degrees.of(20); 
-	public static final Angle MAX_ANGLE = Degrees.of(45); 
-	public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(3); 
-	public static final AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(8); 
+	public static final Angle MIN_ANGLE = Degrees.of(20);
+	public static final Angle MAX_ANGLE = Degrees.of(45);
+	public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(3);
+	public static final AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(8);
 
 	// for every rotation of the hood the motor shaft rotates this amount
-	public static final double GEAR_RATIO = 10.8; 
+	public static final double GEAR_RATIO = 10.8;
 	public static final double MOMENT_OF_INERTIA = 0.03;
 
-	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0); 
-	public static final Distance HOOD_LENGTH = Meters.of(0.305); 
-	public static final double VOLTAGE_LIMIT = 12; 
+	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0);
+	public static final Distance HOOD_LENGTH = Meters.of(0.305);
+	public static final double VOLTAGE_LIMIT = 12;
 
 	public static final double kP = 0;
 	public static final double kI = 0;

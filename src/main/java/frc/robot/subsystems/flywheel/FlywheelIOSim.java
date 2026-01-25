@@ -57,7 +57,7 @@ public class FlywheelIOSim implements FlywheelIO {
 
 	public void setVelocityRPS(double targetVelocity) {
 		// converted radians/sec -> rotations.sec
-		double pidOutput = pidController.calculate((sim.getAngularVelocity()).in(RotationsPerSecond), targetVelocity); 
+		double pidOutput = pidController.calculate((sim.getAngularVelocity()).in(RotationsPerSecond), targetVelocity);
 		double ffVolts = motorFeedForward.calculate(targetVelocity);
 		double totalOutput = pidOutput + ffVolts;
 		sim.setInputVoltage(MathUtil.clamp(totalOutput, -12.0, 12.0));

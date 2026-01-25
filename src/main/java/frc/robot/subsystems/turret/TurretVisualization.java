@@ -15,7 +15,7 @@ public class TurretVisualization {
 	public void update() {
 		turretPose = new Pose2d(
 			0,
-			0, 
+			0,
 			Rotation2d.fromRotations(RobotContainer.turret.io.getRobotRelativeAngle())
 		);
 	}
@@ -23,9 +23,9 @@ public class TurretVisualization {
 	public void log() {
 		Logger.recordOutput("Turret/turret_internal", "turret logging" + number);
 		number++;
-		
+
 		Logger.recordOutput(
-			"Turret/TurretPose", 
+			"Turret/TurretPose",
 			new Pose3d(0, 0, 0, new Rotation3d(turretPose.getRotation()))
 		);
 	}

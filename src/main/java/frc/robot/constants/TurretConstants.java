@@ -10,9 +10,9 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public class TurretConstants {
-	
-	public static final Translation2d HUB_LOCATION = new Translation2d(4.6256, 4.034); 
-	
+
+	public static final Translation2d HUB_LOCATION = new Translation2d(4.6256, 4.034);
+
 	// ports
 	public static final int CAN_ID = -1;
 
@@ -21,11 +21,11 @@ public class TurretConstants {
 	public static final Angle MAX_ANGLE = Rotations.of(1);
 	public static final AngularVelocity TURRET_CRUISE_VELOCITY = RotationsPerSecond.of(4); // target cruise velocity of the turret, 4 rps
 	public static final AngularAcceleration TURRET_ACCELERATION = RotationsPerSecondPerSecond.of(16); // target acceleration of the turret, 16 rps^2
-	public static final double TURRET_JERK = 160; // target jerk of the turret, 160 rps^3 
+	public static final double TURRET_JERK = 160; // target jerk of the turret, 160 rps^3
 	public static final Angle ANGLE_TOLERANCE = Rotations.of(0.001);
 
 	public static final double GEAR_RATIO = 12; // how many rotations of the output shaft per rotation of the turret
-	
+
 	// physical properties
 	public static final double MOMENT_OF_INERTIA = 0.35;
 	public static final double LENGTH = 0.3;
