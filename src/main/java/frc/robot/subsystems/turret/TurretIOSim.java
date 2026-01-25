@@ -1,6 +1,7 @@
 package frc.robot.subsystems.turret;
 
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
@@ -73,7 +74,8 @@ public class TurretIOSim implements TurretIO {
     pidController.setGoal(
         new TrapezoidProfile.State(
             wrapAngleSetpoint(angle),
-            -RobotContainer.drivetrain.getSimAngularVelocity().in(RotationsPerSecond)));
+            RadiansPerSecond.of(RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond)
+                .in(RotationsPerSecond)));
 
     setVoltage(pidController.calculate(getRobotRelativeAngle()));
   }
@@ -85,7 +87,7 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public double getFieldRelativeAngle() {
-    return getRobotRelativeAngle() + RobotContainer.drivetrain.getSimYaw().in(Rotations);
+    return getRobotRelativeAngle() + RobotContainer.drivetrain.getWrappedHeading().getRotations();
   }
 
   @Override
@@ -110,7 +112,8 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public void setFieldRelativeAngle(double angle) {
-    double robotRelativeAngleSetpoint = angle - RobotContainer.drivetrain.getSimYaw().in(Rotations);
+    double robotRelativeAngleSetpoint =
+        angle - RobotContainer.drivetrain.getWrappedHeading().getRotations();
     fieldRelativeSetpoint = angle;
     setRobotRelativeAngle(robotRelativeAngleSetpoint);
   }

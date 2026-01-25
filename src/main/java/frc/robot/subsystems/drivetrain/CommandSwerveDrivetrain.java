@@ -29,8 +29,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -246,22 +244,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     return wrapAngle(odometryHeading);
   }
 
-  public AngularVelocity getSimAngularVelocity() {
-    return RadiansPerSecond.of(
-        mapleSimSwerveDrivetrain.mapleSimDrive.getDriveTrainSimulatedChassisSpeedsRobotRelative()
-            .omegaRadiansPerSecond);
-  }
-
-  public Angle getSimYaw() {
-    var pose = mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose();
-    var omega =
-        mapleSimSwerveDrivetrain.mapleSimDrive.getDriveTrainSimulatedChassisSpeedsRobotRelative()
-            .omegaRadiansPerSecond;
-
-    // ≈ 76 ms gyro latency compensation
-    return Radians.of(pose.getRotation().getRadians() + omega * 0.076);
-  }
-
   public double getStrafeVelocityFromController() {
     double xInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.06);
     return MathUtil.copyDirectionPow(xInput, joystickInputGain) * MAX_SPEED.in(MetersPerSecond);
@@ -334,12 +316,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   public void setRobotRelativeAngle(Rotation2d angDeg) {
-    double wrappedSetPoint = wrapAngle(odometryHeading.plus(angDeg)).getRadians();
+    double wrappedSetPoint = wrapAngle(getWrappedHeading().plus(angDeg)).getRadians();
     thetaController.setSetpoint(wrappedSetPoint);
   }
 
   public void alignToAngleRobotRelative(boolean lockDrive) {
-    double response = thetaController.calculate(odometryHeading.getRadians());
+    double response = thetaController.calculate(getWrappedHeading().getRadians());
     if (lockDrive) {
       drive(0, 0, response, false, true); // perspective doesn't matter in robot relative
     } else {
@@ -358,7 +340,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   public void alignToAngleFieldRelative(boolean lockDrive) {
-    double response = thetaController.calculate(odometryHeading.getRadians());
+    double response = thetaController.calculate(getWrappedHeading().getRadians());
     if (lockDrive) {
       drive(0, 0, response, true, true);
     } else {
@@ -387,6 +369,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   @AutoLogOutput
   public Pose2d getRobotPose() {
+    if (Utils.isSimulation() && mapleSimSwerveDrivetrain != null) {
+      return mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose();
+    }
     return this.getState().Pose;
   }
 
@@ -442,9 +427,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   @Override
   public void periodic() {
 
-    odometryHeading = getRobotPose().getRotation();
+    odometryHeading = this.getState().Pose.getRotation();
     fieldRelative = !RobotContainer.driverController.L2().getAsBoolean();
     Logger.recordOutput("DriveState/FieldRelative", fieldRelative);
+    Logger.recordOutput("DriveState/odometryHeading", odometryHeading);
+    Logger.recordOutput("DriveState/robotPose", getRobotPose());
     isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
     /*

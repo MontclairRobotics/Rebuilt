@@ -143,7 +143,7 @@ public class MapleSimSwerveDrivetrain {
         mapleSimDrive.getDriveTrainSimulatedChassisSpeedsRobotRelative().omegaRadiansPerSecond;
 
     // ≈ 76 ms gyro latency compensation
-    return pose.getRotation().getRadians() + omega * 0.076;
+    return pose.getRotation().getRadians() + (-0.003436 * omega * omega + 0.07693 * omega + 0.0175);
   }
 
   /**

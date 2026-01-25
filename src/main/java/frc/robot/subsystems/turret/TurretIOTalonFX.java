@@ -85,7 +85,7 @@ public class TurretIOTalonFX implements TurretIO {
   public void setFieldRelativeAngle(double angle) {
     fieldRelativeSetpoint = angle;
     double robotRelativeAngleSetpoint =
-        angle - RobotContainer.drivetrain.odometryHeading.getRotations();
+        angle - RobotContainer.drivetrain.getWrappedHeading().getRotations();
     setRobotRelativeAngle(robotRelativeAngleSetpoint);
   }
 
@@ -96,7 +96,7 @@ public class TurretIOTalonFX implements TurretIO {
 
   @Override
   public double getFieldRelativeAngle() {
-    return getRobotRelativeAngle() + RobotContainer.drivetrain.odometryHeading.getRotations();
+    return getRobotRelativeAngle() + RobotContainer.drivetrain.getWrappedHeading().getRotations();
   }
 
   @Override
