@@ -109,7 +109,7 @@ public class TurretIOTalonFX implements TurretIO {
 	public double wrapAngleSetpoint(double angle) {
 		if (angle > MAX_ANGLE.in(Rotations)) {
 			return angle - 1;
-		} else if (angle < 0) {
+		} else if (angle < MIN_ANGLE.in(Rotations)) {
 			return angle + 1;
 		} else {
 			return angle;
