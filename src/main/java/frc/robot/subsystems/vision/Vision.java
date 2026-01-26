@@ -76,14 +76,14 @@ public class Vision extends SubsystemBase {
 	@Override
 	public void periodic() {
 		logCounter++;
-		allRobotPoses.clear();
-		allTagPoses.clear();
-		allRobotPosesAccepted.clear();
-		allRobotPosesRejected.clear();
-		robotPoses.clear();
-		tagPoses.clear();
-		robotPosesAccepted.clear();
-		robotPosesRejected.clear();
+		// allRobotPoses.clear();
+		// allTagPoses.clear();
+		// allRobotPosesAccepted.clear();
+		// allRobotPosesRejected.clear();
+		// robotPoses.clear();
+		// tagPoses.clear();
+		// robotPosesAccepted.clear();
+		// robotPosesRejected.clear();
 
 		for (int i = 0; i < io.length; i++) {
 			io[i].updateInputs(inputs[i]);
@@ -97,10 +97,10 @@ public class Vision extends SubsystemBase {
 			// Update disconnected alert
 			disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
-			robotPoses.clear();
-			tagPoses.clear();
-			robotPosesAccepted.clear();
-			robotPosesRejected.clear();
+			// robotPoses.clear();
+			// tagPoses.clear();
+			// robotPosesAccepted.clear();
+			// robotPosesRejected.clear();
 
 			// Add tag poses
 			if (logCounter % 5 == 0) {

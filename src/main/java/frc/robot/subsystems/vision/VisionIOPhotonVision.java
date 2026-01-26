@@ -13,13 +13,11 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonPipelineResult;
 
 /** IO implementation for real PhotonVision hardware. */
 public class VisionIOPhotonVision implements VisionIO {
@@ -37,19 +35,9 @@ public class VisionIOPhotonVision implements VisionIO {
 		this.robotToCamera = robotToCamera;
 	}
 
-	private final List<PhotonPipelineResult> cachedResults = new ArrayList<>();
-	private final List<PoseObservation> cachedPoseObservations = new ArrayList<>();
-	private final Set<Short> cachedTagIds = new HashSet<>();
-
 	@Override
 	public void updateInputs(VisionIOInputs inputs) {
 		inputs.connected = camera.isConnected();
-
-		cachedResults.clear();
-		cachedResults.addAll(camera.getAllUnreadResults());
-
-		cachedTagIds.clear();
-		cachedPoseObservations.clear();
 
 		// Read new camera observations
 		Set<Short> tagIds = new HashSet<>();
