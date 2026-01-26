@@ -130,7 +130,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded); // TODO: SET
 
 	/* Heading PID Controller for things like automatic alignment buttons */
-	public PIDController thetaController = new PIDController(5, 0, 0.1);
+	public PIDController thetaController = new PIDController(7, 0, 0.1);
 
 	/* variable to store our heading */
 	public Rotation2d odometryHeading = new Rotation2d();
@@ -244,19 +244,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	}
 
 	public double getStrafeVelocityFromController() {
-		double xInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.06);
+		double xInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.1);
 		return MathUtil.copyDirectionPow(xInput, joystickInputGain) * MAX_SPEED.in(MetersPerSecond);
 	}
 
 	public double getForwardVelocityFromController() {
-		double yInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.06);
+		double yInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.1);
 		return MathUtil.copyDirectionPow(yInput, joystickInputGain) * MAX_SPEED.in(MetersPerSecond);
 	}
 
 	public void driveJoystick() {
-		double rotInput = -MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.06);
+		double rotInput = -MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.1);
 		double rotVelocity =
-			MathUtil.copyDirectionPow(rotInput, joystickInputGain)
+			MathUtil.copyDirectionPow(rotInput, joystickInputRotGain)
 				* MAX_ANGULAR_SPEED.in(RadiansPerSecond);
 
 		drive(

@@ -17,8 +17,8 @@ public class TurretConstants {
 	public static final int CAN_ID = -1;
 
 	// constraints
-	public static final Angle MIN_ANLGE = Rotations.of(0);
-	public static final Angle MAX_ANGLE = Rotations.of(1);
+	public static final Angle MIN_ANGLE = Rotations.of(-0.5);
+	public static final Angle MAX_ANGLE = Rotations.of(0.5);
 	public static final AngularVelocity TURRET_CRUISE_VELOCITY = RotationsPerSecond.of(4); // target cruise velocity of the turret, 4 rps
 	public static final AngularAcceleration TURRET_ACCELERATION = RotationsPerSecondPerSecond.of(16); // target acceleration of the turret, 16 rps^2
 	public static final double TURRET_JERK = 160; // target jerk of the turret, 160 rps^3
