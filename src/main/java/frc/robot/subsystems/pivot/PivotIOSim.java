@@ -34,6 +34,7 @@ public class PivotIOSim implements PivotIO {
     encoder = new DutyCycleEncoderSim(realEncoder);
     encoder.setConnected(true);
 
+    //TODO: set the sim program numbers
     sim =
         new SingleJointedArmSim(
             DCMotor.getNEO(1),

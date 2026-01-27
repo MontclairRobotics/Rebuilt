@@ -19,7 +19,7 @@ public class PivotIOTalonFX implements PivotIO {
   private TalonFX motor;
 
   // pid & ff controllers
-  private ArmFeedforward PivotFeedforward = new ArmFeedforward(0, 0.2, 0);
+  private ArmFeedforward PivotFeedforward = new ArmFeedforward(0, 0, 0);
   private PIDController pidController = new PIDController(0, 0, 0);
 
   // encoders
@@ -43,12 +43,14 @@ public class PivotIOTalonFX implements PivotIO {
   public void updateInputs(PivotIOInputs inputs) {
     inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
     inputs.current = motor.getStatorCurrent().getValueAsDouble();
-
+    
+    //needed?
     inputs.angle = angleDeg;
 
     inputs.encoderConnected = PivotEncoder.isConnected();
   }
 
+  //supposed to be zero?
   public double calculateStationaryFeedforward() {
     double voltage = PivotFeedforward.calculate(getPivotAngle().getRadians(), 0);
     return getPivotAngle().getDegrees() > 0 ? voltage : -voltage;

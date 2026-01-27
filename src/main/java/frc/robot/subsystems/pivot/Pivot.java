@@ -73,6 +73,7 @@ public class Pivot extends SubsystemBase {
     return Commands.runOnce(() -> stop());
   }
 
+  //simple go to angle
   public Command goToAngleCommand(Rotation2d angle) {
     return Commands.run(
             () -> {
@@ -87,6 +88,7 @@ public class Pivot extends SubsystemBase {
             });
   }
 
+//keep going to the angle without stopping
   public Command goToAngleContinuousCommand(Rotation2d angle) {
     return Commands.run(
             () -> {
@@ -100,6 +102,7 @@ public class Pivot extends SubsystemBase {
             });
   }
 
+  //joystick control command (
   public Command joystickControlCommand() {
     return Commands.run(this::joystickControl, this);
   }
