@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "trenchRight-outpost"
+            "pathName": "trenchBottom-outpost"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "outpost-trenchRight"
+            "pathName": "outpost-trenchBottom"
           }
         },
         {
@@ -31,13 +31,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "trenchRight-centerRight"
+            "pathName": "trenchBottom-closeBottom"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "centerRight-trenchRight"
+            "pathName": "closeBottom-trenchBottom"
           }
         },
         {

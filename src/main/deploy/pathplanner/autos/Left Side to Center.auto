@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "trenchLeft-centerLeft"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "centerLeft-trenchLeft"
+            "pathName": "closeTop-trenchTop"
           }
         },
         {
