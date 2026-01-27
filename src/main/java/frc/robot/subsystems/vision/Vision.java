@@ -13,12 +13,17 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
+import frc.robot.constants.TurretConstants;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+import frc.robot.util.PoseUtils;
+
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -59,6 +64,22 @@ public class Vision extends SubsystemBase {
   public Rotation2d getTargetX(int cameraIndex) {
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
+
+  public double getDistanceToHub() {
+      Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+      Pose2d hubPose = new Pose2d(TurretConstants.HUB_LOCATION, Rotation2d.fromDegrees(0));
+      hubPose = PoseUtils.flipPoseAlliance(hubPose);
+      return robotPose.getTranslation().getDistance(hubPose.getTranslation());
+  }
+
+  public double getAngleToHub() {
+      Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+      Pose2d hubPose = new Pose2d(TurretConstants.HUB_LOCATION, Rotation2d.fromDegrees(0));
+      hubPose = PoseUtils.flipPoseAlliance(hubPose);
+      Translation2d robotToHub = hubPose.getTranslation().minus(robotPose.getTranslation());
+      return robotToHub.getAngle().getRotations();
+  }
+
 
   @Override
   public void periodic() {
