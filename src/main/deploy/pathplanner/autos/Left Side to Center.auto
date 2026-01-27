@@ -27,12 +27,6 @@
           "data": {
             "name": "shoot"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "trenchLeft-towerLeft"
-          }
         }
       ]
     }
