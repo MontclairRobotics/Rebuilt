@@ -14,13 +14,16 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.util.TunerConstants;
 
 public class DriveConstants {
+
   public static final Distance bumperWidth = Inches.of(0); // TODO: set
+
   public static final LinearVelocity MAX_SPEED = TunerConstants.kSpeedAt12Volts; // TODO: set
   public static final LinearAcceleration MAX_ACCELERATION =
-      MetersPerSecondPerSecond.of(10); // TODO: set
-  public static final AngularVelocity MAX_ANGULAR_SPEED = RotationsPerSecond.of(2); // TODO: set
+      MetersPerSecondPerSecond.of(12); // TODO: set
+
+  public static final AngularVelocity MAX_ANGULAR_SPEED = RotationsPerSecond.of(4); // TODO: set
   public static final AngularAcceleration MAX_ANGULAR_ACCELERATION =
-      RotationsPerSecondPerSecond.of(3); // TODO: set
+      RotationsPerSecondPerSecond.of(9); // TODO: set
 
   public static final PathConstraints DEFAULT_CONSTRAINTS =
       new PathConstraints(MAX_SPEED, MAX_ACCELERATION, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION);

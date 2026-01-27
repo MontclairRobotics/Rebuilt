@@ -1,9 +1,10 @@
 package frc.robot.subsystems.drivetrain;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.constants.Constants.*;
+import static frc.robot.constants.DriveConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
-// import frc.robot.util.MapleSimSwerveDrivetrain;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -17,14 +18,17 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import dev.doglog.DogLog;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -35,7 +39,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.RobotContainer;
-import frc.robot.constants.DriveConstants;
+import frc.robot.constants.Constants;
+import frc.robot.util.MapleSimSwerveDrivetrain;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.TunerConstants.TunerSwerveDrivetrain;
@@ -44,6 +49,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
+  public TimeInterpolatableBuffer<Pose2d> poseBuffer = TimeInterpolatableBuffer.createBuffer(3);
 
   private static final double kSimLoopPeriod = 0.002; // 2 ms
   private Notifier m_simNotifier = null;
@@ -119,12 +125,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   /* The SysId routine to test */
   private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
 
-  private Rotation2d targetHeading = Rotation2d.fromDegrees(0);
-
-  public AprilTagFieldLayout tagLayout; // TODO: SET
+  public AprilTagFieldLayout tagLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded); // TODO: SET
 
   /* Heading PID Controller for things like automatic alignment buttons */
-  public PIDController thetaController = new PIDController(5, 0, .1);
+  public PIDController thetaController = new PIDController(5, 0, 0.1);
 
   /* variable to store our heading */
   public Rotation2d odometryHeading = new Rotation2d();
@@ -155,17 +160,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       Matrix<N3, N1> odometryStandardDeviation,
       Matrix<N3, N1> visionStandardDeviation,
       SwerveModuleConstants<?, ?, ?>... modules) {
+
     super(
         drivetrainConstants,
         odometryUpdateFrequency,
         odometryStandardDeviation,
         visionStandardDeviation,
-        TunerConstants.FrontLeft,
-        TunerConstants.FrontRight,
-        TunerConstants.BackLeft,
-        TunerConstants.BackRight
-        // , MapleSimSwerveDrivetrain.regulateModuleConstantsForSimulation(modules)
-        );
+        Constants.currentMode == Constants.Mode.SIM
+            ? MapleSimSwerveDrivetrain.regulateModuleConstantsForSimulation(modules)
+            : modules);
+
+    odometryHeading = Rotation2d.fromRotations(0);
 
     if (Utils.isSimulation()) {
       startSimThread();
@@ -174,12 +179,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     try {
       config = RobotConfig.fromGUISettings();
     } catch (Exception e) {
-
     }
 
     tagLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
     fieldRelative = true;
     configureAutoBuilder();
+
     thetaController.setTolerance(Degrees.of(1).in(Radians));
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
@@ -241,18 +246,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   public double getVelocityXFromController() {
     double xInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.06);
-    return Math.pow(xInput, 3) * DriveConstants.MAX_SPEED.in(MetersPerSecond);
+    return Math.pow(xInput, 3) * MAX_SPEED.in(MetersPerSecond);
   }
 
   public double getVelocityYFromController() {
-    double yInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.06);
-    return Math.pow(yInput, 3) * DriveConstants.MAX_SPEED.in(MetersPerSecond);
+    double yInput = MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.06);
+    return Math.pow(yInput, 3) * MAX_SPEED.in(MetersPerSecond);
   }
 
   public void driveJoystick() {
     double rotInput = -MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.06);
-    double rotVelocity =
-        Math.pow(rotInput, 3) * DriveConstants.MAX_ANGULAR_SPEED.in(RadiansPerSecond);
+    double rotVelocity = Math.pow(rotInput, 3) * MAX_ANGULAR_SPEED.in(RadiansPerSecond);
+
     drive(
         getVelocityYFromController(),
         getVelocityXFromController(),
@@ -299,7 +304,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             .withDriveRequestType(DriveRequestType.Velocity)
             .withSteerRequestType(SteerRequestType.Position);
 
-    setControl(req);
+    setControl(req); // actually drives
   }
 
   public void setRobotRelativeAngle(Rotation2d angDeg) {
@@ -395,6 +400,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     odometryHeading = getRobotPose().getRotation();
     fieldRelative = !RobotContainer.driverController.L2().getAsBoolean();
     Logger.recordOutput("DriveState/FieldRelative", fieldRelative);
+    isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
     /*
      * Periodically try to apply the operator perspective.
@@ -403,6 +409,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * Otherwise, only check and apply the operator perspective if the DS is disabled.
      * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
      */
+
     if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
       DriverStation.getAlliance()
           .ifPresent(
@@ -420,43 +427,46 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     DogLog.log("Drive/TargetStates", getState().ModuleTargets);
     DogLog.log("Drive/MeasuredStates", getState().ModuleStates);
     DogLog.log("Drive/MeasuredSpeeds", getState().Speeds);
-    // if (mapleSimSwerveDrivetrain != null)
-    //   DogLog.log(
-    //       "Drive/SimulationPose",
-    //       mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose());
+
+    if (mapleSimSwerveDrivetrain != null) {
+      DogLog.log(
+          "Drive/SimulationPose",
+          mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose());
+    }
   }
 
-  // public MapleSimSwerveDrivetrain mapleSimSwerveDrivetrain = null;
+  public MapleSimSwerveDrivetrain mapleSimSwerveDrivetrain = null;
 
   @SuppressWarnings("unchecked")
   private void startSimThread() {
-    // mapleSimSwerveDrivetrain =
-    //     new MapleSimSwerveDrivetrain(
-    //         Seconds.of(kSimLoopPeriod),
-    //         // TODO: modify the following constants according to your robot
-    //         Pounds.of(150), // robot weight
-    //         Inches.of(35.5), // bumper length
-    //         Inches.of(35.5), // bumper width
-    //         DCMotor.getKrakenX60Foc(1), // drive motor type
-    //         DCMotor.getKrakenX60Foc(1), // steer motor type
-    //         1.2, // wheel COF
-    //         getModuleLocations(),
-    //         getPigeon2(),
-    //         getModules(),
-    //         TunerConstants.FrontLeft,
-    //         TunerConstants.FrontRight,
-    //         TunerConstants.BackLeft,
-    //         TunerConstants.BackRight);
-    // /* Run simulation at a faster rate so PID gains behave more reasonably */
-    // m_simNotifier = new Notifier(mapleSimSwerveDrivetrain::update);
-    // m_simNotifier.startPeriodic(kSimLoopPeriod);
+    mapleSimSwerveDrivetrain =
+        new MapleSimSwerveDrivetrain(
+            Seconds.of(kSimLoopPeriod),
+            // TODO: modify the following constants according to our robot
+            ROBOT_MASS, // robot weight
+            BUMPER_WIDTH, // bumper length
+            BUMPER_WIDTH, // bumper width
+            DCMotor.getKrakenX60Foc(1), // drive motor type
+            DCMotor.getKrakenX60Foc(1), // steer motor type
+            1.2, // wheel COF
+            getModuleLocations(),
+            getPigeon2(),
+            getModules(),
+            TunerConstants.FrontLeft,
+            TunerConstants.FrontRight,
+            TunerConstants.BackLeft,
+            TunerConstants.BackRight);
+    /* Run simulation at a faster rate so PID gains behave more reasonably */
+    m_simNotifier = new Notifier(mapleSimSwerveDrivetrain::update);
+    m_simNotifier.startPeriodic(kSimLoopPeriod);
   }
 
   @Override
   public void resetPose(Pose2d pose) {
-    // if (this.mapleSimSwerveDrivetrain != null)
-    //   mapleSimSwerveDrivetrain.mapleSimDrive.setSimulationWorldPose(pose);
-    Timer.delay(0.1); // wait for simulation to update
+    if (this.mapleSimSwerveDrivetrain != null) {
+      mapleSimSwerveDrivetrain.mapleSimDrive.setSimulationWorldPose(pose);
+      Timer.delay(0.1); // wait for simulation to update
+    }
     super.resetPose(pose);
   }
 }
