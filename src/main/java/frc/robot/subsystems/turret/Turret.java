@@ -4,8 +4,10 @@ import static frc.robot.constants.TurretConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -59,6 +61,13 @@ public class Turret extends SubsystemBase {
 		Translation2d hublocation = PoseUtils.flipTranslationAlliance(HUB_LOCATION);
 		Translation2d robotToHub = hublocation.minus(robotPose.getTranslation());
 		return robotToHub.getAngle().getRotations();
+	}
+
+	public Translation2d getFieldRelativePosition() {
+		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+		Rotation2d robotHeading = robotPose.getRotation();
+		Translation2d fieldRelativeOffset = TURRET_OFFSET.rotateBy(robotHeading);
+		return robotPose.getTranslation().plus(fieldRelativeOffset);
 	}
 
 	@Override
