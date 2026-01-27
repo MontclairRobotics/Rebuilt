@@ -30,7 +30,7 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 	public void updateInputs(FlywheelIOInputs inputs) {
 		inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
 		inputs.tempCelcius = motor.getDeviceTemp().getValueAsDouble(); // celsius
-		inputs.velocity = motor.getVelocity().getValueAsDouble(); // RPS
+		inputs.velocity = this.getMotorVelocity(); // RPS
 		inputs.velocitySetpoint = pidController.getSetpoint();
 	}
 
