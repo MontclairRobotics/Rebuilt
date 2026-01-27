@@ -12,47 +12,48 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
-  FlywheelIO io;
-  private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
-  SysIdRoutine flyWheelRoutine =
-      new SysIdRoutine(
-          new SysIdRoutine.Config(
-              null,
-              Volts.of(4),
-              null,
-              state -> SignalLogger.writeString("SysIdFlywheel_State", state.toString())),
-          new SysIdRoutine.Mechanism(output -> io.setVoltage(output.in(Volts)), null, this));
+	FlywheelIO io;
+	private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
-  public Flywheel(FlywheelIO io) {
-    this.io = io;
-  }
+	SysIdRoutine flyWheelRoutine =
+		new SysIdRoutine(
+			new SysIdRoutine.Config(
+				null,
+				Volts.of(4),
+				null,
+				state -> SignalLogger.writeString("SysIdFlywheel_State", state.toString())
+			),
+			new SysIdRoutine.Mechanism(output -> io.setVoltage(output.in(Volts)), null, this)
+		);
 
-  @Override
-  public void periodic() {
-    io.updateInputs(inputs);
-    Logger.processInputs("Flywheel", inputs);
-  }
+	public Flywheel(FlywheelIO io) {
+		this.io = io;
+	}
 
-  public Command holdSpeedCommand(double targetVelocity) {
-    return Commands.run(
-        () -> {
-          io.setVelocityRPS(targetVelocity);
-        });
-  }
+	@Override
+	public void periodic() {
+		io.updateInputs(inputs);
+		Logger.processInputs("Flywheel", inputs);
+	}
 
-  public Command holdSpeedCommand(DoubleSupplier targetVelocityRPSSupplier) {
-    return Commands.run(
-        () -> {
-          io.setVelocityRPS(targetVelocityRPSSupplier);
-        });
-  }
+	public Command holdSpeedCommand(double targetVelocity) {
+		return Commands.run(() -> {
+			io.setVelocityRPS(targetVelocity);
+		});
+	}
 
-  public Command posSysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return flyWheelRoutine.quasistatic(direction);
-  }
+	public Command holdSpeedCommand(DoubleSupplier targetVelocityRPSSupplier) {
+		return Commands.run(() -> {
+			io.setVelocityRPS(targetVelocityRPSSupplier);
+		});
+	}
 
-  public Command negSysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return flyWheelRoutine.quasistatic(Direction.kReverse);
-  }
+	public Command posSysIdQuasistatic(SysIdRoutine.Direction direction) {
+		return flyWheelRoutine.quasistatic(direction);
+	}
+
+	public Command negSysIdQuasistatic(SysIdRoutine.Direction direction) {
+		return flyWheelRoutine.quasistatic(Direction.kReverse);
+	}
 }

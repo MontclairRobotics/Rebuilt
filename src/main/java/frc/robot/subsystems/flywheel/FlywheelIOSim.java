@@ -12,60 +12,62 @@ import frc.robot.constants.FlywheelConstants;
 import java.util.function.DoubleSupplier;
 
 public class FlywheelIOSim implements FlywheelIO {
-  private PIDController pidController;
-  private SimpleMotorFeedforward motorFeedForward;
 
-  private FlywheelSim sim =
-      new FlywheelSim(
-          LinearSystemId.createFlywheelSystem(
-              DCMotor.getKrakenX60(1),
-              FlywheelConstants.MOMENT_OF_INERTIA,
-              FlywheelConstants.GEARING),
-          DCMotor.getKrakenX60(1),
-          0.0);
+	private PIDController pidController;
+	private SimpleMotorFeedforward motorFeedForward;
 
-  public FlywheelIOSim() {
-    pidController =
-        new PIDController(
-            FlywheelConstants.SLOT0_CONFIGS.kP,
-            FlywheelConstants.SLOT0_CONFIGS.kI,
-            FlywheelConstants.SLOT0_CONFIGS.kD);
-    motorFeedForward =
-        new SimpleMotorFeedforward(
-            FlywheelConstants.SLOT0_CONFIGS.kS, FlywheelConstants.SLOT0_CONFIGS.kV);
-  }
+	private FlywheelSim sim =
+		new FlywheelSim(
+			LinearSystemId.createFlywheelSystem(
+				DCMotor.getKrakenX60(1),
+				FlywheelConstants.MOMENT_OF_INERTIA,
+				FlywheelConstants.GEARING),
+			DCMotor.getKrakenX60(1),
+			0.0
+		);
 
-  public void updateInputs(FlywheelIOInputs inputs) {
-    inputs.appliedVoltage = sim.getInputVoltage();
-    inputs.velocity = (sim.getAngularVelocityRadPerSec() / 2 * Math.PI);
-    inputs.tempCelcius = 0; // TODO: maybe figure out how to do this?
-    inputs.velocitySetpoint = pidController.getSetpoint();
-  }
+	public FlywheelIOSim() {
+		pidController =
+			new PIDController(
+				FlywheelConstants.SLOT0_CONFIGS.kP,
+				FlywheelConstants.SLOT0_CONFIGS.kI,
+				FlywheelConstants.SLOT0_CONFIGS.kD
+			);
+		motorFeedForward =
+			new SimpleMotorFeedforward(
+				FlywheelConstants.SLOT0_CONFIGS.kS, FlywheelConstants.SLOT0_CONFIGS.kV
+			);
+	}
 
-  @Override
-  public void setVoltage(double currentVoltage) {
-    sim.setInputVoltage(currentVoltage);
-  }
+	public void updateInputs(FlywheelIOInputs inputs) {
+		inputs.appliedVoltage = sim.getInputVoltage();
+		inputs.velocity = (sim.getAngularVelocityRadPerSec() / 2 * Math.PI);
+		inputs.tempCelcius = 0; // TODO: maybe figure out how to do this?
+		inputs.velocitySetpoint = pidController.getSetpoint();
+	}
 
-  public void stop() {
-    setVoltage(0);
-  }
+	@Override
+	public void setVoltage(double currentVoltage) {
+		sim.setInputVoltage(currentVoltage);
+	}
 
-  public void setVelocityRPS(double targetVelocity) {
-    double pidOutput =
-        pidController.calculate(
-            (sim.getAngularVelocity()).in(RotationsPerSecond),
-            targetVelocity); // converted radians/sec->rotations.sec
-    double ffVolts = motorFeedForward.calculate(targetVelocity);
-    double totalOutput = pidOutput + ffVolts;
-    sim.setInputVoltage(MathUtil.clamp(totalOutput, -12.0, 12.0));
-  }
+	public void stop() {
+		setVoltage(0);
+	}
 
-  public void setVelocityRPS(DoubleSupplier targetVelocitySupplier) {
-    setVelocityRPS(targetVelocitySupplier.getAsDouble());
-  }
+	public void setVelocityRPS(double targetVelocity) {
+		// converted radians/sec -> rotations.sec
+		double pidOutput = pidController.calculate((sim.getAngularVelocity()).in(RotationsPerSecond), targetVelocity);
+		double ffVolts = motorFeedForward.calculate(targetVelocity);
+		double totalOutput = pidOutput + ffVolts;
+		sim.setInputVoltage(MathUtil.clamp(totalOutput, -12.0, 12.0));
+	}
 
-  public boolean atSetPoint() {
-    return pidController.atSetpoint();
-  }
+	public void setVelocityRPS(DoubleSupplier targetVelocitySupplier) {
+		setVelocityRPS(targetVelocitySupplier.getAsDouble());
+	}
+
+	public boolean atSetPoint() {
+		return pidController.atSetpoint();
+	}
 }
