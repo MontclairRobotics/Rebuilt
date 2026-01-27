@@ -77,18 +77,16 @@ public class Vision extends SubsystemBase {
 		return inputs[cameraIndex].latestTargetObservation.tx();
 	}
 
-  public double getDistanceToHub() {
-    Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+  public double getDistanceToHub(Pose2d turretPose) {
     Pose2d hubPose = new Pose2d(TurretConstants.HUB_LOCATION, Rotation2d.fromDegrees(0));
     hubPose = PoseUtils.flipPoseAlliance(hubPose);
-    return robotPose.getTranslation().getDistance(hubPose.getTranslation());
+    return turretPose.getTranslation().getDistance(hubPose.getTranslation());
   }
 
-  public double getAngleToHub() {
-    Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+  public double getAngleToHub(Pose2d turretPose) {
     Pose2d hubPose = new Pose2d(TurretConstants.HUB_LOCATION, Rotation2d.fromDegrees(0));
     hubPose = PoseUtils.flipPoseAlliance(hubPose);
-    Translation2d robotToHub = hubPose.getTranslation().minus(robotPose.getTranslation());
+    Translation2d robotToHub = hubPose.getTranslation().minus(turretPose.getTranslation());
     return robotToHub.getAngle().getRotations();
   }
 
