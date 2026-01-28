@@ -7,7 +7,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import frc.robot.constants.Constants.IntakeConstants;
+import frc.robot.constants.IntakeConstants;
 
 public class IntakeIOSparkMax implements IntakeIO {
   private SparkMax motor;

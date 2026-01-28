@@ -1,6 +1,6 @@
 package frc.robot.subsystems.intake;
 
-import frc.robot.constants.IntakeConstants.IntakeConstants;
+import frc.robot.constants.IntakeConstants;
 
 public class IntakeIOSim implements IntakeIO {
   private double appliedVoltage = 0.0;
@@ -21,13 +21,15 @@ public class IntakeIOSim implements IntakeIO {
   }
 
   @Override
-  public void setVoltage(double voltage) {}
+  public void setVoltage(double voltage) {
+      appliedVoltage = voltage;
+  }
 
   @Override
   public void set(double current) {}
 
   @Override
   public void stop() {
-    motor.setVoltage(0);
+    setVoltage(0);
   }
 }
