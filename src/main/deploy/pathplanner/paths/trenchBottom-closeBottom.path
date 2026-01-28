@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.4834337349397595,
-        "y": 0.5272048192771093
+        "x": 5.738351996527777,
+        "y": 0.40706561053240753
       },
       "isLocked": false,
       "linkedName": "trenchBottom"
@@ -20,8 +20,8 @@
         "y": 2.166361445783133
       },
       "prevControl": {
-        "x": 7.552581087445019,
-        "y": 1.1684222628609686
+        "x": 7.592899305555555,
+        "y": 0.8068305844907411
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 89.6412196998333
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": null,
