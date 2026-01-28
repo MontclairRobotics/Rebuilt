@@ -17,7 +17,7 @@ public class HoodVisualization {
 		hoodPose =
 			new Pose3d(
 				Translation3d.kZero,
-				new Rotation3d(0, Rotations.of(RobotContainer.hood.io.getAngle()).in(Radians), 0));
+				new Rotation3d(0, -Rotations.of(RobotContainer.hood.io.getAngle()).in(Radians), 0));
 	}
 
 	public void log() {
