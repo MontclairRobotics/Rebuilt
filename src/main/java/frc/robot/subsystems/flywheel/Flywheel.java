@@ -54,7 +54,7 @@ public class Flywheel extends SubsystemBase {
 	}
 
 	/**
-	 * Calls {@link #setVelocityRPS} to continously ramp up the Flywheel to a changing target angular velocity
+	 * Calls {@link #setVelocityRPS} to continuously ramp up the Flywheel to a changing target angular velocity
 	 * @param targetFlywheelVelocitySupplier supplier function (lambda) of the target angular velocity of the flywheel
 	 */
 	public void setVelocityRPS(DoubleSupplier targetFlywheelVelocitySupplier) {

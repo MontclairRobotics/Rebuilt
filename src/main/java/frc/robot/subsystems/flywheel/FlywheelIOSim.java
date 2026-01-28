@@ -58,6 +58,6 @@ public class FlywheelIOSim implements FlywheelIO {
 
 	@Override
 	public double getMotorTemp() {
-		return 0; 
+		return 0;
 	}
 }

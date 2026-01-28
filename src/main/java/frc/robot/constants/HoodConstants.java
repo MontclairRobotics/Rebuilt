@@ -37,5 +37,6 @@ public class HoodConstants {
 	public static final double kS = 0;
 	public static final double kV = 0;
 	public static final double kG = 0;
+	public static final Angle PIDTolerance = Angle.ofBaseUnits(0.002, Rotations); // TODO: set up PID
 
 }

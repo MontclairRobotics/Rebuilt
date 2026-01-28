@@ -38,7 +38,7 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 	public double getFlywheelVelocity() {
 		return getMotorVelocity() / GEARING;
 	}
-	
+
 	@Override
 	public double getMotorVoltage() {
 		return motor.getMotorVoltage().getValueAsDouble();
