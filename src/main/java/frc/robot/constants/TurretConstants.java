@@ -27,6 +27,7 @@ public class TurretConstants {
 	// physical properties
 	public static final double MOMENT_OF_INERTIA = 0.35;
 	public static final double LENGTH = 0.3;
+	public static final Translation2d TURRET_OFFSET = new Translation2d(0.1, 0.1);
 	public static final double GEARING = 12; // how many rotations of the output shaft per rotation of the turret
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret

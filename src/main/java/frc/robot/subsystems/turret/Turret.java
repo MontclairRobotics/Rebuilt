@@ -8,9 +8,13 @@ import static frc.robot.constants.TurretConstants.*;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -145,6 +149,33 @@ public class Turret extends SubsystemBase {
 		return Commands.run(() -> {
 			setFieldRelativeAngle(angleSupplier.getAsDouble());
 		});
+	}
+
+	public Translation2d getFieldRelativePosition() {
+		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+		Rotation2d robotHeading = robotPose.getRotation();
+		Translation2d fieldRelativeOffset = TURRET_OFFSET.rotateBy(robotHeading);
+		return robotPose.getTranslation().plus(fieldRelativeOffset);
+	}
+
+  
+	public Translation2d getFieldRelativeVelocity() {
+		ChassisSpeeds robotSpeeds = RobotContainer.drivetrain.getState().Speeds;
+		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+		Rotation2d robotHeading = robotPose.getRotation();
+		Translation2d fieldRelativeOffset = TURRET_OFFSET.rotateBy(robotHeading);
+		
+		Rotation2d offsetAngle = fieldRelativeOffset.getAngle();
+		Rotation2d tangentialDirection = offsetAngle.plus(Rotation2d.fromDegrees(90));
+		
+		double offsetMagnitude = fieldRelativeOffset.getNorm();
+		double tangentialVelocityMagnitude = robotSpeeds.omegaRadiansPerSecond * offsetMagnitude;
+		Translation2d tangentialVelocity = new Translation2d(tangentialVelocityMagnitude, tangentialDirection);
+		
+		return new Translation2d(
+			robotSpeeds.vxMetersPerSecond + tangentialVelocity.getX(),
+			robotSpeeds.vyMetersPerSecond + tangentialVelocity.getY()
+		);
 	}
 
 	@Override
