@@ -1,41 +1,47 @@
 package frc.robot.subsystems.turret;
 
-import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface TurretIO {
 
 	@AutoLog
 	public static class TurretIOInputs {
-		public double velocity;
 		public double appliedVoltage;
-		public double robotRelativeAngle; // angles are in rotations
-		public double robotRelativeAngleSetpoint;
+
+		// velocities are in rotations per second
+		public double motorVelocity;
+		public double turretVelocity;
+
+		// angles are in rotations
+		public double robotRelativeAngle;
 		public double fieldRelativeAngle;
-		public double fieldRelativeAngleSetpoint;
 	}
 
 	public void updateInputs(TurretIOInputs inputs);
 
-	public double getRobotRelativeAngle(); // encoders are relative
+	public void setVoltage(double volts);
 
+	public void stop();
+
+	/**
+	 * @return the angular velocity of the <b>motor shaft</b>, in rotations per second
+	 */
+	public double getMotorVelocity();
+
+	/**
+	 * @return the angular velocity of the <b>turret</b>, in rotations per second
+	 */
+	public double getTurretVelocity();
+
+	/**
+	 * @return the angle of the turret <b>relative to its zero</b>, in rotations
+	 */
+	public double getRobotRelativeAngle();
+
+	/**
+	 * @return the angle of the turret <b>relative to the field</b>, in rotations
+	 */
 	public double getFieldRelativeAngle();
 
-	public boolean atSetpoint();
-
-	public double wrapAngleSetpoint(double angle);
-
-	public void zeroRelativeEncoder();
-
-	public void setRobotRelativeAngle(double angle);
-
-	public void setRobotRelativeAngle(DoubleSupplier supplier);
-
-	public void setFieldRelativeAngle(double angle);
-
-	public void setFieldRelativeAngle(DoubleSupplier supplier);
-
-	public void setVoltage(double volts); // maybe double?
-
-	public void stop(); // also command w/ binding, especially for testing
+	public void zero();
 }
