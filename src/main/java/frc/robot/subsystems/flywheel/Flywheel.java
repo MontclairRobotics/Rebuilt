@@ -1,9 +1,10 @@
 package frc.robot.subsystems.flywheel;
 
+import static frc.robot.constants.FlywheelConstants.*;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -11,89 +12,85 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.constants.FlywheelConstants;
-import frc.robot.subsystems.flywheel.FlywheelIO.FlywheelIOInputs;
-
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
 
-	FlywheelIO io;
+	private FlywheelIO io;
 	private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
-	private PIDController pidController =
-		new PIDController(
-			FlywheelConstants.SLOT0_CONFIGS.kP,
-			FlywheelConstants.SLOT0_CONFIGS.kI,
-			FlywheelConstants.SLOT0_CONFIGS.kD
-		);
-	private SimpleMotorFeedforward motorFeedForward =
-		new SimpleMotorFeedforward(
-			FlywheelConstants.SLOT0_CONFIGS.kS, FlywheelConstants.SLOT0_CONFIGS.kV
-		);
+	private PIDController pidController;
+	private SimpleMotorFeedforward motorFeedforward;
 
-	SysIdRoutine flyWheelRoutine =
-		new SysIdRoutine(
-			new SysIdRoutine.Config(
-				null,
-				Volts.of(4),
-				null,
-				state -> SignalLogger.writeString("SysIdFlywheel_State", state.toString())
-			),
-			new SysIdRoutine.Mechanism(output -> io.setVoltage(output.in(Volts)), null, this)
-		);
+	SysIdRoutine flyWheelRoutine = new SysIdRoutine(
+		new SysIdRoutine.Config(
+			null,
+			Volts.of(4),
+			null,
+			state -> SignalLogger.writeString("SysIdFlywheel_State", state.toString())
+		),
+		new SysIdRoutine.Mechanism(output -> io.setVoltage(output.in(Volts)), null, this)
+	);
 
 	public Flywheel(FlywheelIO io) {
 		this.io = io;
+
+		pidController = new PIDController(kP, kI, kD);
+		pidController.setTolerance(TOLERANCE.in(RotationsPerSecond));
+
+		motorFeedforward = new SimpleMotorFeedforward(kS, kV);
 	}
 
-	public void updateInputs(FlywheelIOInputs inputs) {
-		inputs.appliedVoltage = io.getMotorVoltage();
-		inputs.tempCelcius = io.getMotorTemp(); // celsius
-		inputs.velocity = io.getMotorVelocity(); // RPS
-		inputs.velocitySetpoint = pidController.getSetpoint();
-	}
-
-	public void setVelocityRPS(DoubleSupplier targetVelocitySupplier) {
-		setVelocityRPS(targetVelocitySupplier.getAsDouble());
-	}
-
-	public void setVelocityRPS(double targetVelocity) {
-		double pidOutput = pidController.calculate(io.getMotorVelocity(), targetVelocity);
-		double ffVolts = motorFeedForward.calculate(targetVelocity);
-		double totalOutput = pidOutput + ffVolts;
+	/**
+	 * Uses PID and FF Control to ramp up the Flywheel to a target angular velocity
+	 * @param targetFlywheelVelocity the target angular velocity of the flywheel
+	 */
+	public void setVelocityRPS(double targetFlywheelVelocity) {
+		double pidOutput = pidController.calculate(io.getFlywheelVelocity(), targetFlywheelVelocity);
+		double ffOutput = motorFeedforward.calculate(targetFlywheelVelocity);
+		double totalOutput = pidOutput + ffOutput;
 		io.setVoltage(MathUtil.clamp(totalOutput, 12.0, -12.0));
 	}
 
-	public boolean atSetPoint() {
+	/**
+	 * Calls {@link #setVelocityRPS} to continously ramp up the Flywheel to a changing target angular velocity
+	 * @param targetFlywheelVelocitySupplier supplier function (lambda) of the target angular velocity of the flywheel
+	 */
+	public void setVelocityRPS(DoubleSupplier targetFlywheelVelocitySupplier) {
+		setVelocityRPS(targetFlywheelVelocitySupplier.getAsDouble());
+	}
+
+	/**
+	 * @return whether or not the flywheel is within tolerance of its setpoint
+	 */
+	public boolean atSetpoint() {
 		return pidController.atSetpoint();
 	}
 
 	@Override
 	public void periodic() {
-		updateInputs(inputs);
+		io.updateInputs(inputs);
 		Logger.processInputs("Flywheel", inputs);
 	}
 
-	public Command holdSpeedCommand(double targetVelocity) {
+	public Command holdVelocityCommand(double targetFlywheelVelocity) {
 		return Commands.run(() -> {
-			setVelocityRPS(targetVelocity);
+			setVelocityRPS(targetFlywheelVelocity);
 		});
 	}
 
-	public Command holdSpeedCommand(DoubleSupplier targetVelocityRPSSupplier) {
+	public Command holdVelocityCommand(DoubleSupplier targetFlywheelVelocitySupplier) {
 		return Commands.run(() -> {
-			setVelocityRPS(targetVelocityRPSSupplier);
+			setVelocityRPS(targetFlywheelVelocitySupplier);
 		});
 	}
 
-	public Command posSysIdQuasistatic(SysIdRoutine.Direction direction) {
+	public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
 		return flyWheelRoutine.quasistatic(direction);
 	}
 
-	public Command negSysIdQuasistatic(SysIdRoutine.Direction direction) {
-		return flyWheelRoutine.quasistatic(Direction.kReverse);
+	public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+		return flyWheelRoutine.dynamic(direction);
 	}
 }

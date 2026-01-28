@@ -1,34 +1,51 @@
 package frc.robot.subsystems.flywheel;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-import frc.robot.constants.FlywheelConstants;
+import static frc.robot.constants.FlywheelConstants.*;
 
 public class FlywheelIOTalonFX implements FlywheelIO {
 
-	TalonFX motor;
+	private TalonFX motor;
 
 	public FlywheelIOTalonFX() {
-		motor = new TalonFX(FlywheelConstants.CAN_ID);
+		motor = new TalonFX(CAN_ID);
 	}
 
-	public void stop() {
-		motor.stopMotor();
+	@Override
+	public void updateInputs(FlywheelIOInputs inputs) {
+		inputs.appliedVoltage = getMotorVoltage();
+		inputs.tempCelcius = getMotorTemp();
+		inputs.motorVelocity = getMotorVelocity();
+		inputs.flywheelVelocity = getFlywheelVelocity();
 	}
 
+	@Override
 	public void setVoltage(double voltage) {
 		motor.setVoltage(voltage);
 	}
 
-	public double getMotorVelocity() {
-		return motor.getVelocity().getValueAsDouble() / FlywheelConstants.GEARING; //This provides rotations per second
+	@Override
+	public void stop() {
+		motor.stopMotor();
 	}
 
+	@Override
+	public double getMotorVelocity() {
+		return motor.getVelocity().getValueAsDouble();
+	}
+
+	@Override
+	public double getFlywheelVelocity() {
+		return getMotorVelocity() / GEARING;
+	}
+	
+	@Override
 	public double getMotorVoltage() {
 		return motor.getMotorVoltage().getValueAsDouble();
 	}
 
+	@Override
 	public double getMotorTemp() {
 		return motor.getDeviceTemp().getValueAsDouble();
 	}
-
 }
