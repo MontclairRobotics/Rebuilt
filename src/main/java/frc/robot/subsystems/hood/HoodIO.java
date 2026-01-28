@@ -1,6 +1,5 @@
 package frc.robot.subsystems.hood;
 
-import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface HoodIO {
@@ -20,11 +19,6 @@ public interface HoodIO {
 	/** Gets the angle in Rotations from the relative encoder */
 	public double getAngle();
 
-	public void setAngle(double goal);
-
-	public void setAngle(DoubleSupplier goalSupplier);
-
 	public void stop();
 
-	public boolean atSetpoint();
 }
