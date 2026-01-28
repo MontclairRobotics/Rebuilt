@@ -29,7 +29,7 @@ public class TurretConstants {
 	// physical properties
 	public static final double MOMENT_OF_INERTIA = 0.35;
 	public static final double LENGTH = 0.3;
-	public static final Translation2d TURRET_OFFSET = new Translation2d(0, 0);
+	public static final Translation2d TURRET_OFFSET = new Translation2d(0.1, 0.1);
 	// pid + ff gains
 	public static double SIM_KP = 100;
 	public static double SIM_KI = 10;

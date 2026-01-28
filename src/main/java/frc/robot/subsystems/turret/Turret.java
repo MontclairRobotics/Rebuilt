@@ -70,6 +70,26 @@ public class Turret extends SubsystemBase {
 		return robotPose.getTranslation().plus(fieldRelativeOffset);
 	}
 
+  
+	public Translation2d getFieldRelativeVelocity() {
+		ChassisSpeeds robotSpeeds = RobotContainer.drivetrain.getState().Speeds;
+		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+		Rotation2d robotHeading = robotPose.getRotation();
+		Translation2d fieldRelativeOffset = TURRET_OFFSET.rotateBy(robotHeading);
+		
+		Rotation2d offsetAngle = fieldRelativeOffset.getAngle();
+		Rotation2d tangentialDirection = offsetAngle.plus(Rotation2d.fromDegrees(90));
+		
+		double offsetMagnitude = fieldRelativeOffset.getNorm();
+		double tangentialVelocityMagnitude = robotSpeeds.omegaRadiansPerSecond * offsetMagnitude;
+		Translation2d tangentialVelocity = new Translation2d(tangentialVelocityMagnitude, tangentialDirection);
+		
+		return new Translation2d(
+			robotSpeeds.vxMetersPerSecond + tangentialVelocity.getX(),
+			robotSpeeds.vyMetersPerSecond + tangentialVelocity.getY()
+		);
+	}
+
 	@Override
 	public void periodic() {
 		io.updateInputs(inputs);
