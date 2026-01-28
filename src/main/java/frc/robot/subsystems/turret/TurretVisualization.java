@@ -9,7 +9,6 @@ import org.littletonrobotics.junction.Logger;
 
 public class TurretVisualization {
 
-	static int number = 0;
 	public Pose2d turretPose = new Pose2d();
 
 	public void update() {
@@ -21,9 +20,6 @@ public class TurretVisualization {
 	}
 
 	public void log() {
-		Logger.recordOutput("Turret/turret_internal", "turret logging" + number);
-		number++;
-
 		Logger.recordOutput(
 			"Turret/TurretPose",
 			new Pose3d(0, 0, 0, new Rotation3d(turretPose.getRotation()))

@@ -105,7 +105,7 @@ public class RobotContainer {
 		// driverController.square().whileTrue(turret.setNegativeVoltageCommand());
 		// driverController.L1().onTrue(turret.setRobotRelativeAngleCommand(0.25));
 		driverController.L1().whileTrue(new SnakeDriveCommand(drivetrain));
-		driverController.R2().whileTrue(turret.goToHubCommand());
+		driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
 
 		driverController
 			.triangle()
