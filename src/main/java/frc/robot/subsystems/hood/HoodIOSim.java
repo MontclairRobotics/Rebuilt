@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.HoodConstants.*;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -50,7 +51,7 @@ public class HoodIOSim implements HoodIO {
 
 		inputs.appliedVoltage = appliedVoltage;
 		inputs.current = sim.getCurrentDrawAmps();
-		inputs.angle = getAngle();
+		inputs.angle = getAngle().in(Rotations);
 		// encoder.set(Radians.of(sim.getAngleRads()).in(Rotations));
 
 		sim.update(0.02);
@@ -68,7 +69,7 @@ public class HoodIOSim implements HoodIO {
 	}
 
 	@Override
-	public double getAngle() {
-		return Rotations.of(sim.getAngleRads()).in(Radians);
+	public Angle getAngle() {
+		return Angle.ofBaseUnits(sim.getAngleRads(), Radians);
 	}
 }

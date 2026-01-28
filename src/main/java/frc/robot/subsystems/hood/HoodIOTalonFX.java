@@ -2,6 +2,9 @@ package frc.robot.subsystems.hood;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.units.measure.Angle;
+
+import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.HoodConstants.*;
 
 public class HoodIOTalonFX implements HoodIO {
@@ -17,7 +20,7 @@ public class HoodIOTalonFX implements HoodIO {
 		inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
 		inputs.current = motor.getStatorCurrent().getValueAsDouble();
 		inputs.tempCelsius = motor.getDeviceTemp().getValueAsDouble();
-		inputs.angle = getAngle();
+		inputs.angle = getAngle().in(Rotations);
 	}
 
 	@Override
@@ -31,7 +34,7 @@ public class HoodIOTalonFX implements HoodIO {
 	}
 
 	@Override
-	public double getAngle() {
-		return motor.getPosition().getValueAsDouble() / GEAR_RATIO;
+	public Angle getAngle() {
+		return Angle.ofBaseUnits(motor.getPosition().getValueAsDouble() / GEAR_RATIO, Rotations);
 	}
 }
