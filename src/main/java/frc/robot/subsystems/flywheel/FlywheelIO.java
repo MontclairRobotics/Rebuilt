@@ -1,6 +1,5 @@
 package frc.robot.subsystems.flywheel;
 
-import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface FlywheelIO {
@@ -8,20 +7,28 @@ public interface FlywheelIO {
 	@AutoLog
 	public class FlywheelIOInputs {
 		public double appliedVoltage = 0.0;
-		public double velocity = 0.0; // rps
 		public double tempCelcius = 0.0;
-		public double velocitySetpoint = 0.0;
+		public double motorVelocity = 0.0; // rotations per second
+		public double flywheelVelocity = 0.0; // rotations per second
 	}
 
 	public void updateInputs(FlywheelIOInputs inputs);
 
-	public void setVoltage(double currentVoltage);
+	public void setVoltage(double voltage);
 
 	public void stop();
 
-	public void setVelocityRPS(double targetVelocity);
+	/**
+	 * @return the angular velocity of the <b>motor shaft</b>, in rotations per second
+	 */
+	public double getMotorVelocity();
 
-	public void setVelocityRPS(DoubleSupplier targetVelocitySupplier);
+	/**
+	 * @return the angular velocity of the <b>flywheel</b>, in rotations per second
+	 */
+	public double getFlywheelVelocity();
 
-	public boolean atSetPoint();
+	public double getMotorVoltage();
+
+	public double getMotorTemp();
 }

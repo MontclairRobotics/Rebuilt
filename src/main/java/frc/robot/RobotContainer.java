@@ -94,12 +94,13 @@ public class RobotContainer {
 		drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
 
 		configureBindings();
+
+    drivetrain.registerTelemetry(logger::telemeterize);
 	}
 
 	private void configureBindings() {
 		hood.setDefaultCommand(hood.joystickCommand());
 		drivetrain.setDefaultCommand(drivetrain.driveJoystickInputCommand());
-		drivetrain.registerTelemetry(logger::telemeterize);
 		// driverController.cross().whileTrue(turret.setPositiveVoltageCommand());
 		// driverController.square().whileTrue(turret.setNegativeVoltageCommand());
 		// driverController.L1().onTrue(turret.setRobotRelativeAngleCommand(0.25));

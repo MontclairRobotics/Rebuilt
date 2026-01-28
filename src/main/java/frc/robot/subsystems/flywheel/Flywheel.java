@@ -1,34 +1,71 @@
 package frc.robot.subsystems.flywheel;
 
+import static frc.robot.constants.FlywheelConstants.*;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
 
-	FlywheelIO io;
+	private FlywheelIO io;
 	private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
-	SysIdRoutine flyWheelRoutine =
-		new SysIdRoutine(
-			new SysIdRoutine.Config(
-				null,
-				Volts.of(4),
-				null,
-				state -> SignalLogger.writeString("SysIdFlywheel_State", state.toString())
-			),
-			new SysIdRoutine.Mechanism(output -> io.setVoltage(output.in(Volts)), null, this)
-		);
+	private PIDController pidController;
+	private SimpleMotorFeedforward motorFeedforward;
+
+	SysIdRoutine flyWheelRoutine = new SysIdRoutine(
+		new SysIdRoutine.Config(
+			null,
+			Volts.of(4),
+			null,
+			state -> SignalLogger.writeString("SysIdFlywheel_State", state.toString())
+		),
+		new SysIdRoutine.Mechanism(output -> io.setVoltage(output.in(Volts)), null, this)
+	);
 
 	public Flywheel(FlywheelIO io) {
 		this.io = io;
+
+		pidController = new PIDController(kP, kI, kD);
+		pidController.setTolerance(TOLERANCE.in(RotationsPerSecond));
+
+		motorFeedforward = new SimpleMotorFeedforward(kS, kV);
+	}
+
+	/**
+	 * Uses PID and FF Control to ramp up the Flywheel to a target angular velocity
+	 * @param targetFlywheelVelocity the target angular velocity of the flywheel
+	 */
+	public void setVelocityRPS(double targetFlywheelVelocity) {
+		double pidOutput = pidController.calculate(io.getFlywheelVelocity(), targetFlywheelVelocity);
+		double ffOutput = motorFeedforward.calculate(targetFlywheelVelocity);
+		double totalOutput = pidOutput + ffOutput;
+		io.setVoltage(MathUtil.clamp(totalOutput, 12.0, -12.0));
+	}
+
+	/**
+	 * Calls {@link #setVelocityRPS} to continously ramp up the Flywheel to a changing target angular velocity
+	 * @param targetFlywheelVelocitySupplier supplier function (lambda) of the target angular velocity of the flywheel
+	 */
+	public void setVelocityRPS(DoubleSupplier targetFlywheelVelocitySupplier) {
+		setVelocityRPS(targetFlywheelVelocitySupplier.getAsDouble());
+	}
+
+	/**
+	 * @return whether or not the flywheel is within tolerance of its setpoint
+	 */
+	public boolean atSetpoint() {
+		return pidController.atSetpoint();
 	}
 
 	@Override
@@ -37,23 +74,23 @@ public class Flywheel extends SubsystemBase {
 		Logger.processInputs("Flywheel", inputs);
 	}
 
-	public Command holdSpeedCommand(double targetVelocity) {
+	public Command holdVelocityCommand(double targetFlywheelVelocity) {
 		return Commands.run(() -> {
-			io.setVelocityRPS(targetVelocity);
+			setVelocityRPS(targetFlywheelVelocity);
 		});
 	}
 
-	public Command holdSpeedCommand(DoubleSupplier targetVelocityRPSSupplier) {
+	public Command holdVelocityCommand(DoubleSupplier targetFlywheelVelocitySupplier) {
 		return Commands.run(() -> {
-			io.setVelocityRPS(targetVelocityRPSSupplier);
+			setVelocityRPS(targetFlywheelVelocitySupplier);
 		});
 	}
 
-	public Command posSysIdQuasistatic(SysIdRoutine.Direction direction) {
+	public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
 		return flyWheelRoutine.quasistatic(direction);
 	}
 
-	public Command negSysIdQuasistatic(SysIdRoutine.Direction direction) {
-		return flyWheelRoutine.quasistatic(Direction.kReverse);
+	public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+		return flyWheelRoutine.dynamic(direction);
 	}
 }
