@@ -28,7 +28,6 @@ import frc.robot.subsystems.turret.TurretIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
@@ -76,13 +75,15 @@ public class RobotContainer {
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 			turret = new Turret(new TurretIOSim());
 			hood = new Hood(new HoodIOSim());
-			vision =
-				new Vision(
-					drivetrain::addVisionMeasurement,
-					new VisionIOPhotonVisionSim(
-						"camera0Name", robotToCamera0, drivetrain::getRobotPose),
-					new VisionIOPhotonVisionSim(
-						"camera1Name", robotToCamera1, drivetrain::getRobotPose));
+			// vision =
+			// 	new Vision(
+			// 		drivetrain::addVisionMeasurement,
+			// 		new VisionIOPhotonVisionSim(
+			// 			"camera0Name", robotToCamera0, drivetrain::getRobotPose),
+			// 		new VisionIOPhotonVisionSim(
+			// 			"camera1Name", robotToCamera1, drivetrain::getRobotPose));
+
+			//TODO: Fix vision simulation! (It is causing loop overruns and memory issues with advantage kit logging)
 
 			break;
 
