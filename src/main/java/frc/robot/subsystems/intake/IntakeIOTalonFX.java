@@ -16,7 +16,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     // define config
     config = new TalonFXConfiguration();
 
-    //motor setup and inverted setting
+    // motor setup and inverted setting
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     motor.getConfigurator().apply(config);
   }
