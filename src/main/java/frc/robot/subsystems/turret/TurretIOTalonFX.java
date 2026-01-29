@@ -1,11 +1,10 @@
 package frc.robot.subsystems.turret;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static frc.robot.constants.TurretConstants.*;
-
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -15,15 +14,10 @@ import java.util.function.DoubleSupplier;
 public class TurretIOTalonFX implements TurretIO {
 
   private TalonFX motor;
-  private MotionMagicVoltage mm_req;
-  private double robotRelativeSetpoint;
   private double fieldRelativeSetpoint;
   private ProfiledPIDController pidController;
-  private double voltageToUse;
 
   public TurretIOTalonFX() {
-
-    robotRelativeSetpoint = 0;
     fieldRelativeSetpoint = 0;
 
     motor = new TalonFX(CAN_ID);
@@ -35,6 +29,7 @@ public class TurretIOTalonFX implements TurretIO {
             new TrapezoidProfile.Constraints(
                 TURRET_CRUISE_VELOCITY.in(RotationsPerSecond),
                 TURRET_ACCELERATION.in(RotationsPerSecondPerSecond)));
+    pidController.disableContinuousInput();
   }
 
   @Override
@@ -42,17 +37,20 @@ public class TurretIOTalonFX implements TurretIO {
     inputs.velocity = motor.getVelocity().getValueAsDouble(); // rps
     inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
     inputs.robotRelativeAngle = getRobotRelativeAngle();
-    inputs.robotRelativeAngleSetpoint = robotRelativeSetpoint;
+    inputs.robotRelativeAngleSetpoint = pidController.getSetpoint().position;
     inputs.fieldRelativeAngle = getFieldRelativeAngle();
     inputs.fieldRelativeAngleSetpoint = fieldRelativeSetpoint;
   }
 
   @Override
   public void setRobotRelativeAngle(double angle) {
-    robotRelativeSetpoint = angle;
     // converts to motor output shaft rotations and makes request to motion magic for a new
     // setpoint.
-    pidController.setGoal(new TrapezoidProfile.State());
+    pidController.setGoal(
+        new TrapezoidProfile.State(
+            wrapAngleSetpoint(angle),
+            -RadiansPerSecond.of(RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond)
+                .in(RotationsPerSecond)));
     setVoltage(pidController.calculate(getRobotRelativeAngle()));
   }
 
@@ -84,9 +82,7 @@ public class TurretIOTalonFX implements TurretIO {
   @Override
   public void setFieldRelativeAngle(double angle) {
     fieldRelativeSetpoint = angle;
-    double robotRelativeAngleSetpoint =
-        angle - RobotContainer.drivetrain.odometryHeading.getRotations();
-    setRobotRelativeAngle(robotRelativeAngleSetpoint);
+    setRobotRelativeAngle(angle - RobotContainer.drivetrain.odometryHeading.getRotations());
   }
 
   @Override
@@ -101,9 +97,7 @@ public class TurretIOTalonFX implements TurretIO {
 
   @Override
   public boolean atSetpoint() {
-    return Math.abs(
-            getRobotRelativeAngle() - mm_req.getPositionMeasure().in(Rotations) / GEAR_RATIO)
-        < ANGLE_TOLERANCE.in(Rotations);
+    return pidController.atSetpoint();
   }
 
   @Override

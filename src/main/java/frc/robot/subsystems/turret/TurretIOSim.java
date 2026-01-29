@@ -112,10 +112,8 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public void setFieldRelativeAngle(double angle) {
-    double robotRelativeAngleSetpoint =
-        angle - RobotContainer.drivetrain.odometryHeading.getRotations();
     fieldRelativeSetpoint = angle;
-    setRobotRelativeAngle(robotRelativeAngleSetpoint);
+    setRobotRelativeAngle(angle - RobotContainer.drivetrain.odometryHeading.getRotations());
   }
 
   @Override
