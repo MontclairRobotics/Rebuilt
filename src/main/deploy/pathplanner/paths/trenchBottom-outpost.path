@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 2.7387474165308054,
-        "y": 1.3221839845430579
+        "y": 1.3221839845430576
       },
       "isLocked": false,
       "linkedName": "trenchBottom"
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.6525862339250368
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

@@ -5,30 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "trenchBottom-outpost"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "outpost-trenchBottom"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "shoot"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "trenchBottom-closeBottom"
@@ -44,6 +20,60 @@
           "type": "named",
           "data": {
             "name": "shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "trenchBottom-closeCenter"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "closeCenter-trenchRight"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "trenchBottom-closeCenter"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "closeCenter-trenchRight"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "trenchBottom-towerRight"
           }
         }
       ]
