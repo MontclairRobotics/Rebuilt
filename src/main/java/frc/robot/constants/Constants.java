@@ -30,25 +30,5 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
-
-  public class IntakeConstants {
-    public static final double INTAKE_FUEL_SPEED = 0.0; // TODO: set this number
-    public static final double MAX_CURRENT = 0.0; // TODO: set this number
-    public static final double OUTTAKE_FUEL_SPEED = 0.0; // TODO: set this number
-    public static final double INTAKE_STALL_CURRENT = 0.0; // TODO: set this number
-    public static final int MOTOR_ID = -1; // TODO: set the device id
-  }
-
-  public class PivotConstants {
-    public static final Rotation2d PIVOT_MAX_ANGLE =
-        Rotation2d.fromRadians(0); // TODO: set this number
-    public static final Rotation2d PIVOT_MIN_ANGLE =
-        Rotation2d.fromRadians(0); // TODO: set this number
-    public static final Rotation2d SHOULDER_ENCODER_OFFSET =
-        Rotation2d.fromDegrees(1 + 2); // TODO set this number
-    public static final double PIVOT_TO_MOTOR = 0.0; // TODO: set this number
-    public static final int PIVOT_MOTOR_ID = 0; // TODO: set THIS device id
-    public static final int TBD = 0; // TODO: PLEASE SET THIS LATER
-    public static final double VOLTAGE_LIMIT = 0.0;
-  }
+  
 }

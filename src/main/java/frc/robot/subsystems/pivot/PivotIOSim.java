@@ -1,104 +1,55 @@
 package frc.robot.subsystems.pivot;
 
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
+import static frc.robot.constants.PivotConstants.*;
+
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.constants.Constants.PivotConstants;
-import frc.robot.util.PoseUtils;
 
 public class PivotIOSim implements PivotIO {
-  private DutyCycleEncoderSim encoder;
-  private DutyCycleEncoder realEncoder;
 
-  private SingleJointedArmSim sim;
-  // representing our double jointed arm as a single jointed arm sim of the first joint,
-  // and chose to ignore the second joint :)
+	private SingleJointedArmSim sim;
+	private double appliedVoltage;
 
-  private PIDController pidController;
-  private ArmFeedforward armFeedforward;
+	public PivotIOSim() {
+		sim = new SingleJointedArmSim(
+			DCMotor.getKrakenX60(1),
+			GEARING,
+			10.0,
+			0.0,
+			MIN_ANGLE.in(Radians),
+			MAX_ANGLE.in(Radians),
+			true,
+			MIN_ANGLE.in(Radians),
+			0.0,
+			0.0
+		);
+	}
 
-  private double appliedVoltage;
+	public void updateInputs(PivotIOInputs inputs) {
+		// updates the simulator
+		sim.setInputVoltage(appliedVoltage);
+		sim.update(0.02);
 
-  public PivotIOSim() {
-    pidController = new PIDController(0, 0, 0); // TODO: define this or replace
-    armFeedforward = new ArmFeedforward(0, 0, 0);
+		// updates inputs
+		inputs.appliedVoltage = appliedVoltage;
+		inputs.current = sim.getCurrentDrawAmps();
+		inputs.pivotAngle = getPivotAngle().in(Rotations);
+		inputs.tempCelsius = 0;
+		inputs.encoderConnected = false;
+	}
 
-    realEncoder = new DutyCycleEncoder(0, 0, PivotConstants.SHOULDER_ENCODER_OFFSET.getRotations());
-    encoder = new DutyCycleEncoderSim(realEncoder);
-    encoder.setConnected(true);
+	public void setVoltage(double voltage) {
+		appliedVoltage = voltage;
+	}
 
-    //TODO: set the sim program numbers
-    sim =
-        new SingleJointedArmSim(
-            DCMotor.getNEO(1),
-            PivotConstants.PIVOT_TO_MOTOR,
-            10.0,
-            0.0,
-            1.0,
-            1.0,
-            true,
-            1.0,
-            0.0,
-            0.0);
-  }
+	public void stop() {
+		sim.setInputVoltage(0);
+	}
 
-  public void updateInputs(PivotIOInputs inputs) {
-    inputs.appliedVoltage = appliedVoltage;
-    inputs.current = sim.getCurrentDrawAmps();
-
-    inputs.angle = getPivotAngle();
-
-    inputs.encoderConnected = encoder.getConnected();
-  }
-
-  public void setVoltage(double voltage) {
-    appliedVoltage = voltage;
-    sim.setInputVoltage(voltage);
-    encoder.set(sim.getAngleRads());
-  }
-
-  public void stop() {
-    sim.setInputVoltage(0);
-  }
-
-  public Rotation2d getPivotAngle() {
-    return Rotation2d.fromRotations(encoder.get() % 1);
-  }
-
-  public boolean atSetpoint() {
-    return false; // TODO: huh???
-  }
-
-  public double getPercentRotation() {
-    double distance =
-        PoseUtils.getAngleDistance(getPivotAngle(), PivotConstants.PIVOT_MIN_ANGLE).getDegrees();
-    double interval =
-        PoseUtils.getAngleDistance(PivotConstants.PIVOT_MAX_ANGLE, PivotConstants.PIVOT_MIN_ANGLE)
-            .getDegrees();
-    return distance / interval;
-    // TODO: please clarify if this is correct!!
-    // TODO: also it said about fixing something in "PoseUtils"
-  }
-
-  public void resetPIDController() {
-    pidController.reset();
-  }
-
-  public double calculateStationaryFeedforward() {
-    double voltage = armFeedforward.calculate(getPivotAngle().getRadians(), 0);
-    return getPivotAngle().getDegrees() > 0 ? voltage : -voltage;
-  }
-
-  public void setIdleMode(IdleMode mode) {}
-
-  public Command setIdleModeCommand(IdleMode mode) {
-    return Commands.runOnce(() -> setIdleMode(mode)).ignoringDisable(true);
-  }
+	public Angle getPivotAngle() {
+		return Radians.of(sim.getAngleRads());
+	}
 }
