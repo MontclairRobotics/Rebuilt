@@ -13,9 +13,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import frc.robot.commands.SnakeDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.HoodConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
@@ -28,7 +28,6 @@ import frc.robot.subsystems.turret.TurretIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
-import frc.robot.util.PoseUtils;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import org.ironmaple.simulation.SimulatedArena;
@@ -99,22 +98,26 @@ public class RobotContainer {
 	}
 
 	private void configureBindings() {
-		hood.setDefaultCommand(hood.joystickCommand());
+		// hood.setDefaultCommand(hood.joystickCommand());
 		drivetrain.setDefaultCommand(drivetrain.driveJoystickInputCommand());
 		// driverController.cross().whileTrue(turret.setPositiveVoltageCommand());
 		// driverController.square().whileTrue(turret.setNegativeVoltageCommand());
 		// driverController.L1().onTrue(turret.setRobotRelativeAngleCommand(0.25));
-		driverController.L1().whileTrue(new SnakeDriveCommand(drivetrain));
+		// driverController.L1().whileTrue(new SnakeDriveCommand(drivetrain));
 		driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
+		driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub()));
 
-		driverController.triangle()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
-		driverController.square()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
-		driverController.cross()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
-		driverController.circle()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
+		driverController.triangle().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
+		driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MIN_ANGLE));
+
+		// driverController.triangle()
+		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
+		// driverController.square()
+		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
+		// driverController.cross()
+		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
+		// driverController.circle()
+		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
 
 		// zeros gyro
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());

@@ -37,6 +37,7 @@ public class HoodIOSim implements HoodIO {
 	public void updateInputs(HoodIOInputs inputs) {
 
 		sim.setInputVoltage(appliedVoltage);
+		sim.update(0.02);
 
 		inputs.appliedVoltage = appliedVoltage;
 		inputs.current = sim.getCurrentDrawAmps();
@@ -44,7 +45,6 @@ public class HoodIOSim implements HoodIO {
 		inputs.tempCelsius = 0;
 		inputs.encoderConnected = false;
 
-		sim.update(0.02);
 	}
 
 	@Override
