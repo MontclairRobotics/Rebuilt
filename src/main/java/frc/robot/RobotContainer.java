@@ -107,21 +107,13 @@ public class RobotContainer {
 		driverController.L1().whileTrue(new SnakeDriveCommand(drivetrain));
 		driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
 
-		driverController
-			.triangle()
-			.onTrue(
-				drivetrain.alignToAngleFieldRelativeCommand(
-					PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
-		driverController
-			.square()
+		driverController.triangle()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
+		driverController.square()
 			.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
-		driverController
-			.cross()
-			.onTrue(
-				drivetrain.alignToAngleFieldRelativeCommand(
-					PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
-		driverController
-			.circle()
+		driverController.cross()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
+		driverController.circle()
 			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
 
 		// zeros gyro

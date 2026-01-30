@@ -13,15 +13,12 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.TurretConstants;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
-import frc.robot.util.PoseUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,31 +73,17 @@ public class Vision extends SubsystemBase {
 		return inputs[cameraIndex].latestTargetObservation.tx();
 	}
 
-  public double getDistanceToHub(Pose2d turretPose) {
-    Pose2d hubPose = new Pose2d(TurretConstants.HUB_LOCATION, Rotation2d.fromDegrees(0));
-    hubPose = PoseUtils.flipPoseAlliance(hubPose);
-    return turretPose.getTranslation().getDistance(hubPose.getTranslation());
-  }
-
-  public double getAngleToHub(Pose2d turretPose) {
-    Pose2d hubPose = new Pose2d(TurretConstants.HUB_LOCATION, Rotation2d.fromDegrees(0));
-    hubPose = PoseUtils.flipPoseAlliance(hubPose);
-    Translation2d robotToHub = hubPose.getTranslation().minus(turretPose.getTranslation());
-    return robotToHub.getAngle().getRotations();
-  }
-
-
 	@Override
 	public void periodic() {
 		logCounter++;
-		// allRobotPoses.clear();
-		// allTagPoses.clear();
-		// allRobotPosesAccepted.clear();
-		// allRobotPosesRejected.clear();
-		// robotPoses.clear();
-		// tagPoses.clear();
-		// robotPosesAccepted.clear();
-		// robotPosesRejected.clear();
+		allRobotPoses.clear();
+		allTagPoses.clear();
+		allRobotPosesAccepted.clear();
+		allRobotPosesRejected.clear();
+		robotPoses.clear();
+		tagPoses.clear();
+		robotPosesAccepted.clear();
+		robotPosesRejected.clear();
 
 		for (int i = 0; i < io.length; i++) {
 			io[i].updateInputs(inputs[i]);
@@ -114,10 +97,10 @@ public class Vision extends SubsystemBase {
 			// Update disconnected alert
 			disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
-			// robotPoses.clear();
-			// tagPoses.clear();
-			// robotPosesAccepted.clear();
-			// robotPosesRejected.clear();
+			robotPoses.clear();
+			tagPoses.clear();
+			robotPosesAccepted.clear();
+			robotPosesRejected.clear();
 
 			// Add tag poses
 			if (logCounter % 5 == 0) {

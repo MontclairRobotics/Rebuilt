@@ -1,5 +1,6 @@
 package frc.robot.subsystems.turret;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
@@ -8,6 +9,8 @@ import static frc.robot.constants.TurretConstants.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.RobotContainer;
 
@@ -20,7 +23,7 @@ public class TurretIOSim implements TurretIO {
 			DCMotor.getKrakenX60(1),
 			GEARING,
 			MOMENT_OF_INERTIA,
-			LENGTH,
+			LENGTH.in(Meters),
 			MIN_ANGLE.in(Radians),
 			MAX_ANGLE.in(Radians),
 			false,
@@ -38,10 +41,10 @@ public class TurretIOSim implements TurretIO {
 
 		// updates logged values
 		inputs.appliedVoltage = appliedVoltage;
-		inputs.motorVelocity = getMotorVelocity();
-		inputs.turretVelocity = getTurretVelocity();
-		inputs.robotRelativeAngle = getRobotRelativeAngle();
-		inputs.fieldRelativeAngle = getFieldRelativeAngle();
+		inputs.motorVelocity = getMotorVelocity().in(RotationsPerSecond);
+		inputs.turretVelocity = getTurretVelocity().in(RotationsPerSecond);
+		inputs.robotRelativeAngle = getRobotRelativeAngle().in(Rotations);
+		inputs.fieldRelativeAngle = getFieldRelativeAngle().in(Rotations);
 	}
 
 	@Override
@@ -55,22 +58,22 @@ public class TurretIOSim implements TurretIO {
 	}
 
 	@Override
-	public double getMotorVelocity() {
-		return getTurretVelocity() * GEARING;
+	public AngularVelocity getMotorVelocity() {
+		return getTurretVelocity().times(GEARING);
 	}
 
 	@Override
-	public double getTurretVelocity() {
-		return RadiansPerSecond.of(sim.getVelocityRadPerSec()).in(RotationsPerSecond);
+	public AngularVelocity getTurretVelocity() {
+		return RadiansPerSecond.of(sim.getVelocityRadPerSec());
 	}
 
 	@Override
-	public double getRobotRelativeAngle() {
-		return Radians.of(sim.getAngleRads()).in(Rotations);
+	public Angle getRobotRelativeAngle() {
+		return Radians.of(sim.getAngleRads());
 	}
 
 	@Override
-	public double getFieldRelativeAngle() {
+	public Angle getFieldRelativeAngle() {
 		return RobotContainer.turret.toFieldRelativeAngle(getRobotRelativeAngle());
 	}
 

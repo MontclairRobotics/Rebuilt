@@ -2,6 +2,8 @@ package frc.robot.subsystems.flywheel;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.units.measure.AngularVelocity;
+
 public interface FlywheelIO {
 
 	@AutoLog
@@ -21,12 +23,12 @@ public interface FlywheelIO {
 	/**
 	 * @return the angular velocity of the <b>motor shaft</b>, in rotations per second
 	 */
-	public double getMotorVelocity();
+	public AngularVelocity getMotorVelocity();
 
 	/**
 	 * @return the angular velocity of the <b>flywheel</b>, in rotations per second
 	 */
-	public double getFlywheelVelocity();
+	public AngularVelocity getFlywheelVelocity();
 
 	public double getMotorVoltage();
 

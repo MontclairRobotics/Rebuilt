@@ -5,6 +5,7 @@ import static frc.robot.constants.FlywheelConstants.*;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
 public class FlywheelIOSim implements FlywheelIO {
@@ -27,8 +28,8 @@ public class FlywheelIOSim implements FlywheelIO {
 	public void updateInputs(FlywheelIOInputs inputs) {
 		inputs.appliedVoltage = getMotorVoltage();
 		inputs.tempCelcius = getMotorTemp();
-		inputs.motorVelocity = getMotorVelocity();
-		inputs.flywheelVelocity = getFlywheelVelocity();
+		inputs.motorVelocity = getMotorVelocity().in(RotationsPerSecond);
+		inputs.flywheelVelocity = getFlywheelVelocity().in(RotationsPerSecond);
 	}
 
 	@Override
@@ -42,13 +43,13 @@ public class FlywheelIOSim implements FlywheelIO {
 	}
 
 	@Override
-	public double getMotorVelocity() {
-		return getFlywheelVelocity() * GEARING;
+	public AngularVelocity getMotorVelocity() {
+		return RotationsPerSecond.of(getFlywheelVelocity().in(RotationsPerSecond) * GEARING);
 	}
 
 	@Override
-	public double getFlywheelVelocity() {
-		return sim.getAngularVelocity().in(RotationsPerSecond);
+	public AngularVelocity getFlywheelVelocity() {
+		return sim.getAngularVelocity();
 	}
 
 	@Override

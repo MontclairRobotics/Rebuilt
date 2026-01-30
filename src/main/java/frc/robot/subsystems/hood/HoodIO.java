@@ -11,7 +11,7 @@ public interface HoodIO {
 		public double current;
 		public double tempCelsius;
 		public double angle; // rotations
-		public double angleSetpoint; // rotations
+		public boolean encoderConnected;
 	}
 
 	public void updateInputs(HoodIOInputs inputs);

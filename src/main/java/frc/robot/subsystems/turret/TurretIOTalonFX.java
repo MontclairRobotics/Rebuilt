@@ -1,7 +1,12 @@
 package frc.robot.subsystems.turret;
 
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.RobotContainer;
 
 public class TurretIOTalonFX implements TurretIO {
@@ -15,10 +20,10 @@ public class TurretIOTalonFX implements TurretIO {
 	@Override
 	public void updateInputs(TurretIOInputs inputs) {
 		inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
-		inputs.motorVelocity = getMotorVelocity();
-		inputs.turretVelocity = getTurretVelocity();
-		inputs.robotRelativeAngle = getRobotRelativeAngle();
-		inputs.fieldRelativeAngle = getFieldRelativeAngle();
+		inputs.motorVelocity = getMotorVelocity().in(RotationsPerSecond);
+		inputs.turretVelocity = getTurretVelocity().in(RotationsPerSecond);
+		inputs.robotRelativeAngle = getRobotRelativeAngle().in(Rotations);
+		inputs.fieldRelativeAngle = getFieldRelativeAngle().in(Rotations);
 	}
 
 	@Override
@@ -32,22 +37,22 @@ public class TurretIOTalonFX implements TurretIO {
 	}
 
 	@Override
-	public double getMotorVelocity() {
-		return motor.getVelocity().getValueAsDouble();
+	public AngularVelocity getMotorVelocity() {
+		return motor.getVelocity().getValue();
 	}
 
 	@Override
-	public double getTurretVelocity() {
-		return getMotorVelocity() / GEARING;
+	public AngularVelocity getTurretVelocity() {
+		return getMotorVelocity().div(GEARING);
 	}
 
 	@Override
-	public double getRobotRelativeAngle() {
-		return motor.getPosition().getValueAsDouble() / GEARING;
+	public Angle getRobotRelativeAngle() {
+		return motor.getPosition().getValue().div(GEARING);
 	}
 
 	@Override
-	public double getFieldRelativeAngle() {
+	public Angle getFieldRelativeAngle() {
 		return RobotContainer.turret.toFieldRelativeAngle(getRobotRelativeAngle());
 	}
 

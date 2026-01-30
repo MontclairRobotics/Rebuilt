@@ -8,11 +8,13 @@ import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
@@ -46,9 +48,9 @@ public class Flywheel extends SubsystemBase {
 	 * Uses PID and FF Control to ramp up the Flywheel to a target angular velocity
 	 * @param targetFlywheelVelocity the target angular velocity of the flywheel
 	 */
-	public void setVelocityRPS(double targetFlywheelVelocity) {
-		double pidOutput = pidController.calculate(io.getFlywheelVelocity(), targetFlywheelVelocity);
-		double ffOutput = motorFeedforward.calculate(targetFlywheelVelocity);
+	public void setVelocityRPS(AngularVelocity targetFlywheelVelocity) {
+		double pidOutput = pidController.calculate(io.getFlywheelVelocity().in(RotationsPerSecond), targetFlywheelVelocity.in(RotationsPerSecond));
+		double ffOutput = motorFeedforward.calculate(targetFlywheelVelocity.in(RotationsPerSecond));
 		double totalOutput = pidOutput + ffOutput;
 		io.setVoltage(MathUtil.clamp(totalOutput, 12.0, -12.0));
 	}
@@ -57,8 +59,8 @@ public class Flywheel extends SubsystemBase {
 	 * Calls {@link #setVelocityRPS} to continuously ramp up the Flywheel to a changing target angular velocity
 	 * @param targetFlywheelVelocitySupplier supplier function (lambda) of the target angular velocity of the flywheel
 	 */
-	public void setVelocityRPS(DoubleSupplier targetFlywheelVelocitySupplier) {
-		setVelocityRPS(targetFlywheelVelocitySupplier.getAsDouble());
+	public void setVelocityRPS(Supplier<AngularVelocity> targetFlywheelVelocitySupplier) {
+		setVelocityRPS(targetFlywheelVelocitySupplier.get());
 	}
 
 	/**
@@ -74,13 +76,13 @@ public class Flywheel extends SubsystemBase {
 		Logger.processInputs("Flywheel", inputs);
 	}
 
-	public Command holdVelocityCommand(double targetFlywheelVelocity) {
+	public Command holdVelocityCommand(AngularVelocity targetFlywheelVelocity) {
 		return Commands.run(() -> {
 			setVelocityRPS(targetFlywheelVelocity);
 		});
 	}
 
-	public Command holdVelocityCommand(DoubleSupplier targetFlywheelVelocitySupplier) {
+	public Command holdVelocityCommand(Supplier<AngularVelocity> targetFlywheelVelocitySupplier) {
 		return Commands.run(() -> {
 			setVelocityRPS(targetFlywheelVelocitySupplier);
 		});

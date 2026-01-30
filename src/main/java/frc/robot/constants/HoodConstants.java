@@ -23,20 +23,22 @@ public class HoodConstants {
 	public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(3);
 	public static final AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(8);
 
-	// for every rotation of the hood the motor shaft rotates this amount
-	public static final double GEAR_RATIO = 10.8;
+	// physical properties
+	public static final double GEARING = 10.8; // for every rotation of the hood the motor shaft rotates this amount
 	public static final double MOMENT_OF_INERTIA = 0.03;
-
-	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0);
+	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0); // absolute encoder
 	public static final Distance HOOD_LENGTH = Meters.of(0.305);
 	public static final double VOLTAGE_LIMIT = 12;
 
+
+	// pid
 	public static final double kP = 0;
 	public static final double kI = 0;
 	public static final double kD = 0;
 	public static final double kS = 0;
 	public static final double kV = 0;
 	public static final double kG = 0;
-	public static final Angle PIDTolerance = Angle.ofBaseUnits(0.002, Rotations); // TODO: set up PID
+
+	public static final Angle TOLERANCE = Angle.ofBaseUnits(0.002, Rotations);
 
 }

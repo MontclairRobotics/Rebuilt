@@ -3,16 +3,20 @@ package frc.robot.subsystems.hood;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.HoodConstants.*;
 
 public class HoodIOTalonFX implements HoodIO {
 
-	public TalonFX motor;
+	private TalonFX motor;
+	private DutyCycleEncoder absoluteEncoder;
 
 	public HoodIOTalonFX() {
 		motor = new TalonFX(CAN_ID);
+		absoluteEncoder = new DutyCycleEncoder(ENCODER_PORT, 1, HOOD_ENCODER_OFFSET.in(Rotations));
+		motor.setPosition(Rotations.of(absoluteEncoder.get() * GEARING));
 	}
 
 	@Override
@@ -21,6 +25,7 @@ public class HoodIOTalonFX implements HoodIO {
 		inputs.current = motor.getStatorCurrent().getValueAsDouble();
 		inputs.tempCelsius = motor.getDeviceTemp().getValueAsDouble();
 		inputs.angle = getAngle().in(Rotations);
+		inputs.encoderConnected = absoluteEncoder.isConnected();
 	}
 
 	@Override
@@ -35,6 +40,10 @@ public class HoodIOTalonFX implements HoodIO {
 
 	@Override
 	public Angle getAngle() {
-		return Angle.ofBaseUnits(motor.getPosition().getValueAsDouble() / GEAR_RATIO, Rotations);
+		if(absoluteEncoder.isConnected()) {
+			return Rotations.of(absoluteEncoder.get());
+		} else {
+			return Rotations.of(motor.getPosition().getValueAsDouble() / GEARING); // default back to relative encoder
+		}
 	}
 }

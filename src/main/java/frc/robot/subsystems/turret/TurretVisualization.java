@@ -5,6 +5,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.RobotContainer;
+
+import static edu.wpi.first.units.Units.Rotations;
+
 import org.littletonrobotics.junction.Logger;
 
 public class TurretVisualization {
@@ -15,7 +18,7 @@ public class TurretVisualization {
 		turretPose = new Pose2d(
 			0,
 			0,
-			Rotation2d.fromRotations(RobotContainer.turret.io.getRobotRelativeAngle())
+			Rotation2d.fromRotations(RobotContainer.turret.io.getRobotRelativeAngle().in(Rotations))
 		);
 	}
 

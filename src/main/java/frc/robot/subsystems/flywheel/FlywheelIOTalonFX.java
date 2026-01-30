@@ -1,6 +1,10 @@
 package frc.robot.subsystems.flywheel;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.units.measure.AngularVelocity;
+
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.FlywheelConstants.*;
 
 public class FlywheelIOTalonFX implements FlywheelIO {
@@ -15,8 +19,8 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 	public void updateInputs(FlywheelIOInputs inputs) {
 		inputs.appliedVoltage = getMotorVoltage();
 		inputs.tempCelcius = getMotorTemp();
-		inputs.motorVelocity = getMotorVelocity();
-		inputs.flywheelVelocity = getFlywheelVelocity();
+		inputs.motorVelocity = getMotorVelocity().in(RotationsPerSecond);
+		inputs.flywheelVelocity = getFlywheelVelocity().in(RotationsPerSecond);
 	}
 
 	@Override
@@ -30,13 +34,13 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 	}
 
 	@Override
-	public double getMotorVelocity() {
-		return motor.getVelocity().getValueAsDouble();
+	public AngularVelocity getMotorVelocity() {
+		return motor.getVelocity().getValue();
 	}
 
 	@Override
-	public double getFlywheelVelocity() {
-		return getMotorVelocity() / GEARING;
+	public AngularVelocity getFlywheelVelocity() {
+		return RotationsPerSecond.of(getMotorVelocity().in(RotationsPerSecond) / GEARING);
 	}
 
 	@Override

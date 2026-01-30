@@ -38,7 +38,7 @@ public class Hood extends SubsystemBase {
 		Tunable kVTunable = new Tunable("hood kv", kV, (value) -> feedforward.setKv(value));
 
 		pidController = new PIDController(kP, kI, kD);
-		pidController.setTolerance(PIDTolerance.in(Rotations));
+		pidController.setTolerance(TOLERANCE.in(Rotations));
 		feedforward = new ArmFeedforward(kS, kG, kV);
 	}
 
