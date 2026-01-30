@@ -9,6 +9,5 @@ public class SpindexerConstants {
 
   public static final double MOMENT_OF_INERTIA = 0;
   public static final double GEARING = 1;
-  public static final double SPIN_SPEED = 0.0;
-  public static final double REVERSE_SPIN_SPEED = 0.0;
+  public static final double SPIN_VOLTAGE = 0.0;
 }
