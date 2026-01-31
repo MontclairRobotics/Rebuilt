@@ -18,6 +18,7 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
+import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -42,6 +43,8 @@ public class RobotContainer {
   // Subsystems
   public static CommandSwerveDrivetrain drivetrain;
   public static Flywheel flywheel;
+
+  public static Hood hood;
 
   public RobotContainer() {
 
