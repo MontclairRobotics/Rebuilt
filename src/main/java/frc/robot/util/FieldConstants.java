@@ -301,6 +301,13 @@ public class FieldConstants {
 			new Translation2d(0, AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(29).get().getY());
 	}
 
+	public static class ferryWaypoints{
+		public static final Translation2d CLOSE_FERRYING_LEFT_POINT = new Translation2d(1.1, 1.1);
+		public static final Translation2d CLOSE_FERRYING_RIGHT_POINT = new Translation2d(0.0, 0.0);
+		public static final Translation2d FAR_FERRYING_LEFT_POINT = new Translation2d(0.0, 0.0);
+		public static final Translation2d FAR_FERRYING_RIGHT_POINT = new Translation2d(0.0, 0.0);
+	}
+
 	public enum FieldType {
 		ANDYMARK("andymark"),
 		WELDED("welded");
