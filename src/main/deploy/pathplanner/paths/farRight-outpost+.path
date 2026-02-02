@@ -3,32 +3,53 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.778253012048193,
+        "x": 8.744278297218235,
         "y": 2.166361445783133
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.491191073906332,
-        "y": 0.4789578643694006
+        "x": 8.11028400335233,
+        "y": 0.6395996768815642
       },
       "isLocked": false,
-      "linkedName": "closeBottom"
+      "linkedName": "farRight"
     },
     {
       "anchor": {
-        "x": 3.5732667617689007,
-        "y": 0.8456205420827394
+        "x": 5.677006148726853,
+        "y": 0.6637267361111117
       },
       "prevControl": {
-        "x": 5.42879518072289,
-        "y": 0.45071084337349454
+        "x": 7.214195312499999,
+        "y": 0.6812520254629635
+      },
+      "nextControl": {
+        "x": 4.130243446263954,
+        "y": 0.6460923001170555
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.45090987103174596,
+        "y": 0.6637267361111117
+      },
+      "prevControl": {
+        "x": 1.6976617476851859,
+        "y": 0.6483155381944448
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "trenchBottom"
+      "linkedName": "outpost"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": -179.0100655473469
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -42,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -179.03058412254515
   },
   "reversed": false,
   "folder": null,
