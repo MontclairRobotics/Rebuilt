@@ -118,7 +118,8 @@ public class Turret extends SubsystemBase {
 
 	public Angle getAngleToPoint(Translation2d point) {
 		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
-		Translation2d robotToPoint = point.minus(robotPose.getTranslation());
+		Translation2d location = PoseUtils.flipTranslationAlliance(point);
+		Translation2d robotToPoint = location.minus(robotPose.getTranslation());
 		Logger.recordOutput("Turret/getAngletoPoint", robotToPoint.getAngle().getRotations());
 		return robotToPoint.getAngle().getMeasure();
 	}
