@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.544335792824074,
-        "y": 7.611430121527778
+        "x": 3.521831380208334,
+        "y": 0.6731819299768518
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.2814075901973525,
-        "y": 6.0501507800787
+        "x": 3.1777723347188456,
+        "y": 1.1125493747737982
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "trenchBottom"
     },
     {
       "anchor": {
-        "x": 2.7421978262442135,
-        "y": 4.324785319010417
+        "x": 1.4953188657407412,
+        "y": 3.3231795201391026
       },
       "prevControl": {
-        "x": 2.5578180581133383,
-        "y": 3.8336461969627402
-      },
-      "nextControl": {
-        "x": 2.844075406319276,
-        "y": 4.596160349696494
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 0.6265041956018522,
-        "y": 0.6642588975694446
-      },
-      "prevControl": {
-        "x": 1.3736947218259623,
-        "y": 1.7254493580599135
+        "x": 2.589928673323822,
+        "y": 3.4851069900142657
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "towerRight"
     }
   ],
   "rotationTargets": [],
@@ -64,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
