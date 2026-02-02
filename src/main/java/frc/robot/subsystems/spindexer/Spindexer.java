@@ -23,21 +23,36 @@ public class Spindexer extends SubsystemBase {
 		Logger.processInputs("Spindexer", inputs);
 	}
 
+	public void spin() {
+		io.setSpinVoltage(SPIN_VOLTAGE);
+		io.setTransVoltage(TRANS_VOLTAGE);
+	}
+
+	public void reverseSpin() {
+		io.setSpinVoltage(-SPIN_VOLTAGE);
+		io.setTransVoltage(-TRANS_VOLTAGE);
+	}
+
+	public void stop() {
+		io.stopSpin();
+		io.stopTrans();
+	}
+
 	public Command spinCommand() {
 		return Commands.run(() -> {
-			io.setVoltage(SPIN_VOLTAGE);
+			spin();
 		});
 	}
 
 	public Command reverseSpinCommand() {
 		return Commands.run(() -> {
-			io.setVoltage(-SPIN_VOLTAGE);
+			reverseSpin();
 		});
 	}
 
 	public Command manualControlCommand() {
 		return Commands.run(() -> {
-			io.setVoltage(12 * (Math.pow(RobotContainer.operatorController.getLeftX(), 3)));
+			io.setSpinVoltage(12 * (Math.pow(RobotContainer.operatorController.getLeftX(), 3)));
 		});
 	}
 }

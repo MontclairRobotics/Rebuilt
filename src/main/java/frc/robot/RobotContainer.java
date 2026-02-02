@@ -22,6 +22,9 @@ import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodIOSim;
 import frc.robot.subsystems.hood.HoodIOTalonFX;
+import frc.robot.subsystems.spindexer.Spindexer;
+import frc.robot.subsystems.spindexer.SpindexerIOSim;
+import frc.robot.subsystems.spindexer.SpindexerIOTalonFX;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretIOSim;
 import frc.robot.subsystems.turret.TurretIOTalonFX;
@@ -51,6 +54,7 @@ public class RobotContainer {
 	public static Flywheel flywheel;
 	public static Turret turret;
 	public static Hood hood;
+	public static Spindexer spindexer;
 
 	public RobotContainer() {
 
@@ -60,6 +64,7 @@ public class RobotContainer {
 			drivetrain = TunerConstants.createDrivetrain();
 			turret = new Turret(new TurretIOTalonFX());
 			hood = new Hood(new HoodIOTalonFX());
+			spindexer = new Spindexer(new SpindexerIOTalonFX());
 			vision =
 				new Vision(
 					drivetrain::addVisionMeasurement,
@@ -73,7 +78,9 @@ public class RobotContainer {
 			drivetrain = TunerConstants.createDrivetrain();
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 			turret = new Turret(new TurretIOSim());
+			spindexer = new Spindexer(new SpindexerIOSim());
 			hood = new Hood(new HoodIOSim());
+
 			// vision =
 			// 	new Vision(
 			// 		drivetrain::addVisionMeasurement,
