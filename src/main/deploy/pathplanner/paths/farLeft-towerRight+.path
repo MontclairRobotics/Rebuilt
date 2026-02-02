@@ -24,7 +24,7 @@
         "y": 7.433690305757354
       },
       "nextControl": {
-        "x": 0.8395704057279243,
+        "x": 0.8395704057279247,
         "y": 7.467649164677802
       },
       "isLocked": false,
@@ -46,7 +46,7 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.5,
+      "waypointRelativePos": 0.6024896265560119,
       "rotationDegrees": 180.0
     }
   ],
