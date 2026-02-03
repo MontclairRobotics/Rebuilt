@@ -8,11 +8,11 @@ import static frc.robot.constants.SpindexerConstants.*;
 
 public class SpindexerIOSim implements SpindexerIO {
 
-	private FlywheelSim transSim = new FlywheelSim(
+	private FlywheelSim indexSim = new FlywheelSim(
 		LinearSystemId.createFlywheelSystem(
 			DCMotor.getKrakenX60(1),
-			TRANS_MOMENT_OF_INERTIA,
-			TRANS_GEARING
+			INDEX_MOMENT_OF_INERTIA,
+			INDEX_GEARING
 		),
 		DCMotor.getKrakenX60(1),
 		0.0
@@ -31,9 +31,11 @@ public class SpindexerIOSim implements SpindexerIO {
 	@Override
 	public void updateInputs(SpindexerIOInputs inputs) {
 		inputs.spinAppliedVoltage = spinSim.getInputVoltage();
-		inputs.transAppliedVoltage = transSim.getInputVoltage();
+		inputs.indexAppliedVoltage = indexSim.getInputVoltage();
 		inputs.spinTempCelcius = 0;
-		inputs.transTempCelcius = 0;
+		inputs.indexTempCelcius = 0;
+		inputs.spinVelocity = spinSim.getAngularVelocity();
+		inputs.indexVelocity = indexSim.getAngularVelocity();
 	}
 
 	@Override
@@ -42,8 +44,8 @@ public class SpindexerIOSim implements SpindexerIO {
 	}
 
 	@Override
-	public void setTransVoltage(double currentVoltage) {
-		transSim.setInputVoltage(currentVoltage);
+	public void setIndexVoltage(double currentVoltage) {
+		indexSim.setInputVoltage(currentVoltage);
 	}
 
 	@Override
@@ -52,7 +54,7 @@ public class SpindexerIOSim implements SpindexerIO {
 	}
 
 	@Override
-	public void stopTrans() {
-		setTransVoltage(0.0);
+	public void stopIndex() {
+		setIndexVoltage(0.0);
 	}
 }

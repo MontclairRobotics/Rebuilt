@@ -25,17 +25,17 @@ public class Spindexer extends SubsystemBase {
 
 	public void spin() {
 		io.setSpinVoltage(SPIN_VOLTAGE);
-		io.setTransVoltage(TRANS_VOLTAGE);
+		io.setIndexVoltage(INDEX_VOLTAGE);
 	}
 
 	public void reverseSpin() {
 		io.setSpinVoltage(-SPIN_VOLTAGE);
-		io.setTransVoltage(-TRANS_VOLTAGE);
+		io.setIndexVoltage(-INDEX_VOLTAGE);
 	}
 
 	public void stop() {
 		io.stopSpin();
-		io.stopTrans();
+		io.stopIndex();
 	}
 
 	public Command spinCommand() {
