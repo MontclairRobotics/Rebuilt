@@ -1,4 +1,4 @@
-package frc.robot.subsystems.hood;
+package frc.robot.subsystems.shooter.hood;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -56,7 +56,7 @@ public class Hood extends SubsystemBase {
 		Translation2d location = PoseUtils.flipTranslationAlliance(point);
 		double distance = location.minus(RobotContainer.drivetrain.getRobotPose().getTranslation()).getNorm();
 		return Radians.of(Math.PI/2).minus(Radians.of(Math.atan(heightMeters/distance)));
-	}	
+	}
 
 	public void applyJoystickInput() {
 		double voltage = Math.pow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.04), 3) * 3;
