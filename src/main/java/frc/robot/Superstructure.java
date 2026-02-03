@@ -1,10 +1,9 @@
-package frc.robot.superstructure;
+package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.util.FieldConstants;
