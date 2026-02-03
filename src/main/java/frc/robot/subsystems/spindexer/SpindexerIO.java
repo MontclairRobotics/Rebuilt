@@ -16,5 +16,5 @@ public interface SpindexerIO {
 	public void setVoltage(double currentVoltage);
 
 	public void stop();
-	
+
 }

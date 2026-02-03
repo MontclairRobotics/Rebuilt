@@ -20,7 +20,7 @@ public class SpindexerIOSim implements SpindexerIO {
 	public void updateInputs(SpindexerIOInputs inputs) {
 		inputs.appliedVoltage = sim.getInputVoltage();
 		inputs.velocity = (sim.getAngularVelocityRadPerSec() / 2 * Math.PI);
-		inputs.tempCelcius = 0; 
+		inputs.tempCelcius = 0;
 	}
 
 	@Override
