@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.6498444444444444,
-        "y": 7.3968333333333325
+        "x": 1.6437955005787042,
+        "y": 5.907852647569444
       },
       "isLocked": false,
       "linkedName": "depot"
     },
     {
       "anchor": {
-        "x": 4.537877777777778,
-        "y": 7.465044444444444
+        "x": 4.561823929398148,
+        "y": 7.460001012731482
       },
       "prevControl": {
-        "x": 2.472055555555556,
-        "y": 7.474788888888888
+        "x": 2.632656850875147,
+        "y": 7.503993233961353
       },
       "nextControl": {
-        "x": 6.348699917210598,
-        "y": 7.456502830579194
+        "x": 7.369954716435185,
+        "y": 7.395965133101852
       },
       "isLocked": false,
       "linkedName": null
@@ -33,28 +33,38 @@
     {
       "anchor": {
         "x": 7.791269614835947,
-        "y": 5.89169757489301
+        "y": 4.028530670470756
       },
       "prevControl": {
-        "x": 7.8704777777777775,
-        "y": 7.387088888888888
+        "x": 7.775952690972224,
+        "y": 6.476367910879629
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "closeLeft"
+      "linkedName": "closeCenter"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 0.0
-    },
-    {
-      "waypointRelativePos": 1.2046083860759491,
-      "rotationDegrees": 0.0
+      "waypointRelativePos": 1.0836296912832928,
+      "rotationDegrees": 180.0
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.9028115643712578,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 10.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 2818.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
