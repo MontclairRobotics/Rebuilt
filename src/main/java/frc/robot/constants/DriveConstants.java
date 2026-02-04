@@ -42,12 +42,12 @@ public class DriveConstants {
 	public static final ControlConstants ROTATION_BASE_CONSTANTS =
 		new ControlConstants().withPID(16, 0, 0).withContinuous(-Math.PI, Math.PI);
 	public static final ControlConstants TRENCH_TRANSLATION_BASE_CONSTANTS =
-		new ControlConstants().withPID(0, 0, 0);
+		new ControlConstants().withPID(6, 0, 0);
 
 	public static final TunableControlConstants TRENCH_TRANSLATION_CONSTANTS =
         new TunableControlConstants("Drive/Trench Translation", TRENCH_TRANSLATION_BASE_CONSTANTS);
 	public static final TunableControlConstants ROTATION_CONSTANTS =
 		new TunableControlConstants("Drive/Rotation", ROTATION_BASE_CONSTANTS);
 
-	public static final LinearVelocity MIN_VELOCITY_FOR_TRENCH_AND_BUMP_LOCKS = MetersPerSecond.of(2);
+	public static final LinearVelocity MIN_VELOCITY_FOR_TRENCH_AND_BUMP_LOCKS = MetersPerSecond.of(1);
 }

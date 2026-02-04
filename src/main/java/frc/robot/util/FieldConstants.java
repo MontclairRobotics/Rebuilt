@@ -34,10 +34,10 @@ public class FieldConstants {
 	public static class Zones {
 
 		// space (along x axis) in front and behind the center of the TRENCH to count for the TRENCH zone
-        private static final Distance TRENCH_ZONE_EXTENSION = Inches.of(70);
+        private static final Distance TRENCH_ZONE_EXTENSION = Inches.of(90);
 
 		// space (along x axis) in front and behind the center of the BUMP to count for the BUMP zone
-        private static final Distance BUMP_ZONE_EXTENSION = Inches.of(70);
+        private static final Distance BUMP_ZONE_EXTENSION = Inches.of(80);
 
         public static final Translation2d[][] TRENCH_ZONES = {
 
