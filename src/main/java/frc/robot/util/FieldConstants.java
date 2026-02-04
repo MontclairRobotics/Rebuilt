@@ -34,7 +34,7 @@ public class FieldConstants {
 	public static class Zones {
 
 		// space (along x axis) in front and behind the center of the TRENCH to count for the TRENCH zone
-        private static final Distance TRENCH_ZONE_EXTENSION = Inches.of(70); 
+        private static final Distance TRENCH_ZONE_EXTENSION = Inches.of(40);
 
 		// space (along x axis) in front and behind the center of the BUMP to count for the BUMP zone
         private static final Distance BUMP_ZONE_EXTENSION = Inches.of(60);
@@ -44,25 +44,25 @@ public class FieldConstants {
 			// near right trench
             new Translation2d[] {
                 new Translation2d(LinesVertical.HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), Meters.zero()),
-                new Translation2d(LinesVertical.HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), RightTrench.WIDTH)
+                new Translation2d(LinesVertical.HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), RightTrench.OPENING_WIDTH)
             },
 
 			// near left trench
             new Translation2d[] {
-                new Translation2d(LinesVertical.HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH.minus(LeftTrench.WIDTH)),
+                new Translation2d(LinesVertical.HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH.minus(LeftTrench.OPENING_WIDTH)),
                 new Translation2d(LinesVertical.HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH)
             },
 
 			// far right trench
             new Translation2d[] {
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), Meters.zero()),
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), RightTrench.WIDTH)
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), Meters.zero()),
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), RightTrench.OPENING_WIDTH)
             },
 
 			// far left trench
             new Translation2d[] {
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH.minus(LeftTrench.WIDTH)),
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH)
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH.minus(LeftTrench.OPENING_WIDTH)),
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH)
             }
         };
 
@@ -82,17 +82,17 @@ public class FieldConstants {
 
 			// far right bump
             new Translation2d[] {
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(BUMP_ZONE_EXTENSION), RightBump.OPP_NEAR_RIGHT_CORNER.getMeasureY()),
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(BUMP_ZONE_EXTENSION), RightBump.OPP_FAR_LEFT_CORNER.getMeasureY())
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(BUMP_ZONE_EXTENSION), RightBump.OPP_NEAR_RIGHT_CORNER.getMeasureY()),
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(BUMP_ZONE_EXTENSION), RightBump.OPP_FAR_LEFT_CORNER.getMeasureY())
             },
 
 			// far left bump
             new Translation2d[] {
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(BUMP_ZONE_EXTENSION), LeftBump.OPP_NEAR_RIGHT_CORNER.getMeasureY()),
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(BUMP_ZONE_EXTENSION), LeftBump.OPP_FAR_LEFT_CORNER.getMeasureY())
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(BUMP_ZONE_EXTENSION), LeftBump.OPP_NEAR_RIGHT_CORNER.getMeasureY()),
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(BUMP_ZONE_EXTENSION), LeftBump.OPP_FAR_LEFT_CORNER.getMeasureY())
             }
-        };		
-		
+        };
+
 	}
 
 	/**
@@ -172,13 +172,13 @@ public class FieldConstants {
 				FIELD_WIDTH.div(2.0),
 				HEIGHT);
 		public static final Translation2d OPP_NEAR_LEFT_CORNER =
-			new Translation2d(OPP_TOP_CENTER_POINT.getMeasureX().minus(WIDTH.div(2.0)), FIELD_WIDTH.div(2.0).minus(WIDTH.div(2.0)));
+			new Translation2d(OPP_TOP_CENTER_POINT.getMeasureX().minus(WIDTH.div(2.0)), FIELD_WIDTH.div(2.0).plus(WIDTH.div(2.0)));
 		public static final Translation2d OPP_NEAR_RIGHT_CORNER =
 			new Translation2d(OPP_TOP_CENTER_POINT.getMeasureX().minus(WIDTH.div(2.0)), FIELD_WIDTH.div(2.0).minus(WIDTH.div(2.0)));
 		public static final Translation2d OPP_FAR_LEFT_CORNER =
 			new Translation2d(OPP_TOP_CENTER_POINT.getMeasureX().plus(WIDTH.div(2.0)), FIELD_WIDTH.div(2.0).plus(WIDTH.div(2.0)));
 		public static final Translation2d OPP_FAR_RIGHT_CORNER =
-			new Translation2d(OPP_TOP_CENTER_POINT.getMeasureX().plus(WIDTH.div(2.0)), FIELD_WIDTH.div(2.0).plus(WIDTH.div(2.0)));
+			new Translation2d(OPP_TOP_CENTER_POINT.getMeasureX().plus(WIDTH.div(2.0)), FIELD_WIDTH.div(2.0).minus(WIDTH.div(2.0)));
 
 		// Hub faces
 		public static final Pose2d NEAR_FACE =
@@ -224,20 +224,20 @@ public class FieldConstants {
 		public static final Distance DEPTH = Inches.of(44.4);
 
 		// Relevant reference points on alliance side
-		public static final Translation2d NEAR_LEFT_CORNER =
-			new Translation2d(LinesVertical.HUB_CENTER.plus(WIDTH.div(2.0)), Inches.of(255));
-		public static final Translation2d NEAR_RIGHT_CORNER = Hub.NEAR_LEFT_CORNER;
-		public static final Translation2d FAR_LEFT_CORNER =
-			new Translation2d(LinesVertical.HUB_CENTER.minus(WIDTH.div(2.0)), Inches.of(255));
-		public static final Translation2d FAR_RIGHT_CORNER = Hub.FAR_LEFT_CORNER;
+		public static final Translation2d NEAR_RIGHT_CORNER =
+			new Translation2d(LinesVertical.HUB_CENTER.minus(WIDTH.div(2.0)), Inches.of(62.7));
+		public static final Translation2d NEAR_LEFT_CORNER = Hub.NEAR_RIGHT_CORNER;
+		public static final Translation2d FAR_RIGHT_CORNER =
+			new Translation2d(LinesVertical.HUB_CENTER.plus(WIDTH.div(2.0)), Inches.of(62.7));
+		public static final Translation2d FAR_LEFT_CORNER = Hub.FAR_RIGHT_CORNER;
 
 		// Relevant reference points on opposing side
-		public static final Translation2d OPP_NEAR_LEFT_CORNER =
-			new Translation2d(LinesVertical.HUB_CENTER.plus(WIDTH.div(2.0)), Inches.of(255));
-		public static final Translation2d OPP_NEAR_RIGHT_CORNER = Hub.OPP_NEAR_LEFT_CORNER;
-		public static final Translation2d OPP_FAR_LEFT_CORNER =
-			new Translation2d(LinesVertical.HUB_CENTER.minus(WIDTH.div(2.0)), Inches.of(255));
-		public static final Translation2d OPP_FAR_RIGHT_CORNER = Hub.OPP_FAR_LEFT_CORNER;
+		public static final Translation2d OPP_NEAR_RIGHT_CORNER =
+			new Translation2d(LinesVertical.HUB_CENTER.minus(WIDTH.div(2.0)), Inches.of(62.7));
+		public static final Translation2d OPP_NEAR_LEFT_CORNER = Hub.OPP_NEAR_RIGHT_CORNER;
+		public static final Translation2d OPP_FAR_RIGHT_CORNER =
+			new Translation2d(LinesVertical.HUB_CENTER.plus(WIDTH.div(2.0)), Inches.of(62.7));
+		public static final Translation2d OPP_FAR_LEFT_CORNER = Hub.OPP_FAR_RIGHT_CORNER;
 	}
 
 	/** Left Trench related constants */
@@ -303,7 +303,7 @@ public class FieldConstants {
 		// Relevant reference points on alliance side
 		public static final Translation2d CENTER_POINT =
 			new Translation2d(
-				FRONT_FACE_X, 
+				FRONT_FACE_X,
 				AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(31).get().getMeasureY());
 		public static final Translation2d LEFT_UPRIGHT =
 			new Translation2d(

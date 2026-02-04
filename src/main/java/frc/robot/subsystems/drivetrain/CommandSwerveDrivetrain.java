@@ -253,18 +253,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		return MathUtil.copyDirectionPow(yInput, joystickInputGain) * MAX_SPEED.in(MetersPerSecond);
 	}
 
-	public void driveJoystick() {
+	public double getOmegaVelocityFromController() {
 		double rotInput = -MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.1);
-		double rotVelocity =
-			MathUtil.copyDirectionPow(rotInput, joystickInputRotGain)
-				* MAX_ANGULAR_SPEED.in(RadiansPerSecond);
+		return MathUtil.copyDirectionPow(rotInput, joystickInputRotGain) * MAX_ANGULAR_SPEED.in(RadiansPerSecond);
+	}
 
+	public void driveJoystick() {
 		drive(
 			getForwardVelocityFromController(),
 			getStrafeVelocityFromController(),
-			rotVelocity,
+			getOmegaVelocityFromController(),
 			fieldRelative,
-			true); // drives
+			true
+		); // drives
 	}
 
 	public Rotation2d getSnakeDriveAngle() {
