@@ -11,7 +11,6 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -34,7 +33,6 @@ import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
-import frc.robot.util.FieldConstants;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 
@@ -99,11 +97,6 @@ public class RobotContainer {
 		configureBindings();
 
     	drivetrain.registerTelemetry(logger::telemeterize);
-
-		for(Translation2d[] arr: FieldConstants.Zones.BUMP_ZONES) {
-			for(Translation2d i : arr)
-				System.out.println(i);
-		}
 	}
 
 	private void configureBindings() {

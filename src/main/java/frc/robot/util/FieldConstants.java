@@ -36,8 +36,11 @@ public class FieldConstants {
 		// space (along x axis) in front and behind the center of the TRENCH to count for the TRENCH zone
         private static final Distance TRENCH_ZONE_EXTENSION = Inches.of(40);
 
+		// space (along x axis) in front and behind the center of the TRENCH to count for the TRENCH soft zone
+		private static final Distance SOFT_TRENCH_ZONE_EXTENSION = Inches.of(70);
+
 		// space (along x axis) in front and behind the center of the BUMP to count for the BUMP zone
-        private static final Distance BUMP_ZONE_EXTENSION = Inches.of(60);
+        private static final Distance BUMP_ZONE_EXTENSION = Inches.of(70);
 
         public static final Translation2d[][] TRENCH_ZONES = {
 
@@ -65,6 +68,34 @@ public class FieldConstants {
                 new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH)
             }
         };
+
+		public static final Translation2d[][] SOFT_TRENCH_ZONES= {
+
+			// near right trench
+            new Translation2d[] {
+                new Translation2d(LinesVertical.HUB_CENTER.minus(SOFT_TRENCH_ZONE_EXTENSION), Meters.zero()),
+                new Translation2d(LinesVertical.HUB_CENTER.plus(SOFT_TRENCH_ZONE_EXTENSION), RightTrench.OPENING_WIDTH)
+            },
+
+			// near left trench
+            new Translation2d[] {
+                new Translation2d(LinesVertical.HUB_CENTER.minus(SOFT_TRENCH_ZONE_EXTENSION), FIELD_WIDTH.minus(LeftTrench.OPENING_WIDTH)),
+                new Translation2d(LinesVertical.HUB_CENTER.plus(SOFT_TRENCH_ZONE_EXTENSION), FIELD_WIDTH)
+            },
+
+			// far right trench
+            new Translation2d[] {
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(SOFT_TRENCH_ZONE_EXTENSION), Meters.zero()),
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(SOFT_TRENCH_ZONE_EXTENSION), RightTrench.OPENING_WIDTH)
+            },
+
+			// far left trench
+            new Translation2d[] {
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(SOFT_TRENCH_ZONE_EXTENSION), FIELD_WIDTH.minus(LeftTrench.OPENING_WIDTH)),
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(SOFT_TRENCH_ZONE_EXTENSION), FIELD_WIDTH)
+            }
+
+		};
 
         public static final Translation2d[][] BUMP_ZONES = {
 
