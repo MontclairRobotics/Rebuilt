@@ -1,0 +1,43 @@
+{
+  "name": "555 2026",
+  "disableSimplification": false,
+  "rotations": [
+    {
+      "axis": "x",
+      "degrees": 90
+    },
+    {
+      "axis": "z",
+      "degrees": 90
+    }
+  ],
+  "position": [
+    0,
+    0,
+    0.1
+  ],
+  "cameras": [],
+  "components": [
+    {
+      "zeroedRotations": [
+        {
+          "axis": "y",
+          "degrees": 180
+        },
+        {
+          "axis": "z",
+          "degrees": 180
+        },
+        {
+          "axis": "x",
+          "degrees": 90
+        }
+      ],
+      "zeroedPosition": [
+        0.014,
+        0,
+        0.014
+      ]
+    }
+  ]
+}
