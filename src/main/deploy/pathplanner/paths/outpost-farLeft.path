@@ -20,7 +20,7 @@
         "y": 0.6519897280092595
       },
       "prevControl": {
-        "x": 3.203183693647278,
+        "x": 3.2031836936472775,
         "y": 0.6374811606319863
       },
       "nextControl": {
@@ -50,7 +50,21 @@
       "rotationDegrees": 90.0
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.9333990863787418,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 1.6,
+        "maxAcceleration": 11.7,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 2818.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
