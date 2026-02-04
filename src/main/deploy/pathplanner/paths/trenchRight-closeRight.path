@@ -32,20 +32,16 @@
     {
       "waypointRelativePos": 0.2558635394456304,
       "rotationDegrees": 0.0
-    },
-    {
-      "waypointRelativePos": 0.7423338880670614,
-      "rotationDegrees": 90.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.7231217143691587,
+      "minWaypointRelativePos": 0.8749067473474839,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.5,
-        "maxAcceleration": 11.7,
+        "maxAcceleration": 10.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 2818.0,
         "nominalVoltage": 12.0,
