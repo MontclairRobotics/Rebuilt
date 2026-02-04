@@ -1,8 +1,10 @@
 {
-  "robotWidth": 0.8509,
+  "robotWidth": 0.851,
   "robotLength": 0.851,
   "holonomicMode": true,
-  "pathFolders": [],
+  "pathFolders": [
+    "Yay folder"
+  ],
   "autoFolders": [],
   "defaultMaxVel": 3.93,
   "defaultMaxAccel": 11.7,
@@ -29,6 +31,6 @@
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
   "robotFeatures": [
-    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.0,\"y\":0.0},\"size\":{\"width\":0.857,\"length\":0.857},\"borderRadius\":0.001,\"strokeWidth\":0.001,\"filled\":false}}"
+    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.0,\"y\":0.0},\"size\":{\"width\":0.851,\"length\":0.851},\"borderRadius\":0.001,\"strokeWidth\":0.001,\"filled\":false}}"
   ]
 }

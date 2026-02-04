@@ -5,45 +5,33 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "shoot"
+            "pathName": "trenchLeft-depot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "trenchRight-outpost"
+            "pathName": "depot-closeLeft"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "outpost-trenchRight"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "shoot"
+            "pathName": "closeLeft-trenchLeft"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "trenchRight-centerRight"
+            "pathName": "trenchLeft-closeCenter"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "centerRight-trenchRight"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "shoot"
+            "pathName": "closeCenter-towerLeft"
           }
         }
       ]
