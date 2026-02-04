@@ -5,24 +5,41 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 public class SpindexerIOTalonFX implements SpindexerIO {
 
-	private TalonFX motor;
+	private TalonFX spinMotor;
+	private TalonFX indexMotor;
 
 	public SpindexerIOTalonFX() {
-		motor = new TalonFX(CAN_ID);
+		spinMotor = new TalonFX(SPIN_ID);
+		indexMotor = new TalonFX(INDEX_ID);
 	}
 
+	@Override
 	public void updateInputs(SpindexerIOInputs inputs) {
-		inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
-		inputs.tempCelcius = motor.getDeviceTemp().getValueAsDouble(); // celsius
-		inputs.velocity = motor.getVelocity().getValueAsDouble(); // RPS
+		inputs.spinAppliedVoltage = spinMotor.getMotorVoltage().getValueAsDouble();
+		inputs.indexAppliedVoltage = indexMotor.getMotorVoltage().getValueAsDouble();
+		inputs.spinTempCelcius = spinMotor.getDeviceTemp().getValueAsDouble();
+		inputs.indexTempCelcius = indexMotor.getDeviceTemp().getValueAsDouble();
+		inputs.indexVelocity = indexMotor.getVelocity().getValue();
+		inputs.spinVelocity = spinMotor.getVelocity().getValue();
 	}
 
-	public void stop() {
-		motor.stopMotor();
+	@Override
+	public void stopSpin() {
+		spinMotor.stopMotor();
 	}
 
-	public void setVoltage(double voltage) {
-		motor.setVoltage(voltage);
+	@Override
+	public void stopIndex() {
+		indexMotor.stopMotor();
 	}
 
+	@Override
+	public void setSpinVoltage(double voltage) {
+		spinMotor.setVoltage(voltage);
+	}
+
+	@Override
+	public void setIndexVoltage(double voltage) {
+		indexMotor.setVoltage(voltage);
+	}
 }
