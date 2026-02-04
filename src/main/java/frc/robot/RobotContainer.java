@@ -24,6 +24,8 @@ import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodIOSim;
 import frc.robot.subsystems.hood.HoodIOTalonFX;
+import frc.robot.subsystems.pivot.Pivot;
+import frc.robot.subsystems.pivot.PivotIOTalonFX;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.spindexer.SpindexerIOSim;
 import frc.robot.subsystems.spindexer.SpindexerIOTalonFX;
@@ -57,12 +59,14 @@ public class RobotContainer {
 	public static Turret turret;
 	public static Hood hood;
 	public static Spindexer spindexer;
+  public static Pivot pivot;
 
 	public RobotContainer() {
 
 		switch (Constants.CURRENT_MODE) {
 		case REAL:
 			flywheel = new Flywheel(new FlywheelIOTalonFX());
+      pivot = new Pivot(new PivotIOTalonFX());
 			drivetrain = TunerConstants.createDrivetrain();
 			turret = new Turret(new TurretIOTalonFX());
 			hood = new Hood(new HoodIOTalonFX());
@@ -77,6 +81,7 @@ public class RobotContainer {
 
 		case SIM:
 			flywheel = new Flywheel(new FlywheelIOTalonFX());
+      pivot = new Pivot(new PivotIOTalonFX());
 			drivetrain = TunerConstants.createDrivetrain();
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 			turret = new Turret(new TurretIOSim());
