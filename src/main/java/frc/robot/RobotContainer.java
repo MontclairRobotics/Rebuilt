@@ -17,11 +17,15 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.HoodConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
+import frc.robot.subsystems.shooter.spindexer.Spindexer;
+import frc.robot.subsystems.shooter.spindexer.SpindexerIOSim;
+import frc.robot.subsystems.shooter.spindexer.SpindexerIOTalonFX;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
 import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
@@ -51,6 +55,8 @@ public class RobotContainer {
 	public static Flywheel flywheel;
 	public static Turret turret;
 	public static Hood hood;
+	public static Shooter shooter;
+	public static Spindexer spindexer;
 
 	public RobotContainer() {
 
@@ -60,6 +66,8 @@ public class RobotContainer {
 			drivetrain = TunerConstants.createDrivetrain();
 			turret = new Turret(new TurretIOTalonFX());
 			hood = new Hood(new HoodIOTalonFX());
+			spindexer = new Spindexer(new SpindexerIOTalonFX());
+			shooter = new Shooter(hood, flywheel, turret, spindexer);
 			vision =
 				new Vision(
 					drivetrain::addVisionMeasurement,
@@ -74,6 +82,8 @@ public class RobotContainer {
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 			turret = new Turret(new TurretIOSim());
 			hood = new Hood(new HoodIOSim());
+			spindexer = new Spindexer(new SpindexerIOSim());
+			shooter = new Shooter(hood, flywheel, turret, spindexer);
 			// vision =
 			// 	new Vision(
 			// 		drivetrain::addVisionMeasurement,
@@ -102,8 +112,6 @@ public class RobotContainer {
 		drivetrain.setDefaultCommand(drivetrain.driveJoystickInputCommand());
 		// driverController.cross().whileTrue(turret.setPositiveVoltageCommand());
 		// driverController.square().whileTrue(turret.setNegativeVoltageCommand());
-		// driverController.L1().onTrue(turret.setRobotRelativeAngleCommand(0.25));
-		// driverController.L1().whileTrue(new SnakeDriveCommand(drivetrain));
 		driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
 		driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub()));
 
