@@ -8,12 +8,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.pivot.Pivot;
 
 public class RobotContainer {
 
   // Controllers
   public static CommandPS5Controller driverController = new CommandPS5Controller(0);
   public static CommandPS5Controller operatorController = new CommandPS5Controller(1);
+  public static Pivot pivot;
 
   // Subsystems
   public static CommandSwerveDrivetrain drivetrain;
