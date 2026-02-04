@@ -8,62 +8,46 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.893245823389023,
-        "y": 5.5420167064439125
+        "x": 8.076920310144278,
+        "y": 4.670151610573151
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.872866666666668,
-        "y": 7.435811111111111
+        "x": 5.668233333333334,
+        "y": 7.431398002853067
       },
       "prevControl": {
-        "x": 7.470599753054831,
-        "y": 7.384271334130848
+        "x": 7.068335856049119,
+        "y": 7.108051768086477
       },
       "nextControl": {
-        "x": 4.664555555555555,
-        "y": 7.474788888888888
+        "x": 5.262093197878792,
+        "y": 7.525193908121554
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.8813222222222223,
-        "y": 7.153222222222222
+        "x": 3.521831380208334,
+        "y": 7.431398002853067
       },
       "prevControl": {
-        "x": 3.417266666666667,
-        "y": 7.562488888888888
-      },
-      "nextControl": {
-        "x": 1.9255969983316872,
-        "y": 6.4233956876149065
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 0.6676367559471614,
-        "y": 5.963790972226502
-      },
-      "prevControl": {
-        "x": 1.4099111111111111,
-        "y": 5.9351666666666665
+        "x": 5.0799896782540035,
+        "y": 7.395361373452021
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "trenchLeft"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.0,
-      "rotationDegrees": 180.0
+      "waypointRelativePos": 1.05,
+      "rotationDegrees": 0.0
     }
   ],
   "constraintZones": [],
@@ -78,8 +62,8 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -179.01061531711042
+    "velocity": 0.0,
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": null,

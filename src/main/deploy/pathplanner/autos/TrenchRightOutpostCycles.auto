@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "trenchRight-outpost"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "outpost-closeRight"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "closeRight-trenchRight"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "trenchRight-closeCenter"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "closeCenter-towerRight"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
