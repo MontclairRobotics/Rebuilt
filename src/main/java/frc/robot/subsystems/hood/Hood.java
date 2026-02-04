@@ -1,23 +1,29 @@
 package frc.robot.subsystems.hood;
 
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
+import static frc.robot.constants.HoodConstants.TOLERANCE;
+import static frc.robot.constants.HoodConstants.kD;
+import static frc.robot.constants.HoodConstants.kG;
+import static frc.robot.constants.HoodConstants.kI;
+import static frc.robot.constants.HoodConstants.kP;
+import static frc.robot.constants.HoodConstants.kS;
+import static frc.robot.constants.HoodConstants.kV;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.Tunable;
-
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
-import static frc.robot.constants.HoodConstants.*;
 
 public class Hood extends SubsystemBase {
 	public HoodIO io;
@@ -45,7 +51,7 @@ public class Hood extends SubsystemBase {
 	}
 
 	public Angle getAngleToHub() {
-		double heightMeters = FieldConstants.Hub.height - 0.30;
+		double heightMeters = FieldConstants.Hub.HEIGHT.in(Meters) - 0.30;
 		double distance = FieldConstants.Hub.HUB_LOCATION.minus(RobotContainer.drivetrain.getRobotPose().getTranslation()).getNorm();
 		return Radians.of(Math.PI/2).minus(Radians.of(Math.atan(heightMeters/distance)));
 	}

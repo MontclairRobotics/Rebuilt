@@ -1,18 +1,25 @@
 package frc.robot.subsystems.flywheel;
 
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import frc.robot.constants.FlywheelConstants;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.FlywheelConstants.*;
 
 public class FlywheelIOTalonFX implements FlywheelIO {
 
-	private TalonFX motor;
+	private TalonFX leftMotor;
+	private TalonFX rightMotor;
 
 	public FlywheelIOTalonFX() {
-		motor = new TalonFX(CAN_ID);
+		leftMotor = new TalonFX(LEFT_CAN_ID);
+		rightMotor = new TalonFX(RIGHT_CAN_ID);
+
+		rightMotor.setControl(new Follower(FlywheelConstants.LEFT_CAN_ID, MotorAlignmentValue.Aligned));
 	}
 
 	@Override
@@ -25,17 +32,17 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
 	@Override
 	public void setVoltage(double voltage) {
-		motor.setVoltage(voltage);
+		leftMotor.setVoltage(voltage);
 	}
 
 	@Override
 	public void stop() {
-		motor.stopMotor();
+		leftMotor.stopMotor();
 	}
 
 	@Override
 	public AngularVelocity getMotorVelocity() {
-		return motor.getVelocity().getValue();
+		return leftMotor.getVelocity().getValue();
 	}
 
 	@Override
@@ -45,11 +52,11 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
 	@Override
 	public double getMotorVoltage() {
-		return motor.getMotorVoltage().getValueAsDouble();
+		return leftMotor.getMotorVoltage().getValueAsDouble();
 	}
 
 	@Override
 	public double getMotorTemp() {
-		return motor.getDeviceTemp().getValueAsDouble();
+		return leftMotor.getDeviceTemp().getValueAsDouble();
 	}
 }

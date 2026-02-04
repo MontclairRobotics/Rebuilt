@@ -4,18 +4,20 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static frc.robot.subsystems.vision.VisionConstants.*;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import frc.robot.commands.JoystickDrive;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
-import frc.robot.constants.HoodConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
@@ -29,13 +31,13 @@ import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretIOSim;
 import frc.robot.subsystems.turret.TurretIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.util.PoseUtils;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
 
@@ -101,12 +103,13 @@ public class RobotContainer {
 
 		configureBindings();
 
-    drivetrain.registerTelemetry(logger::telemeterize);
+    	drivetrain.registerTelemetry(logger::telemeterize);
 	}
 
 	private void configureBindings() {
+
 		// hood.setDefaultCommand(hood.joystickCommand());
-		drivetrain.setDefaultCommand(drivetrain.driveJoystickInputCommand());
+		drivetrain.setDefaultCommand(new JoystickDrive());
 		// driverController.cross().whileTrue(turret.setPositiveVoltageCommand());
 		// driverController.square().whileTrue(turret.setNegativeVoltageCommand());
 		// driverController.L1().onTrue(turret.setRobotRelativeAngleCommand(0.25));
@@ -114,17 +117,17 @@ public class RobotContainer {
 		driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
 		driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub()));
 
-		driverController.triangle().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
-		driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MIN_ANGLE));
+		// driverController.triangle().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
+		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MIN_ANGLE));
 
-		// driverController.triangle()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
-		// driverController.square()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
-		// driverController.cross()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
-		// driverController.circle()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
+		driverController.triangle()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
+		driverController.square()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
+		driverController.cross()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
+		driverController.circle()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
 
 		// zeros gyro
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
