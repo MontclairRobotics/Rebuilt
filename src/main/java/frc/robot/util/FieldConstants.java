@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.units.measure.Distance;
+import frc.robot.constants.Constants;
 
 /**
  * credit to team 6328 for this wonderful class of tag-based constants.
@@ -34,34 +35,36 @@ public class FieldConstants {
 	public static class Zones {
 
 		// space (along x axis) in front and behind the center of the TRENCH to count for the TRENCH zone
-        private static final Distance TRENCH_ZONE_EXTENSION = Inches.of(90);
+        public static final Distance TRENCH_ZONE_EXTENSION = Inches.of(90);
 
 		// space (along x axis) in front and behind the center of the BUMP to count for the BUMP zone
         private static final Distance BUMP_ZONE_EXTENSION = Inches.of(80);
+
+		private static final Distance FUDGE_FACTOR = Constants.BUMPER_WIDTH.div(2);
 
         public static final Translation2d[][] TRENCH_ZONES = {
 
 			// near right trench
             new Translation2d[] {
                 new Translation2d(LinesVertical.HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), Meters.zero()),
-                new Translation2d(LinesVertical.HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), RightTrench.OPENING_WIDTH)
+                new Translation2d(LinesVertical.HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), RightTrench.WIDTH)
             },
 
 			// near left trench
             new Translation2d[] {
-                new Translation2d(LinesVertical.HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH.minus(LeftTrench.OPENING_WIDTH)),
+                new Translation2d(LinesVertical.HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH.minus(LeftTrench.WIDTH)),
                 new Translation2d(LinesVertical.HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH)
             },
 
 			// far right trench
             new Translation2d[] {
                 new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), Meters.zero()),
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), RightTrench.OPENING_WIDTH)
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), RightTrench.WIDTH)
             },
 
 			// far left trench
             new Translation2d[] {
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH.minus(LeftTrench.OPENING_WIDTH)),
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH.minus(LeftTrench.WIDTH)),
                 new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH)
             }
         };
@@ -70,26 +73,26 @@ public class FieldConstants {
 
 			// near right bump
             new Translation2d[] {
-                new Translation2d(LinesVertical.HUB_CENTER.minus(BUMP_ZONE_EXTENSION), RightBump.NEAR_RIGHT_CORNER.getMeasureY()),
-                new Translation2d(LinesVertical.HUB_CENTER.plus(BUMP_ZONE_EXTENSION), RightBump.FAR_LEFT_CORNER.getMeasureY())
+                new Translation2d(LinesVertical.HUB_CENTER.minus(BUMP_ZONE_EXTENSION), RightBump.NEAR_RIGHT_CORNER.getMeasureY().plus(FUDGE_FACTOR)),
+                new Translation2d(LinesVertical.HUB_CENTER.plus(BUMP_ZONE_EXTENSION), RightBump.FAR_LEFT_CORNER.getMeasureY().minus(FUDGE_FACTOR))
             },
 
 			// near left bump
             new Translation2d[] {
-                new Translation2d(LinesVertical.HUB_CENTER.minus(BUMP_ZONE_EXTENSION), LeftBump.NEAR_RIGHT_CORNER.getMeasureY()),
-                new Translation2d(LinesVertical.HUB_CENTER.plus(BUMP_ZONE_EXTENSION), LeftBump.FAR_LEFT_CORNER.getMeasureY())
+                new Translation2d(LinesVertical.HUB_CENTER.minus(BUMP_ZONE_EXTENSION), LeftBump.NEAR_RIGHT_CORNER.getMeasureY().plus(FUDGE_FACTOR)),
+                new Translation2d(LinesVertical.HUB_CENTER.plus(BUMP_ZONE_EXTENSION), LeftBump.FAR_LEFT_CORNER.getMeasureY().minus(FUDGE_FACTOR))
             },
 
 			// far right bump
             new Translation2d[] {
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(BUMP_ZONE_EXTENSION), RightBump.OPP_NEAR_RIGHT_CORNER.getMeasureY()),
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(BUMP_ZONE_EXTENSION), RightBump.OPP_FAR_LEFT_CORNER.getMeasureY())
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(BUMP_ZONE_EXTENSION), RightBump.OPP_NEAR_RIGHT_CORNER.getMeasureY().plus(FUDGE_FACTOR)),
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(BUMP_ZONE_EXTENSION), RightBump.OPP_FAR_LEFT_CORNER.getMeasureY().minus(FUDGE_FACTOR))
             },
 
 			// far left bump
             new Translation2d[] {
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(BUMP_ZONE_EXTENSION), LeftBump.OPP_NEAR_RIGHT_CORNER.getMeasureY()),
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(BUMP_ZONE_EXTENSION), LeftBump.OPP_FAR_LEFT_CORNER.getMeasureY())
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(BUMP_ZONE_EXTENSION), LeftBump.OPP_NEAR_RIGHT_CORNER.getMeasureY().plus(FUDGE_FACTOR)),
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(BUMP_ZONE_EXTENSION), LeftBump.OPP_FAR_LEFT_CORNER.getMeasureY().minus(FUDGE_FACTOR))
             }
         };
 
