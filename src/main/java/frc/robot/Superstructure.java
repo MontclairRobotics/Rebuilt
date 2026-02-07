@@ -7,11 +7,14 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.util.FieldConstants;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 public class Superstructure {
 
     public static Turret turret;
     public static Hood hood;
     public CommandScheduler commandScheduler;
+    public final Trigger onLeftSideTrigger;
 
     public enum Modes {
         SCORING,
@@ -19,6 +22,11 @@ public class Superstructure {
         FERRYING_RIGHT,
         NO_ZONE
     }
+
+    onLeftSideTrigger = new Trigger(() -> (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                && poseSupplier.get().getMeasureY().gt(FieldConstants.FIELD_WIDTH.div(2)))
+        || (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+                && poseSupplier.get().getMeasureY().lte(FieldConstants.FIELD_WIDTH.div(2))));
 
     private Modes currentMode = Modes.NO_ZONE;
     private Modes lastMode = Modes.NO_ZONE;
