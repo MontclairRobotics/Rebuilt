@@ -1,20 +1,28 @@
 package frc.robot;
 
+import com.google.flatbuffers.FlexBuffers.Map;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.util.FieldConstants;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Superstructure {
 
     public static Turret turret;
     public static Hood hood;
     public CommandScheduler commandScheduler;
-    public final Trigger onLeftSideTrigger;
+    private final Modes zone = Modes.NO_ZONE;
+    private final Map<zone, Command> zoneCommands;
+    public final Trigger isRedAllianceTrigger = new Trigger (this::isRedAlliance);
+    public final Trigger inScoringZoneTrigger = new Trigger(this::isInScoringZone);
+    public final Trigger ixnFerryingLeftZoneTrigger = new Trigger(this::isInFerryLeftZone);
+    public final Trigger inFerryingRightZoneTrigger = new Trigger(this::isInFerryRightZone);
 
     public enum Modes {
         SCORING,
@@ -23,118 +31,45 @@ public class Superstructure {
         NO_ZONE
     }
 
-    onLeftSideTrigger = new Trigger(() -> (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                && poseSupplier.get().getMeasureY().gt(FieldConstants.FIELD_WIDTH.div(2)))
-        || (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
-                && poseSupplier.get().getMeasureY().lte(FieldConstants.FIELD_WIDTH.div(2))));
 
-    private Modes currentMode = Modes.NO_ZONE;
-    private Modes lastMode = Modes.NO_ZONE;
+    public boolean isRedAlliance(){
+        var alliance = DriverStation.getAlliance();
+        return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+    }
 
-    public void switchModeRedAlliance() {
-
+    public boolean isInScoringZone(){
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
-
-        if (pos.getX() <= FieldConstants.LinesVertical.starting) {
-            currentMode = Modes.SCORING;
-        }
-        else if (pos.getX() <= FieldConstants.LinesVertical.neutralZoneNear) {
-            currentMode = Modes.NO_ZONE;
-        }
-        // else if (pos.getY() <= FieldConstants.LinesHorizontal.center &&
-        //          pos.getX() <= FieldConstants.LinesVertical.center) {
-        //     currentMode = Modes.CLOSE_FERRYING_RIGHT;
-        // }
-        // else if (pos.getY() >= FieldConstants.LinesHorizontal.center &&
-        //          pos.getX() <= FieldConstants.LinesVertical.center) {
-        //     currentMode = Modes.CLOSE_FERRYING_LEFT;
-        // }
-        else if (pos.getY() <= FieldConstants.LinesHorizontal.center &&
-                 pos.getX() <= FieldConstants.LinesVertical.neutralZoneFar) {
-            currentMode = Modes.FERRYING_RIGHT;
-        }
-        else if (pos.getY() >= FieldConstants.LinesHorizontal.center &&
-                 pos.getX() <= FieldConstants.LinesVertical.neutralZoneFar) {
-            currentMode = Modes.FERRYING_LEFT;
-        }
-        else {
-            currentMode = Modes.NO_ZONE;
-        }
+        return (pos.getX() >= FieldConstants.LinesVertical.starting);
     }
 
-    public void switchModeBlueAlliance() {
-
+    public boolean isInFerryLeftZone(){
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
-
-        if (pos.getX() >= FieldConstants.LinesVertical.starting) {
-            currentMode = Modes.SCORING;
-        }
-        else if (pos.getX() >= FieldConstants.LinesVertical.neutralZoneNear) {
-            currentMode = Modes.NO_ZONE;
-        }
-        // else if (pos.getY() >= FieldConstants.LinesHorizontal.center &&
-        //          pos.getX() >= FieldConstants.LinesVertical.center) {
-        //     currentMode = Modes.CLOSE_FERRYING_RIGHT;
-        // }
-        // else if (pos.getY() <= FieldConstants.LinesHorizontal.center &&
-        //          pos.getX() >= FieldConstants.LinesVertical.center) {
-        //     currentMode = Modes.CLOSE_FERRYING_LEFT;
-        // }
-        else if (pos.getY() >= FieldConstants.LinesHorizontal.center &&
-                 pos.getX() >= FieldConstants.LinesVertical.neutralZoneFar) {
-            currentMode = Modes.FERRYING_RIGHT;
-        }
-        else if (pos.getY() <= FieldConstants.LinesHorizontal.center &&
-                 pos.getX() >= FieldConstants.LinesVertical.neutralZoneFar) {
-            currentMode = Modes.FERRYING_LEFT;
-        }
-        else {
-            currentMode = Modes.NO_ZONE;
-        }
+        return (pos.getY() >= FieldConstants.LinesHorizontal.center &&
+                pos.getX() <= FieldConstants.LinesVertical.neutralZoneFar);
     }
 
-    public Modes getCurrentMode() {
-        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-
-        if (alliance == Alliance.Red) {
-            switchModeRedAlliance();
-        } else {
-            switchModeBlueAlliance();
-        }
-        return currentMode;
+    public boolean isInFerryRightZone(){
+        Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
+        return (pos.getY() <= FieldConstants.LinesHorizontal.center &&
+        pos.getX() <= FieldConstants.LinesVertical.neutralZoneFar);       
     }
 
-    public void setModeConstants(){
-        Turret turret = RobotContainer.turret;
-        Hood hood = RobotContainer.hood;
-
-        if (currentMode == lastMode) return;
-        lastMode = currentMode;
-
-
-        switch(currentMode){
-            case NO_ZONE:
-                break;
-            case SCORING:
-                CommandScheduler.getInstance().schedule(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
-                CommandScheduler.getInstance().schedule(hood.setAngleCommand(() -> hood.getAngleToHub()));
-                break;
-            // case CLOSE_FERRYING_LEFT:
-            //     CommandScheduler.getInstance().schedule(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.CLOSE_FERRYING_LEFT_POINT)));
-            //     CommandScheduler.getInstance().schedule(hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.CLOSE_FERRYING_LEFT_POINT, FieldConstants.ferryWaypoints.CLOSE_FERRYING_LEFT_HEIGHT)));
-            //     break;
-            // case CLOSE_FERRYING_RIGHT:
-            //     CommandScheduler.getInstance().schedule(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.CLOSE_FERRYING_RIGHT_POINT)));
-            //     CommandScheduler.getInstance().schedule(hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.CLOSE_FERRYING_RIGHT_POINT, FieldConstants.ferryWaypoints.CLOSE_FERRYING_RIGHT_HEIGHT)));
-            //     break;
-            case FERRYING_LEFT:
-                CommandScheduler.getInstance().schedule(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_POINT)));
-                CommandScheduler.getInstance().schedule(hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_POINT, FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_HEIGHT)));
-                break;
-            case FERRYING_RIGHT:
-                CommandScheduler.getInstance().schedule(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_POINT)));
-                CommandScheduler.getInstance().schedule(hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_POINT, FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_HEIGHT)));
-                break;
-        }
-    }
+    zoneCommands = Map.of(
+        Modes.SCORING,
+        Commands.sequence(
+            turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()),
+            hood.setAngleCommand(() -> hood.getAngleToHub)
+        ),
+        Modes.FERRYING_LEFT(
+            turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_POINT)),
+            hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_POINT, FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_HEIGHT))
+        ),
+        Modes.FERRYING_RIGHT(
+            turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_POINT)),
+            hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_POINT, FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_HEIGHT))
+        ),
+        Modes.NO_ZONE(
+        );
+    )
 }
+
