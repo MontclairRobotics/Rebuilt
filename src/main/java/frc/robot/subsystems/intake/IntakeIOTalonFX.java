@@ -1,23 +1,25 @@
 package frc.robot.subsystems.intake;
 
+import static frc.robot.constants.IntakeConstants.*;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import frc.robot.constants.IntakeConstants;
 
 public class IntakeIOTalonFX implements IntakeIO {
+
   private TalonFX motor;
   TalonFXConfiguration config;
 
   public IntakeIOTalonFX() {
     // define motor
-    motor = new TalonFX(IntakeConstants.MOTOR_ID);
+    motor = new TalonFX(MOTOR_ID);
 
     // define config
     config = new TalonFXConfiguration();
 
     // motor setup and inverted setting
-    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; // TODO: needed?
     motor.getConfigurator().apply(config);
   }
 
@@ -26,23 +28,22 @@ public class IntakeIOTalonFX implements IntakeIO {
     // get double (ints) as outputs
     inputs.current = motor.getStatorCurrent().getValueAsDouble();
     inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
-  }
-
-  @Override
-  public void set(double speed) {
-    // set the speed
-    motor.set(speed);
+    inputs.temperature = motor.getDeviceTemp().getValueAsDouble();
+    inputs.velocity = getVelocity();
   }
 
   @Override
   public void stop() {
-    // stop
     motor.stopMotor();
   }
 
   @Override
   public void setVoltage(double voltage) {
-    // set voltage (same as speed?)
     motor.setVoltage(voltage);
+  }
+
+  @Override
+  public double getVelocity() {
+    return motor.getVelocity().getValueAsDouble();
   }
 }

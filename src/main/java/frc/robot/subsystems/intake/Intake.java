@@ -1,11 +1,12 @@
 package frc.robot.subsystems.intake;
 
+import static frc.robot.constants.IntakeConstants.*;
+
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.IntakeConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -18,7 +19,19 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean isStalled() {
-    return isStalledDebouncer.calculate(inputs.current > IntakeConstants.INTAKE_STALL_CURRENT);
+    return isStalledDebouncer.calculate(inputs.current > INTAKE_STALL_CURRENT);
+  }
+
+  public void intake() {
+    io.setVoltage(INTAKE_VOLTAGE);
+  }
+
+  public void outtake() {
+    io.setVoltage(-INTAKE_VOLTAGE);
+  }
+
+  public void stop() {
+    io.stop();
   }
 
   @Override
@@ -29,33 +42,26 @@ public class Intake extends SubsystemBase {
 
   // --------------------------COMMANDS--------------------------
 
-  // TODO: intake class for SparkMax?
-
-  // stop all commands
-  public Command stopCommands() {
-    return Commands.runOnce(() -> io.stop(), this);
+  public Command stopCommand() {
+    return Commands.runOnce(this::stop, this);
   }
 
   // power intake
   public Command intakeCommand() {
-    return Commands.run(() -> io.set(IntakeConstants.INTAKE_FUEL_SPEED), this)
-        .finallyDo(
-            () -> {
-              io.stop();
-            });
+    return Commands.run(this::intake, this).finallyDo(this::stop);
   }
 
   // used for unjamming
   public Command outtakeCommand() {
-    return Commands.run(() -> io.set(IntakeConstants.OUTTAKE_FUEL_SPEED), this);
+    return Commands.run(this::outtake, this);
   }
 
   // unjam command
   public Command unjamCommand() {
-    return Commands.run(() -> io.set(IntakeConstants.INTAKE_FUEL_SPEED), this)
+    return Commands.run(this::intake, this)
         .until(this::isStalled)
         .withTimeout(1.0)
-        .andThen(Commands.run(() -> io.set(-0.1), this).withTimeout(0.1))
+        .andThen(Commands.run(this::outtake, this).withTimeout(0.2))
         .andThen(intakeCommand());
   }
 }

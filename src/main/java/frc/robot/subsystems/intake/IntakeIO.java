@@ -5,9 +5,10 @@ import org.littletonrobotics.junction.AutoLog;
 public interface IntakeIO {
   @AutoLog
   public static class IntakeIOInputs {
-    public double current = 0;
     public double velocity = 0;
     public double appliedVoltage = 0;
+    public double temperature = 0;
+    public double current = 0;
   }
 
   /**
@@ -16,6 +17,7 @@ public interface IntakeIO {
    * @param inputs IO Inputs to update
    */
   public void updateInputs(IntakeIOInputs inputs);
+
   /**
    * Applies voltages to the intake motor
    *
@@ -23,13 +25,11 @@ public interface IntakeIO {
    */
   public void setVoltage(double voltage);
 
-  /**
-   * Applies motor output to intake motor, represented by a double from -1 to 1
-   *
-   * @param motor output to the intake motor
-   */
-  public void set(double motor);
-
   /** Stops the motor */
   public void stop();
+
+  /**
+   * @return the velocity of the motor.
+   */
+  public double getVelocity();
 }

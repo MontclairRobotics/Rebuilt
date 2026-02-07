@@ -1,35 +1,46 @@
 package frc.robot.subsystems.intake;
 
-import frc.robot.constants.IntakeConstants;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static frc.robot.constants.IntakeConstants.*;
+
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
 public class IntakeIOSim implements IntakeIO {
-  private double appliedVoltage = 0.0;
-  private double velocity = 0.0;
-  private double current = 0.0;
+  private FlywheelSim sim;
 
-  private static final double MAX_SPEED = 2000;
+  public IntakeIOSim() {
+    sim =
+        new FlywheelSim(
+            LinearSystemId.createFlywheelSystem(
+                DCMotor.getKrakenX60(2), MOMENT_OF_INERTIA, GEARING),
+            DCMotor.getKrakenX60(2),
+            0.0);
+  }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    velocity = (appliedVoltage * 12.0) * MAX_SPEED;
-    current = Math.abs(appliedVoltage * 12.0) * IntakeConstants.MAX_CURRENT;
 
     // "population" of IOInputs
-    inputs.appliedVoltage = appliedVoltage;
-    inputs.velocity = velocity;
-    inputs.current = current;
+    inputs.appliedVoltage = sim.getInputVoltage();
+    inputs.velocity = getVelocity();
+    inputs.current = sim.getCurrentDrawAmps();
+    inputs.temperature = 0;
   }
 
   @Override
   public void setVoltage(double voltage) {
-      appliedVoltage = voltage;
+    sim.setInputVoltage(voltage);
   }
-
-  @Override
-  public void set(double current) {}
 
   @Override
   public void stop() {
     setVoltage(0);
+  }
+
+  @Override
+  public double getVelocity() {
+    return sim.getAngularVelocity().in(RotationsPerSecond);
   }
 }
