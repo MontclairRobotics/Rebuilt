@@ -25,7 +25,7 @@ public class HoodConstants {
 
 	// physical properties
 	public static final double GEARING = 10.8; // for every rotation of the hood the motor shaft rotates this amount
-	public static final double MOMENT_OF_INERTIA = 0.03;
+	public static final double MOMENT_OF_INERTIA = 0.03038161694; //MOE from CAD around the pivot of the hoot on 2026.02.03
 	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0); // absolute encoder
 	public static final Distance HOOD_LENGTH = Meters.of(0.305);
 	public static final double VOLTAGE_LIMIT = 12;

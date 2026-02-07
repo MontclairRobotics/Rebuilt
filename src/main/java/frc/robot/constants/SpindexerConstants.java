@@ -1,13 +1,13 @@
 package frc.robot.constants;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
-
 public class SpindexerConstants {
-  public static final int CAN_ID = 0;
-  public static final Slot0Configs SLOT0_CONFIGS =
-      new Slot0Configs().withKP(0).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0).withKG(0);
+  public static final int SPIN_ID = -1; //TODO: GET MOTOR IDS
+  public static final int INDEX_ID = -1;
 
-  public static final double MOMENT_OF_INERTIA = 0.1;//TODO:fix this i guess
-  public static final double GEARING = 1;
-  public static final double SPIN_VOLTAGE = 0.0;
+  public static final double SPIN_MOMENT_OF_INERTIA = 2; //TODO: Get all of these
+  public static final double INDEX_MOMENT_OF_INERTIA = 2;
+  public static final double SPIN_GEARING = 1;
+  public static final double INDEX_GEARING = 1;
+  public static final double SPIN_VOLTAGE = 3.0;
+  public static final double INDEX_VOLTAGE = 3.0;
 }
