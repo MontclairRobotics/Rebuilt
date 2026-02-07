@@ -1,4 +1,4 @@
-package frc.robot.subsystems.flywheel;
+package frc.robot.subsystems.shooter.flywheel;
 
 import static frc.robot.constants.FlywheelConstants.*;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
