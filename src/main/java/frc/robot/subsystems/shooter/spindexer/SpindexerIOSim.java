@@ -3,33 +3,58 @@ package frc.robot.subsystems.shooter.spindexer;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import frc.robot.constants.SpindexerConstants;
+
+import static frc.robot.constants.SpindexerConstants.*;
 
 public class SpindexerIOSim implements SpindexerIO {
 
-	private FlywheelSim sim = new FlywheelSim(
+	private FlywheelSim indexSim = new FlywheelSim(
 		LinearSystemId.createFlywheelSystem(
 			DCMotor.getKrakenX60(1),
-			SpindexerConstants.MOMENT_OF_INERTIA,
-			SpindexerConstants.GEARING
+			INDEX_MOMENT_OF_INERTIA,
+			INDEX_GEARING
 		),
 		DCMotor.getKrakenX60(1),
 		0.0
 	);
 
+	private FlywheelSim spinSim = new FlywheelSim(
+		LinearSystemId.createFlywheelSystem(
+			DCMotor.getKrakenX60(1),
+			SPIN_MOMENT_OF_INERTIA,
+			SPIN_GEARING
+		),
+		DCMotor.getKrakenX60(1),
+		0.0
+	);
+
+	@Override
 	public void updateInputs(SpindexerIOInputs inputs) {
-		inputs.appliedVoltage = sim.getInputVoltage();
-		inputs.velocity = (sim.getAngularVelocityRadPerSec() / 2 * Math.PI);
-		inputs.tempCelcius = 0;
+		inputs.spinAppliedVoltage = spinSim.getInputVoltage();
+		inputs.indexAppliedVoltage = indexSim.getInputVoltage();
+		inputs.spinTempCelcius = 0;
+		inputs.indexTempCelcius = 0;
+		inputs.spinVelocity = spinSim.getAngularVelocity();
+		inputs.indexVelocity = indexSim.getAngularVelocity();
 	}
 
 	@Override
-	public void setVoltage(double currentVoltage) {
-		sim.setInputVoltage(currentVoltage);
+	public void setSpinVoltage(double currentVoltage) {
+		spinSim.setInputVoltage(currentVoltage);
 	}
 
 	@Override
-	public void stop() {
-		setVoltage(0.0);
+	public void setIndexVoltage(double currentVoltage) {
+		indexSim.setInputVoltage(currentVoltage);
+	}
+
+	@Override
+	public void stopSpin() {
+		setSpinVoltage(0.0);
+	}
+
+	@Override
+	public void stopIndex() {
+		setIndexVoltage(0.0);
 	}
 }
