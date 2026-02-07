@@ -11,7 +11,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 
 public class TurretConstants {
   // TODO: IMPLEMENT
-  private Translation2d hubLocation = new Translation2d(4.6245018, 4.105);
+  public static final Translation2d HUB_LOCATION = new Translation2d(4.6245018, 4.105);
   public static final int CAN_ID = -1;
   public static final Angle MAX_ANGLE = Rotations.of(1);
   public static final double GEAR_RATIO =
