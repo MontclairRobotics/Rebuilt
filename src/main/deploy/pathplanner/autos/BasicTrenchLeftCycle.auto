@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "trenchLeft-closeLeft"
@@ -13,31 +19,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "closeLeft-trenchLeft"
+            "pathName": "closeLeft-towerLeft-whileScoring"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "trenchLeft-closeCenter"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "closeCenter-trenchRight-R"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "trenchRight-closeRight"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "closeRight-towerRight-R"
+            "name": "climb"
           }
         }
       ]

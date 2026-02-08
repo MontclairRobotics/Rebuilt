@@ -17,6 +17,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "trenchRight-closeCenter"
@@ -25,19 +31,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "closeCenter-trenchRight"
+            "pathName": "closeCenter-towerRight-R-whileScoring"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "trenchRight-closeLeft"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "closeLeft-towerLeft"
+            "name": "climb"
           }
         }
       ]

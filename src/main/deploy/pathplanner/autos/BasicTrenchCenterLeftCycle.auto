@@ -7,37 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "trenchCenter-closeLeft"
+            "pathName": "trenchCenter-closeLeft-whileScoring"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "closeLeft-trenchLeft"
+            "pathName": "closeLeft-towerLeft-whileScoring"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "trenchLeft-closeCenter"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "closeCenter-trenchRight"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "trenchRight-closeRight"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "closeRight-towerRight"
+            "name": "climb"
           }
         }
       ]

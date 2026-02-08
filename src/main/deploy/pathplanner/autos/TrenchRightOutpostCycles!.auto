@@ -7,31 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "trenchLeft-depot"
+            "pathName": "trenchRight-outpost-whileScoring"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "depot-closeLeft"
+            "pathName": "outpost-closeRight-whileScoring"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "closeLeft-trenchLeft"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "trenchLeft-closeCenter"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "closeCenter-towerLeft"
+            "pathName": "closeRight-towerRight-whileScoring"
           }
         }
       ]

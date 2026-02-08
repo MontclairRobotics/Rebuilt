@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "trenchCenter-closeRight-whileScoring"
+            "pathName": "trenchLeft-depot-whileScoring"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "closeRight-towerRight-whileScoring"
+            "pathName": "depot-closeLeft-whileScoring"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "closeLeft-towerLeft-whileScoring"
           }
         },
         {
