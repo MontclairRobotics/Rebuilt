@@ -1,11 +1,11 @@
 package frc.robot.constants;
 
+import edu.wpi.first.math.geometry.Translation3d;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -13,13 +13,16 @@ import edu.wpi.first.units.measure.Distance;
 
 public class HoodConstants {
 
+	public static final Translation3d ORIGIN_TO_HOOD = new Translation3d(-0.1651, 0.2782, 0.4395);
+	public static final Translation3d TURRET_TO_HOOD = new Translation3d(-0.113, 0, 0.08128);
+
 	// ports
 	public static final int CAN_ID = 37;
 	public static final int ENCODER_PORT = 4;
 
 	// constraints
-	public static final Angle MIN_ANGLE = Degrees.of(10);
-	public static final Angle MAX_ANGLE = Degrees.of(80);
+	public static final Angle MIN_ANGLE = Degrees.of(-11);
+	public static final Angle MAX_ANGLE = Degrees.of(20);
 	public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(3);
 	public static final AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(8);
 
