@@ -24,6 +24,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -445,6 +446,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		odometryHeading = this.getState().Pose.getRotation();
 		fieldRelative = !RobotContainer.driverController.L2().getAsBoolean();
 		Logger.recordOutput("DriveState/FieldRelative", fieldRelative);
+		Logger.recordOutput("DriveState/zero", new Pose3d());
+		Logger.recordOutput("DriveState/zero2", new Pose3d());
 		Logger.recordOutput("DriveState/odometryHeading", odometryHeading);
 		Logger.recordOutput("DriveState/robotPose", getRobotPose());
 		Logger.recordOutput("DriveState/omegaRotationsPerSecond", Radians.of(this.getState().Speeds.omegaRadiansPerSecond).in(Rotations));

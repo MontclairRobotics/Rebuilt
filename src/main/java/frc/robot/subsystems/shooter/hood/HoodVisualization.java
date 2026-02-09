@@ -2,7 +2,6 @@ package frc.robot.subsystems.shooter.hood;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.config.RobotConfig;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,10 +23,10 @@ public class HoodVisualization {
 		).plus(new Translation3d(0, 0, TURRET_TO_HOOD.getZ()));
 
 		hoodPose = new Pose3d(
-			ORIGIN_TO_TURRET.plus(turretToHoodFieldRelative), 
+			ORIGIN_TO_TURRET.plus(turretToHoodFieldRelative),
 			new Rotation3d(
-				Rotations.zero(), 
-				Rotations.of(-RobotContainer.hood.getAngle().in(Rotations)), 
+				Rotations.zero(),
+				Rotations.of(-RobotContainer.hood.getAngle().in(Rotations)),
 				RobotContainer.turret.getRobotRelativeAngle()
 			)
 		);
