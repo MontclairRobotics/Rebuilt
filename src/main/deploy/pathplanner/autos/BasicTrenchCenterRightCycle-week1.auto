@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "trenchCenter-closeRight-whileScoring"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "closeRight-trenchRight"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "trenchRight-closeLeft"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "closeLeft-trenchLeft-R"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

@@ -9,10 +9,10 @@
       "prevControl": null,
       "nextControl": {
         "x": 6.399066666666666,
-        "y": 0.2638999999999989
+        "y": 0.26389999999999936
       },
       "isLocked": false,
-      "linkedName": "closeBottom"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "trenchBottom"
+      "linkedName": null
     }
   ],
   "rotationTargets": [

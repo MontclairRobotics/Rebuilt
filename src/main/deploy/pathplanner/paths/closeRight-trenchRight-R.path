@@ -12,7 +12,7 @@
         "y": 0.26389999999999936
       },
       "isLocked": false,
-      "linkedName": "closeBottom"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "trenchBottom"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
@@ -53,7 +53,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }
