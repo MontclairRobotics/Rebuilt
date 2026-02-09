@@ -110,6 +110,7 @@ public class FieldConstants {
 		public static final Distance NEUTRAL_ZONE_FAR = CENTER.plus(Inches.of(120));
 		public static final Distance OPP_HUB_CENTER = AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(4).get().getMeasureX().plus(Hub.WIDTH.div(2.0));
 		public static final Distance OPP_ALLIANCE_ZONE = AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(10).get().getMeasureX();
+        public static double neutralZoneFar;
 	}
 
 	/**
