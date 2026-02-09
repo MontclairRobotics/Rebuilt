@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.util.FieldConstants;
+import frc.robot.util.PoseUtils;
 
 public class Superstructure {
 
@@ -18,6 +19,7 @@ public class Superstructure {
     public final Trigger isInScoringZoneTrigger = new Trigger(this::isInScoringZone);
     public final Trigger isInFerryingLeftZoneTrigger = new Trigger(this::isInFerryLeftZone);
     public final Trigger isInFerryingRightZoneTrigger = new Trigger(this::isInFerryRightZone);
+    public final Trigger isApproachingTrenchTrigger = new Trigger(this:isApproachingTrench);
 
     public boolean isRedAlliance(){
         var alliance = DriverStation.getAlliance();
@@ -26,9 +28,9 @@ public class Superstructure {
 
     public Translation2d reflectPointByAlliance(Translation2d pos){
         if (isRedAlliance()){
-            return new Translation2d((FieldConstants.fieldLength - pos.getX()), pos.getY());
+            return PoseUtils.flipTranslationAlliance(pos);
         }
-        return pos;
+        else return pos;
     }
 
     public boolean isInScoringZone(){
@@ -47,6 +49,10 @@ public class Superstructure {
         return (reflectPointByAlliance(pos).getY() <= FieldConstants.LinesHorizontal.center &&
         reflectPointByAlliance(pos).getX() <= FieldConstants.LinesVertical.neutralZoneFar);       
     }
+
+    //public boolean isApproachingTrench(){
+    //    Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
+    //}
 
     Command scoringCommand = Commands.sequence(
         turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()),

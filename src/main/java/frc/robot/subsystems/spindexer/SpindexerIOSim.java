@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter.spindexer;
+package frc.robot.subsystems.spindexer;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;

@@ -15,11 +15,11 @@ public class FlywheelIOSim implements FlywheelIO {
 	public FlywheelIOSim() {
 		sim = new FlywheelSim(
 			LinearSystemId.createFlywheelSystem(
-				DCMotor.getKrakenX60(1),
+				DCMotor.getKrakenX60(2),
 				MOMENT_OF_INERTIA,
 				GEARING
 			),
-			DCMotor.getKrakenX60(1),
+			DCMotor.getKrakenX60(2),
 			0.0
 		);
 	}
