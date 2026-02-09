@@ -364,6 +364,19 @@ public class FieldConstants {
 			new Translation2d(Meters.zero(), AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(29).get().getMeasureY());
 	}
 
+	public static class ferryWaypoints{
+		// TODO: find these values
+		public static final Translation2d CLOSE_FERRYING_LEFT_POINT = new Translation2d(1.1, 1.1);
+		public static final Translation2d CLOSE_FERRYING_RIGHT_POINT = new Translation2d(0.0, 0.0);
+		public static final Translation2d FAR_FERRYING_LEFT_POINT = new Translation2d(0.0, 0.0);
+		public static final Translation2d FAR_FERRYING_RIGHT_POINT = new Translation2d(0.0, 0.0);
+
+		public static final double CLOSE_FERRYING_LEFT_HEIGHT = 0.0;
+		public static final double CLOSE_FERRYING_RIGHT_HEIGHT = 0.0;
+		public static final double FAR_FERRYING_LEFT_HEIGHT = 0.0;
+		public static final double FAR_FERRYING_RIGHT_HEIGHT = 0.0;
+	}
+
 	public enum FieldType {
 		ANDYMARK("andymark"),
 		WELDED("welded");

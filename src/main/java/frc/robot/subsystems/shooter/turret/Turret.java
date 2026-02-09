@@ -1,4 +1,4 @@
-package frc.robot.subsystems.turret;
+package frc.robot.subsystems.shooter.turret;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
@@ -123,6 +123,14 @@ public class Turret extends SubsystemBase {
 		Logger.recordOutput("Turret/getAngleToHub", robotToHub.getAngle().getRotations());
 		Logger.recordOutput("Turret/At Setpoint", atSetpoint());
 		return robotToHub.getAngle().getMeasure();
+	}
+
+	public Angle getAngleToPoint(Translation2d point) {
+		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+		Translation2d location = PoseUtils.flipTranslationAlliance(point);
+		Translation2d robotToPoint = location.minus(robotPose.getTranslation());
+		Logger.recordOutput("Turret/getAngletoPoint", robotToPoint.getAngle().getRotations());
+		return robotToPoint.getAngle().getMeasure();
 	}
 
 	public boolean atSetpoint() {

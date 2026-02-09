@@ -1,4 +1,4 @@
-package frc.robot.subsystems.hood;
+package frc.robot.subsystems.shooter.hood;
 
 import java.util.function.Supplier;
 
@@ -7,6 +7,8 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Translation2d;
+
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
@@ -24,7 +26,15 @@ import static frc.robot.constants.HoodConstants.kI;
 import static frc.robot.constants.HoodConstants.kP;
 import static frc.robot.constants.HoodConstants.kS;
 import static frc.robot.constants.HoodConstants.kV;
+import static frc.robot.constants.HoodConstants.TOLERANCE;
+import static frc.robot.constants.HoodConstants.kD;
+import static frc.robot.constants.HoodConstants.kG;
+import static frc.robot.constants.HoodConstants.kI;
+import static frc.robot.constants.HoodConstants.kP;
+import static frc.robot.constants.HoodConstants.kS;
+import static frc.robot.constants.HoodConstants.kV;
 import frc.robot.util.FieldConstants;
+import frc.robot.util.PoseUtils;
 import frc.robot.util.Tunable;
 
 public class Hood extends SubsystemBase {
@@ -64,6 +74,13 @@ public class Hood extends SubsystemBase {
 	public Angle getAngle() {
 		return io.getAngle();
 	}
+
+	public Angle getAngleToPoint(Translation2d point, double heightMeters) {
+		Translation2d location = PoseUtils.flipTranslationAlliance(point);
+		double distance = location.minus(RobotContainer.drivetrain.getRobotPose().getTranslation()).getNorm();
+		return Radians.of(Math.PI/2).minus(Radians.of(Math.atan(heightMeters/distance)));
+	}
+
 
 	public void applyJoystickInput() {
 		double voltage = Math.pow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.04), 3) * 3;
