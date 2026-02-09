@@ -11,7 +11,7 @@ public class PivotConstants {
 
   // ports & offsets
   public static final int CAN_ID = -1;
-  public static final int ENCODER_PORT = -1;
+  public static final int ENCODER_PORT = 0; //TODO: set this number
   public static final double ENCODER_OFFSET = 0;
 
   // constraints

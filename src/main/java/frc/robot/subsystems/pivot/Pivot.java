@@ -28,9 +28,11 @@ public class Pivot extends SubsystemBase {
 
   private PIDController pidController;
   private ArmFeedforward pivotFeedfoward;
+  private PivotVisualization visualization;
 
   public Pivot(PivotIO io) {
     this.io = io;
+    this.visualization = new PivotVisualization();
 
     pidController = new PIDController(kP, kI, kD);
     pivotFeedfoward = new ArmFeedforward(kS, kG, kV);
@@ -43,6 +45,8 @@ public class Pivot extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Pivot", inputs);
+    visualization.update();
+    visualization.log();
   }
 
   public boolean atSetpoint() {
