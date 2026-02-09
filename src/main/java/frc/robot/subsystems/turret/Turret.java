@@ -3,15 +3,12 @@ package frc.robot.subsystems.turret;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -27,29 +24,27 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.controller.PIDController;
+
 /**
  * The TurretIOHardware class interfaces with the TalonFX motor controller and CANCoders to manage
  * turret movement and sensor readings.
  */
 public class Turret extends SubsystemBase {
 
-	public TurretIO io;
-	private TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
-	private TurretVisualization visualization;
+	public final TurretIO io;
+	private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+	private final TurretVisualization visualization;
 
-	private ProfiledPIDController pidController;
+	private PIDController pidController;
 
 	@SuppressWarnings("unused")
 	public Turret(TurretIO io) {
 		this.io = io;
 		visualization = new TurretVisualization();
 
-		pidController = new ProfiledPIDController(
-			kP, kI, kD,
-			new Constraints(
-				MAX_VELOCITY.in(RotationsPerSecond),
-				MAX_ACCELERATION.in(RotationsPerSecondPerSecond)
-			)
+		pidController = new PIDController(
+			kP, kI, kD
 		);
 
 		pidController.disableContinuousInput();
@@ -83,9 +78,9 @@ public class Turret extends SubsystemBase {
 	 * @return the corresponding target robot relative angle needed to achieve the stated field relative angle
 	 */
 	public Angle toRobotRelativeAngle(Angle fieldRelativeAngle) {
-		return fieldRelativeAngle
+		return constrainAngle(fieldRelativeAngle
 			.minus(Rotations.of(RobotContainer.drivetrain.getWrappedHeading().getRotations()))
-			.minus(OFFSET);
+			.minus(ANGLE_OFFSET));
 	}
 
 	/**
@@ -93,15 +88,24 @@ public class Turret extends SubsystemBase {
 	 * @return the corresponding field relative angle the turret would point at the specified robot relative angle
 	 */
 	public Angle toFieldRelativeAngle(Angle robotRelativeAngle) {
-		return robotRelativeAngle
+		return constrainAngle(robotRelativeAngle
 			.plus(Rotations.of(RobotContainer.drivetrain.getWrappedHeading().getRotations()))
-			.plus(OFFSET);
+			.plus(ANGLE_OFFSET));
+	}
+
+	public Angle getRobotRelativeAngle() {
+		return io.getRobotRelativeAngle();
+	}
+
+	public Angle getFieldRelativeAngle() {
+		return io.getFieldRelativeAngle();
 	}
 
 	/**
 	 * @return the target turret velocity for a given robot angular velocity, which is just that angular velocity
 	 */
-	public AngularVelocity targetTurretVelocity() {
+	public AngularVelocity calculateTargetVelocity() {
+		Logger.recordOutput("Turret/Calculated Target Velocity", RadiansPerSecond.of(RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond).in(RotationsPerSecond));
 		return RadiansPerSecond.of(RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond);
 	}
 
@@ -117,11 +121,12 @@ public class Turret extends SubsystemBase {
 		Translation2d hublocation = PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION);
 		Translation2d robotToHub = hublocation.minus(getFieldRelativePosition());
 		Logger.recordOutput("Turret/getAngleToHub", robotToHub.getAngle().getRotations());
+		Logger.recordOutput("Turret/At Setpoint", atSetpoint());
 		return robotToHub.getAngle().getMeasure();
 	}
 
-	public boolean atGoal() {
-		return pidController.atGoal();
+	public boolean atSetpoint() {
+		return pidController.atSetpoint();
 	}
 
 	/**
@@ -129,19 +134,12 @@ public class Turret extends SubsystemBase {
 	 * @param angle the robot relative angle to align to
 	 */
 	public void setRobotRelativeAngle(Angle angle) {
-		pidController.setGoal(
-			new TrapezoidProfile.State(
-				constrainAngle(angle).in(Rotations),
-				targetTurretVelocity().in(RotationsPerSecond)
-			)
-		);
-
-		Logger.recordOutput("Turret/targetRobotRelativeAngleRotations", angle.in(Rotations));
+		pidController.setSetpoint(constrainAngle(angle).in(Rotations));
 
 		io.setVoltage(pidController.calculate(io.getRobotRelativeAngle().in(Rotations)));
 	}
 
-	public void setFieldRelativeAngle(Angle angle) {;
+	public void setFieldRelativeAngle(Angle angle) {
 		setRobotRelativeAngle(toRobotRelativeAngle(angle));
 	}
 
@@ -152,7 +150,7 @@ public class Turret extends SubsystemBase {
 	public Command setFieldRelativeAngleCommand(Angle angle) {
 		return Commands.run(() -> {
 			setFieldRelativeAngle(angle);
-		}).until(this::atGoal);
+		}).until(this::atSetpoint);
 	}
 
 	public Command setFieldRelativeAngleCommand(Supplier<Angle> angleSupplier) {
@@ -193,6 +191,7 @@ public class Turret extends SubsystemBase {
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Turret", inputs);
+		Logger.recordOutput("Turret/Robot Relative Setpoint", constrainAngle(Rotations.of(pidController.getSetpoint())).in(Rotations));
 		visualization.update();
 		visualization.log();
 	}

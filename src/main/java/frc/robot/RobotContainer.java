@@ -15,7 +15,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import frc.robot.commands.JoystickDrive;
+import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
@@ -47,11 +47,6 @@ public class RobotContainer {
 	public static CommandPS5Controller driverController = new CommandPS5Controller(0);
 	public static CommandPS5Controller operatorController = new CommandPS5Controller(1);
 
-	private SwerveDriveSimulation driveSimulation = null;
-	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
-
-	public static final boolean debugMode = true;
-
 	// Subsystems
 	public static Vision vision;
 	public static CommandSwerveDrivetrain drivetrain;
@@ -61,12 +56,15 @@ public class RobotContainer {
 	public static Spindexer spindexer;
   public static Pivot pivot;
 
+	private SwerveDriveSimulation driveSimulation;
+	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
+
 	public RobotContainer() {
 
 		switch (Constants.CURRENT_MODE) {
 		case REAL:
 			flywheel = new Flywheel(new FlywheelIOTalonFX());
-      pivot = new Pivot(new PivotIOTalonFX());
+      		pivot = new Pivot(new PivotIOTalonFX());
 			drivetrain = TunerConstants.createDrivetrain();
 			turret = new Turret(new TurretIOTalonFX());
 			hood = new Hood(new HoodIOTalonFX());
@@ -77,31 +75,30 @@ public class RobotContainer {
 					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
 					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading));
 
-			break;
+				break;
 
 		case SIM:
 			flywheel = new Flywheel(new FlywheelIOTalonFX());
-      pivot = new Pivot(new PivotIOTalonFX());
+      		pivot = new Pivot(new PivotIOTalonFX());
 			drivetrain = TunerConstants.createDrivetrain();
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 			turret = new Turret(new TurretIOSim());
 			spindexer = new Spindexer(new SpindexerIOSim());
 			hood = new Hood(new HoodIOSim());
 
-			// vision =
-			// 	new Vision(
-			// 		drivetrain::addVisionMeasurement,
-			// 		new VisionIOPhotonVisionSim(
-			// 			"camera0Name", robotToCamera0, drivetrain::getRobotPose),
-			// 		new VisionIOPhotonVisionSim(
-			// 			"camera1Name", robotToCamera1, drivetrain::getRobotPose));
+				// vision = new Vision(
+				// 	drivetrain::addVisionMeasurement,
+				// 	new VisionIOPhotonVisionSim(
+				// 		"camera0Name", robotToCamera0, drivetrain::getRobotPose),
+				// 	new VisionIOPhotonVisionSim(
+				// 		"camera1Name", robotToCamera1, drivetrain::getRobotPose));
 
-			//TODO: Fix vision simulation! (It is causing loop overruns and memory issues with advantage kit logging)
+				//TODO: Fix vision simulation! (It is causing loop overruns and memory issues with advantage kit logging)
 
-			break;
+				break;
 
-		default:
-			vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+			default:
+				vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 		}
 
 		drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
@@ -113,12 +110,9 @@ public class RobotContainer {
 
 	private void configureBindings() {
 
-		// hood.setDefaultCommand(hood.joystickCommand());
-		drivetrain.setDefaultCommand(new JoystickDrive());
-		// driverController.cross().whileTrue(turret.setPositiveVoltageCommand());
-		// driverController.square().whileTrue(turret.setNegativeVoltageCommand());
-		// driverController.L1().onTrue(turret.setRobotRelativeAngleCommand(0.25));
-		// driverController.L1().whileTrue(new SnakeDriveCommand(drivetrain));
+
+		drivetrain.setDefaultCommand(new JoystickDriveCommand());
+
 		driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
 		driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub()));
 

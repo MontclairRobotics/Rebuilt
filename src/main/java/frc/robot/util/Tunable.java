@@ -6,7 +6,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 import java.util.function.Consumer;
 
 public class Tunable extends SubsystemBase {
@@ -64,8 +63,8 @@ public class Tunable extends SubsystemBase {
 	@Override
 	public void periodic() {
 
-		if (RobotContainer.debugMode && !DriverStation.isFMSAttached()) {
-		updateValue();
+		if (!DriverStation.isFMSAttached()) {
+			updateValue();
 		}
 	}
 }

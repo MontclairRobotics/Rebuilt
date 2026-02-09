@@ -7,6 +7,8 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
@@ -51,9 +53,16 @@ public class Hood extends SubsystemBase {
 	}
 
 	public Angle getAngleToHub() {
-		double heightMeters = FieldConstants.Hub.HEIGHT.in(Meters) - 0.30;
+		// double heightMeters = FieldConstants.Hub.HEIGHT.in(Meters) - 0.30;
 		double distance = FieldConstants.Hub.HUB_LOCATION.minus(RobotContainer.drivetrain.getRobotPose().getTranslation()).getNorm();
-		return Radians.of(Math.PI/2).minus(Radians.of(Math.atan(heightMeters/distance)));
+		// return Radians.of(Math.PI/2).minus(Radians.of(Math.atan(heightMeters/distance)));
+
+		//until we get look up table, super fucky
+		return Degrees.of((distance/3) * 30);
+	}
+
+	public Angle getAngle() {
+		return io.getAngle();
 	}
 
 	public void applyJoystickInput() {

@@ -1,20 +1,21 @@
 package frc.robot.subsystems.drivetrain;
 
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.constants.Constants.*;
-import static frc.robot.constants.DriveConstants.*;
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
 import dev.doglog.DogLog;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
@@ -29,6 +30,14 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -40,13 +49,16 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.RobotContainer;
 import frc.robot.constants.Constants;
+import static frc.robot.constants.Constants.BUMPER_WIDTH;
+import static frc.robot.constants.Constants.ROBOT_MASS;
+import static frc.robot.constants.DriveConstants.JOYSTICK_INPUT_GAIN;
+import static frc.robot.constants.DriveConstants.JOYSTICK_INPUT_ROT_GAIN;
+import static frc.robot.constants.DriveConstants.MAX_ANGULAR_SPEED;
+import static frc.robot.constants.DriveConstants.MAX_SPEED;
 import frc.robot.util.MapleSimSwerveDrivetrain;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.TunerConstants.TunerSwerveDrivetrain;
-import java.util.function.Supplier;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
 
@@ -130,7 +142,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded); // TODO: SET
 
 	/* Heading PID Controller for things like automatic alignment buttons */
-	public PIDController thetaController = new PIDController(7, 0, 0.1);
+	public PIDController thetaController = new PIDController(16, 0, 0.1);
 
 	/* variable to store our heading */
 	public Rotation2d odometryHeading = new Rotation2d();
@@ -245,17 +257,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 	public double getStrafeVelocityFromController() {
 		double xInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.1);
-		return MathUtil.copyDirectionPow(xInput, joystickInputGain) * MAX_SPEED.in(MetersPerSecond);
+		return MathUtil.copyDirectionPow(xInput, JOYSTICK_INPUT_GAIN) * MAX_SPEED.in(MetersPerSecond);
 	}
 
 	public double getForwardVelocityFromController() {
 		double yInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.1);
-		return MathUtil.copyDirectionPow(yInput, joystickInputGain) * MAX_SPEED.in(MetersPerSecond);
+		return MathUtil.copyDirectionPow(yInput, JOYSTICK_INPUT_GAIN) * MAX_SPEED.in(MetersPerSecond);
 	}
 
 	public double getOmegaVelocityFromController() {
 		double rotInput = -MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.1);
-		return MathUtil.copyDirectionPow(rotInput, joystickInputRotGain) * MAX_ANGULAR_SPEED.in(RadiansPerSecond);
+		return MathUtil.copyDirectionPow(rotInput, JOYSTICK_INPUT_ROT_GAIN) * MAX_ANGULAR_SPEED.in(RadiansPerSecond);
 	}
 
 	public void driveJoystick() {
@@ -306,11 +318,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 			speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getWrappedHeading());
 		}
 
-		SwerveRequest req =
-			new SwerveRequest.ApplyRobotSpeeds()
-				.withSpeeds(speeds)
-				.withDriveRequestType(DriveRequestType.Velocity)
-				.withSteerRequestType(SteerRequestType.Position);
+		SwerveRequest req = new SwerveRequest.ApplyRobotSpeeds()
+			.withSpeeds(speeds)
+			.withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
 		setControl(req); // actually drives
 	}
@@ -437,6 +447,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		Logger.recordOutput("DriveState/FieldRelative", fieldRelative);
 		Logger.recordOutput("DriveState/odometryHeading", odometryHeading);
 		Logger.recordOutput("DriveState/robotPose", getRobotPose());
+		Logger.recordOutput("DriveState/omegaRotationsPerSecond", Radians.of(this.getState().Speeds.omegaRadiansPerSecond).in(Rotations));
 		isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
 		/*
