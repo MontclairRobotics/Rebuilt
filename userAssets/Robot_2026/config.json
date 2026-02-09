@@ -1,5 +1,5 @@
 {
-  "name": "555 2026",
+  "name": "555 ROBOT",
   "disableSimplification": false,
   "rotations": [
     {
@@ -8,35 +8,48 @@
     },
     {
       "axis": "z",
-      "degrees": 90
+      "degrees": -180
     }
   ],
   "position": [
-    0,
-    0,
-    0.1
+    -0.3429,
+    0.3429,
+    0.035933
   ],
   "cameras": [],
   "components": [
     {
       "zeroedRotations": [
         {
-          "axis": "y",
-          "degrees": 180
+          "axis": "x",
+          "degrees": 90
         },
         {
           "axis": "z",
-          "degrees": 180
-        },
-        {
-          "axis": "x",
-          "degrees": 90
+          "degrees": -89.6671
         }
       ],
       "zeroedPosition": [
-        0.014,
-        0,
-        0.014
+        -0.175,
+        -0.175,
+        -0.3222
+      ]
+    },
+    {
+      "zeroedRotations": [
+        {
+          "axis": "x",
+          "degrees": 90
+        },
+        {
+          "axis": "z",
+          "degrees": -89.6671
+        }
+      ],
+      "zeroedPosition": [
+        -0.062,
+        -0.175,
+        -0.40348
       ]
     }
   ]

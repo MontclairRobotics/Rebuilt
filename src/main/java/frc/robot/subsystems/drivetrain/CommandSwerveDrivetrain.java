@@ -34,6 +34,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -446,6 +447,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		Logger.recordOutput("DriveState/FieldRelative", fieldRelative);
 		Logger.recordOutput("DriveState/odometryHeading", odometryHeading);
 		Logger.recordOutput("DriveState/robotPose", getRobotPose());
+		Logger.recordOutput("DriveState/omegaRotationsPerSecond", Radians.of(this.getState().Speeds.omegaRadiansPerSecond).in(Rotations));
 		isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
 		/*
