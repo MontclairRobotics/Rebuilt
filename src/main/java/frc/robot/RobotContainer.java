@@ -19,19 +19,20 @@ import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
-import frc.robot.subsystems.flywheel.Flywheel;
-import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
-import frc.robot.subsystems.hood.Hood;
-import frc.robot.subsystems.hood.HoodIOSim;
-import frc.robot.subsystems.hood.HoodIOTalonFX;
 import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.pivot.PivotIOTalonFX;
-import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.subsystems.spindexer.SpindexerIOSim;
-import frc.robot.subsystems.spindexer.SpindexerIOTalonFX;
-import frc.robot.subsystems.turret.Turret;
-import frc.robot.subsystems.turret.TurretIOSim;
-import frc.robot.subsystems.turret.TurretIOTalonFX;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.flywheel.Flywheel;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
+import frc.robot.subsystems.shooter.hood.Hood;
+import frc.robot.subsystems.shooter.hood.HoodIOSim;
+import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
+import frc.robot.subsystems.shooter.spindexer.Spindexer;
+import frc.robot.subsystems.shooter.spindexer.SpindexerIOSim;
+import frc.robot.subsystems.shooter.spindexer.SpindexerIOTalonFX;
+import frc.robot.subsystems.shooter.turret.Turret;
+import frc.robot.subsystems.shooter.turret.TurretIOSim;
+import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
@@ -53,6 +54,7 @@ public class RobotContainer {
 	public static Flywheel flywheel;
 	public static Turret turret;
 	public static Hood hood;
+	public static Shooter shooter;
 	public static Spindexer spindexer;
   public static Pivot pivot;
 
@@ -69,6 +71,7 @@ public class RobotContainer {
 			turret = new Turret(new TurretIOTalonFX());
 			hood = new Hood(new HoodIOTalonFX());
 			spindexer = new Spindexer(new SpindexerIOTalonFX());
+			shooter = new Shooter(hood, flywheel, turret, spindexer);
 			vision =
 				new Vision(
 					drivetrain::addVisionMeasurement,
@@ -83,15 +86,16 @@ public class RobotContainer {
 			drivetrain = TunerConstants.createDrivetrain();
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 			turret = new Turret(new TurretIOSim());
-			spindexer = new Spindexer(new SpindexerIOSim());
 			hood = new Hood(new HoodIOSim());
-
-				// vision = new Vision(
-				// 	drivetrain::addVisionMeasurement,
-				// 	new VisionIOPhotonVisionSim(
-				// 		"camera0Name", robotToCamera0, drivetrain::getRobotPose),
-				// 	new VisionIOPhotonVisionSim(
-				// 		"camera1Name", robotToCamera1, drivetrain::getRobotPose));
+			spindexer = new Spindexer(new SpindexerIOSim());
+			shooter = new Shooter(hood, flywheel, turret, spindexer);
+			// vision =
+			// 	new Vision(
+			// 		drivetrain::addVisionMeasurement,
+			// 		new VisionIOPhotonVisionSim(
+			// 			"camera0Name", robotToCamera0, drivetrain::getRobotPose),
+			// 		new VisionIOPhotonVisionSim(
+			// 			"camera1Name", robotToCamera1, drivetrain::getRobotPose));
 
 				//TODO: Fix vision simulation! (It is causing loop overruns and memory issues with advantage kit logging)
 

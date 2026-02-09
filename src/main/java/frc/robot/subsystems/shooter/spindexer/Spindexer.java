@@ -1,4 +1,4 @@
-package frc.robot.subsystems.spindexer;
+package frc.robot.subsystems.shooter.spindexer;
 
 import static frc.robot.constants.SpindexerConstants.*;
 
