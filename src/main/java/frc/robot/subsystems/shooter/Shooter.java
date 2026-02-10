@@ -56,23 +56,28 @@ public class Shooter {
     }
 
 
-    public Command scoringCommand = Commands.sequence(
+    public Command scoringCommand(){
+        return Commands.sequence(
         turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()),
-        hood.setAngleCommand(() -> hood.getAngleToHub())
-    );
+        hood.setAngleCommand(() -> hood.getAngleToHub()));
+    }
+    ;
 
-    public Command ferryingLeftCommand = Commands.sequence(
+    public Command ferryingLeftCommand() {
+        return Commands.sequence(
         turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_POINT)),
-        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_POINT, FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_HEIGHT))
-    );
+        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_POINT, FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_HEIGHT)));
+    };
 
-    public Command ferryRightCommand = Commands.sequence(
+    public Command ferryRightCommand(){
+        return Commands.sequence(
         turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_POINT)),
-        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_POINT, FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_HEIGHT))
-    );
+        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_POINT, FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_HEIGHT)));
+    };
 
-    public Command stowCommand = Commands.sequence(
+    public Command stowCommand(){
+        return Commands.sequence(
         turret.setFieldRelativeAngleCommand(TurretConstants.MIN_ANGLE),
-        hood.setAngleCommand(HoodConstants.MIN_ANGLE)
-    );
+        hood.setAngleCommand(HoodConstants.MIN_ANGLE));
+    }
 }

@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.FieldConstants;
@@ -12,21 +13,29 @@ import frc.robot.util.HubTracker;
 import frc.robot.util.PoseUtils;
 import org.littletonrobotics.junction.Logger;
 
-public class Superstructure {
+public class Superstructure extends SubsystemBase {
     private Shooter shooter;
 
     public Superstructure(Shooter shooter){
     this.shooter = shooter;
-    scoringModeTrigger.onTrue(shooter.scoringCommand);
-    ferryLeftTrigger.onTrue(shooter.ferryingLeftCommand);
-    ferryRightTrigger.onTrue(shooter.ferryRightCommand);
-    trenchDangerZoneTrigger.onTrue(shooter.stowCommand);
+    scoringModeTrigger.onTrue(shooter.scoringCommand());
+    ferryLeftTrigger.onTrue(shooter.ferryingLeftCommand());
+    ferryRightTrigger.onTrue(shooter.ferryRightCommand());
+    trenchDangerZoneTrigger.onTrue(shooter.stowCommand());
     }
 
     public final Trigger scoringModeTrigger = new Trigger(this::shouldBeScoring);
     public final Trigger ferryLeftTrigger = new Trigger(this::shouldFerryLeft);
     public final Trigger ferryRightTrigger = new Trigger(this::shouldFerryRight);
     public final Trigger trenchDangerZoneTrigger = new Trigger(this::inTrenchDangerZone);
+
+    @Override
+    public void periodic(){
+        Logger.recordOutput("Superstructure/shouldBeScoring", shouldBeScoring());
+        Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
+        Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
+        Logger.recordOutput("Superstructure/inTrenchDangerZone", inTrenchDangerZone());
+    };
 
     public boolean isRedAlliance(){
         var alliance = DriverStation.getAlliance();

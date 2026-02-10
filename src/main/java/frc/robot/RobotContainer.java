@@ -54,6 +54,7 @@ public class RobotContainer {
 	public static Hood hood;
 	public static Shooter shooter;
 	public static Spindexer spindexer;
+	public static Superstructure superstructure;
 
 	private SwerveDriveSimulation driveSimulation;
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
@@ -68,6 +69,7 @@ public class RobotContainer {
 			hood = new Hood(new HoodIOTalonFX());
 			spindexer = new Spindexer(new SpindexerIOTalonFX());
 			shooter = new Shooter(hood, flywheel, turret, spindexer);
+			superstructure = new Superstructure(shooter);
 			vision =
 				new Vision(
 					drivetrain::addVisionMeasurement,
@@ -84,6 +86,7 @@ public class RobotContainer {
 			hood = new Hood(new HoodIOSim());
 			spindexer = new Spindexer(new SpindexerIOSim());
 			shooter = new Shooter(hood, flywheel, turret, spindexer);
+			superstructure = new Superstructure(shooter);
 			// vision =
 			// 	new Vision(
 			// 		drivetrain::addVisionMeasurement,
