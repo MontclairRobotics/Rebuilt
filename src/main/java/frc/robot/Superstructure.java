@@ -4,68 +4,108 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.shooter.hood.Hood;
-import frc.robot.subsystems.shooter.turret.Turret;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.FieldConstants;
 import frc.robot.constants.Constants;
-import frc.robot.constants.TurretConstants;
-import frc.robot.constants.HoodConstants;
 import frc.robot.util.HubTracker;
 import frc.robot.util.PoseUtils;
+import org.littletonrobotics.junction.Logger;
 
 public class Superstructure {
+    private Shooter shooter;
 
-    public static Turret turret;
-    public static Hood hood;
-    public final Trigger isInScoringZoneTrigger = new Trigger(this::shouldBeScoring);
-    public final Trigger isInFerryingLeftZoneTrigger = new Trigger(this::isInFerryLeftZone);
-    public final Trigger isInFerryingRightZoneTrigger = new Trigger(this::isInFerryRightZone);
-    public final Trigger isApproachingTrenchTrigger = new Trigger(this::isApproachingTrench);
+    public Superstructure(Shooter shooter){
+    this.shooter = shooter;
+    scoringModeTrigger.onTrue(shooter.scoringCommand);
+    ferryLeftTrigger.onTrue(shooter.ferryingLeftCommand);
+    ferryRightTrigger.onTrue(shooter.ferryRightCommand);
+    trenchDangerZoneTrigger.onTrue(shooter.stowCommand);
+    }
+
+    public final Trigger scoringModeTrigger = new Trigger(this::shouldBeScoring);
+    public final Trigger ferryLeftTrigger = new Trigger(this::shouldFerryLeft);
+    public final Trigger ferryRightTrigger = new Trigger(this::shouldFerryRight);
+    public final Trigger trenchDangerZoneTrigger = new Trigger(this::inTrenchDangerZone);
 
     public boolean isRedAlliance(){
         var alliance = DriverStation.getAlliance();
+        Logger.recordOutput("Superstructure/isRedAlliance",alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red);
         return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
-    }
-
-    public Translation2d reflectPointByAlliance(Translation2d pos){
-        if (isRedAlliance()){
-            return PoseUtils.flipTranslationAlliance(pos);
-        }
-        else return pos;
     }
 
     public boolean isInScoringZone(){
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
-        return (reflectPointByAlliance(pos).getX() >= FieldConstants.LinesVertical.STARTING.in(Meters));
+        Logger.recordOutput("Superstructure/isInScoringZone", !inTrenchDangerZone()
+        && (isRedAlliance() ?
+        pos.getX() >= PoseUtils.flipTranslationAlliance(
+            new Translation2d(FieldConstants.LinesVertical.STARTING.in(Meters), 0)).getX()
+        : pos.getX() <= FieldConstants.LinesVertical.STARTING.in(Meters)));
+
+        return !inTrenchDangerZone()
+        && (isRedAlliance() ?
+        pos.getX() >= PoseUtils.flipTranslationAlliance(
+            new Translation2d(FieldConstants.LinesVertical.STARTING.in(Meters), 0)).getX()
+        : pos.getX() <= FieldConstants.LinesVertical.STARTING.in(Meters));
     }
 
     public boolean shouldBeScoring(){
+        Logger.recordOutput("Superstructure/shouldBeScoring", !inTrenchDangerZone()
+        && isInScoringZone()
+        && HubTracker.isActive(DriverStation.getAlliance().get(), HubTracker.getCurrentShift().get()));
+
         //Are we in the scoring zone and is the hub active
-        return !isApproachingTrench()
-        && isInScoringZone() 
+        return !inTrenchDangerZone()
+        && isInScoringZone()
         && HubTracker.isActive(DriverStation.getAlliance().get(), HubTracker.getCurrentShift().get());
     }
 
-    public boolean isInFerryLeftZone(){
+    public boolean shouldFerryLeft(){
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
-        return !isApproachingTrench()
-        && reflectPointByAlliance(pos).getY() >= FieldConstants.LinesHorizontal.CENTER.in(Meters) 
-        && reflectPointByAlliance(pos).getX() <= FieldConstants.LinesVertical.NEUTRAL_ZONE_FAR.in(Meters);
+        Logger.recordOutput("Superstructure/shouldFerryLeft", !inTrenchDangerZone()
+        && (isRedAlliance()?
+        (pos.getY() <= PoseUtils.flipTranslationAlliance(
+            new Translation2d(0, FieldConstants.LinesHorizontal.CENTER.in(Meters))).getY()
+        && pos.getX() >= PoseUtils.flipTranslationAlliance(
+            new Translation2d(FieldConstants.LinesVertical.NEUTRAL_ZONE_FAR.in(Meters), 0)).getX())
+        : (pos.getY() <= FieldConstants.LinesHorizontal.CENTER.in(Meters)
+        && pos.getX() <= FieldConstants.LinesVertical.NEUTRAL_ZONE_FAR.in(Meters))
+        ));
+        return !inTrenchDangerZone()
+        && (isRedAlliance()?
+        (pos.getY() <= PoseUtils.flipTranslationAlliance(
+            new Translation2d(0, FieldConstants.LinesHorizontal.CENTER.in(Meters))).getY()
+        && pos.getX() >= PoseUtils.flipTranslationAlliance(
+            new Translation2d(FieldConstants.LinesVertical.NEUTRAL_ZONE_FAR.in(Meters), 0)).getX())
+        : (pos.getY() <= FieldConstants.LinesHorizontal.CENTER.in(Meters)
+        && pos.getX() <= FieldConstants.LinesVertical.NEUTRAL_ZONE_FAR.in(Meters))
+        );
     }
 
-    public boolean isInFerryRightZone(){
+    public boolean shouldFerryRight(){
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
+        Logger.recordOutput("Superstructure/shouldFerryRight", !inTrenchDangerZone()
+        && (isRedAlliance()?
+        (pos.getY() >= PoseUtils.flipTranslationAlliance(
+            new Translation2d(0, FieldConstants.LinesHorizontal.CENTER.in(Meters))).getY()
+        && pos.getX() >= PoseUtils.flipTranslationAlliance(
+            new Translation2d(FieldConstants.LinesVertical.NEUTRAL_ZONE_FAR.in(Meters), 0)).getX())
+        : (pos.getY() >= FieldConstants.LinesHorizontal.CENTER.in(Meters)
+        && pos.getX() <= FieldConstants.LinesVertical.NEUTRAL_ZONE_FAR.in(Meters))));
 
-        return !isApproachingTrench()
-        && reflectPointByAlliance(pos).getY() <= FieldConstants.LinesHorizontal.CENTER.in(Meters) 
-        && reflectPointByAlliance(pos).getX() <= FieldConstants.LinesVertical.NEUTRAL_ZONE_FAR.in(Meters);       
+        return !inTrenchDangerZone()
+        && (isRedAlliance()?
+        (pos.getY() >= PoseUtils.flipTranslationAlliance(
+            new Translation2d(0, FieldConstants.LinesHorizontal.CENTER.in(Meters))).getY()
+        && pos.getX() >= PoseUtils.flipTranslationAlliance(
+            new Translation2d(FieldConstants.LinesVertical.NEUTRAL_ZONE_FAR.in(Meters), 0)).getX())
+        : (pos.getY() >= FieldConstants.LinesHorizontal.CENTER.in(Meters)
+        && pos.getX() <= FieldConstants.LinesVertical.NEUTRAL_ZONE_FAR.in(Meters))
+        );
     }
 
-    public boolean isApproachingTrench(){
-        return inTrenchZone() 
+    public boolean inTrenchDangerZone(){
+        return inTrenchZone()
         && movingIntoObstacle();
     }
 
@@ -115,31 +155,4 @@ public class Superstructure {
 			|| (robotPose.getX() > FieldConstants.LinesVertical.OPP_ALLIANCE_ZONE.minus(FieldConstants.Hub.WIDTH.div(2)).minus(Constants.BUMPER_WIDTH).in(Meters)
 			&& RobotContainer.drivetrain.getForwardVelocityFromController() < 0);
 	}
-
-    Command scoringCommand = Commands.sequence(
-        turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()),
-        hood.setAngleCommand(() -> hood.getAngleToHub())
-    );
-
-    Command ferryingLeftCommand = Commands.sequence(
-        turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_POINT)),
-        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_POINT, FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_HEIGHT))
-    );
-
-    Command ferryRightCommand = Commands.sequence(
-        turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_POINT)),
-        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_POINT, FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_HEIGHT))
-    );
-
-    Command stowCommand = Commands.sequence(
-        turret.setFieldRelativeAngleCommand(TurretConstants.MIN_ANGLE),
-        hood.setAngleCommand(HoodConstants.MIN_ANGLE)
-    );
-
-    public Superstructure(){
-    isInScoringZoneTrigger.onTrue(scoringCommand);
-    isInFerryingLeftZoneTrigger.onTrue(ferryingLeftCommand);
-    isInFerryingRightZoneTrigger.onTrue(ferryRightCommand);
-    isApproachingTrenchTrigger.onTrue(stowCommand);
-    }
 }

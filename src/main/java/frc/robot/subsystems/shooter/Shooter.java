@@ -4,10 +4,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.constants.HoodConstants;
+import frc.robot.constants.TurretConstants;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 import frc.robot.subsystems.shooter.turret.Turret;
+import frc.robot.util.FieldConstants;
 
 public class Shooter {
     private Hood hood;
@@ -51,4 +54,25 @@ public class Shooter {
             spindexer.spinCommand()
             );
     }
+
+
+    public Command scoringCommand = Commands.sequence(
+        turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()),
+        hood.setAngleCommand(() -> hood.getAngleToHub())
+    );
+
+    public Command ferryingLeftCommand = Commands.sequence(
+        turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_POINT)),
+        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_POINT, FieldConstants.ferryWaypoints.FAR_FERRYING_LEFT_HEIGHT))
+    );
+
+    public Command ferryRightCommand = Commands.sequence(
+        turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_POINT)),
+        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_POINT, FieldConstants.ferryWaypoints.FAR_FERRYING_RIGHT_HEIGHT))
+    );
+
+    public Command stowCommand = Commands.sequence(
+        turret.setFieldRelativeAngleCommand(TurretConstants.MIN_ANGLE),
+        hood.setAngleCommand(HoodConstants.MIN_ANGLE)
+    );
 }
