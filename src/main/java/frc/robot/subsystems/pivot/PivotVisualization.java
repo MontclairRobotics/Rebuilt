@@ -20,8 +20,8 @@ public class PivotVisualization {
             0,
             0,
             new Rotation3d(
-                Angle.ofBaseUnits(0, Rotations),
-                RobotContainer.pivot.io.getPivotAngle(),
+                Angle.ofBaseUnits(0, Rotations), 
+                RobotContainer.pivot.io.getPivotAngle(), //turns upwards
                 Angle.ofBaseUnits(0, Rotations)));
   }
 
