@@ -19,6 +19,8 @@ import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.pivot.Pivot;
+import frc.robot.subsystems.pivot.PivotIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
@@ -54,6 +56,7 @@ public class RobotContainer {
 	public static Hood hood;
 	public static Shooter shooter;
 	public static Spindexer spindexer;
+  public static Pivot pivot;
 
 	private SwerveDriveSimulation driveSimulation;
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
@@ -63,6 +66,7 @@ public class RobotContainer {
 		switch (Constants.CURRENT_MODE) {
 		case REAL:
 			flywheel = new Flywheel(new FlywheelIOTalonFX());
+      		pivot = new Pivot(new PivotIOTalonFX());
 			drivetrain = TunerConstants.createDrivetrain();
 			turret = new Turret(new TurretIOTalonFX());
 			hood = new Hood(new HoodIOTalonFX());
@@ -78,6 +82,7 @@ public class RobotContainer {
 
 		case SIM:
 			flywheel = new Flywheel(new FlywheelIOTalonFX());
+      		pivot = new Pivot(new PivotIOTalonFX());
 			drivetrain = TunerConstants.createDrivetrain();
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 			turret = new Turret(new TurretIOSim());
