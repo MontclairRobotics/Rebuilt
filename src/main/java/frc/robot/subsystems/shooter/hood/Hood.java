@@ -8,8 +8,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
-
-
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
@@ -25,16 +23,9 @@ import static frc.robot.constants.HoodConstants.kI;
 import static frc.robot.constants.HoodConstants.kP;
 import static frc.robot.constants.HoodConstants.kS;
 import static frc.robot.constants.HoodConstants.kV;
-import static frc.robot.constants.HoodConstants.TOLERANCE;
-import static frc.robot.constants.HoodConstants.kD;
-import static frc.robot.constants.HoodConstants.kG;
-import static frc.robot.constants.HoodConstants.kI;
-import static frc.robot.constants.HoodConstants.kP;
-import static frc.robot.constants.HoodConstants.kS;
-import static frc.robot.constants.HoodConstants.kV;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
-import frc.robot.util.Tunable;
+import frc.robot.util.tunables.Tunable;
 
 public class Hood extends SubsystemBase {
 	public HoodIO io;

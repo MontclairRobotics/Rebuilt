@@ -22,7 +22,7 @@ import static frc.robot.constants.DriveConstants.MIN_VELOCITY_FOR_TRENCH_AND_BUM
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LeftTrench;
-import frc.robot.util.TunableControls.TunablePIDController;
+import frc.robot.util.tunables.TunablePIDController;
 
 public class JoystickDriveCommand extends Command {
 

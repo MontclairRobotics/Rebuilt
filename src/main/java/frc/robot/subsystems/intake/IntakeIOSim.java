@@ -10,7 +10,7 @@ import static frc.robot.constants.IntakeConstants.GEARING;
 import static frc.robot.constants.IntakeConstants.MOMENT_OF_INERTIA;
 
 public class IntakeIOSim implements IntakeIO {
-		
+
 	private FlywheelSim sim;
 	private double appliedVoltage;
 

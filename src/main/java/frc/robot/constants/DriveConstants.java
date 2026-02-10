@@ -10,9 +10,9 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
-import frc.robot.util.TunableControls.ControlConstants;
-import frc.robot.util.TunableControls.TunableControlConstants;
 import frc.robot.util.TunerConstants;
+import frc.robot.util.tunables.ControlConstants;
+import frc.robot.util.tunables.TunableControlConstants;
 
 public class DriveConstants {
 
