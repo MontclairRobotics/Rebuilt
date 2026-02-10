@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "trenchLeftForward-closeLeft-singlePass"
+            "pathName": "trenchRightForward-closeRight-singlePass"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "trenchRightForward-closeRight-singlePass"
+            "pathName": "trenchLeftForward-closeLeft-singlePass"
           }
         },
         {

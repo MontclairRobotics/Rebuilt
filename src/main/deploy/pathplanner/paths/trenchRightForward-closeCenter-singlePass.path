@@ -32,16 +32,32 @@
     },
     {
       "anchor": {
-        "x": 7.038808107729311,
-        "y": 5.48373540185999
+        "x": 6.80793152639087,
+        "y": 5.309457917261056
       },
       "prevControl": {
-        "x": 7.578380431449682,
-        "y": 5.260015734950293
+        "x": 7.125485512425979,
+        "y": 4.819204668581963
       },
       "nextControl": {
-        "x": 6.202241014268663,
-        "y": 5.830596245659722
+        "x": 6.434729695409061,
+        "y": 5.885622658054419
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.2774465049928665,
+        "y": 6.939728958630528
+      },
+      "prevControl": {
+        "x": 6.555638818582712,
+        "y": 6.522440488245763
+      },
+      "nextControl": {
+        "x": 6.138771455936559,
+        "y": 7.147741532214988
       },
       "isLocked": false,
       "linkedName": null
@@ -49,11 +65,11 @@
     {
       "anchor": {
         "x": 4.479411111111111,
-        "y": 7.3983763201678245
+        "y": 7.41845934379458
       },
       "prevControl": {
-        "x": 6.155455555555555,
-        "y": 7.505565209056713
+        "x": 6.1480599144079875,
+        "y": 7.593806276123189
       },
       "nextControl": null,
       "isLocked": false,
@@ -62,15 +78,25 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.7445880957609098,
-      "rotationDegrees": 42.51143739801707
-    },
-    {
       "waypointRelativePos": 1.331964075212648,
       "rotationDegrees": 90.0
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.7238352464551013,
+      "maxWaypointRelativePos": 2.2795408507764985,
+      "constraints": {
+        "maxVelocity": 1.2,
+        "maxAcceleration": 11.7,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 2818.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
