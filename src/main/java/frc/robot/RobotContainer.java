@@ -36,6 +36,7 @@ import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.util.FuelSim;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
@@ -57,7 +58,7 @@ public class RobotContainer {
 
 	private SwerveDriveSimulation driveSimulation;
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
-
+	public FuelSim fuelSim = new FuelSim("fuel");
 	public RobotContainer() {
 
 		switch (Constants.CURRENT_MODE) {
@@ -84,6 +85,7 @@ public class RobotContainer {
 			hood = new Hood(new HoodIOSim());
 			spindexer = new Spindexer(new SpindexerIOSim());
 			shooter = new Shooter(hood, flywheel, turret, spindexer);
+
 			// vision =
 			// 	new Vision(
 			// 		drivetrain::addVisionMeasurement,
