@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.intake.rollers;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -6,15 +6,15 @@ import com.ctre.phoenix6.signals.InvertedValue;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.AngularVelocity;
-import static frc.robot.constants.IntakeConstants.GEARING;
-import static frc.robot.constants.IntakeConstants.MOTOR_ID;
+import static frc.robot.constants.RollersConstants.GEARING;
+import static frc.robot.constants.RollersConstants.MOTOR_ID;
 
-public class IntakeIOTalonFX implements IntakeIO {
+public class RollersIOTalonFX implements RollersIO {
 
 	private TalonFX motor;
 	TalonFXConfiguration config;
 
-	public IntakeIOTalonFX() {
+	public RollersIOTalonFX() {
 		motor = new TalonFX(MOTOR_ID);
 		config = new TalonFXConfiguration();
 

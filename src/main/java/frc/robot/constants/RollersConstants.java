@@ -1,6 +1,6 @@
 package frc.robot.constants;
 
-public class IntakeConstants {
+public class RollersConstants {
   public static final double INTAKE_VOLTAGE = 0.0; // TODO: set this number
   public static final double MAX_CURRENT = 0.0; // TODO: set this number
   public static final double INTAKE_STALL_CURRENT = 0.0; // TODO: set this number

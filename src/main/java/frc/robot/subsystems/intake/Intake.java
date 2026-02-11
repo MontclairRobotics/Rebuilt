@@ -1,52 +1,41 @@
 package frc.robot.subsystems.intake;
 
-import org.littletonrobotics.junction.Logger;
-
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.constants.IntakeConstants.INTAKE_VOLTAGE;
+import frc.robot.constants.PivotConstants;
+import frc.robot.subsystems.intake.pivot.Pivot;
+import frc.robot.subsystems.intake.rollers.Rollers;
 
-public class Intake extends SubsystemBase {
+public class Intake {
+    private Pivot pivot;
+    private Rollers rollers;
+    public Intake(Pivot pivot, Rollers rollers){
+        this.pivot = pivot;
+        this.rollers = rollers;
+        
+    }
 
-	private final IntakeIO io;
-	private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+    public Command stopCommand(){
+        return Commands.parallel(
+            rollers.stopCommand(),
+            pivot.stopCommand()
+        );
+    }
 
-	public Intake(IntakeIO io) {
-		this.io = io;
-	}
+    public Command intakeCommand(){
+        return Commands.parallel(
+            pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+            rollers.intakeCommand()
+        );
+    }
 
-	public void intake() {
-		io.setVoltage(INTAKE_VOLTAGE);
-	}
-
-	public void outtake() {
-		io.setVoltage(-INTAKE_VOLTAGE);
-	}
-
-	public void stop() {
-		io.stop();
-	}
-
-	@Override
-	public void periodic() {
-		io.updateInputs(inputs);
-		Logger.processInputs("Intake", inputs);
-	}
-
-	// --------------------------COMMANDS--------------------------
-
-	public Command stopCommand() {
-		return Commands.runOnce(this::stop, this);
-	}
-
-	// power intake
-	public Command intakeCommand() {
-		return Commands.run(this::intake, this).finallyDo(this::stop);
-	}
-
-	// used for unjamming
-	public Command outtakeCommand() {
-		return Commands.run(this::outtake, this);
-	}
+    public Command wiggleCommand(){
+        return Commands.sequence(
+            rollers.intakeCommand().withTimeout(0.13),
+            rollers.outtakeCommand().withTimeout(0.13),
+            rollers.intakeCommand().withTimeout(0.13)
+        );
+    }
 }
