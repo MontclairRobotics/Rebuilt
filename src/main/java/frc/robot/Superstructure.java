@@ -4,6 +4,8 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+
 import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -20,16 +22,17 @@ public class Superstructure extends SubsystemBase {
 
     public Superstructure(Shooter shooter) {
 		this.shooter = shooter;
-		scoringModeTrigger.onTrue(shooter.scoringCommand());
-		ferryLeftTrigger.onTrue(shooter.ferryingLeftCommand());
-		ferryRightTrigger.onTrue(shooter.ferryRightCommand());
-		shouldStowHoodTrigger.onTrue(shooter.stowCommand());
+		scoringModeTrigger.whileTrue(shooter.scoringCommand());
+		ferryLeftTrigger.whileTrue(shooter.ferryingLeftCommand());
+		ferryRightTrigger.whileTrue(shooter.ferryRightCommand());
+		shouldStowHoodTrigger.whileTrue(shooter.stowCommand());
     }
 
     public final Trigger scoringModeTrigger = new Trigger(this::shouldBeScoring);
     public final Trigger ferryLeftTrigger = new Trigger(this::shouldFerryLeft);
     public final Trigger ferryRightTrigger = new Trigger(this::shouldFerryRight);
     public final Trigger shouldStowHoodTrigger = new Trigger(this::shouldStowHood);
+	public final Trigger startTrigger = new Trigger(this::isStarting);
 
     @Override
     public void periodic() {
@@ -44,6 +47,10 @@ public class Superstructure extends SubsystemBase {
     public boolean isRedAlliance() {
 		return AllianceManager.isRed();
     }
+
+	public boolean isStarting(){
+		return DriverStation.isTeleopEnabled();
+	}
 
     public boolean isInScoringZone() {
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
