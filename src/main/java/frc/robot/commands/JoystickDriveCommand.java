@@ -22,7 +22,7 @@ import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LeftTrench;
-import frc.robot.util.TunableControls.TunablePIDController;
+import frc.robot.util.tunables.TunablePIDController;
 
 public class JoystickDriveCommand extends Command {
 

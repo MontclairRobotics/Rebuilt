@@ -5,13 +5,14 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.util;
+package frc.robot.util.tunables;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
