@@ -16,7 +16,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -81,7 +80,7 @@ public class Robot extends LoggedRobot {
 
 	@Override
 	public void robotInit() {
-		RobotContainer.drivetrain.resetPose(new Pose2d());
+		// RobotContainer.drivetrain.resetPose(new Pose2d());
 		DogLog.setOptions(
 			new DogLogOptions()
 				.withLogExtras(true)
@@ -119,7 +118,7 @@ public class Robot extends LoggedRobot {
 
 		// schedule the autonomous command (example)
 		if (autonomousCommand != null) {
-		autonomousCommand.schedule();
+			CommandScheduler.getInstance().schedule(autonomousCommand);
 		}
 	}
 
@@ -158,7 +157,7 @@ public class Robot extends LoggedRobot {
 	/** This function is called periodically whilst in simulation. */
 	@Override
 	public void simulationPeriodic() {
-		RobotContainer.drivetrain.mapleSimSwerveDrivetrain.update();
+		// RobotContainer.drivetrain.mapleSimSwerveDrivetrain.update();
 		robotContainer.displaySimFieldToAdvantageScope();
 	}
 }

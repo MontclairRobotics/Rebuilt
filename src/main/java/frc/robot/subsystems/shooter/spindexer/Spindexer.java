@@ -8,12 +8,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import org.littletonrobotics.junction.Logger;
 
+import frc.robot.util.Tunable;
+
 public class Spindexer extends SubsystemBase {
 
 	private SpindexerIO io;
 	private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
 
 	public Spindexer(SpindexerIO io) {
+		Tunable spinVoltage = new Tunable("spin voltage", SPIN_VOLTAGE, (value) -> SPIN_VOLTAGE = value);
+		Tunable indexVoltage = new Tunable("index voltage", INDEX_VOLTAGE, (x) -> INDEX_VOLTAGE = x);
 		this.io = io;
 	}
 
@@ -36,6 +40,10 @@ public class Spindexer extends SubsystemBase {
 	public void stop() {
 		io.stopSpin();
 		io.stopIndex();
+	}
+
+	public Command stopCommand() {
+		return Commands.runOnce(() -> stop(), this);
 	}
 
 	public Command spinCommand() {

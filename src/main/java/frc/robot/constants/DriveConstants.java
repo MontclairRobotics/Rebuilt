@@ -1,7 +1,5 @@
 package frc.robot.constants;
 
-import com.pathplanner.lib.path.PathConstraints;
-
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -12,11 +10,11 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.util.TunableControls.ControlConstants;
 import frc.robot.util.TunableControls.TunableControlConstants;
-import frc.robot.util.TunerConstants;
+// import frc.robot.util.TunerConstants;
 
 public class DriveConstants {
 
-	public static final LinearVelocity MAX_SPEED = TunerConstants.kSpeedAt12Volts;
+	// public static final LinearVelocity MAX_SPEED = TunerConstants.kSpeedAt12Volts;
 	public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(8);
 
 	public static final double JOYSTICK_INPUT_GAIN = 1;
@@ -26,12 +24,12 @@ public class DriveConstants {
 	public static final AngularVelocity MAX_ANGULAR_SPEED = RotationsPerSecond.of(1.624);
 	public static final AngularAcceleration MAX_ANGULAR_ACCELERATION = RotationsPerSecondPerSecond.of(4);
 
-	public static final PathConstraints DEFAULT_CONSTRAINTS = new PathConstraints(
-		MAX_SPEED,
-		MAX_ACCELERATION,
-		MAX_ANGULAR_SPEED,
-		MAX_ANGULAR_ACCELERATION
-	);
+	// public static final PathConstraints DEFAULT_CONSTRAINTS = new PathConstraints(
+	// 	MAX_SPEED,
+	// 	MAX_ACCELERATION,
+	// 	MAX_ANGULAR_SPEED,
+	// 	MAX_ANGULAR_ACCELERATION
+	// );
 
 	public static final ControlConstants ROTATION_BASE_CONSTANTS = new ControlConstants()
 		.withPID(16, 0, 0)
