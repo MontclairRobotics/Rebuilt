@@ -115,8 +115,8 @@ public class RobotContainer {
 
 		drivetrain.setDefaultCommand(new JoystickDriveCommand());
 
-		driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
-		driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub()));
+		driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub())).onFalse(turret.stopCommand());
+		driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub())).onFalse(hood.stopCommand());
 
 		// driverController.triangle().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MIN_ANGLE));

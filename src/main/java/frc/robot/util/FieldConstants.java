@@ -37,6 +37,8 @@ public class FieldConstants {
 		// space (along x axis) in front and behind the center of the TRENCH to count for the TRENCH zone
         public static final Distance TRENCH_ZONE_EXTENSION = Inches.of(90);
 
+		public static final Distance TRENCH_DANGER_ZONE_EXTENSION = Inches.of(40);
+
 		// space (along x axis) in front and behind the center of the BUMP to count for the BUMP zone
         private static final Distance BUMP_ZONE_EXTENSION = Inches.of(80);
 
@@ -66,6 +68,33 @@ public class FieldConstants {
             new Translation2d[] {
                 new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH.minus(LeftTrench.WIDTH)),
                 new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_ZONE_EXTENSION), FIELD_WIDTH)
+            }
+        };
+
+		public static final Translation2d[][] TRENCH_DANGER_ZONES = {
+
+			// near right trench
+            new Translation2d[] {
+                new Translation2d(LinesVertical.HUB_CENTER.minus(TRENCH_DANGER_ZONE_EXTENSION), Meters.zero()),
+                new Translation2d(LinesVertical.HUB_CENTER.plus(TRENCH_DANGER_ZONE_EXTENSION), RightTrench.WIDTH)
+            },
+
+			// near left trench
+            new Translation2d[] {
+                new Translation2d(LinesVertical.HUB_CENTER.minus(TRENCH_DANGER_ZONE_EXTENSION), FIELD_WIDTH.minus(LeftTrench.WIDTH)),
+                new Translation2d(LinesVertical.HUB_CENTER.plus(TRENCH_DANGER_ZONE_EXTENSION), FIELD_WIDTH)
+            },
+
+			// far right trench
+            new Translation2d[] {
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_DANGER_ZONE_EXTENSION), Meters.zero()),
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_DANGER_ZONE_EXTENSION), RightTrench.WIDTH)
+            },
+
+			// far left trench
+            new Translation2d[] {
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_DANGER_ZONE_EXTENSION), FIELD_WIDTH.minus(LeftTrench.WIDTH)),
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_DANGER_ZONE_EXTENSION), FIELD_WIDTH)
             }
         };
 
@@ -367,15 +396,11 @@ public class FieldConstants {
 
 	public static class ferryWaypoints{
 		// TODO: find these values
-		public static final Translation2d CLOSE_FERRYING_LEFT_POINT = new Translation2d(1.1, 1.1);
-		public static final Translation2d CLOSE_FERRYING_RIGHT_POINT = new Translation2d(0.0, 0.0);
-		public static final Translation2d FAR_FERRYING_LEFT_POINT = new Translation2d(0.0, 0.0);
-		public static final Translation2d FAR_FERRYING_RIGHT_POINT = new Translation2d(0.0, 0.0);
-
-		public static final double CLOSE_FERRYING_LEFT_HEIGHT = 0.0;
-		public static final double CLOSE_FERRYING_RIGHT_HEIGHT = 0.0;
-		public static final double FAR_FERRYING_LEFT_HEIGHT = 0.0;
-		public static final double FAR_FERRYING_RIGHT_HEIGHT = 0.0;
+		public static final Translation2d LEFT_FERRYING_POINT = new Translation2d(3, 5);
+		public static final Translation2d RIGHT_FERRYING_POINT = new Translation2d(3, 3);
+	
+		public static final double LEFT_FERRYING_HEIGHT = 0.0;
+		public static final double RIGHT_FERRYING_HEIGHT = 0.0;
 	}
 
 	public enum FieldType {
