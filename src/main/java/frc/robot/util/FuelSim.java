@@ -520,7 +520,8 @@ public class FuelSim {
 
         Pose3d launchPose = new Pose3d(
             new Translation3d(RobotContainer.turret.getFieldRelativePosition()),
-            new Rotation3d(RobotContainer.drivetrain.odometryHeading)).plus(new Transform3d(new Translation3d(Meters.zero(), Meters.zero(),
+            Rotation3d.kZero
+            ).plus(new Transform3d(new Translation3d(Meters.zero(), Meters.zero(),
             launchHeight),
             Rotation3d.kZero));
         ChassisSpeeds fieldSpeeds = this.robotFieldSpeedsSupplier.get();
