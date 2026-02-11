@@ -25,6 +25,14 @@ public class PoseUtils {
 		return pose;
 	}
 
+//	public static Distance flipDistanceAlliance(Distance distance){
+//		if (DriverStation.getAlliance().isPresent()
+//			&& DriverStation.getAlliance().get() == Alliance.Red) {
+//		return FlippingUtil;
+//		}
+//		return distance;
+//	}
+
 	public static Translation2d flipTranslationAlliance(Translation2d trans) {
 		if (DriverStation.getAlliance().isPresent()
 			&& DriverStation.getAlliance().get() == Alliance.Red) {

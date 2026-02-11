@@ -195,7 +195,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 		tagLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
 		fieldRelative = true;
-		configureAutoBuilder();
+		// configureAutoBuilder();
 
 		thetaController.setTolerance(Degrees.of(1).in(Radians));
 		thetaController.enableContinuousInput(-Math.PI, Math.PI);

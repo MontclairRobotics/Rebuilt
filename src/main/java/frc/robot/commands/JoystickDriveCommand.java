@@ -7,7 +7,6 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.units.measure.Distance;
@@ -16,10 +15,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
-import frc.robot.constants.Constants;
+import frc.robot.Superstructure;
 import frc.robot.constants.DriveConstants;
 import static frc.robot.constants.DriveConstants.MIN_VELOCITY_FOR_TRENCH_AND_BUMP_LOCKS;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LeftTrench;
 import frc.robot.util.tunables.TunablePIDController;
@@ -68,59 +68,12 @@ public class JoystickDriveCommand extends Command {
 		addRequirements(drivetrain);
 	}
 
-	// whether we are in the zone to apply trench lock
-	private boolean inTrenchZone() {
-        Pose2d robotPose = drivetrain.getRobotPose();
-        for (Translation2d[] zone : FieldConstants.Zones.TRENCH_ZONES) {
-            if (robotPose.getX() >= zone[0].getX()
-                    && robotPose.getX() <= zone[1].getX()
-                    && robotPose.getY() >= zone[0].getY()
-                    && robotPose.getY() <= zone[1].getY()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-	// whether we are in the zone to apply bump lock
-	private boolean inBumpZone() {
-		Pose2d robotPose = drivetrain.getRobotPose();
-		for (Translation2d[] zone : FieldConstants.Zones.BUMP_ZONES) {
-            if (robotPose.getX() >= zone[0].getX()
-                    && robotPose.getX() <= zone[1].getX()
-                    && robotPose.getY() >= zone[0].getY()
-                    && robotPose.getY() <= zone[1].getY()) {
-                return true;
-            }
-        }
-        return false;
-	}
-
-	// are we moving INTO the trench?
-	private boolean movingIntoObstacle() {
-		Pose2d robotPose = drivetrain.getRobotPose();
-		return
-			(robotPose.getX() < FieldConstants.LinesVertical.ALLIANCE_ZONE.plus(FieldConstants.Hub.WIDTH.div(2)).plus(Constants.BUMPER_WIDTH).in(Meters)
-			&& xVelocitySupplier.getAsDouble() > 0 )
-
-			|| (robotPose.getX() > FieldConstants.LinesVertical.ALLIANCE_ZONE.in(Meters)
-			&& robotPose.getX() < FieldConstants.LinesVertical.CENTER.in(Meters)
-			&& xVelocitySupplier.getAsDouble() < 0)
-
-			|| (robotPose.getX() < FieldConstants.LinesVertical.OPP_ALLIANCE_ZONE.in(Meters)
-			&& robotPose.getX() > FieldConstants.LinesVertical.CENTER.in(Meters)
-			&& xVelocitySupplier.getAsDouble() > 0)
-
-			|| (robotPose.getX() > FieldConstants.LinesVertical.OPP_ALLIANCE_ZONE.minus(FieldConstants.Hub.WIDTH.div(2)).minus(Constants.BUMPER_WIDTH).in(Meters)
-			&& xVelocitySupplier.getAsDouble() < 0);
-	}
-
 	private boolean shouldTrenchLock() {
-		return inTrenchZone() && drivingBiasedForwards() && movingIntoObstacle();
+		return Superstructure.inTrenchZone() && drivingBiasedForwards() && Superstructure.movingIntoObstacle();
 	}
 
 	private boolean shouldBumpLock() {
-		return inBumpZone() && drivingBiasedForwards() && movingIntoObstacle() && Math.abs(omegaVelocitySupplier.getAsDouble()) < 1;
+		return Superstructure.inBumpZone() && drivingBiasedForwards() && Superstructure.movingIntoObstacle() && Math.abs(omegaVelocitySupplier.getAsDouble()) < 1;
 	}
 
 	// if we are moving forwards a little bit and not significantly moving sideways
@@ -131,12 +84,15 @@ public class JoystickDriveCommand extends Command {
 	// gets the distance to the midline of the trench, used for PID calculations
 	private Distance getTrenchY() {
 		Pose2d robotPose = drivetrain.getRobotPose();
+		Distance trenchY;
 		// are we in the left side of the field
 		if(robotPose.getMeasureY().gte(FieldConstants.FIELD_WIDTH.div(2))) {
-			return FieldConstants.LinesHorizontal.LEFT_TRENCH_OPEN_END.plus(LeftTrench.OPENING_WIDTH.div(2.0));
+			trenchY = FieldConstants.LinesHorizontal.LEFT_TRENCH_OPEN_END.plus(LeftTrench.OPENING_WIDTH.div(2.0));
 		} else {
-			return FieldConstants.RightTrench.OPENING_WIDTH.div(2.0);
+			trenchY =  FieldConstants.RightTrench.OPENING_WIDTH.div(2.0);
 		}
+
+		return trenchY;
 	}
 
 	// how much to adjust the PID based on how close we are to the center of the trench (x value)
@@ -190,9 +146,12 @@ public class JoystickDriveCommand extends Command {
 				break;
 
 			case TRENCH_LOCK:
+				double pidContribution = AllianceManager.isRed() ?
+					-(getTrenchYAdjustFactor() * trenchYController.calculate(drivetrain.getRobotPose().getY(), getTrenchY().in(Meters)))
+					:
+					(getTrenchYAdjustFactor() * trenchYController.calculate(drivetrain.getRobotPose().getY(), getTrenchY().in(Meters)));
 				double yVelocity =
-				(yVelocitySupplier.getAsDouble()) / 1.3 +
-				(getTrenchYAdjustFactor() * trenchYController.calculate(drivetrain.getRobotPose().getY(), getTrenchY().in(Meters)));
+				(yVelocitySupplier.getAsDouble()) / 1.3 + pidContribution;
 				double rotVelocityTrenchLock = thetaController.calculate(
 					drivetrain.getWrappedHeading().getRadians(), getTrenchLockAngle().getRadians()
 				);

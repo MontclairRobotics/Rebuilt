@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
+import frc.robot.util.AllianceManager;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -97,6 +98,7 @@ public class Robot extends LoggedRobot {
 	/** This function is called periodically during all modes. */
 	@Override
 	public void robotPeriodic() {
+		AllianceManager.update();
 		CommandScheduler.getInstance().run();
 	}
 

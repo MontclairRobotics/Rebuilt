@@ -98,6 +98,10 @@ public class Hood extends SubsystemBase {
 		visualization.log();
 	}
 
+	public Command stopCommand() {
+		return Commands.runOnce(() -> io.stop());
+	}
+
 	public Command setAngleCommand(Supplier<Angle> supplier) {
 		return Commands.run(() -> setAngle(supplier), this);
 	}
