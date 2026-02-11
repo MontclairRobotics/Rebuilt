@@ -146,7 +146,7 @@ public class JoystickDriveCommand extends Command {
 				break;
 
 			case TRENCH_LOCK:
-				double pidContribution = AllianceManager.isRed() ? 
+				double pidContribution = AllianceManager.isRed() ?
 					-(getTrenchYAdjustFactor() * trenchYController.calculate(drivetrain.getRobotPose().getY(), getTrenchY().in(Meters)))
 					:
 					(getTrenchYAdjustFactor() * trenchYController.calculate(drivetrain.getRobotPose().getY(), getTrenchY().in(Meters)));

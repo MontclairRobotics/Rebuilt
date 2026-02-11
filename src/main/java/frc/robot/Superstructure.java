@@ -63,7 +63,7 @@ public class Superstructure extends SubsystemBase {
 		// if(!AllianceManager.isAllianceKnown() || (HubTracker.getCurrentShift().isEmpty())) return false;
 
 		if(!AllianceManager.isAllianceKnown()) return false;
-		return 
+		return
 			!shouldStowHood()
 			&& isInScoringZone();
         //Are we in the scoring zone and is the hub active
@@ -166,7 +166,7 @@ public class Superstructure extends SubsystemBase {
 	// are we moving INTO the trench?
 	public static boolean movingIntoObstacle() {
 		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
-		boolean movingIntoObstacleOnBlue = 
+		boolean movingIntoObstacleOnBlue =
 			(robotPose.getX() < FieldConstants.LinesVertical.ALLIANCE_ZONE.plus(FieldConstants.Hub.WIDTH.div(2)).plus(Constants.BUMPER_WIDTH).in(Meters)
 			&& RobotContainer.drivetrain.getForwardVelocityFromController() > 0 )
 

@@ -398,7 +398,7 @@ public class FieldConstants {
 		// TODO: find these values
 		public static final Translation2d LEFT_FERRYING_POINT = new Translation2d(3, 5);
 		public static final Translation2d RIGHT_FERRYING_POINT = new Translation2d(3, 3);
-	
+
 		public static final double LEFT_FERRYING_HEIGHT = 0.0;
 		public static final double RIGHT_FERRYING_HEIGHT = 0.0;
 	}
