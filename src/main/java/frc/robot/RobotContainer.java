@@ -29,89 +29,154 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import frc.robot.commands.JoystickDriveCommand;
+import frc.robot.constants.Constants;
+import frc.robot.constants.DriveConstants;
+import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.flywheel.Flywheel;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
+import frc.robot.subsystems.shooter.hood.Hood;
+import frc.robot.subsystems.shooter.hood.HoodIOSim;
+import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
+import frc.robot.subsystems.shooter.spindexer.Spindexer;
+import frc.robot.subsystems.shooter.spindexer.SpindexerIOSim;
+import frc.robot.subsystems.shooter.spindexer.SpindexerIOTalonFX;
+import frc.robot.subsystems.shooter.turret.Turret;
+import frc.robot.subsystems.shooter.turret.TurretIOSim;
+import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
+import frc.robot.subsystems.vision.Vision;
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.util.PoseUtils;
+import frc.robot.util.Telemetry;
+import frc.robot.util.TunerConstants;
+
 public class RobotContainer {
 
-  private final Vision vision;
+	// Controllers
+	public static CommandPS5Controller driverController = new CommandPS5Controller(0);
+	public static CommandPS5Controller operatorController = new CommandPS5Controller(1);
 
-  // Controllers
-  public static CommandPS5Controller driverController = new CommandPS5Controller(0);
-  public static CommandPS5Controller operatorController = new CommandPS5Controller(1);
+	// Subsystems
+	public static Vision vision;
+	public static CommandSwerveDrivetrain drivetrain;
+	public static Flywheel flywheel;
+	public static Turret turret;
+	public static Hood hood;
+	public static Shooter shooter;
+	public static Spindexer spindexer;
+	public static Hood hood;
+	private SwerveDriveSimulation driveSimulation;
+	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
 
-  private SwerveDriveSimulation driveSimulation = null;
-  private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
+	public RobotContainer() {
 
-  // Subsystems
-  public static CommandSwerveDrivetrain drivetrain;
-  public static Flywheel flywheel;
+  
+		switch (Constants.CURRENT_MODE) {
+		case REAL:
+			flywheel = new Flywheel(new FlywheelIOTalonFX());
+			drivetrain = TunerConstants.createDrivetrain();
+			turret = new Turret(new TurretIOTalonFX());
+			hood = new Hood(new HoodIOTalonFX());
+			spindexer = new Spindexer(new SpindexerIOTalonFX());
+			shooter = new Shooter(hood, flywheel, turret, spindexer);
+			vision =
+				new Vision(
+					drivetrain::addVisionMeasurement,
+					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
+					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading));
 
-  public static Hood hood;
+				break;
 
-  public RobotContainer() {
+		case SIM:
+			flywheel = new Flywheel(new FlywheelIOTalonFX());
+			drivetrain = TunerConstants.createDrivetrain();
+			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
+			turret = new Turret(new TurretIOSim());
+			hood = new Hood(new HoodIOSim());
+			spindexer = new Spindexer(new SpindexerIOSim());
+			shooter = new Shooter(hood, flywheel, turret, spindexer);
+			// vision =
+			// 	new Vision(
+			// 		drivetrain::addVisionMeasurement,
+			// 		new VisionIOPhotonVisionSim(
+			// 			"camera0Name", robotToCamera0, drivetrain::getRobotPose),
+			// 		new VisionIOPhotonVisionSim(
+			// 			"camera1Name", robotToCamera1, drivetrain::getRobotPose));
 
-    switch (Constants.currentMode) {
-      case REAL:
-        flywheel = new Flywheel(new FlywheelIOTalonFX());
-        drivetrain = TunerConstants.createDrivetrain();
+				//TODO: Fix vision simulation! (It is causing loop overruns and memory issues with advantage kit logging)
 
-        vision =
-            new Vision(
-                drivetrain::addVisionMeasurement,
-                new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
-                new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading));
+				break;
 
-        break;
+			default:
+				vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+		}
 
-      case SIM:
-        flywheel = new Flywheel(new FlywheelIOTalonFX());
-        drivetrain = TunerConstants.createDrivetrain();
-        driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
+		drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
 
-        vision =
-            new Vision(
-                drivetrain::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(
-                    "camera0Name", robotToCamera0, drivetrain::getRobotPose),
-                new VisionIOPhotonVisionSim(
-                    "camera1Name", robotToCamera1, drivetrain::getRobotPose));
+		configureBindings();
 
-        break;
+    	drivetrain.registerTelemetry(logger::telemeterize);
+	}
 
-      default:
-        vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-    }
+	private void configureBindings() {
 
-    configureBindings();
-  }
 
-  private void configureBindings() {
-    drivetrain.setDefaultCommand(drivetrain.driveJoystickInputCommand());
-    drivetrain.registerTelemetry(logger::telemeterize);
-  }
+		drivetrain.setDefaultCommand(new JoystickDriveCommand());
 
-  public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
-  }
+		driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
+		driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub()));
 
-  /**
-   * Resets the simulation.
-   *
-   * <p>Borrowed from
-   * https://github.com/Pearadox/2025RobotCode/blob/main/src/main/java/frc/robot/RobotContainer.java#L394.
-   */
-  public void resetSimulation() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
-    drivetrain.resetPose(new Pose2d(3, 2, new Rotation2d()));
-    SimulatedArena.getInstance().resetFieldForAuto();
-  }
+		// driverController.triangle().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
+		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MIN_ANGLE));
 
-  /** Updates Simulated Arena; to be called from Robot.simulationPeriodic() */
-  public void displaySimFieldToAdvantageScope() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
+		driverController.triangle()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
+		driverController.square()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
+		driverController.cross()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
+		driverController.circle()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
 
-    SimulatedArena.getInstance().simulationPeriodic();
-    // The pose by maplesim, including collisions with the field.
-    // See https://www.chiefdelphi.com/t/simulated-robot-goes-through-walls-with-maplesim/508663.
-    Logger.recordOutput(
-        "FieldSimulation/Pose", new Pose3d(driveSimulation.getSimulatedDriveTrainPose()));
-  }
+		// zeros gyro
+		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
+	}
+
+	public Command getAutonomousCommand() {
+		return Commands.print("No autonomous command configured");
+	}
+
+	/**
+	 * Resets the simulation.
+	 *
+	 * <p>Borrowed from
+	 * https://github.com/Pearadox/2025RobotCode/blob/main/src/main/java/frc/robot/RobotContainer.java#L394.
+	 */
+	public void resetSimulation() {
+		if (Constants.CURRENT_MODE != Constants.Mode.SIM) return;
+		drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
+		SimulatedArena.getInstance().resetFieldForAuto();
+	}
+
+	/** Updates Simulated Arena; to be called from Robot.simulationPeriodic() */
+	public void displaySimFieldToAdvantageScope() {
+		if (Constants.CURRENT_MODE != Constants.Mode.SIM) return;
+
+		SimulatedArena.getInstance().simulationPeriodic();
+		// The pose by maplesim, including collisions with the field.
+		// See https://www.chiefdelphi.com/t/simulated-robot-goes-through-walls-with-maplesim/508663.
+		Logger.recordOutput(
+			"FieldSimulation/Pose", new Pose3d(driveSimulation.getSimulatedDriveTrainPose()));
+	}
 }
