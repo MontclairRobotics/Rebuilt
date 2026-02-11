@@ -32,7 +32,6 @@ public class Superstructure extends SubsystemBase {
     public final Trigger ferryLeftTrigger = new Trigger(this::shouldFerryLeft);
     public final Trigger ferryRightTrigger = new Trigger(this::shouldFerryRight);
     public final Trigger shouldStowHoodTrigger = new Trigger(this::shouldStowHood);
-	public final Trigger startTrigger = new Trigger(this::isStarting);
 
     @Override
     public void periodic() {
@@ -47,10 +46,6 @@ public class Superstructure extends SubsystemBase {
     public boolean isRedAlliance() {
 		return AllianceManager.isRed();
     }
-
-	public boolean isStarting(){
-		return DriverStation.isTeleopEnabled();
-	}
 
     public boolean isInScoringZone() {
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
