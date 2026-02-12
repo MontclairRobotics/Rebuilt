@@ -16,7 +16,7 @@ public class FlywheelConstants {
 	public static final double kS = 0;
 	public static final double kV = 0;
 
-	public static final double MOMENT_OF_INERTIA = 0;
-	public static final double GEARING = 1;
+	public static final double MOMENT_OF_INERTIA = 0.00233846427; //From CAD on 2026.02.11 Mayhaps to small?
+	public static final double GEARING = 1; //Turns out one flywheel is 1 and the other is 2 but I don't actually care enough to make to sims as flywheel doesn't deserve 1 sim in the first place...
 
 }

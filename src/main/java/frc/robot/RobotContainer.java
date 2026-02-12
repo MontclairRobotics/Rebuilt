@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.HoodConstants;
+import frc.robot.constants.TurretConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
@@ -28,6 +31,7 @@ import org.littletonrobotics.junction.Logger;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
@@ -87,7 +91,7 @@ public class RobotContainer {
 				break;
 
 		case SIM:
-			flywheel = new Flywheel(new FlywheelIOTalonFX());
+			flywheel = new Flywheel(new FlywheelIOSim());
 			drivetrain = TunerConstants.createDrivetrain();
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 			turret = new Turret(new TurretIOSim());
