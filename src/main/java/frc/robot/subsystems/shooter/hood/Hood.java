@@ -58,7 +58,7 @@ public class Hood extends SubsystemBase {
 		// return Radians.of(Math.PI/2).minus(Radians.of(Math.atan(heightMeters/distance)));
 
 		//until we get look up table, super fucky
-		return Degrees.of((distance/3) * 30);
+		return Degrees.of((distance/3) * 36);
 	}
 
 	public Angle getAngle() {
