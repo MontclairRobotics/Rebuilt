@@ -53,6 +53,10 @@ public class Pivot extends SubsystemBase {
     return pidController.atSetpoint();
   }
 
+  public Command testVoltageCommand() {
+    return Commands.run(() -> io.setVoltage(2));
+  }
+
   public void setPivotAngle(Angle angle) {
     double pidOutput =
         pidController.calculate(io.getPivotAngle().in(Rotations), angle.in(Rotations));
