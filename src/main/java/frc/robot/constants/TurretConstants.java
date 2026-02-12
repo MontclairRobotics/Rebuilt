@@ -29,10 +29,10 @@ public class TurretConstants {
 	public static final AngularVelocity ANGULAR_VELOCITY_TOLERANCE = RotationsPerSecond.of(1);
 
 	// physical properties
-	public static final double MOMENT_OF_INERTIA = 0.35;
+	public static final double MOMENT_OF_INERTIA = 0.154244993; //From CAD on 2026.02.12
 	public static final Distance LENGTH = Meters.of(0.3);
 	public static final Translation2d TURRET_OFFSET = ORIGIN_TO_TURRET.toTranslation2d();
-	public static final double GEARING = 12; // how many rotations of the output shaft per rotation of the turret
+	public static final double GEARING = 70.0/9.0; // how many rotations of the output shaft per rotation of the turret
 
 	public static final double LATENCY = 0.02; // seconds
 
@@ -40,7 +40,7 @@ public class TurretConstants {
 	public static final Angle ANGLE_OFFSET = Rotations.of(0.5); // turret zero is perpendicular to gyro zero, pointed to the left
 
 	// pid + ff gains
-	public static final double kP = 100;
+	public static final double kP = 138; //Tuned PID in Simulation
 	public static final double kI = 10;
 	public static final double kD = 5;
 
