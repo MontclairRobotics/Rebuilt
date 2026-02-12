@@ -21,8 +21,8 @@ public class HoodConstants {
 	public static final int ENCODER_PORT = 4;
 
 	// constraints
-	public static final Angle MIN_ANGLE = Degrees.of(-11);
-	public static final Angle MAX_ANGLE = Degrees.of(20);
+	public static final Angle MIN_ANGLE = Degrees.of(0);
+	public static final Angle MAX_ANGLE = Degrees.of(36);
 	public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(3);
 	public static final AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(8);
 
