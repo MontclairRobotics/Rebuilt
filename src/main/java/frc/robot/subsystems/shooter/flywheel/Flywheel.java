@@ -19,7 +19,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
 
-	private FlywheelIO io;
+	public FlywheelIO io;
 	private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
 	private PIDController pidController;
