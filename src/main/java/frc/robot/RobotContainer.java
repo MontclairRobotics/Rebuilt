@@ -18,10 +18,16 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
-import frc.robot.subsystems.pivot.Pivot;
-import frc.robot.subsystems.pivot.PivotIOTalonFX;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.pivot.Pivot;
+import frc.robot.subsystems.intake.pivot.PivotIOSim;
+import frc.robot.subsystems.intake.pivot.PivotIOTalonFX;
+import frc.robot.subsystems.intake.rollers.Rollers;
+import frc.robot.subsystems.intake.rollers.RollersIOSim;
+import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
@@ -54,7 +60,9 @@ public class RobotContainer {
 	public static Hood hood;
 	public static Shooter shooter;
 	public static Spindexer spindexer;
-  public static Pivot pivot;
+  	public static Pivot pivot;
+	public static Rollers rollers;
+	public static Intake intake;
 
 	private SwerveDriveSimulation driveSimulation;
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
@@ -65,11 +73,13 @@ public class RobotContainer {
 		case REAL:
 			flywheel = new Flywheel(new FlywheelIOTalonFX());
       		pivot = new Pivot(new PivotIOTalonFX());
+			rollers = new Rollers(new RollersIOTalonFX());
 			drivetrain = TunerConstants.createDrivetrain();
 			turret = new Turret(new TurretIOTalonFX());
 			hood = new Hood(new HoodIOTalonFX());
 			spindexer = new Spindexer(new SpindexerIOTalonFX());
 			shooter = new Shooter(hood, flywheel, turret, spindexer);
+			intake = new Intake(pivot, rollers);
 			vision =
 				new Vision(
 					drivetrain::addVisionMeasurement,
@@ -79,14 +89,16 @@ public class RobotContainer {
 				break;
 
 		case SIM:
-			flywheel = new Flywheel(new FlywheelIOTalonFX());
-      		pivot = new Pivot(new PivotIOTalonFX());
+			flywheel = new Flywheel(new FlywheelIOSim());
+      		pivot = new Pivot(new PivotIOSim());
+			rollers = new Rollers(new RollersIOSim());
 			drivetrain = TunerConstants.createDrivetrain();
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 			turret = new Turret(new TurretIOSim());
 			hood = new Hood(new HoodIOSim());
 			spindexer = new Spindexer(new SpindexerIOSim());
 			shooter = new Shooter(hood, flywheel, turret, spindexer);
+			intake = new Intake(pivot, rollers);
 			// vision =
 			// 	new Vision(
 			// 		drivetrain::addVisionMeasurement,
@@ -115,8 +127,10 @@ public class RobotContainer {
 
 		// drivetrain.setDefaultCommand(new JoystickDriveCommand());
 
-		pivot.setDefaultCommand(pivot.joystickControlCommand());
-		operatorController.circle().onTrue(pivot.testVoltageCommand());
+		driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
+		driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub()));
+		driverController.L1().whileTrue(intake.intakeCommand());
+		driverController.L2().whileTrue(intake.stopCommand());
 
 		// driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
 		// driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub()));
