@@ -85,14 +85,14 @@ public class Shooter {
 
     public Command ferryingLeftCommand() {
         return Commands.parallel (
-        turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.LEFT_FERRYING_POINT)),
-        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.LEFT_FERRYING_POINT, FieldConstants.ferryWaypoints.LEFT_FERRYING_HEIGHT)));
+        turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT)),
+        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT, FieldConstants.FerryWaypoints.LEFT_FERRYING_HEIGHT)));
     };
 
     public Command ferryRightCommand(){
         return Commands.parallel (
-        turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.ferryWaypoints.RIGHT_FERRYING_POINT)),
-        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.ferryWaypoints.RIGHT_FERRYING_POINT, FieldConstants.ferryWaypoints.RIGHT_FERRYING_HEIGHT)));
+        turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT)),
+        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT, FieldConstants.FerryWaypoints.RIGHT_FERRYING_HEIGHT)));
     };
 
     public Command stowCommand(){
