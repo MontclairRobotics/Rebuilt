@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LL2"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 5.0
+            "pathName": "RR0"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LD1"
+            "pathName": "RR1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RO1"
           }
         }
       ]

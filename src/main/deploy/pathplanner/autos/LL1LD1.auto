@@ -11,15 +11,15 @@
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "LL2"
+            "waitTime": 5.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LD0"
+            "pathName": "LD1"
           }
         }
       ]
