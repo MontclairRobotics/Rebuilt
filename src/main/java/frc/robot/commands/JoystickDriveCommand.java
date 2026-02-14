@@ -28,26 +28,25 @@ public class JoystickDriveCommand extends Command {
 
 	private final CommandSwerveDrivetrain drivetrain;
 
-	// inputs from controller
-	private final DoubleSupplier xVelocitySupplier; // forwards velocity input
-	private final DoubleSupplier yVelocitySupplier; // strafe velocity input
+	private final DoubleSupplier xVelocitySupplier; // forwards velocity input, away from driver
+	private final DoubleSupplier yVelocitySupplier; // strafe velocity input, left/right relative to driver
 	private final DoubleSupplier omegaVelocitySupplier; // angular velocity input
 
 	@AutoLogOutput
 	private final Trigger shouldTrenchLockTrigger = new Trigger(this::shouldTrenchLock)
 		.and(() -> DriverStation.isEnabled()) // resets value when disabled
-		.debounce(0.1);
+		.debounce(0.1); // accounts for flickering
 
 	@AutoLogOutput
 	private final Trigger shouldBumpLockTrigger = new Trigger(this::shouldBumpLock)
 		.and(() -> DriverStation.isEnabled()) // resets value when disabled
-		.debounce(0.1);
+		.debounce(0.1); // accounts for flicker
 
 	private final TunablePIDController thetaController =
-		new TunablePIDController(DriveConstants.ROTATION_CONSTANTS);
+		new TunablePIDController(DriveConstants.TUNABLE_ROTATION_GAINS);
 
 	private final TunablePIDController trenchYController =
-		new TunablePIDController(DriveConstants.TRENCH_TRANSLATION_CONSTANTS);
+		new TunablePIDController(DriveConstants.TUNABLE_TRENCH_TRANSLATION_GAINS);
 
 	private DriveMode currentDriveMode = DriveMode.NORMAL;
 
@@ -61,8 +60,8 @@ public class JoystickDriveCommand extends Command {
 			.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.L1().getAsBoolean()))
 			.onFalse(updateDriveMode(DriveMode.SNAKE).onlyIf(() -> RobotContainer.driverController.L1().getAsBoolean()));
 		shouldBumpLockTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK))
-		.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.L1().getAsBoolean()))
-		.onFalse(updateDriveMode(DriveMode.SNAKE).onlyIf(() -> RobotContainer.driverController.L1().getAsBoolean()));
+			.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.L1().getAsBoolean()))
+			.onFalse(updateDriveMode(DriveMode.SNAKE).onlyIf(() -> RobotContainer.driverController.L1().getAsBoolean()));
 		RobotContainer.driverController.L1().onTrue(updateDriveMode(DriveMode.SNAKE)).onFalse(updateDriveMode(DriveMode.NORMAL));
 
 		addRequirements(drivetrain);
@@ -73,29 +72,36 @@ public class JoystickDriveCommand extends Command {
 	}
 
 	private boolean shouldBumpLock() {
-		return Superstructure.inBumpZone() && drivingBiasedForwards() && Superstructure.movingIntoObstacle() && Math.abs(omegaVelocitySupplier.getAsDouble()) < 1;
+		return Superstructure.inBumpZone() && drivingBiasedForwards()
+			&& Superstructure.movingIntoObstacle() && Math.abs(omegaVelocitySupplier.getAsDouble()) < 1;
 	}
 
-	// if we are moving forwards a little bit and not significantly moving sideways
 	private boolean drivingBiasedForwards() {
-		return Math.abs(xVelocitySupplier.getAsDouble()) > MIN_VELOCITY_FOR_TRENCH_AND_BUMP_LOCKS.in(MetersPerSecond) && Math.abs(yVelocitySupplier.getAsDouble()) < Math.abs(xVelocitySupplier.getAsDouble());
+		return Math.abs(xVelocitySupplier.getAsDouble()) > MIN_VELOCITY_FOR_TRENCH_AND_BUMP_LOCKS.in(MetersPerSecond)
+			&& Math.abs(yVelocitySupplier.getAsDouble()) < Math.abs(xVelocitySupplier.getAsDouble());
 	}
 
-	// gets the distance to the midline of the trench, used for PID calculations
+	/**
+	 * @return Distance to the midline of the nearest trench, using for PID
+	 */
 	private Distance getTrenchY() {
 		Pose2d robotPose = drivetrain.getRobotPose();
 		Distance trenchY;
+
 		// are we in the left side of the field
 		if(robotPose.getMeasureY().gte(FieldConstants.FIELD_WIDTH.div(2))) {
 			trenchY = FieldConstants.LinesHorizontal.LEFT_TRENCH_OPEN_END.plus(LeftTrench.OPENING_WIDTH.div(2.0));
 		} else {
-			trenchY =  FieldConstants.RightTrench.OPENING_WIDTH.div(2.0);
+			trenchY = FieldConstants.RightTrench.OPENING_WIDTH.div(2.0);
 		}
 
 		return trenchY;
 	}
 
-	// how much to adjust the PID based on how close we are to the center of the trench (x value)
+	/**
+	 * Smoothly scales PID input to increase compensation the closer you are to the trench
+	 * @return the factor, from 0.2 to 1, to multiply the PID output by
+	 */
 	private double getTrenchYAdjustFactor() {
 		Pose2d robotPose = drivetrain.getRobotPose();
 		if(robotPose.getX() < FieldConstants.LinesVertical.CENTER.in(Meters)) {
@@ -135,6 +141,7 @@ public class JoystickDriveCommand extends Command {
 	public void execute() {
 		switch (currentDriveMode) {
 			case NORMAL:
+
 				drivetrain.drive(
 					xVelocitySupplier.getAsDouble(),
 					yVelocitySupplier.getAsDouble(),
@@ -146,15 +153,20 @@ public class JoystickDriveCommand extends Command {
 				break;
 
 			case TRENCH_LOCK:
-				double pidContribution = AllianceManager.isRed() ?
+
+				// reverses PID contribution direction for red alliance
+				double pidContribution =
+					AllianceManager.isRed() ?
 					-(getTrenchYAdjustFactor() * trenchYController.calculate(drivetrain.getRobotPose().getY(), getTrenchY().in(Meters)))
-					:
-					(getTrenchYAdjustFactor() * trenchYController.calculate(drivetrain.getRobotPose().getY(), getTrenchY().in(Meters)));
-				double yVelocity =
-				(yVelocitySupplier.getAsDouble()) / 1.3 + pidContribution;
+					: (getTrenchYAdjustFactor() * trenchYController.calculate(drivetrain.getRobotPose().getY(), getTrenchY().in(Meters)));
+
+				// reduce joystick input effect by a fudge factor and nudge the robot by adding the PID contribution
+				double yVelocity = (yVelocitySupplier.getAsDouble()) / 1.3 + pidContribution;
+
+				// rotational velocity based on what angle to auto align to
 				double rotVelocityTrenchLock = thetaController.calculate(
-					drivetrain.getWrappedHeading().getRadians(), getTrenchLockAngle().getRadians()
-				);
+					drivetrain.getWrappedHeading().getRadians(), getTrenchLockAngle().getRadians());
+
 				drivetrain.drive(
 					xVelocitySupplier.getAsDouble(),
 					yVelocity,
@@ -166,9 +178,12 @@ public class JoystickDriveCommand extends Command {
 				break;
 
 			case BUMP_LOCK:
+
+				// bump lock only changes angle of robot
 				double rotVelocityBumpLock = thetaController.calculate(
 					drivetrain.getWrappedHeading().getRadians(), getBumpLockAngle().getRadians()
 				);
+
 				drivetrain.drive(
 					xVelocitySupplier.getAsDouble(),
 					yVelocitySupplier.getAsDouble(),
@@ -180,6 +195,7 @@ public class JoystickDriveCommand extends Command {
 				break;
 
 			case SNAKE:
+
 				Rotation2d targetAngle = drivetrain.getSnakeDriveAngle();
 				drivetrain.setFieldRelativeAngle(targetAngle);
 				drivetrain.alignToAngleFieldRelative(false);

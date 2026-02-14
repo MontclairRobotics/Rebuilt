@@ -2,6 +2,8 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.AngularVelocity;
+import frc.robot.util.tunables.ControlConstants;
+import frc.robot.util.tunables.TunableControlConstants;
 
 public class FlywheelConstants {
 
@@ -13,10 +15,20 @@ public class FlywheelConstants {
 	public static final double kP = 0;
 	public static final double kI = 0;
 	public static final double kD = 0;
-	public static final double kS = 0;
 	public static final double kV = 0;
+	public static final double kA = 0;
 
-	public static final double MOMENT_OF_INERTIA = 0.00233846427; //From CAD on 2026.02.11 Mayhaps to small?
-	public static final double GEARING = 1; //Turns out one flywheel is 1 and the other is 2 but I don't actually care enough to make to sims as flywheel doesn't deserve 1 sim in the first place...
+	public static final ControlConstants GAINS = new ControlConstants()
+		.withPID(kP, kI, kD)
+		.withFeedforward(kV, kA)
+		.withTolerance(TOLERANCE.in(RotationsPerSecond))
+		.withVelocityControl();
+
+	public static final TunableControlConstants TUNABLE_GAINS = new TunableControlConstants(
+		"Flywheel", GAINS
+	);
+
+	public static final double MOMENT_OF_INERTIA = 0.00233846427; // From CAD on 2026.02.11
+	public static final double GEARING = 1; // gearing of motors to the BIG flywheel
 
 }
