@@ -8,6 +8,6 @@ public class SpindexerConstants {
   public static final double INDEX_MOMENT_OF_INERTIA = 2;
   public static final double SPIN_GEARING = 1;
   public static final double INDEX_GEARING = 1;
-  public static final double SPIN_VOLTAGE = 3.0;
-  public static final double INDEX_VOLTAGE = 3.0;
+  public static final double SPIN_VOLTAGE = 12.0;
+  public static final double INDEX_VOLTAGE = -12.0;
 }

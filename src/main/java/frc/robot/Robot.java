@@ -160,7 +160,7 @@ public class Robot extends LoggedRobot {
 	/** This function is called periodically whilst in simulation. */
 	@Override
 	public void simulationPeriodic() {
-		robotContainer.fuelSim.updateSim();
+		// robotContainer.fuelSim.updateSim();
 		RobotContainer.drivetrain.mapleSimSwerveDrivetrain.update();
 		robotContainer.displaySimFieldToAdvantageScope();
 	}

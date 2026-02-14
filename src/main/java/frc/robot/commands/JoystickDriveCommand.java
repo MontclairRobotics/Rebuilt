@@ -2,20 +2,15 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
-import frc.robot.Superstructure;
 import frc.robot.constants.DriveConstants;
 import static frc.robot.constants.DriveConstants.MIN_VELOCITY_FOR_TRENCH_AND_BUMP_LOCKS;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
@@ -33,15 +28,15 @@ public class JoystickDriveCommand extends Command {
 	private final DoubleSupplier yVelocitySupplier; // strafe velocity input
 	private final DoubleSupplier omegaVelocitySupplier; // angular velocity input
 
-	@AutoLogOutput
-	private final Trigger shouldTrenchLockTrigger = new Trigger(this::shouldTrenchLock)
-		.and(() -> DriverStation.isEnabled()) // resets value when disabled
-		.debounce(0.1);
+	// @AutoLogOutput
+	// // private final Trigger shouldTrenchLockTrigger = new Trigger(this::shouldTrenchLock)
+	// 	.and(() -> DriverStation.isEnabled()) // resets value when disabled
+	// 	.debounce(0.1);
 
-	@AutoLogOutput
-	private final Trigger shouldBumpLockTrigger = new Trigger(this::shouldBumpLock)
-		.and(() -> DriverStation.isEnabled()) // resets value when disabled
-		.debounce(0.1);
+	// @AutoLogOutput
+	// // private final Trigger shouldBumpLockTrigger = new Trigger(this::shouldBumpLock)
+	// 	.and(() -> DriverStation.isEnabled()) // resets value when disabled
+	// 	.debounce(0.1);
 
 	private final TunablePIDController thetaController =
 		new TunablePIDController(DriveConstants.ROTATION_CONSTANTS);
@@ -57,24 +52,24 @@ public class JoystickDriveCommand extends Command {
 		this.yVelocitySupplier = () -> drivetrain.getStrafeVelocityFromController();
 		this.omegaVelocitySupplier = () -> drivetrain.getOmegaVelocityFromController();
 
-		shouldTrenchLockTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK))
-			.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.L1().getAsBoolean()))
-			.onFalse(updateDriveMode(DriveMode.SNAKE).onlyIf(() -> RobotContainer.driverController.L1().getAsBoolean()));
-		shouldBumpLockTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK))
-		.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.L1().getAsBoolean()))
-		.onFalse(updateDriveMode(DriveMode.SNAKE).onlyIf(() -> RobotContainer.driverController.L1().getAsBoolean()));
-		RobotContainer.driverController.L1().onTrue(updateDriveMode(DriveMode.SNAKE)).onFalse(updateDriveMode(DriveMode.NORMAL));
+		// shouldTrenchLockTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK))
+		// 	.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.L1().getAsBoolean()))
+		// 	.onFalse(updateDriveMode(DriveMode.SNAKE).onlyIf(() -> RobotContainer.driverController.L1().getAsBoolean()));
+		// shouldBumpLockTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK))
+		// .onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.L1().getAsBoolean()))
+		// .onFalse(updateDriveMode(DriveMode.SNAKE).onlyIf(() -> RobotContainer.driverController.L1().getAsBoolean()));
+		// RobotContainer.driverController.L1().onTrue(updateDriveMode(DriveMode.SNAKE)).onFalse(updateDriveMode(DriveMode.NORMAL));
 
 		addRequirements(drivetrain);
 	}
 
-	private boolean shouldTrenchLock() {
-		return Superstructure.inTrenchZone() && drivingBiasedForwards() && Superstructure.movingIntoObstacle();
-	}
+	// private boolean shouldTrenchLock() {
+	// 	return Superstructure.inTrenchZone() && drivingBiasedForwards() && Superstructure.movingIntoObstacle();
+	// }
 
-	private boolean shouldBumpLock() {
-		return Superstructure.inBumpZone() && drivingBiasedForwards() && Superstructure.movingIntoObstacle() && Math.abs(omegaVelocitySupplier.getAsDouble()) < 1;
-	}
+	// private boolean shouldBumpLock() {
+	// 	return Superstructure.inBumpZone() && drivingBiasedForwards() && Superstructure.movingIntoObstacle() && Math.abs(omegaVelocitySupplier.getAsDouble()) < 1;
+	// }
 
 	// if we are moving forwards a little bit and not significantly moving sideways
 	private boolean drivingBiasedForwards() {
