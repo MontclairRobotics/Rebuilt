@@ -16,7 +16,7 @@ import edu.wpi.first.units.measure.Time;
 public class AimingConstants {
 
 	public static final double LATENCY = 0.04; // seconds it takes to reach desired state once state is set
-  	
+
 	public record ShotSettings(Angle angle, AngularVelocity flywheelVelocity, Time timeOfFlight, boolean withConstantVelocity) implements Interpolatable<ShotSettings> {
 		public ShotSettings(Angle angle, AngularVelocity flywheelVelocity, Time timeOfFlight, boolean withConstantVelocity) {
 			this.angle = angle;
@@ -68,7 +68,7 @@ public class AimingConstants {
 		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShotSettings::interpolate);
 
 	public static final InterpolatingTreeMap<Double, SimShotSettings> SIM_MAP =
-		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), SimShotSettings::interpolate);	
+		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), SimShotSettings::interpolate);
 
 	public static final InterpolatingTreeMap<Double, SimShotSettings> SIM_FERRY_MAP =
 		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), SimShotSettings::interpolate);

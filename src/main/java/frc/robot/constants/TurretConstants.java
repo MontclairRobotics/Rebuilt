@@ -38,7 +38,7 @@ public class TurretConstants {
 	public static final double LATENCY = 0.04; // seconds
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
-	public static final Angle ANGLE_OFFSET = Rotations.of(-0.25); // turret zero is perpendicular to gyro zero, pointed to the left
+	public static final Angle ANGLE_OFFSET = Rotations.of(0.5); // turret zero is perpendicular to gyro zero, pointed to the left
 
 	// pid + ff gains
 	public static final double kP = 138; //Tuned PID in Simulation

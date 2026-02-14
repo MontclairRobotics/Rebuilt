@@ -17,7 +17,7 @@ import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 
 public class Aiming {
-	
+
 	private final Turret turret;
 
 	public Aiming() {
@@ -39,8 +39,8 @@ public class Aiming {
 				break;
 			case FERRY_RIGHT:
 				map = withConstantVelocity ? AimingConstants.REAL_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.REAL_FERRY_MAP;
-				break;	
-			default: 
+				break;
+			default:
 				map = AimingConstants.REAL_MAP;
 		}
 
@@ -64,7 +64,7 @@ public class Aiming {
 				virtualTarget = targetLocation.minus(turretVelocity.times(estimatedTOF));
 				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
 				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
-	
+
 				if(Math.abs(newTOF - estimatedTOF) < 0.02) break;
 				estimatedTOF = newTOF;
 			}
@@ -92,8 +92,8 @@ public class Aiming {
 				break;
 			case FERRY_RIGHT:
 				map = withConstantVelocity ? AimingConstants.SIM_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.SIM_FERRY_MAP;
-				break;	
-			default: 
+				break;
+			default:
 				map = AimingConstants.SIM_MAP;
 		}
 
@@ -117,7 +117,7 @@ public class Aiming {
 				virtualTarget = targetLocation.minus(turretVelocity.times(estimatedTOF));
 				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
 				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
-	
+
 				if(Math.abs(newTOF - estimatedTOF) < 0.02) break;
 				estimatedTOF = newTOF;
 			}
