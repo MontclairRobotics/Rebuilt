@@ -15,6 +15,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
@@ -104,12 +105,18 @@ public class RobotContainer {
 
 
 		drivetrain.setDefaultCommand(new JoystickDriveCommand());
+		operatorController.circle().whileTrue(drivetrain.sysIdDynamic(Direction.kForward)).onFalse(drivetrain.stopCommand());
+		operatorController.square().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse)).onFalse(drivetrain.stopCommand());
+		operatorController.triangle().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward)).onFalse(drivetrain.stopCommand());
+		operatorController.cross().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse)).onFalse(drivetrain.stopCommand());
+
+
 		// driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub())).onFalse(turret.stopCommand());
 		// driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub())).onFalse(hood.stopCommand());
 		// driverController.circle().whileTrue(Commands.runOnce(()->fuelSim.launchFuel(MetersPerSecond.of(8), (hood.getAngle().times(-1)).plus(Degrees.of(90)), turret.getFieldRelativeAngle(),TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
 		// driverController.triangle().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MIN_ANGLE));
-		driverController.L1().onTrue(spindexer.spinCommand()).onFalse(spindexer.stopCommand());
+		driverController.L1().whileTrue(spindexer.spinCommand()).onFalse(spindexer.stopCommand());
 		// driverController.triangle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
 		// driverController.square()
