@@ -1,5 +1,6 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
@@ -37,6 +38,10 @@ public class ShootingLUT {
       new InterpolatingTreeMap<Double, ShooterParameters>(
           InverseInterpolator.forDouble(), ShooterParameters::interpolate);
   static {
-    PARAMETER_MAP.put(0.0, new ShooterParameters(Radians.of(0), MetersPerSecond.of(0), Seconds.of(0)));
+    PARAMETER_MAP.put(1.9903752661244565, new ShooterParameters(Degrees.of(25), MetersPerSecond.of(6.5), Seconds.of(0)));//TODO:get time
+    PARAMETER_MAP.put(5.826633877745524, new ShooterParameters(Degrees.of(35), MetersPerSecond.of(9.2), Seconds.of(0)));//TODO:get time
+    PARAMETER_MAP.put(3.999783393399773, new ShooterParameters(Degrees.of(29), MetersPerSecond.of(8), Seconds.of(0)));//TODO:get time
+    PARAMETER_MAP.put(4.9556367067256595, new ShooterParameters(Degrees.of(33), MetersPerSecond.of(8.5), Seconds.of(0)));//TODO:get time
+    PARAMETER_MAP.put(2.9955979444441723, new ShooterParameters(Degrees.of(33), MetersPerSecond.of(7), Seconds.of(0)));//TODO:get time
   }
 }

@@ -106,7 +106,7 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void disabledInit() {
 		if (!RobotBase.isReal()) {
-		robotContainer.resetSimulation();
+		// robotContainer.resetSdimulation();
 		}
 	}
 

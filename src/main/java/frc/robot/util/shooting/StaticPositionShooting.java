@@ -5,7 +5,6 @@ import static frc.robot.constants.ShootingLUT.*;
 import static frc.robot.util.FieldConstants.*;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.util.PoseUtils;
 
@@ -17,13 +16,13 @@ public class StaticPositionShooting {
         Translation2d hublocation = PoseUtils.flipTranslationAlliance(Hub.HUB_LOCATION);
         return getFieldRelativePosition().getDistance(hublocation);
     }
-  public Distance getDistance() {
+  public static Distance getDistance() {
     double distance = getDistanceToHub();
     return Meters.of(distance);
   }
 
-  public Command staticShoot() {
-    return RobotContainer.hood.setAngleCommand(getParametersFor(getDistance()).angle());
+  public static ShooterParameters staticShootCurrentParameters() {
+    return getParametersFor(getDistance());
   }
   public static ShooterParameters getParametersFor(Distance distance) {
     return PARAMETER_MAP.get(distance.in(Meters));

@@ -201,7 +201,8 @@ public class Turret extends SubsystemBase {
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Turret", inputs);
-		Logger.recordOutput("INtake pose", new Pose3d(0.2664714, 0, 0.1711706, Rotation3d.kZero));
+		Logger.recordOutput("Intake pose", new Pose3d(0.2664714, 0, 0.1711706, Rotation3d.kZero));
+		Logger.recordOutput("Turret distance to hub", getDistanceToHub());
 		Logger.recordOutput("Turret/Robot Relative Setpoint", constrainAngle(Rotations.of(pidController.getSetpoint())).in(Rotations));
 		visualization.update();
 		visualization.log();
