@@ -1,20 +1,19 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.rollers;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.measure.AngularVelocity;
-
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import static frc.robot.constants.IntakeConstants.GEARING;
-import static frc.robot.constants.IntakeConstants.MOMENT_OF_INERTIA;
+import static frc.robot.constants.RollersConstants.GEARING;
+import static frc.robot.constants.RollersConstants.MOMENT_OF_INERTIA;
 
-public class IntakeIOSim implements IntakeIO {
+public class RollersIOSim implements RollersIO {
 
 	private FlywheelSim sim;
 	private double appliedVoltage;
 
-	public IntakeIOSim() {
+	public RollersIOSim() {
 		sim = new FlywheelSim(
 			LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX60(1), MOMENT_OF_INERTIA, GEARING),
 			DCMotor.getKrakenX60(1),
@@ -23,7 +22,7 @@ public class IntakeIOSim implements IntakeIO {
 	}
 
 	@Override
-	public void updateInputs(IntakeIOInputs inputs) {
+	public void updateInputs(RollersIOInputs inputs) {
 
 		sim.setInputVoltage(appliedVoltage);
 		sim.update(0.02);

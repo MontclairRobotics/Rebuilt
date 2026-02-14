@@ -121,7 +121,7 @@ public class Robot extends LoggedRobot {
 
 		// schedule the autonomous command (example)
 		if (autonomousCommand != null) {
-		autonomousCommand.schedule();
+			CommandScheduler.getInstance().schedule(autonomousCommand);
 		}
 	}
 
@@ -133,7 +133,7 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void teleopInit() {
 		if (autonomousCommand != null) {
-		autonomousCommand.cancel();
+			autonomousCommand.cancel();
 		}
 	}
 

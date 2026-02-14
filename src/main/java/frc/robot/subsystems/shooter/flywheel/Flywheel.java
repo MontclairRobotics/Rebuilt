@@ -41,7 +41,6 @@ public class Flywheel extends SubsystemBase {
 		pidController = new PIDController(kP, kI, kD);
 		pidController.setTolerance(TOLERANCE.in(RotationsPerSecond));
 
-		motorFeedforward = new SimpleMotorFeedforward(kS, kV);
 	}
 
 	/**

@@ -32,6 +32,7 @@ import org.littletonrobotics.junction.Logger;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
@@ -93,7 +94,7 @@ public class RobotContainer {
 				break;
 
 		case SIM:
-			flywheel = new Flywheel(new FlywheelIOTalonFX());
+			flywheel = new Flywheel(new FlywheelIOSim());
 			drivetrain = TunerConstants.createDrivetrain();
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 			turret = new Turret(new TurretIOSim());

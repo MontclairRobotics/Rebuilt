@@ -4,6 +4,7 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 
 import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,10 +28,17 @@ public class Superstructure extends SubsystemBase {
 		shouldStowHoodTrigger.whileTrue(shooter.stowCommand());
     }
 
-    public final Trigger scoringModeTrigger = new Trigger(this::shouldBeScoring);
-    public final Trigger ferryLeftTrigger = new Trigger(this::shouldFerryLeft);
-    public final Trigger ferryRightTrigger = new Trigger(this::shouldFerryRight);
-    public final Trigger shouldStowHoodTrigger = new Trigger(this::shouldStowHood);
+	public final Trigger scoringModeTrigger =
+			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldBeScoring());
+
+	public final Trigger ferryLeftTrigger =
+			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryLeft());
+
+	public final Trigger ferryRightTrigger =
+			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryRight());
+
+	public final Trigger shouldStowHoodTrigger =
+			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldStowHood());
 
     @Override
     public void periodic() {

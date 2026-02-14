@@ -394,7 +394,7 @@ public class FieldConstants {
 			new Translation2d(Meters.zero(), AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(29).get().getMeasureY());
 	}
 
-	public static class ferryWaypoints{
+	public static class FerryWaypoints {
 		// TODO: find these values
 		public static final Translation2d LEFT_FERRYING_POINT = new Translation2d(3, 5);
 		public static final Translation2d RIGHT_FERRYING_POINT = new Translation2d(3, 3);
