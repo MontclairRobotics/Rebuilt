@@ -7,19 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RR0"
+            "pathName": "LL0"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "RR1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "RO1"
+            "pathName": "LD1"
           }
         }
       ]
