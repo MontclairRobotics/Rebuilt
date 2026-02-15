@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter.turret;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -13,11 +14,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.tunables.Tunable;
@@ -207,5 +210,8 @@ public class Turret extends SubsystemBase {
 		Logger.recordOutput("Turret/Robot Relative Angle", getRobotRelativeAngle());
 		visualization.update();
 		visualization.log();
+
+		// AimingConstants.LATENCY = Math.pow((0.04/0.645) * RobotContainer.turret.getFieldRelativeVelocity().getNorm(), 2);
+		if(DriverStation.isTeleopEnabled()) RobotContainer.simShootingParameters = RobotContainer.aiming.calculateSimShot(TargetLocation.HUB, false, true);
 	}
 }

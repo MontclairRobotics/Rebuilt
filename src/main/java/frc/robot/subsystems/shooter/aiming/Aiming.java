@@ -7,7 +7,6 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.ShotSettings;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
@@ -20,8 +19,8 @@ public class Aiming {
 
 	private final Turret turret;
 
-	public Aiming() {
-		this.turret = RobotContainer.turret;
+	public Aiming(Turret turret) {
+		this.turret = turret;
 		TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
 	}
 
@@ -48,8 +47,16 @@ public class Aiming {
 		Angle hoodAngle;
 		AngularVelocity flywheelVelocity;
 
+		Translation2d initalTurretPosition = turret.getFieldRelativePosition();
 		Translation2d turretVelocity = turret.getFieldRelativeVelocity();
-		Translation2d futureTurretPosition = turret.getFieldRelativePosition()
+
+		// Translation2d r = targetLocation.minus(initalTurretPosition);
+		// Translation2d r_hat = r.div(r.getNorm());
+		// double v_radial = turretVelocity.dot(r_hat);
+		// double v_tangent = turretVelocity.minus(r_hat.times(v_radial)).getNorm();
+		// double omega_relative = v_tangent / r.getNorm();
+
+		Translation2d futureTurretPosition = initalTurretPosition
 			.plus(turretVelocity.times(AimingConstants.LATENCY));
 
 		Translation2d displacementToTarget = targetLocation.minus(futureTurretPosition);
@@ -60,7 +67,7 @@ public class Aiming {
 		double estimatedTOF = map.get(realDistanceToTarget).timeOfFlight().in(Seconds);
 
 		if(whileMoving) {
-			for(int i=0; i<5; i++) {
+			for(int i=0; i<8; i++) {
 				virtualTarget = targetLocation.minus(turretVelocity.times(estimatedTOF));
 				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
 				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
@@ -128,7 +135,7 @@ public class Aiming {
 		hoodAngle = map.get(virtualDistance).angle();
 		exitVelocity = map.get(virtualDistance).exitVelocity();
 
-		return new SimShootingParameters(robotRelativeTurretAngle, hoodAngle, exitVelocity);
+		return new SimShootingParameters(turret.toFieldRelativeAngle(robotRelativeTurretAngle), hoodAngle, exitVelocity);
 	}
 
 	public enum TargetLocation {

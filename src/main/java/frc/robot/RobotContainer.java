@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
-import frc.robot.constants.HoodConstants;
 import frc.robot.constants.TurretConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.vision.Vision;
@@ -24,13 +23,15 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
-import frc.robot.util.shooting.StaticPositionShooting;
+import frc.robot.util.tunables.Tunable;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.aiming.Aiming;
+import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
@@ -46,7 +47,6 @@ import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import frc.robot.util.FuelSim;
-import frc.robot.util.PoseUtils;
 
 public class RobotContainer {
 
@@ -63,14 +63,18 @@ public class RobotContainer {
 	public static Shooter shooter;
 	public static Spindexer spindexer;
 	public static Superstructure superstructure;
+	public static Aiming aiming;
+
+	public static SimShootingParameters simShootingParameters = new SimShootingParameters(Degrees.zero(), Degrees.zero(), MetersPerSecond.zero());
+
 
 	private SwerveDriveSimulation driveSimulation;
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
 	public FuelSim fuelSim = new FuelSim("fuel");
 	double launchSpeed=0;
 	double hoodAngle = 20;
-	// Tunable launchSpeedTunable = new Tunable("launch speed (MPS)",5,(value)->launchSpeed = value);
-	// Tunable hoodAngleTunable = new Tunable("launch angle (degree)",20,(value)->hoodAngle = value);
+	Tunable launchSpeedTunable = new Tunable("launch speed (MPS)",5,(value)->launchSpeed = value);
+	Tunable hoodAngleTunable = new Tunable("launch angle (degree)",20,(value)->hoodAngle = value);
 
 	public RobotContainer() {
 			fuelSim.registerRobot(Constants.BUMPER_WIDTH,Constants.BUMPER_WIDTH, Inches.of(6),()->drivetrain.getRobotPose(),()->drivetrain.getState().Speeds);
@@ -85,6 +89,7 @@ public class RobotContainer {
 			spindexer = new Spindexer(new SpindexerIOTalonFX());
 			shooter = new Shooter(hood, flywheel, turret, spindexer);
 			superstructure = new Superstructure(shooter);
+			aiming = new Aiming(turret);
 			vision =
 				new Vision(
 					drivetrain::addVisionMeasurement,
@@ -92,6 +97,7 @@ public class RobotContainer {
 					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading));
 
 				break;
+
 
 		case SIM:
 			flywheel = new Flywheel(new FlywheelIOSim());
@@ -104,6 +110,7 @@ public class RobotContainer {
 			superstructure = new Superstructure(shooter);
 			fuelSim.enableAirResistance();
 			fuelSim.start();
+			aiming = new Aiming(turret);
 			// vision =
 			// 	new Vision(
 			// 		drivetrain::addVisionMeasurement,
@@ -131,25 +138,24 @@ public class RobotContainer {
 
 
 		drivetrain.setDefaultCommand(new JoystickDriveCommand());
-
-		driverController.povDown().whileTrue(Commands.runOnce(()->{hoodAngle=StaticPositionShooting.staticShootCurrentParameters().angle().in(Degrees);launchSpeed=StaticPositionShooting.staticShootCurrentParameters().speed().in(MetersPerSecond);}));
-		driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub())).onFalse(turret.stopCommand());
-		driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub())).onFalse(hood.stopCommand());
-		driverController.circle().whileTrue(Commands.runOnce(()->fuelSim.launchFuel(MetersPerSecond.of(StaticPositionShooting.staticShootCurrentParameters().speed().in(MetersPerSecond)), (Degrees.of(90-StaticPositionShooting.staticShootCurrentParameters().angle().in(Degrees))), turret.getFieldRelativeAngle(),TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
+		// driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub())).onFalse(turret.stopCommand());
+		// driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub())).onFalse(hood.stopCommand());
+		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed), (Degrees.of(90-hoodAngle)), turret.getFieldRelativeAngle(), TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
+		driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(simShootingParameters.exitVelocity(), Degrees.of(90- simShootingParameters.hoodAngle().in(Degrees)), simShootingParameters.turretAngle(), TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
 		// driverController.triangle().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MIN_ANGLE));
 
-		driverController.triangle()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
-		driverController.square()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
-		driverController.cross()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
+		// driverController.triangle()
+		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
+		// driverController.square()
+		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
+		// driverController.cross()
+		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
 		// driverController.circle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
-		driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
+		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
 		// zeros gyro
-		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
+		// driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 	}
 
 	public Command getAutonomousCommand() {
