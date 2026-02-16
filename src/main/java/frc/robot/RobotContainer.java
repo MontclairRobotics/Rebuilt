@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
-import frc.robot.constants.TurretConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
@@ -57,11 +56,13 @@ public class RobotContainer {
 	// Subsystems
 	public static Vision vision;
 	public static CommandSwerveDrivetrain drivetrain;
+
+	public static Shooter shooter;
 	public static Flywheel flywheel;
 	public static Turret turret;
 	public static Hood hood;
-	public static Shooter shooter;
 	public static Spindexer spindexer;
+
 	public static Superstructure superstructure;
 	public static Aiming aiming;
 
@@ -69,7 +70,10 @@ public class RobotContainer {
 
 	private SwerveDriveSimulation driveSimulation;
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
-	public FuelSim fuelSim = new FuelSim("fuel");
+	public static FuelSim fuelSim = new FuelSim("fuel");
+
+	private boolean withConstantVelocity = false;
+	private boolean whileMoving = true;
 
 	double launchSpeed = 0;
 	double hoodAngle = 20;
@@ -77,7 +81,13 @@ public class RobotContainer {
 	Tunable hoodAngleTunable = new Tunable("launch angle (degree)",20,(value)->hoodAngle = value);
 
 	public RobotContainer() {
-			fuelSim.registerRobot(Constants.BUMPER_WIDTH,Constants.BUMPER_WIDTH, Inches.of(6),()->drivetrain.getRobotPose(),()->drivetrain.getState().Speeds);
+			fuelSim.registerRobot(
+				Constants.BUMPER_WIDTH,
+				Constants.BUMPER_WIDTH,
+				Inches.of(6),
+				() -> drivetrain.getRobotPose(),
+				() -> drivetrain.getFieldRelativeSpeeds()
+			);
 			fuelSim.registerIntake(Inches.of(15), Inches.of(22), Inches.of(-15), Inches.of(15));
 			// fuelSim.spawnStartingFuel();
 		switch (Constants.CURRENT_MODE) {
@@ -87,7 +97,10 @@ public class RobotContainer {
 			turret = new Turret(new TurretIOTalonFX());
 			hood = new Hood(new HoodIOTalonFX());
 			spindexer = new Spindexer(new SpindexerIOTalonFX());
-			shooter = new Shooter(hood, flywheel, turret, spindexer);
+			shooter = new Shooter(
+				hood, flywheel, turret, spindexer,
+				withConstantVelocity, whileMoving
+			);
 			superstructure = new Superstructure(shooter);
 			aiming = new Aiming(turret);
 			vision =
@@ -106,7 +119,10 @@ public class RobotContainer {
 			turret = new Turret(new TurretIOSim());
 			hood = new Hood(new HoodIOSim());
 			spindexer = new Spindexer(new SpindexerIOSim());
-			shooter = new Shooter(hood, flywheel, turret, spindexer);
+			shooter = new Shooter(
+				hood, flywheel, turret, spindexer,
+				withConstantVelocity, whileMoving
+			);
 			superstructure = new Superstructure(shooter);
 			fuelSim.enableAirResistance();
 			fuelSim.start();
@@ -141,7 +157,7 @@ public class RobotContainer {
 		// driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub())).onFalse(turret.stopCommand());
 		// driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub())).onFalse(hood.stopCommand());
 		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed), (Degrees.of(90-hoodAngle)), turret.getFieldRelativeAngle(), TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
-		driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(simShootingParameters.exitVelocity(), Degrees.of(90- simShootingParameters.hoodAngle().in(Degrees)), simShootingParameters.turretAngle(), TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
+		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(simShootingParameters.exitVelocity(), Degrees.of(90- simShootingParameters.hoodAngle().in(Degrees)), simShootingParameters.robotRelativeTurretAngle(), TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
 		// driverController.triangle().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MIN_ANGLE));
 

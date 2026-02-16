@@ -50,12 +50,6 @@ public class Aiming {
 		Translation2d initalTurretPosition = turret.getFieldRelativePosition();
 		Translation2d turretVelocity = turret.getFieldRelativeVelocity();
 
-		// Translation2d r = targetLocation.minus(initalTurretPosition);
-		// Translation2d r_hat = r.div(r.getNorm());
-		// double v_radial = turretVelocity.dot(r_hat);
-		// double v_tangent = turretVelocity.minus(r_hat.times(v_radial)).getNorm();
-		// double omega_relative = v_tangent / r.getNorm();
-
 		Translation2d futureTurretPosition = initalTurretPosition
 			.plus(turretVelocity.times(AimingConstants.LATENCY));
 
@@ -67,7 +61,7 @@ public class Aiming {
 		double estimatedTOF = map.get(realDistanceToTarget).timeOfFlight().in(Seconds);
 
 		if(whileMoving) {
-			for(int i=0; i<8; i++) {
+			for(int i = 0; i < 5; i++) {
 				virtualTarget = targetLocation.minus(turretVelocity.times(estimatedTOF));
 				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
 				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
@@ -120,12 +114,12 @@ public class Aiming {
 		double estimatedTOF = map.get(realDistanceToTarget).timeOfFlight().in(Seconds);
 
 		if(whileMoving) {
-			for(int i=0; i<5; i++) {
+			for(int i = 0; i < 5; i++) {
 				virtualTarget = targetLocation.minus(turretVelocity.times(estimatedTOF));
 				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
 				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
 
-				if(Math.abs(newTOF - estimatedTOF) < 0.02) break;
+				if (Math.abs(newTOF - estimatedTOF) < 0.02) break;
 				estimatedTOF = newTOF;
 			}
 		}
@@ -135,7 +129,7 @@ public class Aiming {
 		hoodAngle = map.get(virtualDistance).angle();
 		exitVelocity = map.get(virtualDistance).exitVelocity();
 
-		return new SimShootingParameters(turret.toFieldRelativeAngle(robotRelativeTurretAngle), hoodAngle, exitVelocity);
+		return new SimShootingParameters(robotRelativeTurretAngle, hoodAngle, exitVelocity);
 	}
 
 	public enum TargetLocation {

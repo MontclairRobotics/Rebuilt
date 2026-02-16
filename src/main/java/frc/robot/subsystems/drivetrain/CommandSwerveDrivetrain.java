@@ -22,7 +22,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,7 +30,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -194,7 +192,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 		try {
 			config = RobotConfig.fromGUISettings();
-		} 
+		}
 		catch (Exception e) {}
 
 		tagLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
@@ -262,6 +260,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		return wrapAngle(odometryHeading);
 	}
 
+	public ChassisSpeeds getFieldRelativeSpeeds() {
+		return ChassisSpeeds.fromRobotRelativeSpeeds(this.getState().Speeds, getWrappedHeading());
+	}
+
 	public double getStrafeVelocityFromController() {
 		double xInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.1);
 		return MathUtil.copyDirectionPow(xInput, JOYSTICK_INPUT_GAIN) * MAX_SPEED.in(MetersPerSecond);
@@ -284,7 +286,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 			getOmegaVelocityFromController(),
 			fieldRelative,
 			true
-		); 
+		);
 	}
 
 	public Rotation2d getSnakeDriveAngle() {
@@ -482,7 +484,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		DogLog.log("Drive/OdometryPose", getState().Pose);
 		DogLog.log("Drive/TargetStates", getState().ModuleTargets);
 		DogLog.log("Drive/MeasuredStates", getState().ModuleStates);
-		DogLog.log("Drive/MeasuredSpeeds", getState().Speeds);
+		DogLog.log("Drive/RobotRelativeSpeeds", getState().Speeds);
 
 		if (mapleSimSwerveDrivetrain != null) {
 		DogLog.log(

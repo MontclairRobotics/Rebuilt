@@ -82,20 +82,13 @@ public class AimingConstants {
 		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), SimShotSettings::interpolate);
 
 	static {
-		REAL_MAP.put(0.0, new ShotSettings(Rotations.of(0), RotationsPerSecond.of(0), Seconds.of(0), false));
+
 		SIM_CONSTANT_VELOCITY_MAP.put(1.540124, new SimShotSettings(Degrees.of(6), MetersPerSecond.of(9.5), Seconds.of(1.61), true));
 		SIM_CONSTANT_VELOCITY_MAP.put(2.367771, new SimShotSettings(Degrees.of(9.5), MetersPerSecond.of(9.5), Seconds.of(1.58), true));
 		SIM_CONSTANT_VELOCITY_MAP.put(3.510013, new SimShotSettings(Degrees.of(14), MetersPerSecond.of(9.5), Seconds.of(1.58), true));
 		SIM_CONSTANT_VELOCITY_MAP.put(4.586577, new SimShotSettings(Degrees.of(20), MetersPerSecond.of(9.5), Seconds.of(1.5), true));
 		SIM_CONSTANT_VELOCITY_MAP.put(5.653741, new SimShotSettings(Degrees.of(28), MetersPerSecond.of(9.5), Seconds.of(1.42), true));
 
-		// SIM_MAP.put(5.653741, new SimShotSettings(Degrees.of(28), MetersPerSecond.of(9.5), Seconds.of(1.42), false));//TODO:get time
-		// SIM_MAP.put(5.826633877745524, new SimShotSettings(Degrees.of(28), MetersPerSecond.of(9.2), Seconds.of(0), false));//TODO:get time
-		// SIM_MAP.put(3.999783393399773, new SimShotSettings(Degrees.of(28), MetersPerSecond.of(8), Seconds.of(0), false));//TODO:get time
-		// SIM_MAP.put(4.9556367067256595, new SimShotSettings(Degrees.of(28), MetersPerSecond.of(8.5), Seconds.of(0), false));//TODO:get time
-		// SIM_MAP.put(2.9955979444441723, new SimShotSettings(Degrees.of(28), MetersPerSecond.of(7.15), Seconds.of(0.86), false));//TODO:get time
-		// SIM_MAP.put(1.9903752661244565, new SimShotSettings(Degrees.of(25), MetersPerSecond.of(6.5), Seconds.of(0.82),false));
-	
 		SIM_MAP.put(0.99912, new SimShotSettings(Degrees.of(7), MetersPerSecond.of(7), Seconds.of(1.12), false));
 		SIM_MAP.put(2.005294, new SimShotSettings(Degrees.of(16), MetersPerSecond.of(7), Seconds.of(1.12), false));
 		SIM_MAP.put(3.000977, new SimShotSettings(Degrees.of(22), MetersPerSecond.of(7.4), Seconds.of(1), false));
@@ -103,19 +96,21 @@ public class AimingConstants {
 		SIM_MAP.put(4.998351, new SimShotSettings(Degrees.of(33), MetersPerSecond.of(8.6), Seconds.of(1.1), false));
 		SIM_MAP.put(5.714192, new SimShotSettings(Degrees.of(37), MetersPerSecond.of(9), Seconds.of(1.14), false));
 
+		SIM_FERRY_MAP.put(0.0, new SimShotSettings(Degrees.zero(), MetersPerSecond.zero(), Seconds.zero(), false));
+		SIM_CONSTANT_VELOCITY_FERRY_MAP.put(0.0, new SimShotSettings(Degrees.zero(), MetersPerSecond.zero(), Seconds.zero(), true));
 	}
 
-	public record ShootingParameters(Angle turretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity) {
-		public ShootingParameters(Angle turretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity) {
-			this.turretAngle = turretAngle;
+	public record ShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity) {
+		public ShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity) {
+			this.robotRelativeTurretAngle = robotRelativeTurretAngle;
 			this.hoodAngle = hoodAngle;
 			this.flywheelVelocity = flywheelVelocity;
 		}
 	}
 
-	public record SimShootingParameters(Angle turretAngle, Angle hoodAngle, LinearVelocity exitVelocity) {
-		public SimShootingParameters(Angle turretAngle, Angle hoodAngle, LinearVelocity exitVelocity) {
-			this.turretAngle = turretAngle;
+	public record SimShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, LinearVelocity exitVelocity) {
+		public SimShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, LinearVelocity exitVelocity) {
+			this.robotRelativeTurretAngle = robotRelativeTurretAngle;
 			this.hoodAngle = hoodAngle;
 			this.exitVelocity = exitVelocity;
 		}

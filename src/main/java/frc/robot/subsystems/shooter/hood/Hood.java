@@ -6,9 +6,7 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
@@ -16,16 +14,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import static frc.robot.constants.HoodConstants.TOLERANCE;
-import static frc.robot.constants.HoodConstants.kD;
+import frc.robot.constants.HoodConstants;
+
 import static frc.robot.constants.HoodConstants.kG;
-import static frc.robot.constants.HoodConstants.kI;
-import static frc.robot.constants.HoodConstants.kP;
 import static frc.robot.constants.HoodConstants.kS;
 import static frc.robot.constants.HoodConstants.kV;
-import static frc.robot.constants.TurretConstants.TUNABLE_GAINS;
 
-import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.tunables.Tunable;
 import frc.robot.util.tunables.TunablePIDController;
@@ -48,7 +42,7 @@ public class Hood extends SubsystemBase {
 		Tunable kGTunable = new Tunable("Hood/Hood kG", kG, (value) -> feedforward.setKg(value));
 		Tunable kVTunable = new Tunable("Hood/Hood kV", kV, (value) -> feedforward.setKv(value));
 
-		pidController = new TunablePIDController(TUNABLE_GAINS);
+		pidController = new TunablePIDController(HoodConstants.TUNABLE_GAINS);
 		feedforward = new ArmFeedforward(kS, kG, kV);
 	}
 
@@ -72,6 +66,7 @@ public class Hood extends SubsystemBase {
 	}
 
 	public void setAngle(Angle angle) {
+		Logger.recordOutput("Hood/Target Angle", angle);
 		double pidVoltage = pidController.calculate(io.getAngle().in(Rotations), angle.in(Rotations));
 		double feedforwardVoltage = feedforward.calculate(io.getAngle().in(Rotations), 0);
 		io.setVoltage(pidVoltage + feedforwardVoltage);
@@ -84,6 +79,7 @@ public class Hood extends SubsystemBase {
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Hood", inputs);
+		Logger.recordOutput("Hood/Hood Angle", getAngle());
 		visualization.update();
 		visualization.log();
 	}

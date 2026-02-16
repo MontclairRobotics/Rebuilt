@@ -15,10 +15,10 @@ public class TurretVisualization {
 
 	public void update() {
 		turretPose = new Pose3d(
-			TurretConstants.ORIGIN_TO_TURRET, 
+			TurretConstants.ORIGIN_TO_TURRET,
 			new Rotation3d(
-				Rotations.zero(), 
-				Rotations.zero(), 
+				Rotations.zero(),
+				Rotations.zero(),
 				RobotContainer.turret.getRobotRelativeAngle()
 			)
 		);

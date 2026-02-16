@@ -1,9 +1,7 @@
 package frc.robot.subsystems.shooter.turret;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,14 +21,12 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
-import frc.robot.util.tunables.Tunable;
 import frc.robot.util.tunables.TunablePIDController;
 
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.controller.PIDController;
 
 /**
  * The TurretIOHardware class interfaces with the TalonFX motor controller and CANCoders to manage
@@ -99,7 +95,7 @@ public class Turret extends SubsystemBase {
 	 * @return the target turret velocity for a given robot angular velocity, which is just that angular velocity
 	 */
 	public AngularVelocity calculateTargetVelocity() {
-		Logger.recordOutput("Turret/Calculated Target Velocity", RadiansPerSecond.of(RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond).in(RotationsPerSecond));
+		// Logger.recordOutput("Turret/Calculated Target Velocity", RadiansPerSecond.of(RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond).in(RotationsPerSecond));
 		return RadiansPerSecond.of(RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond);
 	}
 
@@ -136,8 +132,8 @@ public class Turret extends SubsystemBase {
 	 * @param angle the robot relative angle to align to
 	 */
 	public void setRobotRelativeAngle(Angle angle) {
+		// Logger.recordOutput("Turret/Target Robot Relative Anlge", angle);
 		pidController.setSetpoint(constrainAngle(angle).in(Rotations));
-
 		io.setVoltage(pidController.calculate(io.getRobotRelativeAngle().in(Rotations)));
 	}
 
@@ -149,17 +145,8 @@ public class Turret extends SubsystemBase {
 		return Commands.runOnce(() -> io.stop());
 	}
 
-	public Command setFieldRelativeAngleCommand(Angle angle) {
-		return Commands.run(() -> {
-			setFieldRelativeAngle(angle);
-		}).until(this::atSetpoint);
-	}
-
-	public Command setFieldRelativeAngleCommand(Supplier<Angle> angleSupplier) {
-		return Commands.run(() -> {
-			setFieldRelativeAngle(angleSupplier.get());
-			Logger.recordOutput("Turret/targetFieldRelativeAngleRotations", angleSupplier.get().in(Rotations));
-		});
+	public Command setRobotRelativeAngleCommand(Supplier<Angle> angleSupplier) {
+		return Commands.run(() -> setRobotRelativeAngle(angleSupplier.get()));
 	}
 
 	public Translation2d getFieldRelativePosition() {
@@ -171,7 +158,7 @@ public class Turret extends SubsystemBase {
 
 
 	public Translation2d getFieldRelativeVelocity() {
-		ChassisSpeeds robotSpeeds = RobotContainer.drivetrain.getState().Speeds;
+		ChassisSpeeds fieldSpeeds = RobotContainer.drivetrain.getFieldRelativeSpeeds();
 		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
 		Rotation2d robotHeading = robotPose.getRotation();
 		Translation2d fieldRelativeOffset = TURRET_OFFSET.rotateBy(robotHeading);
@@ -180,12 +167,12 @@ public class Turret extends SubsystemBase {
 		Rotation2d tangentialDirection = offsetAngle.plus(Rotation2d.fromDegrees(90));
 
 		double offsetMagnitude = fieldRelativeOffset.getNorm();
-		double tangentialVelocityMagnitude = robotSpeeds.omegaRadiansPerSecond * offsetMagnitude;
+		double tangentialVelocityMagnitude = fieldSpeeds.omegaRadiansPerSecond * offsetMagnitude;
 		Translation2d tangentialVelocity = new Translation2d(tangentialVelocityMagnitude, tangentialDirection);
 
 		return new Translation2d(
-			robotSpeeds.vxMetersPerSecond + tangentialVelocity.getX(),
-			robotSpeeds.vyMetersPerSecond + tangentialVelocity.getY()
+			fieldSpeeds.vxMetersPerSecond + tangentialVelocity.getX(),
+			fieldSpeeds.vyMetersPerSecond + tangentialVelocity.getY()
 		);
 	}
 

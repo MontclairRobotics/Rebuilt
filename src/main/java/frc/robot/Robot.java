@@ -91,8 +91,9 @@ public class Robot extends LoggedRobot {
 				.withCaptureNt(true));
 		DogLog.setPdh(new PowerDistribution());
 		if (isSimulation()) {
-		// Do not spam the logs with "Button x on port y not available" log messages.
-		DriverStation.silenceJoystickConnectionWarning(true);
+			// Do not spam the logs with "Button x on port y not available" log messages.
+			DriverStation.silenceJoystickConnectionWarning(true);
+			robotContainer.resetSimulation();
 		}
 	}
 	/** This function is called periodically during all modes. */

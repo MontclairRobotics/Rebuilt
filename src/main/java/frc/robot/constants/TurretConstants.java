@@ -46,7 +46,7 @@ public class TurretConstants {
 
 	public static final ControlConstants GAINS = new ControlConstants()
 		.withPID(kP, kI, kD)
-		.withProfiled(true)
+		.withProfiled(false)
 		.withTolerance(ANGLE_TOLERANCE.in(Rotations));
 
 	public static final TunableControlConstants TUNABLE_GAINS = new TunableControlConstants(

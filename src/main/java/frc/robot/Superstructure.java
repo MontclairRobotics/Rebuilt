@@ -7,9 +7,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import static edu.wpi.first.units.Units.Meters;
+import static frc.robot.constants.Constants.CURRENT_MODE;
+import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.FERRY_LEFT;
+import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.FERRY_RIGHT;
+import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.HUB;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.Mode;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
@@ -22,10 +28,41 @@ public class Superstructure extends SubsystemBase {
 
     public Superstructure(Shooter shooter) {
 		this.shooter = shooter;
-		scoringModeTrigger.whileTrue(shooter.scoringCommand());
-		ferryLeftTrigger.whileTrue(shooter.ferryingLeftCommand());
-		ferryRightTrigger.whileTrue(shooter.ferryRightCommand());
-		shouldStowHoodTrigger.whileTrue(shooter.stowCommand());
+		if(CURRENT_MODE == Mode.SIM) {
+			scoringModeTrigger.whileTrue(
+				shooter.setSimParameters(
+					() -> RobotContainer.aiming.calculateSimShot(
+						HUB, shooter.withConstantVelocity, shooter.whileMoving)
+				));
+			ferryLeftTrigger.whileTrue(
+				shooter.setSimParameters(
+					() -> RobotContainer.aiming.calculateSimShot(
+						FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
+				));
+			ferryRightTrigger.whileTrue(
+				shooter.setSimParameters(
+					() -> RobotContainer.aiming.calculateSimShot(
+						FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
+				));
+			shouldStowHoodTrigger.whileTrue(
+				shooter.stowCommand());
+		} else {
+			scoringModeTrigger.whileTrue(
+				shooter.setParameters(
+					() -> RobotContainer.aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
+				));
+			ferryLeftTrigger.whileTrue(
+				shooter.setParameters(
+					() -> RobotContainer.aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
+				));
+			ferryRightTrigger.whileTrue(
+				shooter.setParameters(
+					() -> RobotContainer.aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
+				));
+			shouldStowHoodTrigger.whileTrue(
+				shooter.stowCommand());
+		}
+
     }
 
 	public final Trigger scoringModeTrigger =

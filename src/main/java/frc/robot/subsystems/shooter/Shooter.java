@@ -4,28 +4,47 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
+import static frc.robot.constants.TurretConstants.ORIGIN_TO_TURRET;
+
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
+import frc.robot.commands.LaunchFuelCommand;
 import frc.robot.constants.HoodConstants;
 import frc.robot.constants.TurretConstants;
+import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
+import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 import frc.robot.subsystems.shooter.turret.Turret;
-import frc.robot.util.FieldConstants;
 
-public class Shooter {
+public class Shooter extends SubsystemBase {
+
     private Hood hood;
     private Flywheel flywheel;
     private Turret turret;
     private Spindexer spindexer;
-    public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer){
+
+    public boolean withConstantVelocity;
+    public boolean whileMoving;
+
+    public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean withConstantVelocity, boolean whileMoving) {
         this.hood = hood;
         this.flywheel = flywheel;
         this.turret = turret;
         this.spindexer = spindexer;
+        this.withConstantVelocity = withConstantVelocity;
+        this.whileMoving = whileMoving;
     }
 
 	public Pose3d getFieldRelativePosition() {
@@ -44,56 +63,58 @@ public class Shooter {
 		);
 	}
 
-    public Command aimToHubCommand(){
+    public boolean atSetpoint() {
+        return true;
+    }
+
+    public Command setParameters(Supplier<ShootingParameters> paramsSupplier) {
         return Commands.parallel(
-            turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub())
-            // hood.setAngleCommand(() -> hood.getAngleToHub())
+            turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle()),
+            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
+            indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
         );
     }
 
-    public Command aimToPointCommand(Translation2d point, double height){
+    public Command setSimParameters(Supplier<SimShootingParameters> paramsSupplier) {
         return Commands.parallel(
-            turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(point)),
-            hood.setAngleCommand(() -> hood.getAngleToPoint(point, height))
+            Commands.run(() -> {
+                SimShootingParameters params = paramsSupplier.get();
+                Logger.recordOutput("setSimParameters()/Robot Relative Turret Angle", params.robotRelativeTurretAngle());
+                Logger.recordOutput("setSimParameters()/Hood Angle", params.hoodAngle());
+                Logger.recordOutput("setSimParameters()/Exit Velocity", params.exitVelocity());
+            }),
+            turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle()),
+            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
+            new LaunchFuelCommand(paramsSupplier, 6)
         );
     }
-    public Command shootToHubCommand(AngularVelocity targetRPS){
-        return Commands.parallel(
-            turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()),
-            // hood.setAngleCommand(() -> hood.getAngleToHub()),
-            flywheel.holdVelocityCommand(targetRPS),
-            spindexer.spinCommand()
-        );
+
+    public Command indexAndShootCommand(Supplier<AngularVelocity> flywheelVelocitySupplier) {
+        return Commands.run(() -> {
+            if (RobotContainer.driverController.circle().getAsBoolean() && this.atSetpoint()) {
+                spindexer.spin();
+                flywheel.setVelocityRPS(flywheelVelocitySupplier);
+            }
+        });
     }
 
-    public Command shootToPointCommand(Translation2d point, double height, AngularVelocity targetRPS){
-        return Commands.parallel(
-            turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(point)),
-            hood.setAngleCommand(() -> hood.getAngleToPoint(point, height)),
-            flywheel.holdVelocityCommand(targetRPS),
-            spindexer.spinCommand()
-            );
-    }
+    public Command launchFuelCommand(Supplier<SimShootingParameters> paramsSupplier) {
+        return Commands.run(() -> {
+            if (RobotContainer.driverController.circle().getAsBoolean() && this.atSetpoint()) {
+                SimShootingParameters params = paramsSupplier.get();
 
+                Logger.recordOutput("launchFuelCommand()/Robot Relative Turret Angle", params.robotRelativeTurretAngle());
+                Logger.recordOutput("launchFuelCommand()/Hood Angle", params.hoodAngle());
+                Logger.recordOutput("launchFuelCommand()/Exit Velocity", params.exitVelocity());
 
-    public Command scoringCommand(){
-        return Commands.parallel(
-            turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub())
-            // hood.setAngleCommand(() -> hood.getAngleToHub())
-        );
-    }
-    
-
-    public Command ferryingLeftCommand() {
-        return Commands.parallel (
-        turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT)),
-        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT, FieldConstants.FerryWaypoints.LEFT_FERRYING_HEIGHT)));
-    }
-
-    public Command ferryRightCommand(){
-        return Commands.parallel (
-        turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT)),
-        hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT, FieldConstants.FerryWaypoints.RIGHT_FERRYING_HEIGHT)));
+                RobotContainer.fuelSim.launchFuel(
+                    params.exitVelocity(),
+                    Degrees.of(90).minus(params.hoodAngle()),
+                    params.robotRelativeTurretAngle(),
+                    ORIGIN_TO_TURRET.getMeasureZ()
+                );
+            }
+        });
     }
 
     public Command stowCommand(){
