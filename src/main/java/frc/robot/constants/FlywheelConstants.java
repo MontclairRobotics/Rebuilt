@@ -10,7 +10,7 @@ public class FlywheelConstants {
 	public static final int LEFT_CAN_ID = 0;
 	public static final int RIGHT_CAN_ID = 0;
 
-	public static final AngularVelocity TOLERANCE = RotationsPerSecond.of(0.5);
+	public static final AngularVelocity TOLERANCE = RotationsPerSecond.of(1);
 
 	public static final double kP = 0;
 	public static final double kI = 0;

@@ -56,10 +56,13 @@ import static frc.robot.constants.DriveConstants.JOYSTICK_INPUT_GAIN;
 import static frc.robot.constants.DriveConstants.JOYSTICK_INPUT_ROT_GAIN;
 import static frc.robot.constants.DriveConstants.MAX_ANGULAR_SPEED;
 import static frc.robot.constants.DriveConstants.MAX_SPEED;
-import frc.robot.util.MapleSimSwerveDrivetrain;
+import static frc.robot.constants.DriveConstants.TUNABLE_ROTATION_GAINS;
+
 import frc.robot.util.PoseUtils;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.util.sim.MapleSimSwerveDrivetrain;
+import frc.robot.util.tunables.TunablePIDController;
 
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
 
@@ -140,10 +143,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
 
 	public AprilTagFieldLayout tagLayout =
-		AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded); // TODO: SET
+		AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
 	/* Heading PID Controller for things like automatic alignment buttons */
-	public PIDController thetaController = new PIDController(16, 0, 0.1);
+	public TunablePIDController thetaController = new TunablePIDController(TUNABLE_ROTATION_GAINS);
 
 	/* variable to store our heading */
 	public Rotation2d odometryHeading = new Rotation2d();
@@ -191,14 +194,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 		try {
 			config = RobotConfig.fromGUISettings();
-		} catch (Exception e) {}
+		} 
+		catch (Exception e) {}
 
 		tagLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
 		fieldRelative = true;
-		// configureAutoBuilder();
+		configureAutoBuilder();
 
-		thetaController.setTolerance(Degrees.of(1).in(Radians));
-		thetaController.enableContinuousInput(-Math.PI, Math.PI);
 	}
 
 	private void configureAutoBuilder() {
@@ -243,6 +245,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		return m_sysIdRoutineToApply.dynamic(direction);
 	}
 
+	/**
+	 * @param ang Rotation2d to be wrapped
+	 * @return a new Rotation2d object wrapped from -180 to 180 degrees
+	 */
 	public static Rotation2d wrapAngle(Rotation2d ang) {
 		double angle = ang.getDegrees();
 		angle = (angle + 180) % 360; // Step 1 and 2
@@ -278,7 +284,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 			getOmegaVelocityFromController(),
 			fieldRelative,
 			true
-		); // drives
+		); 
 	}
 
 	public Rotation2d getSnakeDriveAngle() {
@@ -287,14 +293,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		return new Rotation2d(x, y).plus(Rotation2d.kCW_90deg);
 	}
 
-	public void drive(
-		ChassisSpeeds speeds, boolean fieldRelative, boolean respectOperatorPerspective) {
+	public void drive(ChassisSpeeds speeds, boolean fieldRelative, boolean respectOperatorPerspective) {
 		drive(
 			speeds.vxMetersPerSecond,
 			speeds.vyMetersPerSecond,
 			speeds.omegaRadiansPerSecond,
 			fieldRelative,
-			respectOperatorPerspective);
+			respectOperatorPerspective
+		);
 	}
 
 	public void drive(
@@ -366,8 +372,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		}
 	}
 
-	public void alignToAngleRobotRelativeContinuous(
-		Supplier<Rotation2d> angleSup, boolean lockDrive) {
+	public void alignToAngleRobotRelativeContinuous(Supplier<Rotation2d> angleSup, boolean lockDrive) {
 		setRobotRelativeAngle(angleSup.get());
 		alignToAngleRobotRelative(lockDrive);
 	}
@@ -493,7 +498,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		mapleSimSwerveDrivetrain =
 			new MapleSimSwerveDrivetrain(
 				Seconds.of(kSimLoopPeriod),
-				// TODO: modify the following constants according to our robot
 				ROBOT_MASS, // robot weight
 				BUMPER_WIDTH, // bumper length
 				BUMPER_WIDTH, // bumper width

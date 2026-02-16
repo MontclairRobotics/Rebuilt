@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
 import frc.robot.Superstructure;
 import frc.robot.constants.DriveConstants;
-import static frc.robot.constants.DriveConstants.MIN_VELOCITY_FOR_TRENCH_AND_BUMP_LOCKS;
+import static frc.robot.constants.DriveConstants.SIGNIFICANT_VELOCITY;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
@@ -77,7 +77,7 @@ public class JoystickDriveCommand extends Command {
 	}
 
 	private boolean drivingBiasedForwards() {
-		return Math.abs(xVelocitySupplier.getAsDouble()) > MIN_VELOCITY_FOR_TRENCH_AND_BUMP_LOCKS.in(MetersPerSecond)
+		return Math.abs(xVelocitySupplier.getAsDouble()) > SIGNIFICANT_VELOCITY.in(MetersPerSecond)
 			&& Math.abs(yVelocitySupplier.getAsDouble()) < Math.abs(xVelocitySupplier.getAsDouble());
 	}
 

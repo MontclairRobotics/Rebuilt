@@ -8,7 +8,7 @@ public interface RollersIO {
 
 	@AutoLog
 	public static class RollersIOInputs {
-		public double velocity = 0;
+		public double motorVelocity = 0;
 		public double appliedVoltage = 0;
 		public double temperature = 0;
 		public double current = 0;
@@ -34,5 +34,5 @@ public interface RollersIO {
 	/**
 	 * @return the velocity of the motor.
 	 */
-	public AngularVelocity getVelocity();
+	public AngularVelocity getMotorVelocity();
 }

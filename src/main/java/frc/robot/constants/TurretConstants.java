@@ -27,7 +27,6 @@ public class TurretConstants {
 	public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(4);
 	public static final AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(16);
 	public static final Angle ANGLE_TOLERANCE = Rotations.of(0.005);
-	public static final AngularVelocity ANGULAR_VELOCITY_TOLERANCE = RotationsPerSecond.of(1);
 
 	// physical properties
 	public static final double MOMENT_OF_INERTIA = 0.154244993; //From CAD on 2026.02.12
@@ -41,14 +40,14 @@ public class TurretConstants {
 	public static final Angle ANGLE_OFFSET = Rotations.of(0.5); // turret zero is perpendicular to gyro zero, pointed to the left
 
 	// pid + ff gains
-	public static final double kP = 138; //Tuned PID in Simulation
+	public static final double kP = 138; // Tuned PID in Simulation
 	public static final double kI = 10;
 	public static final double kD = 5;
 
 	public static final ControlConstants GAINS = new ControlConstants()
 		.withPID(kP, kI, kD)
 		.withProfiled(true)
-		.withTolerance(ANGLE_TOLERANCE.in(Rotations), ANGULAR_VELOCITY_TOLERANCE.in(RotationsPerSecond));
+		.withTolerance(ANGLE_TOLERANCE.in(Rotations));
 
 	public static final TunableControlConstants TUNABLE_GAINS = new TunableControlConstants(
 		"Turret", GAINS

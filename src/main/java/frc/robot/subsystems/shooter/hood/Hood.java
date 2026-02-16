@@ -23,15 +23,19 @@ import static frc.robot.constants.HoodConstants.kI;
 import static frc.robot.constants.HoodConstants.kP;
 import static frc.robot.constants.HoodConstants.kS;
 import static frc.robot.constants.HoodConstants.kV;
+import static frc.robot.constants.TurretConstants.TUNABLE_GAINS;
+
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.tunables.Tunable;
+import frc.robot.util.tunables.TunablePIDController;
 
 public class Hood extends SubsystemBase {
-	public HoodIO io;
-	private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 
-	public PIDController pidController;
+	private final HoodIO io;
+	private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
+
+	public TunablePIDController pidController;
 	public ArmFeedforward feedforward;
 
 	private HoodVisualization visualization;
@@ -40,25 +44,12 @@ public class Hood extends SubsystemBase {
 		this.io = hoodIO;
 		this.visualization = new HoodVisualization();
 
-		Tunable kPTunable = new Tunable("hood kP", kP, (value) -> pidController.setP(value));
-		Tunable kITunable = new Tunable("hood kI", kI, (value) -> pidController.setI(value));
-		Tunable kDTunable = new Tunable("hood kD", kD, (value) -> pidController.setD(value));
-		Tunable kSTunable = new Tunable("hood ks", kS, (value) -> feedforward.setKs(value));
-		Tunable kGTunable = new Tunable("hood kg", kG, (value) -> feedforward.setKg(value));
-		Tunable kVTunable = new Tunable("hood kv", kV, (value) -> feedforward.setKv(value));
+		Tunable kSTunable = new Tunable("Hood/Hood kS", kS, (value) -> feedforward.setKs(value));
+		Tunable kGTunable = new Tunable("Hood/Hood kG", kG, (value) -> feedforward.setKg(value));
+		Tunable kVTunable = new Tunable("Hood/Hood kV", kV, (value) -> feedforward.setKv(value));
 
-		pidController = new PIDController(kP, kI, kD);
-		pidController.setTolerance(TOLERANCE.in(Rotations));
+		pidController = new TunablePIDController(TUNABLE_GAINS);
 		feedforward = new ArmFeedforward(kS, kG, kV);
-	}
-
-	public Angle getAngleToHub() {
-		// double heightMeters = FieldConstants.Hub.HEIGHT.in(Meters) - 0.30;
-		double distance = FieldConstants.Hub.HUB_LOCATION.minus(RobotContainer.drivetrain.getRobotPose().getTranslation()).getNorm();
-		// return Radians.of(Math.PI/2).minus(Radians.of(Math.atan(heightMeters/distance)));
-
-		//until we get look up table, super fucky
-		return Degrees.of((distance/3) * 36);
 	}
 
 	public Angle getAngle() {
@@ -71,18 +62,17 @@ public class Hood extends SubsystemBase {
 		return Radians.of(Math.PI/2).minus(Radians.of(Math.atan(heightMeters/distance)));
 	}
 
-
 	public void applyJoystickInput() {
 		double voltage = Math.pow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.04), 3) * 3;
 		io.setVoltage(voltage);
 	}
 
-	public void setAngle(Supplier<Angle> goalSupplier) {
-		setAngle(goalSupplier.get());
+	public void setAngle(Supplier<Angle> angleSupplier) {
+		setAngle(angleSupplier.get());
 	}
 
-	public void setAngle(Angle goal) {
-		double pidVoltage = pidController.calculate(io.getAngle().in(Rotations), goal.in(Rotations));
+	public void setAngle(Angle angle) {
+		double pidVoltage = pidController.calculate(io.getAngle().in(Rotations), angle.in(Rotations));
 		double feedforwardVoltage = feedforward.calculate(io.getAngle().in(Rotations), 0);
 		io.setVoltage(pidVoltage + feedforwardVoltage);
 	}
@@ -102,8 +92,8 @@ public class Hood extends SubsystemBase {
 		return Commands.runOnce(() -> io.stop());
 	}
 
-	public Command setAngleCommand(Supplier<Angle> supplier) {
-		return Commands.run(() -> setAngle(supplier), this);
+	public Command setAngleCommand(Supplier<Angle> angleSupplier) {
+		return Commands.run(() -> setAngle(angleSupplier), this);
 	}
 
 	public Command setAngleCommand(Angle angle) {

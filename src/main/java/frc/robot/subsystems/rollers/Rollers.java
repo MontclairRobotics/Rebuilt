@@ -35,19 +35,17 @@ public class Rollers extends SubsystemBase {
 		Logger.processInputs("Intake", inputs);
 	}
 
-	// --------------------------COMMANDS--------------------------
-
 	public Command stopCommand() {
-		return Commands.runOnce(this::stop, this);
+		return Commands.runOnce(() -> stop(), this);
 	}
 
-	// power intake
 	public Command intakeCommand() {
-		return Commands.run(this::intake, this).finallyDo(this::stop);
+		return Commands.run(() -> intake(), this)
+			.finallyDo(() -> stop());
 	}
 
-	// used for unjamming
 	public Command outtakeCommand() {
-		return Commands.run(this::outtake, this);
+		return Commands.run(() -> outtake(), this)
+			.finallyDo(() -> stop());
 	}
 }

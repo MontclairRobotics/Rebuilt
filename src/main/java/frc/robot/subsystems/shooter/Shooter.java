@@ -46,8 +46,8 @@ public class Shooter {
 
     public Command aimToHubCommand(){
         return Commands.parallel(
-            turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()),
-            hood.setAngleCommand(() -> hood.getAngleToHub())
+            turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub())
+            // hood.setAngleCommand(() -> hood.getAngleToHub())
         );
     }
 
@@ -55,12 +55,12 @@ public class Shooter {
         return Commands.parallel(
             turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(point)),
             hood.setAngleCommand(() -> hood.getAngleToPoint(point, height))
-            );
+        );
     }
     public Command shootToHubCommand(AngularVelocity targetRPS){
         return Commands.parallel(
             turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()),
-            hood.setAngleCommand(() -> hood.getAngleToHub()),
+            // hood.setAngleCommand(() -> hood.getAngleToHub()),
             flywheel.holdVelocityCommand(targetRPS),
             spindexer.spinCommand()
         );
@@ -77,23 +77,24 @@ public class Shooter {
 
 
     public Command scoringCommand(){
-        return Commands.parallel (
-        turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()),
-        hood.setAngleCommand(() -> hood.getAngleToHub()));
+        return Commands.parallel(
+            turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub())
+            // hood.setAngleCommand(() -> hood.getAngleToHub())
+        );
     }
-    ;
+    
 
     public Command ferryingLeftCommand() {
         return Commands.parallel (
         turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT)),
         hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT, FieldConstants.FerryWaypoints.LEFT_FERRYING_HEIGHT)));
-    };
+    }
 
     public Command ferryRightCommand(){
         return Commands.parallel (
         turret.setFieldRelativeAngleCommand(() -> turret.getAngleToPoint(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT)),
         hood.setAngleCommand(() -> hood.getAngleToPoint(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT, FieldConstants.FerryWaypoints.RIGHT_FERRYING_HEIGHT)));
-    };
+    }
 
     public Command stowCommand(){
         return Commands.parallel (

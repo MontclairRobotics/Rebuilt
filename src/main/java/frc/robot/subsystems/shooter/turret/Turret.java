@@ -24,6 +24,7 @@ import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.tunables.Tunable;
+import frc.robot.util.tunables.TunablePIDController;
 
 import java.util.function.Supplier;
 
@@ -41,26 +42,14 @@ public class Turret extends SubsystemBase {
 	private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 	private final TurretVisualization visualization;
 
-	private PIDController pidController;
+	private TunablePIDController pidController;
 
 	@SuppressWarnings("unused")
 	public Turret(TurretIO io) {
 		this.io = io;
 		visualization = new TurretVisualization();
 
-		pidController = new PIDController(
-			kP, kI, kD
-		);
-
-		pidController.disableContinuousInput();
-		pidController.setTolerance(
-			ANGLE_TOLERANCE.in(Rotations),
-			ANGULAR_VELOCITY_TOLERANCE.in(RotationsPerSecond)
-		);
-
-		Tunable kpTunable = new Tunable("turret kP", kP, (value) -> pidController.setP(value));
-		Tunable kiTunable = new Tunable("turret kI", kP, (value) -> pidController.setI(value));
-		Tunable kdTunable = new Tunable("turret kD", kP, (value) -> pidController.setD(value));
+		pidController = new TunablePIDController(TUNABLE_GAINS);
 	}
 
 	/**
@@ -211,7 +200,6 @@ public class Turret extends SubsystemBase {
 		visualization.update();
 		visualization.log();
 
-		// AimingConstants.LATENCY = Math.pow((0.04/0.645) * RobotContainer.turret.getFieldRelativeVelocity().getNorm(), 2);
 		if(DriverStation.isTeleopEnabled()) RobotContainer.simShootingParameters = RobotContainer.aiming.calculateSimShot(TargetLocation.HUB, false, true);
 	}
 }

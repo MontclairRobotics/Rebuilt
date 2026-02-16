@@ -21,7 +21,7 @@ public class HoodConstants {
 
 	// constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);
-	public static final Angle MAX_ANGLE = Degrees.of(28);
+	public static final Angle MAX_ANGLE = Degrees.of(40);
 
 	// physical properties
 	public static final double GEARING = 10.8; // for every rotation of the hood the motor shaft rotates this amount

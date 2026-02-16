@@ -1,5 +1,5 @@
 // https://github.com/hammerheads5000/FuelSim
-package frc.robot.util;
+package frc.robot.util.sim;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;

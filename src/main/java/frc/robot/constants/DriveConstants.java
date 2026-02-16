@@ -2,8 +2,10 @@ package frc.robot.constants;
 
 import com.pathplanner.lib.path.PathConstraints;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -34,18 +36,21 @@ public class DriveConstants {
 	);
 
 	public static final ControlConstants ROTATION_GAINS = new ControlConstants()
-		.withPID(16, 0, 0)
-		.withContinuous(-Math.PI, Math.PI);
+		.withPID(16, 0, 0.1)
+		.withContinuous(-Math.PI, Math.PI)
+		.withTolerance(Degrees.of(1).in(Radians));
 
-	public static final TunableControlConstants TUNABLE_ROTATION_GAINS =
-		new TunableControlConstants("Drive/Rotation", ROTATION_GAINS);
+	public static final TunableControlConstants TUNABLE_ROTATION_GAINS = new TunableControlConstants(
+		"Drive/Rotation", ROTATION_GAINS
+	);
 
 	public static final ControlConstants TRENCH_TRANSLATION_GAINS = new ControlConstants()
 		.withPID(4, 0, 0);
 
-	public static final TunableControlConstants TUNABLE_TRENCH_TRANSLATION_GAINS =
-        new TunableControlConstants("Drive/Trench Translation", TRENCH_TRANSLATION_GAINS);
+	public static final TunableControlConstants TUNABLE_TRENCH_TRANSLATION_GAINS = new TunableControlConstants(
+		"Drive/Trench Translation", TRENCH_TRANSLATION_GAINS
+	);
 
-	public static final LinearVelocity MIN_VELOCITY_FOR_TRENCH_AND_BUMP_LOCKS = MetersPerSecond.of(1);
+	public static final LinearVelocity SIGNIFICANT_VELOCITY = MetersPerSecond.of(2);
 
 }

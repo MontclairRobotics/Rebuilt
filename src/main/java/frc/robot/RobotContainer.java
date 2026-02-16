@@ -23,6 +23,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
+import frc.robot.util.sim.FuelSim;
 import frc.robot.util.tunables.Tunable;
 
 import org.ironmaple.simulation.SimulatedArena;
@@ -46,7 +47,6 @@ import frc.robot.subsystems.shooter.turret.TurretIOSim;
 import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
-import frc.robot.util.FuelSim;
 
 public class RobotContainer {
 
@@ -67,11 +67,11 @@ public class RobotContainer {
 
 	public static SimShootingParameters simShootingParameters = new SimShootingParameters(Degrees.zero(), Degrees.zero(), MetersPerSecond.zero());
 
-
 	private SwerveDriveSimulation driveSimulation;
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
 	public FuelSim fuelSim = new FuelSim("fuel");
-	double launchSpeed=0;
+
+	double launchSpeed = 0;
 	double hoodAngle = 20;
 	Tunable launchSpeedTunable = new Tunable("launch speed (MPS)",5,(value)->launchSpeed = value);
 	Tunable hoodAngleTunable = new Tunable("launch angle (degree)",20,(value)->hoodAngle = value);
