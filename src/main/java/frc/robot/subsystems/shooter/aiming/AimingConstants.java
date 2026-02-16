@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.Time;
 
 public class AimingConstants {
 
-	public static double LATENCY = 0.07; // seconds it takes to reach desired state once state is set
+	public static double LATENCY = 0.085; // seconds it takes to reach desired state once state is set
 
 	public record ShotSettings(Angle angle, AngularVelocity flywheelVelocity, Time timeOfFlight, boolean withConstantVelocity) implements Interpolatable<ShotSettings> {
 		public ShotSettings(Angle angle, AngularVelocity flywheelVelocity, Time timeOfFlight, boolean withConstantVelocity) {

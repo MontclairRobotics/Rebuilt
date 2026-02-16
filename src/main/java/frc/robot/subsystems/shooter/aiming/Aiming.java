@@ -1,12 +1,18 @@
 package frc.robot.subsystems.shooter.aiming;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
+import static frc.robot.constants.TurretConstants.ORIGIN_TO_TURRET;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.ShotSettings;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
@@ -102,9 +108,17 @@ public class Aiming {
 		Angle hoodAngle;
 		LinearVelocity exitVelocity;
 
-		Translation2d turretVelocity = turret.getFieldRelativeVelocity();
-		Translation2d futureTurretPosition = turret.getFieldRelativePosition()
-			.plus(turretVelocity.times(AimingConstants.LATENCY));
+		ChassisSpeeds fieldRelativeSpeeds = RobotContainer.drivetrain.getFieldRelativeSpeeds();
+		Translation2d futureRobotPose = RobotContainer.drivetrain.getRobotPose().getTranslation()
+			.plus(new Translation2d(
+				fieldRelativeSpeeds.vxMetersPerSecond * AimingConstants.LATENCY,
+				fieldRelativeSpeeds.vyMetersPerSecond * AimingConstants.LATENCY
+			));
+
+		double robotOmega = RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond;
+		Rotation2d deltaRotation = new Rotation2d(robotOmega * AimingConstants.LATENCY);
+		Translation2d rotatedOffset = ORIGIN_TO_TURRET.toTranslation2d().rotateBy(deltaRotation);
+		Translation2d futureTurretPosition = futureRobotPose.plus(rotatedOffset);
 
 		Translation2d displacementToTarget = targetLocation.minus(futureTurretPosition);
 		double realDistanceToTarget = displacementToTarget.getNorm();
@@ -115,7 +129,12 @@ public class Aiming {
 
 		if(whileMoving) {
 			for(int i = 0; i < 5; i++) {
-				virtualTarget = targetLocation.minus(turretVelocity.times(estimatedTOF));
+				Translation2d robotDisplacementDuringShot = new Translation2d(
+					fieldRelativeSpeeds.vxMetersPerSecond * estimatedTOF,
+					fieldRelativeSpeeds.vyMetersPerSecond * estimatedTOF
+				);
+
+				virtualTarget = targetLocation.minus(robotDisplacementDuringShot);
 				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
 				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
 
