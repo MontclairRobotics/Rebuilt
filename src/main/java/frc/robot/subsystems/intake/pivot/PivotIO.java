@@ -1,4 +1,4 @@
-package frc.robot.subsystems.rollers.PivotIO;
+package frc.robot.subsystems.intake.pivot;
 
 import edu.wpi.first.units.measure.Angle;
 import org.littletonrobotics.junction.AutoLog;
@@ -25,4 +25,3 @@ public interface PivotIO {
    */
   public Angle getPivotAngle();
 }
-

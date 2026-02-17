@@ -36,4 +36,3 @@ public class PivotConstants {
 
   public static final Angle TOLERANCE = Rotations.of(0.002);
 }
-
