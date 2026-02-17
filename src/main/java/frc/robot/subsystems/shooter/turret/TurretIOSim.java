@@ -15,8 +15,9 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.RobotContainer;
 
 public class TurretIOSim implements TurretIO {
+
 	private SingleJointedArmSim sim;
-	double appliedVoltage = 0;
+	private double appliedVoltage = 0;
 
 	public TurretIOSim() {
 		sim = new SingleJointedArmSim(
