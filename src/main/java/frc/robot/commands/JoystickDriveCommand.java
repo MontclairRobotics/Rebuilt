@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import static edu.wpi.first.units.Units.Meters;
@@ -16,13 +17,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
 import frc.robot.Superstructure;
-import frc.robot.constants.DriveConstants;
+
 import static frc.robot.constants.DriveConstants.SIGNIFICANT_VELOCITY;
+import static frc.robot.constants.DriveConstants.TRENCH_TRANSLATION_kD;
+import static frc.robot.constants.DriveConstants.TRENCH_TRANSLATION_kI;
+import static frc.robot.constants.DriveConstants.TRENCH_TRANSLATION_kP;
+
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LeftTrench;
-import frc.robot.util.tunables.TunablePIDController;
 
 public class JoystickDriveCommand extends Command {
 
@@ -42,11 +46,11 @@ public class JoystickDriveCommand extends Command {
 		.and(() -> DriverStation.isEnabled()) // resets value when disabled
 		.debounce(0.1); // accounts for flicker
 
-	private final TunablePIDController thetaController =
-		new TunablePIDController(DriveConstants.TUNABLE_ROTATION_GAINS);
+	private final PIDController thetaController =
+		RobotContainer.drivetrain.thetaController;
 
-	private final TunablePIDController trenchYController =
-		new TunablePIDController(DriveConstants.TUNABLE_TRENCH_TRANSLATION_GAINS);
+	private final PIDController trenchYController =
+		new PIDController(TRENCH_TRANSLATION_kP, TRENCH_TRANSLATION_kI, TRENCH_TRANSLATION_kD);
 
 	private DriveMode currentDriveMode = DriveMode.NORMAL;
 

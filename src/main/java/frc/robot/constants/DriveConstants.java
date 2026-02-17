@@ -5,16 +5,15 @@ import com.pathplanner.lib.path.PathConstraints;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.util.TunerConstants;
-import frc.robot.util.tunables.ControlConstants;
-import frc.robot.util.tunables.TunableControlConstants;
 
 public class DriveConstants {
 
@@ -35,22 +34,15 @@ public class DriveConstants {
 		MAX_ANGULAR_ACCELERATION
 	);
 
-	public static final ControlConstants ROTATION_GAINS = new ControlConstants()
-		.withPID(16, 0, 0.1)
-		.withContinuous(-Math.PI, Math.PI)
-		.withTolerance(Degrees.of(1).in(Radians));
+	public static final double ROTATION_kP = 16;
+	public static final double ROTATION_kI = 0;
+	public static final double ROTATION_kD = 0.1;
+	public static final Angle ROTATION_TOLERANCE = Degrees.of(1);
 
-	public static final TunableControlConstants TUNABLE_ROTATION_GAINS = new TunableControlConstants(
-		"Drive/Rotation", ROTATION_GAINS
-	);
+	public static final double TRENCH_TRANSLATION_kP = 4;
+	public static final double TRENCH_TRANSLATION_kI = 0;
+	public static final double TRENCH_TRANSLATION_kD = 0;
 
-	public static final ControlConstants TRENCH_TRANSLATION_GAINS = new ControlConstants()
-		.withPID(4, 0, 0);
-
-	public static final TunableControlConstants TUNABLE_TRENCH_TRANSLATION_GAINS = new TunableControlConstants(
-		"Drive/Trench Translation", TRENCH_TRANSLATION_GAINS
-	);
-
-	public static final LinearVelocity SIGNIFICANT_VELOCITY = MetersPerSecond.of(2);
+	public static final LinearVelocity SIGNIFICANT_VELOCITY = MetersPerSecond.of(1);
 
 }

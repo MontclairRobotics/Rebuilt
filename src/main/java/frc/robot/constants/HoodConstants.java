@@ -6,8 +6,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-import frc.robot.util.tunables.ControlConstants;
-import frc.robot.util.tunables.TunableControlConstants;
 
 public class HoodConstants {
 
@@ -35,18 +33,9 @@ public class HoodConstants {
 	public static final double kD = 1;
 	public static final double kS = 0;
 	public static final double kV = 0;
-	public static final double kG = 0;
+	public static final double kG = 0.482952;
 	public static final double kA = 0;
 
-	public static final Angle TOLERANCE = Angle.ofBaseUnits(0.002, Rotations);
+	public static final Angle TOLERANCE = Degrees.of(1);
 
-	public static final ControlConstants GAINS = new ControlConstants()
-		.withPID(kP, kI, kD)
-		.withFeedforward(kV, kA)
-		.withPhysical(kS, kG)
-		.withTolerance(TOLERANCE.in(Rotations));
-
-	public static final TunableControlConstants TUNABLE_GAINS = new TunableControlConstants(
-		"Hood", GAINS
-	);
 }

@@ -76,9 +76,9 @@ public class RobotContainer {
 	private boolean whileMoving = true;
 
 	double launchSpeed = 0;
-	double hoodAngle = 20;
+	double hoodAngle = 0;
 	Tunable launchSpeedTunable = new Tunable("launch speed (MPS)",5,(value)->launchSpeed = value);
-	Tunable hoodAngleTunable = new Tunable("launch angle (degree)",20,(value)->hoodAngle = value);
+	Tunable hoodAngleTunable = new Tunable("launch angle (degree)",hoodAngle,(value)->hoodAngle = value);
 
 	public RobotContainer() {
 			fuelSim.registerRobot(
@@ -151,16 +151,8 @@ public class RobotContainer {
 	}
 
 	private void configureBindings() {
-
-
 		drivetrain.setDefaultCommand(new JoystickDriveCommand());
-		// driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub())).onFalse(turret.stopCommand());
-		// driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub())).onFalse(hood.stopCommand());
-		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed), (Degrees.of(90-hoodAngle)), turret.getFieldRelativeAngle(), TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
-		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(simShootingParameters.exitVelocity(), Degrees.of(90- simShootingParameters.hoodAngle().in(Degrees)), simShootingParameters.robotRelativeTurretAngle(), TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
-		// driverController.triangle().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
-		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MIN_ANGLE));
-
+		
 		// driverController.triangle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
 		// driverController.square()
@@ -170,8 +162,9 @@ public class RobotContainer {
 		// driverController.circle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
+		
 		// zeros gyro
-		// driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
+		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 	}
 
 	public Command getAutonomousCommand() {

@@ -22,14 +22,19 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
+
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -54,13 +59,15 @@ import static frc.robot.constants.DriveConstants.JOYSTICK_INPUT_GAIN;
 import static frc.robot.constants.DriveConstants.JOYSTICK_INPUT_ROT_GAIN;
 import static frc.robot.constants.DriveConstants.MAX_ANGULAR_SPEED;
 import static frc.robot.constants.DriveConstants.MAX_SPEED;
-import static frc.robot.constants.DriveConstants.TUNABLE_ROTATION_GAINS;
+import static frc.robot.constants.DriveConstants.ROTATION_TOLERANCE;
+import static frc.robot.constants.DriveConstants.ROTATION_kD;
+import static frc.robot.constants.DriveConstants.ROTATION_kI;
+import static frc.robot.constants.DriveConstants.ROTATION_kP;
 
 import frc.robot.util.PoseUtils;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.util.sim.MapleSimSwerveDrivetrain;
-import frc.robot.util.tunables.TunablePIDController;
 
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
 
@@ -144,7 +151,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
 	/* Heading PID Controller for things like automatic alignment buttons */
-	public TunablePIDController thetaController = new TunablePIDController(TUNABLE_ROTATION_GAINS);
+	public PIDController thetaController;
 
 	/* variable to store our heading */
 	public Rotation2d odometryHeading = new Rotation2d();
@@ -184,6 +191,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 			Constants.CURRENT_MODE == Constants.Mode.SIM ? MapleSimSwerveDrivetrain.regulateModuleConstantsForSimulation(modules) : modules
 		);
 
+		thetaController = new PIDController(ROTATION_kP, ROTATION_kI, ROTATION_kD);
+		thetaController.setTolerance(ROTATION_TOLERANCE.in(Radians));
+		thetaController.enableContinuousInput(-Math.PI, Math.PI);
 		odometryHeading = Rotation2d.fromRotations(0);
 
 		if (Utils.isSimulation()) {
@@ -262,6 +272,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 	public ChassisSpeeds getFieldRelativeSpeeds() {
 		return ChassisSpeeds.fromRobotRelativeSpeeds(this.getState().Speeds, getWrappedHeading());
+	}
+
+	public Translation2d getFieldRelativeVelocity() {
+		return new Translation2d(
+			getFieldRelativeSpeeds().vxMetersPerSecond,
+			getFieldRelativeSpeeds().vyMetersPerSecond
+		);
+	}
+
+	public LinearVelocity getFieldRelativeLinearSpeed() {
+		return MetersPerSecond.of(getFieldRelativeVelocity().getNorm());
+	}
+
+	public AngularVelocity getAngularSpeed() {
+		return RadiansPerSecond.of(Math.abs(getFieldRelativeSpeeds().omegaRadiansPerSecond));
 	}
 
 	public double getStrafeVelocityFromController() {

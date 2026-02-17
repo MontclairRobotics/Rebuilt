@@ -6,13 +6,13 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.util.tunables.TunablePIDController;
 
 import java.util.function.Supplier;
 
@@ -23,7 +23,7 @@ public class Flywheel extends SubsystemBase {
 	private final FlywheelIO io;
 	private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
-	private TunablePIDController pidController;
+	private PIDController pidController;
 	private SimpleMotorFeedforward motorFeedforward;
 
 	SysIdRoutine flyWheelRoutine;
@@ -31,7 +31,8 @@ public class Flywheel extends SubsystemBase {
 	public Flywheel(FlywheelIO io) {
 		this.io = io;
 
-		pidController = new TunablePIDController(TUNABLE_GAINS);
+		pidController = new PIDController(kP, kI, kD);
+		pidController.setTolerance(TOLERANCE.in(RotationsPerSecond));
 
 		flyWheelRoutine = new SysIdRoutine(
 			new SysIdRoutine.Config(

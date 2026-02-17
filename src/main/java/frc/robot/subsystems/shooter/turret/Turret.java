@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.TurretConstants.*;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,21 +13,18 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
+import frc.robot.constants.TurretConstants;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
-import frc.robot.util.tunables.TunablePIDController;
 
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
-
 
 /**
  * The TurretIOHardware class interfaces with the TalonFX motor controller and CANCoders to manage
@@ -38,14 +36,15 @@ public class Turret extends SubsystemBase {
 	private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 	private final TurretVisualization visualization;
 
-	private TunablePIDController pidController;
+	private PIDController pidController;
 
 	@SuppressWarnings("unused")
 	public Turret(TurretIO io) {
 		this.io = io;
 		visualization = new TurretVisualization();
 
-		pidController = new TunablePIDController(TUNABLE_GAINS);
+		pidController = new PIDController(TurretConstants.kP, TurretConstants.kI, TurretConstants.kD);
+		pidController.setTolerance(TurretConstants.ANGLE_TOLERANCE.in(Rotations));
 	}
 
 	/**
@@ -111,7 +110,6 @@ public class Turret extends SubsystemBase {
 		Translation2d hublocation = PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION);
 		Translation2d robotToHub = hublocation.minus(getFieldRelativePosition());
 		Logger.recordOutput("Turret/getAngleToHub", robotToHub.getAngle().getRotations());
-		Logger.recordOutput("Turret/At Setpoint", atSetpoint());
 		return robotToHub.getAngle().getMeasure();
 	}
 
@@ -123,8 +121,8 @@ public class Turret extends SubsystemBase {
 		return robotToPoint.getAngle().getMeasure();
 	}
 
-	public boolean atSetpoint() {
-		return pidController.atSetpoint();
+	public boolean atSetpointForShooting() {
+		return Math.abs(pidController.getSetpoint() - getRobotRelativeAngle().in(Rotations)) < TurretConstants.ANGLE_TOLERANCE.in(Rotations);
 	}
 
 	/**
@@ -135,6 +133,10 @@ public class Turret extends SubsystemBase {
 		// Logger.recordOutput("Turret/Target Robot Relative Anlge", angle);
 		pidController.setSetpoint(constrainAngle(angle).in(Rotations));
 		io.setVoltage(pidController.calculate(io.getRobotRelativeAngle().in(Rotations)));
+	}
+
+	public void setRobotRelativeAngle(Supplier<Angle> angleSupplier) {
+		setRobotRelativeAngle(angleSupplier.get());
 	}
 
 	public void setFieldRelativeAngle(Angle angle) {
@@ -183,10 +185,15 @@ public class Turret extends SubsystemBase {
 		Logger.recordOutput("Intake pose", new Pose3d(0.2664714, 0, 0.1711706, Rotation3d.kZero));
 		Logger.recordOutput("Turret distance to hub", getDistanceToHub());
 		Logger.recordOutput("Turret/Robot Relative Setpoint", constrainAngle(Rotations.of(pidController.getSetpoint())).in(Rotations));
-		Logger.recordOutput("Turret/Robot Relative Angle", getRobotRelativeAngle());
+		Logger.recordOutput("Turret/Robot Relative Angle", getRobotRelativeAngle().in(Rotations));
+		Logger.recordOutput("Turret/My Recorded Error", Math.abs(getRobotRelativeAngle().in(Rotations) - pidController.getSetpoint()));
+		Logger.recordOutput("Turret/Robot Relative Angle to Hub", toRobotRelativeAngle(getAngleToHub()).in(Rotations));
+		Logger.recordOutput("Turret/At Setpoint Real", RobotContainer.turret.atSetpointForShooting());
+		Logger.recordOutput("Turret/PID Controller Setpoint", pidController.getSetpoint());
+		Logger.recordOutput("Turret/Tolerance", pidController.getErrorTolerance());
+		Logger.recordOutput("Turret/PID Controller Error", pidController.getError());
+
 		visualization.update();
 		visualization.log();
-
-		if(DriverStation.isTeleopEnabled()) RobotContainer.simShootingParameters = RobotContainer.aiming.calculateSimShot(TargetLocation.HUB, false, true);
 	}
 }

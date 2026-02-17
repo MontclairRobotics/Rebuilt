@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.constants.TurretConstants.ORIGIN_TO_TURRET;
 
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -116,8 +117,10 @@ public class Aiming {
 			));
 
 		double robotOmega = RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond;
-		Rotation2d deltaRotation = new Rotation2d(robotOmega * AimingConstants.LATENCY);
-		Translation2d rotatedOffset = ORIGIN_TO_TURRET.toTranslation2d().rotateBy(deltaRotation);
+		Rotation2d futureRobotHeading = RobotContainer.drivetrain.getWrappedHeading()
+			.plus(new Rotation2d(robotOmega * AimingConstants.LATENCY));
+			
+		Translation2d rotatedOffset = ORIGIN_TO_TURRET.toTranslation2d().rotateBy(futureRobotHeading);
 		Translation2d futureTurretPosition = futureRobotPose.plus(rotatedOffset);
 
 		Translation2d displacementToTarget = targetLocation.minus(futureTurretPosition);

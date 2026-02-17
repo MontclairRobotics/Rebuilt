@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import java.io.File;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -20,10 +22,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
+import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.util.AllianceManager;
+import frc.robot.util.FieldConstants;
+import frc.robot.util.PoseUtils;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -35,6 +41,8 @@ public class Robot extends LoggedRobot {
 
 	private Command autonomousCommand;
 	private RobotContainer robotContainer;
+
+	private boolean hasAppliedTargetLocation = false;
 
 	public Robot() {
 
@@ -100,6 +108,13 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void robotPeriodic() {
 		AllianceManager.update();
+		// TODO: fix this
+		if(!hasAppliedTargetLocation && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+			hasAppliedTargetLocation = true;
+			TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
+			TargetLocation.FERRY_LEFT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT));
+			TargetLocation.FERRY_RIGHT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT));
+		}
 		CommandScheduler.getInstance().run();
 	}
 
