@@ -54,11 +54,19 @@ public class Aiming {
 		Angle hoodAngle;
 		AngularVelocity flywheelVelocity;
 
-		Translation2d initalTurretPosition = turret.getFieldRelativePosition();
-		Translation2d turretVelocity = turret.getFieldRelativeVelocity();
+		ChassisSpeeds fieldRelativeSpeeds = RobotContainer.drivetrain.getFieldRelativeSpeeds();
+		Translation2d futureRobotPose = RobotContainer.drivetrain.getRobotPose().getTranslation()
+			.plus(new Translation2d(
+				fieldRelativeSpeeds.vxMetersPerSecond * AimingConstants.LATENCY,
+				fieldRelativeSpeeds.vyMetersPerSecond * AimingConstants.LATENCY
+			));
 
-		Translation2d futureTurretPosition = initalTurretPosition
-			.plus(turretVelocity.times(AimingConstants.LATENCY));
+		double robotOmega = RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond;
+		Rotation2d futureRobotHeading = RobotContainer.drivetrain.getWrappedHeading()
+			.plus(new Rotation2d(robotOmega * AimingConstants.LATENCY));
+			
+		Translation2d rotatedOffset = ORIGIN_TO_TURRET.toTranslation2d().rotateBy(futureRobotHeading);
+		Translation2d futureTurretPosition = futureRobotPose.plus(rotatedOffset);
 
 		Translation2d displacementToTarget = targetLocation.minus(futureTurretPosition);
 		double realDistanceToTarget = displacementToTarget.getNorm();
@@ -69,11 +77,16 @@ public class Aiming {
 
 		if(whileMoving) {
 			for(int i = 0; i < 5; i++) {
-				virtualTarget = targetLocation.minus(turretVelocity.times(estimatedTOF));
+				Translation2d robotDisplacementDuringShot = new Translation2d(
+					fieldRelativeSpeeds.vxMetersPerSecond * estimatedTOF,
+					fieldRelativeSpeeds.vyMetersPerSecond * estimatedTOF
+				);
+
+				virtualTarget = targetLocation.minus(robotDisplacementDuringShot);
 				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
 				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
 
-				if(Math.abs(newTOF - estimatedTOF) < 0.02) break;
+				if (Math.abs(newTOF - estimatedTOF) < 0.02) break;
 				estimatedTOF = newTOF;
 			}
 		}
@@ -119,7 +132,7 @@ public class Aiming {
 		double robotOmega = RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond;
 		Rotation2d futureRobotHeading = RobotContainer.drivetrain.getWrappedHeading()
 			.plus(new Rotation2d(robotOmega * AimingConstants.LATENCY));
-			
+
 		Translation2d rotatedOffset = ORIGIN_TO_TURRET.toTranslation2d().rotateBy(futureRobotHeading);
 		Translation2d futureTurretPosition = futureRobotPose.plus(rotatedOffset);
 
