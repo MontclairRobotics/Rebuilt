@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake.pivot;
+package frc.robot.subsystems.pivot.Pivot;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
