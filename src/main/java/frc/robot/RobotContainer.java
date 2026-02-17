@@ -107,8 +107,17 @@ public class RobotContainer {
 
 		configureBindings();
 
+<<<<<<< Updated upstream
     	drivetrain.registerTelemetry(logger::telemeterize);
 	}
+=======
+      default:
+        vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+    }
+
+    // Build an auto chooser. This will use Commands.none() as the default option.
+    autoChooser = AutoBuilder.buildAutoChooser();
+>>>>>>> Stashed changes
 
 	private void configureBindings() {
 
