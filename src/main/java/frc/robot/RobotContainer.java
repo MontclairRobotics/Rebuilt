@@ -5,9 +5,11 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -75,9 +77,9 @@ public class RobotContainer {
 	private boolean withConstantVelocity = false;
 	private boolean whileMoving = true;
 
-	double launchSpeed = 0;
-	double hoodAngle = 0;
-	Tunable launchSpeedTunable = new Tunable("launch speed (MPS)",5,(value)->launchSpeed = value);
+	double launchSpeed = 10;
+	double hoodAngle = 30;
+	Tunable launchSpeedTunable = new Tunable("launch speed (MPS)",10,(value)->launchSpeed = value);
 	Tunable hoodAngleTunable = new Tunable("launch angle (degree)",hoodAngle,(value)->hoodAngle = value);
 
 	public RobotContainer() {
@@ -151,8 +153,8 @@ public class RobotContainer {
 	}
 
 	private void configureBindings() {
-		drivetrain.setDefaultCommand(new JoystickDriveCommand());
-		
+		drivetrain.setDefaultCommand(new JoystickDriveCommand());//.times(1).minus(Rotations.of(drivetrain.getWrappedHeading().getRotations()))
+		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed),Degrees.of(90-hoodAngle),turret.getAngleToPoint(new Translation2d(2,7)),TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
 		// driverController.triangle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
 		// driverController.square()
@@ -162,7 +164,7 @@ public class RobotContainer {
 		// driverController.circle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
-		
+		driverController.PS().whileTrue(Commands.runOnce(()->fuelSim.clearFuel()));
 		// zeros gyro
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 	}
@@ -192,5 +194,8 @@ public class RobotContainer {
 		// See https://www.chiefdelphi.com/t/simulated-robot-goes-through-walls-with-maplesim/508663.
 		Logger.recordOutput(
 			"FieldSimulation/Pose", new Pose3d(driveSimulation.getSimulatedDriveTrainPose()));
+		Logger.recordOutput("ferry1",new Translation2d(2,7));
+		// Logger.recordOutput("ferry2",new Translation2d(2,1));
+		Logger.recordOutput("ferrydistance", turret.getDistanceToPoint(new Translation2d(2,7)));
 	}
 }
