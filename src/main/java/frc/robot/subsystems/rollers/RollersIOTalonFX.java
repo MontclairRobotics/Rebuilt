@@ -1,35 +1,34 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.rollers;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.AngularVelocity;
-import static frc.robot.constants.IntakeConstants.GEARING;
-import static frc.robot.constants.IntakeConstants.MOTOR_ID;
+import static frc.robot.constants.RollersConstants.CAN_ID;
 
-public class IntakeIOTalonFX implements IntakeIO {
+public class RollersIOTalonFX implements RollersIO {
 
 	private TalonFX motor;
 	TalonFXConfiguration config;
 
-	public IntakeIOTalonFX() {
-		motor = new TalonFX(MOTOR_ID);
-		config = new TalonFXConfiguration();
+	public RollersIOTalonFX() {
+		motor = new TalonFX(CAN_ID);
 
-		// motor setup and inverted setting
-		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; // TODO: needed?
+		TalonFXConfiguration config = new TalonFXConfiguration();
+		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; // default
+		config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 		motor.getConfigurator().apply(config);
 	}
 
 	@Override
-	public void updateInputs(IntakeIOInputs inputs) {
-		// get double (ints) as outputs
+	public void updateInputs(RollersIOInputs inputs) {
 		inputs.current = motor.getStatorCurrent().getValueAsDouble();
 		inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
 		inputs.temperature = motor.getDeviceTemp().getValueAsDouble();
-		inputs.velocity = getVelocity().in(RotationsPerSecond);
+		inputs.motorVelocity = getMotorVelocity().in(RotationsPerSecond);
 	}
 
 	@Override
@@ -43,7 +42,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 	}
 
 	@Override
-	public AngularVelocity getVelocity() {
-		return motor.getVelocity().getValue().div(GEARING);
+	public AngularVelocity getMotorVelocity() {
+		return motor.getVelocity().getValue();
 	}
 }
