@@ -39,15 +39,11 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public Command spinCommand() {
-		return Commands.run(() -> {
-			spin();
-		});
+		return Commands.run(() -> spin());
 	}
 
 	public Command reverseSpinCommand() {
-		return Commands.run(() -> {
-			reverseSpin();
-		});
+		return Commands.run(() -> reverseSpin());
 	}
 
 	public Command manualControlCommand() {

@@ -1,13 +1,14 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.rollers;
 
 import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 
-public interface IntakeIO {
+public interface RollersIO {
+
 	@AutoLog
-	public static class IntakeIOInputs {
-		public double velocity = 0;
+	public static class RollersIOInputs {
+		public double motorVelocity = 0;
 		public double appliedVoltage = 0;
 		public double temperature = 0;
 		public double current = 0;
@@ -18,7 +19,7 @@ public interface IntakeIO {
 	 *
 	 * @param inputs IO Inputs to update
 	 */
-	public void updateInputs(IntakeIOInputs inputs);
+	public void updateInputs(RollersIOInputs inputs);
 
 	/**
 	 * Applies voltages to the intake motor
@@ -33,5 +34,5 @@ public interface IntakeIO {
 	/**
 	 * @return the velocity of the motor.
 	 */
-	public AngularVelocity getVelocity();
+	public AngularVelocity getMotorVelocity();
 }
