@@ -21,8 +21,8 @@ public class PivotVisualization {
             0.1711706,
             new Rotation3d(
                 Angle.ofBaseUnits(0, Rotations),
-                Angle.ofBaseUnits(0, Rotations), //TODO: possibly turning wrong??
-                RobotContainer.pivot.io.getPivotAngle()
+                RobotContainer.pivot.io.getPivotAngle(),
+                Angle.ofBaseUnits(0, Rotations) //TODO: possibly turning wrong??
                 )
             );
   }

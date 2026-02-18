@@ -19,13 +19,12 @@ public class PivotIOSim implements PivotIO {
             DCMotor.getKrakenX60(1),
             GEARING,
             10.0,
-            0.0,
+            0.1,
             MIN_ANGLE.in(Radians),
             MAX_ANGLE.in(Radians),
             true,
-            MIN_ANGLE.in(Radians),
-            0.0,
-            0.0);
+            MIN_ANGLE.in(Radians)
+      );
   }
 
   public void updateInputs(PivotIOInputs inputs) {
@@ -46,6 +45,7 @@ public class PivotIOSim implements PivotIO {
   }
 
   public void stop() {
+    appliedVoltage = 0;
     sim.setInputVoltage(0);
   }
 

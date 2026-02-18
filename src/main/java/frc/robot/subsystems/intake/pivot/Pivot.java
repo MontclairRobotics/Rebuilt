@@ -65,12 +65,14 @@ public class Pivot extends SubsystemBase {
     io.setVoltage(totalOutput);
   }
 
-  public void joystickControl() {
+public void joystickControl() {
     double voltage =
-        Math.pow(MathUtil.applyDeadband(RobotContainer.operatorController.getRightY(), 0.04), 3)
+        Math.pow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.04), 3)
             * 12;
+    Logger.recordOutput("Pivot/JoystickVoltage", voltage);
+    Logger.recordOutput("Pivot/RawAxis", RobotContainer.driverController.getRightY());
     io.setVoltage(voltage);
-  }
+}
 
   public Command stopCommand() {
     return Commands.runOnce(() -> io.stop());
