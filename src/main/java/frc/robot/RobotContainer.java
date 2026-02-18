@@ -147,21 +147,12 @@ public class RobotContainer {
 
 		configureBindings();
 
-<<<<<<< Updated upstream
     	drivetrain.registerTelemetry(logger::telemeterize);
 	}
-=======
-      default:
-        vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-    }
-
-    // Build an auto chooser. This will use Commands.none() as the default option.
-    autoChooser = AutoBuilder.buildAutoChooser();
->>>>>>> Stashed changes
 
 	private void configureBindings() {
 		drivetrain.setDefaultCommand(new JoystickDriveCommand());
-		
+
 		// driverController.triangle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
 		// driverController.square()
@@ -171,7 +162,7 @@ public class RobotContainer {
 		// driverController.circle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
-		
+
 		// zeros gyro
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 	}

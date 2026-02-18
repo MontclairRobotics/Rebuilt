@@ -64,7 +64,7 @@ public class Aiming {
 		double robotOmega = RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond;
 		Rotation2d futureRobotHeading = RobotContainer.drivetrain.getWrappedHeading()
 			.plus(new Rotation2d(robotOmega * AimingConstants.LATENCY));
-			
+
 		Translation2d rotatedOffset = ORIGIN_TO_TURRET.toTranslation2d().rotateBy(futureRobotHeading);
 		Translation2d futureTurretPosition = futureRobotPose.plus(rotatedOffset);
 
