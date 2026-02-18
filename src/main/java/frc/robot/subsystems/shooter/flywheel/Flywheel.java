@@ -13,20 +13,27 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
 
-	private final FlywheelIO io;
+	private FlywheelIO io;
 	private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
 	private PIDController pidController;
 	private SimpleMotorFeedforward motorFeedforward;
 
-	SysIdRoutine flyWheelRoutine;
+	SysIdRoutine flyWheelRoutine = new SysIdRoutine(
+		new SysIdRoutine.Config(
+			null,
+			Volts.of(4),
+			null,
+			state -> SignalLogger.writeString("SysIdFlywheel_State", state.toString())
+		),
+		new SysIdRoutine.Mechanism(output -> io.setVoltage(output.in(Volts)), null, this)
+	);
 
 	public Flywheel(FlywheelIO io) {
 		this.io = io;
@@ -34,15 +41,7 @@ public class Flywheel extends SubsystemBase {
 		pidController = new PIDController(kP, kI, kD);
 		pidController.setTolerance(TOLERANCE.in(RotationsPerSecond));
 
-		flyWheelRoutine = new SysIdRoutine(
-			new SysIdRoutine.Config(
-				null,
-				Volts.of(4),
-				null,
-				state -> SignalLogger.writeString("SysIdFlywheel_State", state.toString())
-			),
-			new SysIdRoutine.Mechanism(output -> io.setVoltage(output.in(Volts)), null, this)
-		);
+		motorFeedforward = new SimpleMotorFeedforward(kS, kV);
 	}
 
 	/**

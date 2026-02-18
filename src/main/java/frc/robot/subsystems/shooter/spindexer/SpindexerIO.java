@@ -10,19 +10,19 @@ public interface SpindexerIO {
 
 	@AutoLog
 	public class SpindexerIOInputs {
-		public double appliedSpinVoltage = 0.0;
-		public double appliedIndexVoltage = 0.0;
+		public double spinAppliedVoltage = 0.0;
+		public double indexAppliedVoltage = 0.0;
 		public double spinTempCelcius = 0.0;
 		public double indexTempCelcius = 0.0;
-		public AngularVelocity spinVelocity = RotationsPerSecond.zero();
-		public AngularVelocity indexVelocity = RotationsPerSecond.zero();
+		public AngularVelocity spinVelocity = AngularVelocity.ofBaseUnits(0, RotationsPerSecond);
+		public AngularVelocity indexVelocity = AngularVelocity.ofBaseUnits(0, RotationsPerSecond);
 	}
 
 	public void updateInputs(SpindexerIOInputs inputs);
 
-	public void setSpinVoltage(double voltage);
+	public void setSpinVoltage(double currentVoltage);
 
-	public void setIndexVoltage(double voltage);
+	public void setIndexVoltage(double currentVoltage);
 
 	public void stopSpin();
 

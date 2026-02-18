@@ -19,10 +19,8 @@ public class HoodVisualization {
 
 	public void update() {
 		Translation3d turretToHoodFieldRelative = new Translation3d(
-			TURRET_TO_HOOD.toTranslation2d()
-			.rotateBy(Rotation2d.fromRotations(RobotContainer.turret.getRobotRelativeAngle().in(Rotations))))
-			.plus(new Translation3d(0, 0, TURRET_TO_HOOD.getZ())
-		);
+			TURRET_TO_HOOD.toTranslation2d().rotateBy(Rotation2d.fromRotations(RobotContainer.turret.getRobotRelativeAngle().in(Rotations)))
+		).plus(new Translation3d(0, 0, TURRET_TO_HOOD.getZ()));
 
 		hoodPose = new Pose3d(
 			ORIGIN_TO_TURRET.plus(turretToHoodFieldRelative),
@@ -36,5 +34,7 @@ public class HoodVisualization {
 
 	public void log() {
 		Logger.recordOutput("Hood/Hood Pose", hoodPose);
+		// Logger.recordOutput("Hood/zero", new Pose3d());
+		// Logger.recordOutput("Hood/zero2", new Pose3d());
 	}
 }

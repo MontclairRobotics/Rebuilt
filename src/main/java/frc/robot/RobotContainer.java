@@ -4,34 +4,28 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionIOLimelight;
-import frc.robot.util.Telemetry;
-import frc.robot.util.TunerConstants;
-import frc.robot.util.sim.FuelSim;
-import frc.robot.util.tunables.Tunable;
-
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.Logger;
-import frc.robot.commands.JoystickDriveCommand;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.pivot.Pivot;
+import frc.robot.subsystems.intake.pivot.PivotIOSim;
+import frc.robot.subsystems.intake.pivot.PivotIOTalonFX;
+import frc.robot.subsystems.intake.rollers.Rollers;
+import frc.robot.subsystems.intake.rollers.RollersIOSim;
+import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.aiming.Aiming;
-import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
@@ -44,8 +38,13 @@ import frc.robot.subsystems.shooter.spindexer.SpindexerIOTalonFX;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
 import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
+import frc.robot.subsystems.vision.Vision;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.util.Telemetry;
+import frc.robot.util.TunerConstants;
 
 public class RobotContainer {
 
@@ -56,53 +55,31 @@ public class RobotContainer {
 	// Subsystems
 	public static Vision vision;
 	public static CommandSwerveDrivetrain drivetrain;
-
-	public static Shooter shooter;
 	public static Flywheel flywheel;
 	public static Turret turret;
 	public static Hood hood;
+	public static Shooter shooter;
 	public static Spindexer spindexer;
-
-	public static Superstructure superstructure;
-	public static Aiming aiming;
-
-	public static SimShootingParameters simShootingParameters = new SimShootingParameters(Degrees.zero(), Degrees.zero(), MetersPerSecond.zero());
+  	public static Pivot pivot;
+	public static Rollers rollers;
+	public static Intake intake;
 
 	private SwerveDriveSimulation driveSimulation;
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
-	public static FuelSim fuelSim = new FuelSim("fuel");
-
-	private boolean withConstantVelocity = false;
-	private boolean whileMoving = true;
-
-	double launchSpeed = 0;
-	double hoodAngle = 0;
-	Tunable launchSpeedTunable = new Tunable("launch speed (MPS)",5,(value)->launchSpeed = value);
-	Tunable hoodAngleTunable = new Tunable("launch angle (degree)",hoodAngle,(value)->hoodAngle = value);
 
 	public RobotContainer() {
-			fuelSim.registerRobot(
-				Constants.BUMPER_WIDTH,
-				Constants.BUMPER_WIDTH,
-				Inches.of(6),
-				() -> drivetrain.getRobotPose(),
-				() -> drivetrain.getFieldRelativeSpeeds()
-			);
-			fuelSim.registerIntake(Inches.of(15), Inches.of(22), Inches.of(-15), Inches.of(15));
-			// fuelSim.spawnStartingFuel();
+
 		switch (Constants.CURRENT_MODE) {
 		case REAL:
 			flywheel = new Flywheel(new FlywheelIOTalonFX());
+      		pivot = new Pivot(new PivotIOTalonFX());
+			rollers = new Rollers(new RollersIOTalonFX());
 			drivetrain = TunerConstants.createDrivetrain();
 			turret = new Turret(new TurretIOTalonFX());
 			hood = new Hood(new HoodIOTalonFX());
 			spindexer = new Spindexer(new SpindexerIOTalonFX());
-			shooter = new Shooter(
-				hood, flywheel, turret, spindexer,
-				withConstantVelocity, whileMoving
-			);
-			superstructure = new Superstructure(shooter);
-			aiming = new Aiming(turret);
+			shooter = new Shooter(hood, flywheel, turret, spindexer);
+			intake = new Intake(pivot, rollers);
 			vision =
 				new Vision(
 					drivetrain::addVisionMeasurement,
@@ -111,22 +88,17 @@ public class RobotContainer {
 
 				break;
 
-
 		case SIM:
 			flywheel = new Flywheel(new FlywheelIOSim());
+      		pivot = new Pivot(new PivotIOSim());
+			rollers = new Rollers(new RollersIOSim());
 			drivetrain = TunerConstants.createDrivetrain();
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 			turret = new Turret(new TurretIOSim());
 			hood = new Hood(new HoodIOSim());
 			spindexer = new Spindexer(new SpindexerIOSim());
-			shooter = new Shooter(
-				hood, flywheel, turret, spindexer,
-				withConstantVelocity, whileMoving
-			);
-			superstructure = new Superstructure(shooter);
-			fuelSim.enableAirResistance();
-			fuelSim.start();
-			aiming = new Aiming(turret);
+			shooter = new Shooter(hood, flywheel, turret, spindexer);
+			intake = new Intake(pivot, rollers);
 			// vision =
 			// 	new Vision(
 			// 		drivetrain::addVisionMeasurement,
@@ -151,20 +123,33 @@ public class RobotContainer {
 	}
 
 	private void configureBindings() {
-		drivetrain.setDefaultCommand(new JoystickDriveCommand());
-		
-		// driverController.triangle()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
+
+
+		// drivetrain.setDefaultCommand(new JoystickDriveCommand());
+
+		driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
+		driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub()));
+		driverController.L1().whileTrue(intake.intakeCommand());
+		driverController.L2().whileTrue(intake.stopCommand());
+
+		// driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
+		// driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub()));
+
+		// // driverController.triangle().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
+		// // driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MIN_ANGLE));
+
+
+		//  driverController.triangle() //TODO: uncomment
+		//  	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
 		// driverController.square()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
 		// driverController.cross()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
 		// driverController.circle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
-		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
-		
-		// zeros gyro
-		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
+
+		// // zeros gyro
+		// driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 	}
 
 	public Command getAutonomousCommand() {

@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 public class FlywheelIOSim implements FlywheelIO {
 
 	private FlywheelSim sim;
-	private double appliedVoltage;
 
 	public FlywheelIOSim() {
 		sim = new FlywheelSim(
@@ -27,11 +26,7 @@ public class FlywheelIOSim implements FlywheelIO {
 
 	@Override
 	public void updateInputs(FlywheelIOInputs inputs) {
-
-		sim.setInputVoltage(appliedVoltage);
-		sim.update(0.02);
-
-		inputs.appliedVoltage = appliedVoltage;
+		inputs.appliedVoltage = getMotorVoltage();
 		inputs.tempCelcius = getMotorTemp();
 		inputs.motorVelocity = getMotorVelocity().in(RotationsPerSecond);
 		inputs.flywheelVelocity = getFlywheelVelocity().in(RotationsPerSecond);
@@ -39,7 +34,7 @@ public class FlywheelIOSim implements FlywheelIO {
 
 	@Override
 	public void setVoltage(double voltage) {
-		appliedVoltage = voltage;
+		sim.setInputVoltage(voltage);
 	}
 
 	@Override

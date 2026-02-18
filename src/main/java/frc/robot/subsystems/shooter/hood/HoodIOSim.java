@@ -18,18 +18,19 @@ public class HoodIOSim implements HoodIO {
 	public HoodIOSim() {
 		motor = DCMotor.getKrakenX44(1);
 
-		sim = new SingleJointedArmSim(
-			motor,
-			GEARING,
-			MOMENT_OF_INERTIA,
-			HOOD_LENGTH.in(Meters),
-			MIN_ANGLE.in(Radians),
-			MAX_ANGLE.in(Radians),
-			true,
-			MIN_ANGLE.in(Radians),
-			0.0,
-			0.0
-		);
+		sim =
+			new SingleJointedArmSim(
+				motor,
+				GEARING,
+				MOMENT_OF_INERTIA,
+				HOOD_LENGTH.in(Meters),
+				MIN_ANGLE.in(Radians),
+				MAX_ANGLE.in(Radians),
+				true,
+				MIN_ANGLE.in(Radians),
+				0.0,
+				0.0
+			);
 	}
 
 	@Override

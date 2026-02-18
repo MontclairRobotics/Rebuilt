@@ -1,13 +1,13 @@
-package frc.robot.subsystems.rollers;
+package frc.robot.subsystems.intake.rollers;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.AngularVelocity;
-import static frc.robot.constants.RollersConstants.CAN_ID;
+import static frc.robot.constants.RollersConstants.GEARING;
+import static frc.robot.constants.RollersConstants.MOTOR_ID;
 
 public class RollersIOTalonFX implements RollersIO {
 
@@ -15,20 +15,21 @@ public class RollersIOTalonFX implements RollersIO {
 	TalonFXConfiguration config;
 
 	public RollersIOTalonFX() {
-		motor = new TalonFX(CAN_ID);
+		motor = new TalonFX(MOTOR_ID);
+		config = new TalonFXConfiguration();
 
-		TalonFXConfiguration config = new TalonFXConfiguration();
-		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; // default
-		config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+		// motor setup and inverted setting
+		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; // TODO: needed?
 		motor.getConfigurator().apply(config);
 	}
 
 	@Override
-	public void updateInputs(RollersIOInputs inputs) {
+	public void updateInputs(IntakeIOInputs inputs) {
+		// get double (ints) as outputs
 		inputs.current = motor.getStatorCurrent().getValueAsDouble();
 		inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
 		inputs.temperature = motor.getDeviceTemp().getValueAsDouble();
-		inputs.motorVelocity = getMotorVelocity().in(RotationsPerSecond);
+		inputs.velocity = getVelocity().in(RotationsPerSecond);
 	}
 
 	@Override
@@ -42,7 +43,7 @@ public class RollersIOTalonFX implements RollersIO {
 	}
 
 	@Override
-	public AngularVelocity getMotorVelocity() {
-		return motor.getVelocity().getValue();
+	public AngularVelocity getVelocity() {
+		return motor.getVelocity().getValue().div(GEARING);
 	}
 }
