@@ -18,94 +18,88 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
+import frc.robot.util.tunables.Tunable;
+
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Pivot extends SubsystemBase {
 
-  public PivotIO io;
-  private PivotIOInputsAutoLogged inputs = new PivotIOInputsAutoLogged();
+	public PivotIO io;
+	private PivotIOInputsAutoLogged inputs = new PivotIOInputsAutoLogged();
 
-  private PIDController pidController;
-  private ArmFeedforward pivotFeedfoward;
-  private PivotVisualization visualization;
+	private PIDController pidController;
+	private ArmFeedforward feedforward;
+	private PivotVisualization visualization;
 
-  public Pivot(PivotIO io) {
-    this.io = io;
-    this.visualization = new PivotVisualization();
+	public Pivot(PivotIO io) {
+		this.io = io;
+		this.visualization = new PivotVisualization();
 
-    pidController = new PIDController(kP, kI, kD);
-    pivotFeedfoward = new ArmFeedforward(kS, kG, kV);
+		pidController = new PIDController(kP, kI, kD);
+		feedforward = new ArmFeedforward(kS, kG, kV);
 
-    pidController.disableContinuousInput();
-    pidController.setTolerance(TOLERANCE.in(Rotations));
-  }
+		Tunable kP = new Tunable("Pivot/kP", pidController.getP(), (val) -> pidController.setP(val));
+		Tunable kD = new Tunable("Pivot/kD", pidController.getD(), (val) -> pidController.setD(val));
+		Tunable kG = new Tunable("Pivot/kG", feedforward.getKg(), (val) -> feedforward.setKg(val));
 
-  @Override
-  public void periodic() {
-    io.updateInputs(inputs);
-    Logger.processInputs("Pivot", inputs);
-    visualization.update();
-    visualization.log();
-  }
+		pidController.disableContinuousInput();
+		pidController.setTolerance(TOLERANCE.in(Rotations));
+	}
 
-  public boolean atSetpoint() {
-    return pidController.atSetpoint();
-  }
+	@Override
+	public void periodic() {
+		io.updateInputs(inputs);
+		Logger.processInputs("Pivot", inputs);
+		visualization.update();
+		visualization.log();
+	}
 
-  public Command testVoltageCommand() {
-    return Commands.run(() -> io.setVoltage(2));
-  }
+	public boolean atSetpoint() {
+		return pidController.atSetpoint();
+	}
 
-  public void setPivotAngle(Angle angle) {
-    double pidOutput =
-        pidController.calculate(io.getPivotAngle().in(Rotations), angle.in(Rotations));
-    double ffOutput = pivotFeedfoward.calculate(io.getPivotAngle().in(Radians), 0);
-    double totalOutput = MathUtil.clamp(pidOutput + ffOutput, -12, 12);
-    io.setVoltage(totalOutput);
-  }
+	public Command testVoltageCommand() {
+		return Commands.run(() -> io.setVoltage(2));
+	}
 
-public void joystickControl() {
-    double voltage =
-        Math.pow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.04), 3)
-            * 12;
-    Logger.recordOutput("Pivot/JoystickVoltage", voltage);
-    Logger.recordOutput("Pivot/RawAxis", RobotContainer.driverController.getRightY());
-    io.setVoltage(voltage);
-}
+	public void setPivotAngle(Angle angle) {
+		double pidOutput = pidController.calculate(io.getAngle().in(Rotations), angle.in(Rotations));
+		double ffOutput = feedforward.calculate(io.getAngle().in(Radians), 0);
+		double totalOutput = MathUtil.clamp(pidOutput + ffOutput, -12, 12);
+		io.setVoltage(totalOutput);
+	}
 
-  public Command stopCommand() {
-    return Commands.runOnce(() -> io.stop());
-  }
+	public void joystickControl() {
+		double voltage = MathUtil.copyDirectionPow(MathUtil.applyDeadband(-RobotContainer.driverController.getRightY(), 0.04), 1.5) * 12;
+		Logger.recordOutput("Pivot/JoystickVoltage", voltage);
+		Logger.recordOutput("Pivot/RawAxis", RobotContainer.driverController.getRightY());
+		io.setVoltage(voltage);
+	}
 
-  public Command goToAngleCommand(Angle angle) {
-    return Commands.run(
-            () -> {
-              setPivotAngle(angle);
-            },
-            this)
-        .until(this::atSetpoint)
-        .finallyDo(
-            () -> {
-              io.stop();
-              pidController.reset();
-            });
-  }
+	public Command stopCommand() {
+		return Commands.runOnce(() -> io.stop());
+	}
 
-  public Command goToAngleCommand(Supplier<Angle> angle) {
-    return Commands.run(
-            () -> {
-              setPivotAngle(angle.get());
-            },
-            this)
-        .finallyDo(
-            () -> {
-              io.stop();
-              pidController.reset();
-            });
-  }
+	public Command goToAngleCommand(Angle angle) {
+		return Commands.run(() -> setPivotAngle(angle), this)
+			.until(this::atSetpoint)
+			.finallyDo(() -> {
+				io.stop();
+				pidController.reset();
+			});
+	}
 
-  public Command joystickControlCommand() {
-    return Commands.run(this::joystickControl, this);
-  }
+	public Command goToAngleCommand(Supplier<Angle> angle) {
+		return Commands.run(() -> setPivotAngle(angle.get()), this)
+			.finallyDo(() -> {
+				io.stop();
+				pidController.reset();
+			});
+	}
+
+	public Command joystickControlCommand() {
+		return Commands.run(this::joystickControl, this);
+	}
+
 }

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake.pivot;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.PivotConstants.*;
@@ -10,46 +11,54 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class PivotIOSim implements PivotIO {
 
-  private SingleJointedArmSim sim;
-  private double appliedVoltage;
+ public DCMotor motor;
+	public SingleJointedArmSim sim;
 
-  public PivotIOSim() {
-    sim =
-        new SingleJointedArmSim(
-            DCMotor.getKrakenX60(1),
-            GEARING,
-            10.0,
-            0.1,
-            MIN_ANGLE.in(Radians),
-            MAX_ANGLE.in(Radians),
-            true,
-            MIN_ANGLE.in(Radians)
-      );
-  }
+	private double appliedVoltage;
 
-  public void updateInputs(PivotIOInputs inputs) {
-    // updates the simulator
-    sim.setInputVoltage(appliedVoltage);
-    sim.update(0.02);
+	public PivotIOSim() {
+		motor = DCMotor.getKrakenX60(1);
 
-    // updates inputs
-    inputs.appliedVoltage = appliedVoltage;
-    inputs.current = sim.getCurrentDrawAmps();
-    inputs.pivotAngle = getPivotAngle().in(Rotations);
-    inputs.tempCelsius = 0;
-    inputs.encoderConnected = false;
-  }
+		sim = new SingleJointedArmSim(
+			motor,
+			GEARING,
+			MOMENT_OF_INERTIA,
+			ARM_LENGTH.in(Meters),
+			MIN_ANGLE.in(Radians),
+			MAX_ANGLE.in(Radians),
+			true,
+			MIN_ANGLE.in(Radians),
+			0.0,
+			0.0
+		);
+	}
 
-  public void setVoltage(double voltage) {
-    appliedVoltage = voltage;
-  }
+	@Override
+	public void updateInputs(PivotIOInputs inputs) {
 
-  public void stop() {
-    appliedVoltage = 0;
-    sim.setInputVoltage(0);
-  }
+		sim.setInputVoltage(appliedVoltage);
+		sim.update(0.02);
 
-  public Angle getPivotAngle() {
-    return Radians.of(sim.getAngleRads());
-  }
+		inputs.appliedVoltage = appliedVoltage;
+		inputs.current = sim.getCurrentDrawAmps();
+		inputs.angle = getAngle().in(Rotations);
+		inputs.tempCelsius = 0;
+		inputs.encoderConnected = false;
+
+	}
+
+	@Override
+	public void setVoltage(double voltage) {
+		appliedVoltage = voltage;
+	}
+
+	@Override
+	public void stop() {
+		setVoltage(0);
+	}
+
+    @Override
+    public Angle getAngle() {
+        return Radians.of(sim.getAngleRads());
+    }
 }
