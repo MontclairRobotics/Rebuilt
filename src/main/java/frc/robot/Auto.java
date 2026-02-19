@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.PivotConstants;
 
 public class Auto extends SubsystemBase {
   private String[] pathNames =
@@ -25,6 +26,7 @@ public class Auto extends SubsystemBase {
       };
   private char currentPos;
   private double timeToEmptyFuel = 6.0; //TODO: get the actual value
+  private int maxFuel = 15; //TODO: get the actual value
   private NetworkTableInstance inst = NetworkTableInstance.getDefault();
   private NetworkTable autoTable = inst.getTable("Auto");
   private StringTopic autoTopic = autoTable.getStringTopic("Auto String");
@@ -44,12 +46,12 @@ public class Auto extends SubsystemBase {
     }
 
     if(autoString.substring(0,2) != "LR" && autoString.substring(0,2) != "RL") {
-      estimatedScore += 15; //Assume we collect as much fuel as we can score at for every path + get all fuel in. Change 15 to the actual max fuel storage number
+      estimatedScore += maxFuel; //Assume we collect as much fuel as we can score at for every path + get all fuel in. Change 15 to the actual max fuel storage number
     }
 
     for(int i = 3; i < autoString.length(); i += 2) {
       if(autoString.substring(i,i + 2) != "LR" && autoString.substring(i,i + 2) != "RL") {
-        estimatedScore += 15; //Assume we collect as much fuel as we can score at for every path + get all fuel in. Change 15 to the actual max fuel storage number
+        estimatedScore += maxFuel; //Assume we collect as much fuel as we can score at for every path + get all fuel in. Change 15 to the actual max fuel storage number
       }
     }
 
@@ -73,13 +75,16 @@ public class Auto extends SubsystemBase {
       return false;
     }
 
+    currentPos = autoString.charAt(1);
     for(int i = 3; i < autoString.length(); i += 2) {
-      currentAutoString = currentAutoString.charAt(1) + autoString.substring(i, i + 2);
+      currentAutoString = currentPos + autoString.substring(i, i + 2);
       doesPathExist = false;
       for(int j = 0; j < pathNames.length; j++) {
         if(currentAutoString == pathNames[j]) {
           doesPathExist = true;
         }
+
+        currentPos = currentAutoString.charAt(1);
       }
 
       if(! doesPathExist) {
@@ -90,8 +95,6 @@ public class Auto extends SubsystemBase {
     return true;
   }
 
-  //TODO: Make it work for both alliance
-  //TODO: Account for ferrying
   public Command buildAuto(String autoString) {
     if (!isAutoValid(autoString)) {
       return RobotContainer.shooter.indexAndShootCommand(() -> Units.RadiansPerSecond.of(0.0)).withTimeout(timeToEmptyFuel * (8.0 / 24.0)); //TODO: Get max amount of fuel
@@ -104,54 +107,53 @@ public class Auto extends SubsystemBase {
       if(currentPos != 'D' || autoString.charAt(2) == '0' && currentPos != 'O' || autoString.charAt(2) == '0') {
         if(DriverStation.getAlliance().get() == Alliance.Blue) {
           autoCommand.addCommands(
-            //No pivot, so these commands and objects are standins and don't actually exist
-            // RobotContainer.pivot.stowCommand(),
+            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
             Commands.race(
-                AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)))
-                // RobotContainer.rollers.intakeCommand() //IDK how they have implemented scoring while dirving so this is a placeholder
+                AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3))),
+                RobotContainer.rollers.intakeCommand()
             )
           );
         } else {
           autoCommand.addCommands(
-          // RobotContainer.pivot.stowCommand(),
+            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
             Commands.race(
-              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)).flipPath())
-              // RobotContainer.rollers.intakeCommand() //IDK how they have implemented scoring while dirving so this is a placeholder
+              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)).flipPath()),
+              RobotContainer.rollers.intakeCommand()
             )
           );
         }
 
-        if(autoString.charAt(1) == 'L' || autoString.charAt(1) == 'R') {
+        if(autoString.charAt(1) == 'L' || autoString.charAt(1) == 'R' && autoString.substring(0,2) != "LR" && autoString.substring(0,2) != "RL") {
           autoCommand.addCommands(
-            // RobotContainer.pivot.unstowCommand(),
+            RobotContainer.pivot.goToAngleCommand(PivotConstants.MAX_ANGLE),
             RobotContainer.shooter.indexAndShootCommand(() -> Units.RadiansPerSecond.of(0.0)).withTimeout(timeToEmptyFuel)
           );
         }
       } else {
         if(DriverStation.getAlliance().get() == Alliance.Blue) {
           autoCommand.addCommands(
-            //RobotContainer.pivot.stowCOmmand(),
+            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
             Commands.race(
               AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3))),
               Commands.sequence(
-                Commands.waitUntil(() -> Superstructure.isInScoringZone())
-                // RobotContainer.pivot.unstowCommand(),
+                Commands.waitUntil(() -> Superstructure.isInScoringZone()),
+                RobotContainer.pivot.goToAngleCommand(PivotConstants.MAX_ANGLE)
                 //RobotContainer.shooter.whileScoring() //IDK how they have implemented scoring while dirving so this is a placeholder
-              )
-              // RobotContainer.rollers.intakeCommand()
+              ),
+              RobotContainer.rollers.intakeCommand()
             )
           );
         } else {
           autoCommand.addCommands(
-              //RobotContainer.pivot.stowCOmmand(),
+              RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
               Commands.race(
                 AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)).flipPath()),
                 Commands.sequence(
-                  Commands.waitUntil(() -> Superstructure.isInScoringZone())
-                  // RobotContainer.pivot.unstowCommand(),
-                  //RobotContainer.shooter.whileScoring() //IDK how they have implemented scoring while dirving so this is a placeholder
-                )
-                // RobotContainer.rollers.intakeCommand()
+                  Commands.waitUntil(() -> Superstructure.isInScoringZone()),
+                  RobotContainer.pivot.goToAngleCommand(PivotConstants.MAX_ANGLE)
+                  // RobotContainer.shooter.whileScoring().until(() -> !Superstructure.isInScoringZone()) IDK how they have implemented scoring while dirving so this is a placeholder
+                ),
+                RobotContainer.rollers.intakeCommand()
               )
             );
         }
@@ -164,19 +166,19 @@ public class Auto extends SubsystemBase {
       try {
         if(DriverStation.getAlliance().get() == Alliance.Blue) {
           autoCommand.addCommands(
-            //RobotContainer.pivot.stowCommand(),
+            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
             AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(i - 1, i + 2)))
           );
         } else {
           autoCommand.addCommands(
-            //RobotContainer.pivot.stowCommand(),
+            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
             AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(i - 1, i + 2)).flipPath())
           );
         }
 
         if(autoString.charAt(i) == 'L' || autoString.charAt(i) == 'R') {
           autoCommand.addCommands(
-            //Robot.pivot.unstowCommand(),
+            RobotContainer.pivot.goToAngleCommand(PivotConstants.MAX_ANGLE),
             RobotContainer.shooter.indexAndShootCommand(() -> Units.RadiansPerSecond.of(0.0)).withTimeout(timeToEmptyFuel)
           );
         }
