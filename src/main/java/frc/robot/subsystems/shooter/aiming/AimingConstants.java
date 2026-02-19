@@ -83,11 +83,11 @@ public class AimingConstants {
 
 	static {
 
-		SIM_CONSTANT_VELOCITY_MAP.put(1.540124, new SimShotSettings(Degrees.of(6), MetersPerSecond.of(9.5), Seconds.of(1.61), true));
-		SIM_CONSTANT_VELOCITY_MAP.put(2.367771, new SimShotSettings(Degrees.of(9.5), MetersPerSecond.of(9.5), Seconds.of(1.58), true));
-		SIM_CONSTANT_VELOCITY_MAP.put(3.510013, new SimShotSettings(Degrees.of(14), MetersPerSecond.of(9.5), Seconds.of(1.58), true));
-		SIM_CONSTANT_VELOCITY_MAP.put(4.586577, new SimShotSettings(Degrees.of(20), MetersPerSecond.of(9.5), Seconds.of(1.5), true));
-		SIM_CONSTANT_VELOCITY_MAP.put(5.653741, new SimShotSettings(Degrees.of(28), MetersPerSecond.of(9.5), Seconds.of(1.42), true));
+		SIM_CONSTANT_VELOCITY_MAP.put(0.8516690912634933, new SimShotSettings(Degrees.of(3), MetersPerSecond.of(9), Seconds.of(1.52), true));
+		SIM_CONSTANT_VELOCITY_MAP.put(2.0927103773901443, new SimShotSettings(Degrees.of(10), MetersPerSecond.of(9), Seconds.of(1.504), true));
+		SIM_CONSTANT_VELOCITY_MAP.put(3.3339369176475455, new SimShotSettings(Degrees.of(15), MetersPerSecond.of(9), Seconds.of(1.512), true));
+		SIM_CONSTANT_VELOCITY_MAP.put(4.5789466791916436, new SimShotSettings(Degrees.of(25), MetersPerSecond.of(9), Seconds.of(1.34), true));
+		SIM_CONSTANT_VELOCITY_MAP.put(5.8242079384087, new SimShotSettings(Degrees.of(40), MetersPerSecond.of(9), Seconds.of(1.04), true));
 
 		SIM_MAP.put(0.99912, new SimShotSettings(Degrees.of(7), MetersPerSecond.of(7), Seconds.of(1.12), false));
 		SIM_MAP.put(2.005294, new SimShotSettings(Degrees.of(16), MetersPerSecond.of(7), Seconds.of(1.12), false));
