@@ -71,7 +71,7 @@ public class FieldConstants {
             }
         };
 
-		public static final Translation2d[][] TRENCH_DANGER_ZONES = {
+		public static Translation2d[][] TRENCH_DANGER_ZONES = {
 
 			// near right trench
             new Translation2d[] {
