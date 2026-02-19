@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.pivot.Pivot;
 import frc.robot.subsystems.intake.pivot.PivotIOSim;
 import frc.robot.subsystems.intake.pivot.PivotIOTalonFX;
@@ -62,7 +61,6 @@ public class RobotContainer {
 	public static Spindexer spindexer;
   	public static Pivot pivot;
 	public static Rollers rollers;
-	public static Intake intake;
 
 	private SwerveDriveSimulation driveSimulation;
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
@@ -79,7 +77,6 @@ public class RobotContainer {
 			hood = new Hood(new HoodIOTalonFX());
 			spindexer = new Spindexer(new SpindexerIOTalonFX());
 			shooter = new Shooter(hood, flywheel, turret, spindexer);
-			intake = new Intake(pivot, rollers);
 			vision =
 				new Vision(
 					drivetrain::addVisionMeasurement,
@@ -98,7 +95,6 @@ public class RobotContainer {
 			hood = new Hood(new HoodIOSim());
 			spindexer = new Spindexer(new SpindexerIOSim());
 			shooter = new Shooter(hood, flywheel, turret, spindexer);
-			intake = new Intake(pivot, rollers);
 			// vision =
 			// 	new Vision(
 			// 		drivetrain::addVisionMeasurement,
@@ -129,8 +125,11 @@ public class RobotContainer {
 
 		driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
 		driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub()));
-		driverController.L1().whileTrue(intake.intakeCommand());
-		driverController.L2().whileTrue(intake.stopCommand());
+		driverController.L1().whileTrue(rollers.intakeCommand());
+		driverController.L2().whileTrue(rollers.stopCommand());
+
+		//operatorController.circle().onTrue(pivot.cSetPivotAngle(90));
+
 
 		// driverController.R2().whileTrue(turret.setFieldRelativeAngleCommand(() -> turret.getAngleToHub()));
 		// driverController.R1().whileTrue(hood.setAngleCommand(() -> hood.getAngleToHub()));

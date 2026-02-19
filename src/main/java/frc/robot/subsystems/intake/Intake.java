@@ -9,6 +9,7 @@ import frc.robot.subsystems.intake.rollers.Rollers;
 public class Intake {
     private Pivot pivot;
     private Rollers rollers;
+
     public Intake(Pivot pivot, Rollers rollers){
         this.pivot = pivot;
         this.rollers = rollers;
