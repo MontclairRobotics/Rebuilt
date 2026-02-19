@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import java.io.File;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;

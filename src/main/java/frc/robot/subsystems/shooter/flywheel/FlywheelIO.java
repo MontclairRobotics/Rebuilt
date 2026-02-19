@@ -2,10 +2,12 @@ package frc.robot.subsystems.shooter.flywheel;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public interface FlywheelIO {
-
+	
 	@AutoLog
 	public class FlywheelIOInputs {
 		public double appliedVoltage = 0.0;
@@ -13,13 +15,16 @@ public interface FlywheelIO {
 		public double motorVelocity = 0.0; // rotations per second
 		public double flywheelVelocity = 0.0; // rotations per second
 	}
-
+	// public static enum flywheelMode {
+	// 	COAST,
+	// 	NOT_COAST
+	// }
 	public void updateInputs(FlywheelIOInputs inputs);
 
 	public void setVoltage(double voltage);
 
 	public void stop();
-
+	
 	/**
 	 * @return the angular velocity of the <b>motor shaft</b>, in rotations per second
 	 */

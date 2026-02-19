@@ -5,8 +5,10 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -20,18 +22,19 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
-
 	private final FlywheelIO io;
 	private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
 	private PIDController pidController;
+	//private BangBangController bangBangController;
+	final 
 	private SimpleMotorFeedforward motorFeedforward;
 
 	SysIdRoutine flyWheelRoutine;
 
 	public Flywheel(FlywheelIO io) {
 		this.io = io;
-
+		//bangBangController = new BangBangController(TOLERANCE.in(RotationsPerSecond));
 		pidController = new PIDController(kP, kI, kD);
 		pidController.setTolerance(TOLERANCE.in(RotationsPerSecond));
 
@@ -54,9 +57,11 @@ public class Flywheel extends SubsystemBase {
 	 */
 	public void setVelocityRPS(AngularVelocity targetFlywheelVelocity) {
 		double pidOutput = pidController.calculate(io.getFlywheelVelocity().in(RotationsPerSecond), targetFlywheelVelocity.in(RotationsPerSecond));
+		//double bangOutput = bangBangController.calculate(io.getFlywheelVelocity().in(RotationsPerSecond),targetFlywheelVelocity.in(RotationsPerSecond));
 		double ffOutput = motorFeedforward.calculate(targetFlywheelVelocity.in(RotationsPerSecond));
 		double totalOutput = pidOutput + ffOutput;
-		io.setVoltage(MathUtil.clamp(totalOutput, -12.0, 12.0));
+		//double totalOutput = bangOutput + ffOutput;
+		io.setVoltage(MathUtil.clamp(totalOutput, 12.0, -12.0));
 	}
 
 	/**
@@ -72,12 +77,14 @@ public class Flywheel extends SubsystemBase {
 	 */
 	public boolean atSetpoint() {
 		return pidController.atSetpoint();
+		//return bangBangController.atSetpoint();
 	}
 
 	@Override
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Flywheel", inputs);
+		//Logger.recordOutput("Flywheel/Setpoint", bangBangController.getSetpoint());
 		Logger.recordOutput("Flywheel/Setpoint", pidController.getSetpoint());
 		Logger.recordOutput("Flywheel/Velocity", io.getFlywheelVelocity().in(RotationsPerSecond));
 
