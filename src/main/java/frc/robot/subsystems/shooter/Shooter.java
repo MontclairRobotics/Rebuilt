@@ -96,7 +96,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
-        if (RobotContainer.driverController.circle().getAsBoolean() && RobotContainer.shooter.atSetpoint()) {
+        if (RobotContainer.driverController.R2().getAsBoolean() && RobotContainer.shooter.atSetpoint()) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
 
@@ -123,7 +123,7 @@ public class Shooter extends SubsystemBase {
 
     public Command indexAndShootCommand(Supplier<AngularVelocity> flywheelVelocitySupplier) {
         return Commands.run(() -> {
-            if (RobotContainer.driverController.circle().getAsBoolean() && this.atSetpoint()) {
+            if (RobotContainer.driverController.R2().getAsBoolean() && this.atSetpoint()) {
                 spindexer.spin();
                 flywheel.setVelocityRPS(flywheelVelocitySupplier);
             }
