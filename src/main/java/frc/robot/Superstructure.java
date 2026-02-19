@@ -91,7 +91,7 @@ public class Superstructure extends SubsystemBase {
 		return AllianceManager.isRed();
     }
 
-    public boolean isInScoringZone() {
+    public static boolean isInScoringZone() {
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
 
         return
@@ -158,7 +158,7 @@ public class Superstructure extends SubsystemBase {
         	);
     }
 
-    public boolean shouldStowHood() {
+    public static boolean shouldStowHood() {
 		if(!AllianceManager.isAllianceKnown()) return false;
         return inTrenchDangerZone();
     }
