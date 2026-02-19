@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 
@@ -26,6 +27,7 @@ public class HoodConstants {
 	public static final double MOMENT_OF_INERTIA = 0.03038161694; // from CAD on 3/3/2026
 	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0); // absolute encoder
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
+	public static final double HOOD_LOWER_TIME = 0.6;
 
 	// pid
 	public static final double kP = 20;

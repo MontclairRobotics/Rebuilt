@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -34,6 +35,8 @@ public class Flywheel extends SubsystemBase {
 		pidController = new PIDController(kP, kI, kD);
 		pidController.setTolerance(TOLERANCE.in(RotationsPerSecond));
 
+		motorFeedforward = new SimpleMotorFeedforward(kS, kV);
+
 		flyWheelRoutine = new SysIdRoutine(
 			new SysIdRoutine.Config(
 				null,
@@ -53,7 +56,7 @@ public class Flywheel extends SubsystemBase {
 		double pidOutput = pidController.calculate(io.getFlywheelVelocity().in(RotationsPerSecond), targetFlywheelVelocity.in(RotationsPerSecond));
 		double ffOutput = motorFeedforward.calculate(targetFlywheelVelocity.in(RotationsPerSecond));
 		double totalOutput = pidOutput + ffOutput;
-		io.setVoltage(MathUtil.clamp(totalOutput, 12.0, -12.0));
+		io.setVoltage(MathUtil.clamp(totalOutput, -12.0, 12.0));
 	}
 
 	/**
@@ -75,7 +78,12 @@ public class Flywheel extends SubsystemBase {
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Flywheel", inputs);
+		Logger.recordOutput("Flywheel/Setpoint", pidController.getSetpoint());
+		Logger.recordOutput("Flywheel/Velocity", io.getFlywheelVelocity().in(RotationsPerSecond));
+
 	}
+
+
 
 	public Command holdVelocityCommand(AngularVelocity targetFlywheelVelocity) {
 		return Commands.run(() -> {
