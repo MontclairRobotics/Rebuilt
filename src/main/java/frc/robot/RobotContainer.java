@@ -16,10 +16,18 @@ import static edu.wpi.first.units.Units.Inches;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.TurretConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.pivot.Pivot;
+import frc.robot.subsystems.intake.pivot.PivotIOSim;
+import frc.robot.subsystems.intake.pivot.PivotIOTalonFX;
+import frc.robot.subsystems.intake.rollers.Rollers;
+import frc.robot.subsystems.intake.rollers.RollersIOSim;
+import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -31,7 +39,6 @@ import frc.robot.util.tunables.Tunable;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
-import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
@@ -65,6 +72,10 @@ public class RobotContainer {
 	public static Turret turret;
 	public static Hood hood;
 	public static Spindexer spindexer;
+
+	public static Pivot pivot;
+	public static Rollers rollers;
+	public static Intake intake;
 
 	public static Superstructure superstructure;
 	public static Aiming aiming;
@@ -104,6 +115,9 @@ public class RobotContainer {
 				hood, flywheel, turret, spindexer,
 				withConstantVelocity, whileMoving
 			);
+			pivot = new Pivot(new PivotIOTalonFX());
+			rollers = new Rollers(new RollersIOTalonFX());
+			intake = new Intake(pivot, rollers);
 			superstructure = new Superstructure(shooter);
 			aiming = new Aiming(turret);
 			vision =
@@ -126,6 +140,9 @@ public class RobotContainer {
 				hood, flywheel, turret, spindexer,
 				withConstantVelocity, whileMoving
 			);
+			pivot = new Pivot(new PivotIOSim());
+			rollers = new Rollers(new RollersIOSim());
+			intake = new Intake(pivot, rollers);
 			superstructure = new Superstructure(shooter);
 			fuelSim.enableAirResistance();
 			fuelSim.start();
