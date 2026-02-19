@@ -4,6 +4,7 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import static edu.wpi.first.units.Units.Meters;
@@ -16,17 +17,20 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Mode;
+import frc.robot.constants.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
+import frc.robot.util.FieldConstants.LeftTrench;
+import frc.robot.util.FieldConstants.LinesVertical;
 import frc.robot.util.HubTracker;
 import frc.robot.util.PoseUtils;
 
 public class Superstructure extends SubsystemBase {
 
-    private Shooter shooter;
+	private Shooter shooter;
 
-    public Superstructure(Shooter shooter) {
+	public Superstructure(Shooter shooter) {
 		this.shooter = shooter;
 		if(CURRENT_MODE == Mode.SIM) {
 			scoringModeTrigger.whileTrue(
@@ -63,7 +67,7 @@ public class Superstructure extends SubsystemBase {
 				shooter.stowCommand());
 		}
 
-    }
+	}
 
 	public final Trigger scoringModeTrigger =
 			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldBeScoring());
@@ -77,15 +81,46 @@ public class Superstructure extends SubsystemBase {
 	public final Trigger shouldStowHoodTrigger =
 			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldStowHood());
 
-    @Override
-    public void periodic() {
+	@Override
+	public void periodic() {
 		Logger.recordOutput("Superstructure/isallianceknown", AllianceManager.isAllianceKnown());
 		Logger.recordOutput("Superstructure/currentshiftempty", HubTracker.getCurrentShift().isEmpty());
-        Logger.recordOutput("Superstructure/shouldBeScoring", shouldBeScoring());
-        Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
-        Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
-        Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowHood());
-    };
+		Logger.recordOutput("Superstructure/shouldBeScoring", shouldBeScoring());
+		Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
+		Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
+		Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowHood());
+		updateTrenchZonesVeloBased();
+	};
+
+	public void updateTrenchZonesVeloBased(){
+		//Updates width of zone based on robot velocity
+		Distance dynamicTrenchDangerZoneWidth = Meters.of(0.15 + Math.abs(RobotContainer.drivetrain.getFieldRelativeVelocity().getX())* HoodConstants.HOOD_LOWER_TIME);
+		FieldConstants.Zones.TRENCH_DANGER_ZONES = new Translation2d[][]{
+			// near right trench
+            new Translation2d[] {
+                new Translation2d(LinesVertical.HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), Meters.zero()),
+                new Translation2d(LinesVertical.HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.RightTrench.WIDTH)
+            },
+
+			// near left trench
+            new Translation2d[] {
+                new Translation2d(LinesVertical.HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH.minus(LeftTrench.WIDTH)),
+                new Translation2d(LinesVertical.HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH)
+            },
+
+			// far right trench
+            new Translation2d[] {
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), Meters.zero()),
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.RightTrench.WIDTH)
+            },
+
+			// far left trench
+            new Translation2d[] {
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH.minus(LeftTrench.WIDTH)),
+                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH)
+            }
+        };
+	}
 
     public boolean isRedAlliance() {
 		return AllianceManager.isRed();

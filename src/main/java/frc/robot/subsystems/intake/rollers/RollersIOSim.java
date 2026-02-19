@@ -1,4 +1,4 @@
-package frc.robot.subsystems.rollers;
+package frc.robot.subsystems.intake.rollers;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.AngularVelocity;
