@@ -10,7 +10,7 @@ import frc.robot.RobotContainer;
 import frc.robot.constants.TurretConstants;
 
 public class TurretVisualization {
-    
+
     public Pose3d turretPose = new Pose3d();
 
 	public void update() {

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter2.aiming;
+package frc.robot.subsystems.shooter.aiming;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,11 +14,11 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
+import frc.robot.subsystems.shooter.aiming.AimingConstants.ShotSettings;
+import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
+import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShotSettings;
 import frc.robot.subsystems.shooter.turret.Turret;
-import frc.robot.subsystems.shooter2.aiming.AimingConstants.ShootingParameters;
-import frc.robot.subsystems.shooter2.aiming.AimingConstants.ShotSettings;
-import frc.robot.subsystems.shooter2.aiming.AimingConstants.SimShootingParameters;
-import frc.robot.subsystems.shooter2.aiming.AimingConstants.SimShotSettings;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 

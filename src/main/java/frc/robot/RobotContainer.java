@@ -27,20 +27,18 @@ import frc.robot.subsystems.intake.pivot.PivotIOTalonFX;
 import frc.robot.subsystems.intake.rollers.Rollers;
 import frc.robot.subsystems.intake.rollers.RollersIOSim;
 import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.aiming.Aiming;
+import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
+import frc.robot.subsystems.shooter.spindexer.Spindexer;
+import frc.robot.subsystems.shooter.spindexer.SpindexerIOSim;
+import frc.robot.subsystems.shooter.spindexer.SpindexerIOTalonFX;
 import frc.robot.subsystems.shooter.turret.Turret;
+import frc.robot.subsystems.shooter.turret.TurretIOSim;
 import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
-import frc.robot.subsystems.shooter2.Shooter;
-import frc.robot.subsystems.shooter2.aiming.Aiming;
-import frc.robot.subsystems.shooter2.aiming.AimingConstants.SimShootingParameters;
-import frc.robot.subsystems.shooter2.hood2.Hood;
-import frc.robot.subsystems.shooter2.hood2.HoodIOSim;
-import frc.robot.subsystems.shooter2.hood2.HoodIOTalonFX;
-import frc.robot.subsystems.shooter2.spindexer.Spindexer;
-import frc.robot.subsystems.shooter2.spindexer.SpindexerIOSim;
-import frc.robot.subsystems.shooter2.spindexer.SpindexerIOTalonFX;
-import frc.robot.subsystems.shooter2.turret2.Turret2;
-import frc.robot.subsystems.shooter2.turret2.TurretIOSim2;
-import frc.robot.subsystems.shooter2.turret2.TurretIOTalonFX2;
+import frc.robot.subsystems.shooter.hood.Hood;
+import frc.robot.subsystems.shooter.hood.HoodIOSim;
+import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -69,7 +67,7 @@ public class RobotContainer {
 	public static Shooter shooter;
 	// public static Flywheel2 flywheel;
 	public static Turret turret;
-	public static Hood hood;
+	public static frc.robot.subsystems.shooter.hood.Hood hood;
 	public static Spindexer spindexer;
 
 	public static Pivot pivot;
@@ -132,7 +130,7 @@ public class RobotContainer {
 			// flywheel = new Flywheel2(new FlywheelIOSim2());
 			drivetrain = TunerConstants.createDrivetrain();
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
-			turret = new Turret2(new TurretIOSim2());
+			turret = new Turret(new TurretIOSim());
 			hood = new Hood(new HoodIOSim());
 			spindexer = new Spindexer(new SpindexerIOSim());
 			// shooter = new Shooter(

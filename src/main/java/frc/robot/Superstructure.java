@@ -9,15 +9,15 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.constants.Constants.CURRENT_MODE;
-import static frc.robot.subsystems.shooter2.aiming.Aiming.TargetLocation.FERRY_LEFT;
-import static frc.robot.subsystems.shooter2.aiming.Aiming.TargetLocation.FERRY_RIGHT;
-import static frc.robot.subsystems.shooter2.aiming.Aiming.TargetLocation.HUB;
+import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.FERRY_LEFT;
+import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.FERRY_RIGHT;
+import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.HUB;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Mode;
-import frc.robot.subsystems.shooter2.Shooter;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.constants.HoodConstants;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter.turret;
+package frc.robot.subsystems.shooter.hood;
 
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -8,29 +8,28 @@ import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 
-public interface TurretIO {
+public interface HoodIO {
 
     @AutoLog
-    public class TurretIOInputs {
+    public class HoodIOInputs {
         public boolean motorConnected = false;
 
         public double appliedVoltage = 0.0;
         public double currentDrawAmps = 0.0;
         public double tempCelcius = 0.0;
 
-        public AngularVelocity motorVelocity = RotationsPerSecond.zero();
         public Angle motorPosition = Rotations.zero();
-
-        public Angle robotRelativeAngle = Rotations.zero();
-        public Angle fieldRelativeAngle = Rotations.zero();
-
-        public Angle robotRelativeAngleSetpoint = Rotations.zero();
         public Angle motorPositionSetpoint = Rotations.zero();
+        public AngularVelocity motorVelocity = RotationsPerSecond.zero();
+
+        public Angle hoodAngle = Rotations.zero();
+        public Angle hoodAngleSetpoint = Rotations.zero();
+        public AngularVelocity hoodVelocity = RotationsPerSecond.zero();
     }
 
-    public void updateInputs(TurretIOInputs inputs);
+    public void updateInputs(HoodIOInputs inputs);
 
-    public void setRobotRelativeAngle(Angle angle);
+    public void setAngle(Angle angle);
 
     public void setVoltage(double voltage);
 
@@ -38,6 +37,6 @@ public interface TurretIO {
 
     public boolean isAtSetpoint();
 
-    public void setGains(double kP, double kD, double kS);
+    public void setGains(double kP, double kD, double kS, double kG);
 
 }

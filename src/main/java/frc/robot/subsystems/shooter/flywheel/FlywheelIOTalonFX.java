@@ -16,7 +16,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.CAN;
 import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.*;

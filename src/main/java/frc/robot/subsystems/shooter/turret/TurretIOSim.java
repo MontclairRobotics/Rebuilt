@@ -53,7 +53,7 @@ public class TurretIOSim implements TurretIO {
 
        inputs.appliedVoltage = appliedVoltage;
        inputs.currentDrawAmps = sim.getCurrentDrawAmps();
-       inputs.tempCelcius = 0; // motor temperature is not simulated 
+       inputs.tempCelcius = 0; // motor temperature is not simulated
 
        // sim tracks everything relative to the MECHANISM, meaning we have to multiply each output
        // by the GEARING value to convert it to MOTOR SHAFT values
@@ -103,5 +103,5 @@ public class TurretIOSim implements TurretIO {
         pidController.setD(kD);
         feedforward.setKs(kS);
     }
-    
+
 }
