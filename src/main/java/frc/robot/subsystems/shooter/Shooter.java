@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter;
+// package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -52,21 +52,21 @@ public class Shooter extends SubsystemBase {
         this.whileMoving = whileMoving;
     }
 
-	public Pose3d getFieldRelativePosition() {
-		Translation2d turretTranslation2d = turret.getFieldRelativePosition();
-		return new Pose3d(
-			new Translation3d(
-				turretTranslation2d.getX(),
-				turretTranslation2d.getY(),
-				TurretConstants.ORIGIN_TO_TURRET.getZ()
-			),
-			new Rotation3d(
-				Rotations.zero(),
-				Rotations.zero(),
-				turret.getFieldRelativeAngle()
-			)
-		);
-	}
+// 	public Pose3d getFieldRelativePosition() {
+// 		Translation2d turretTranslation2d = turret.getFieldRelativePosition();
+// 		return new Pose3d(
+// 			new Translation3d(
+// 				turretTranslation2d.getX(),
+// 				turretTranslation2d.getY(),
+// 				TurretConstants.ORIGIN_TO_TURRET.getZ()
+// 			),
+// 			new Rotation3d(
+// 				Rotations.zero(),
+// 				Rotations.zero(),
+// 				turret.getFieldRelativeAngle()
+// 			)
+// 		);
+// 	}
 
     public boolean atSetpoint() {
         return turret.atSetpointForShooting() && hood.atSetpoint();
@@ -130,10 +130,10 @@ public class Shooter extends SubsystemBase {
         });
     }
 
-    public Command stowCommand(){
-        return Commands.parallel (
-			hood.setAngleCommand(() -> HoodConstants.MIN_ANGLE),
-			turret.stopCommand()
-		);
-    }
-}
+//     public Command stowCommand(){
+//         return Commands.parallel (
+// 			hood.setAngleCommand(() -> HoodConstants.MIN_ANGLE),
+// 			turret.stopCommand()
+// 		);
+//     }
+// }

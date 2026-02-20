@@ -2,8 +2,6 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -11,12 +9,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
-import frc.robot.Superstructure;
 
 import static frc.robot.constants.DriveConstants.SIGNIFICANT_VELOCITY;
 import static frc.robot.constants.DriveConstants.TRENCH_TRANSLATION_kD;
@@ -71,9 +66,9 @@ public class JoystickDriveCommand extends Command {
 		addRequirements(drivetrain);
 	}
 
-	private boolean shouldTrenchLock() {
-		return Superstructure.inTrenchZone() && drivingBiasedForwards() && Superstructure.movingIntoObstacle();
-	}
+	// private boolean shouldTrenchLock() {
+	// 	return Superstructure.inTrenchZone() && drivingBiasedForwards() && Superstructure.movingIntoObstacle();
+	// }
 
 	private boolean shouldBumpLock() {
 		return Superstructure.inBumpZone() && drivingBiasedForwards()

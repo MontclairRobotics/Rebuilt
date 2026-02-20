@@ -38,6 +38,10 @@ public class Spindexer extends SubsystemBase {
 		io.stopIndex();
 	}
 
+	public Command stopCommand() {
+		return Commands.runOnce(() -> stop());
+	}
+
 	public Command spinCommand() {
 		return Commands.run(() -> spin());
 	}
