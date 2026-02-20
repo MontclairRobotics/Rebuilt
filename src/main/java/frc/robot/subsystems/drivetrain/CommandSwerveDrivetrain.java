@@ -472,10 +472,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		return alignToAngleFieldRelativeCommand(angle.get(), lockDrive);
 	}
 
-	public Command stopCommand() {
-		return Commands.runOnce(() -> drive(0, 0, 0, false, false));
-	}
-
 	@Override
 	public void periodic() {
 

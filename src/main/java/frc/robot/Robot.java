@@ -15,8 +15,11 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import dev.doglog.DogLog;
+import dev.doglog.DogLogOptions;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -87,13 +90,13 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void robotInit() {
 		RobotContainer.drivetrain.resetPose(new Pose2d());
-		// DogLog.setOptions(
-		// 	new DogLogOptions()
-		// 		.withLogExtras(true)
-		// 		.withCaptureDs(true)
-		// 		.withNtPublish(true)
-		// 		.withCaptureNt(true));
-		// DogLog.setPdh(new PowerDistribution(50, ModuleType.kRev));
+		DogLog.setOptions(
+			new DogLogOptions()
+				.withLogExtras(true)
+				.withCaptureDs(true)
+				.withNtPublish(true)
+				.withCaptureNt(true));
+		DogLog.setPdh(new PowerDistribution());
 		if (isSimulation()) {
 			// Do not spam the logs with "Button x on port y not available" log messages.
 			DriverStation.silenceJoystickConnectionWarning(true);
@@ -172,7 +175,7 @@ public class Robot extends LoggedRobot {
 	/** This function is called periodically whilst in simulation. */
 	@Override
 	public void simulationPeriodic() {
-		// robotContainer.fuelSim.updateSim();
+		robotContainer.fuelSim.updateSim();
 		RobotContainer.drivetrain.mapleSimSwerveDrivetrain.update();
 		robotContainer.displaySimFieldToAdvantageScope();
 	}
