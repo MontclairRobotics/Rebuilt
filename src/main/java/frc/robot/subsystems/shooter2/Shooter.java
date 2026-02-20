@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.subsystems.shooter2;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -24,12 +24,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.constants.HoodConstants;
 import frc.robot.constants.TurretConstants;
-import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
-import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
-import frc.robot.subsystems.shooter.hood.Hood;
-import frc.robot.subsystems.shooter.spindexer.Spindexer;
-import frc.robot.subsystems.shooter.turret.Turret;
+import frc.robot.subsystems.shooter2.aiming.AimingConstants.ShootingParameters;
+import frc.robot.subsystems.shooter2.aiming.AimingConstants.SimShootingParameters;
+import frc.robot.subsystems.shooter2.hood2.Hood;
+import frc.robot.subsystems.shooter2.spindexer.Spindexer;
+import frc.robot.subsystems.shooter2.turret2.Turret;
 
 public class Shooter extends SubsystemBase {
 
@@ -125,7 +125,7 @@ public class Shooter extends SubsystemBase {
         return Commands.run(() -> {
             if (RobotContainer.driverController.R2().getAsBoolean() && this.atSetpoint()) {
                 spindexer.spin();
-                flywheel.setVelocityRPS(flywheelVelocitySupplier);
+                flywheel.setVelocity(flywheelVelocitySupplier);
             }
         });
     }

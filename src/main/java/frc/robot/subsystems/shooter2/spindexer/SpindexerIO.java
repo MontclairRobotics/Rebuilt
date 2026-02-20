@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter.spindexer;
+package frc.robot.subsystems.shooter2.spindexer;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 

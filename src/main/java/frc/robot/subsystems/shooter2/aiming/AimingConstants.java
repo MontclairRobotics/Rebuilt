@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter.aiming;
+package frc.robot.subsystems.shooter2.aiming;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.Interpolatable;

@@ -1,36 +1,39 @@
 package frc.robot.subsystems.shooter.flywheel;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public interface FlywheelIO {
 
-	@AutoLog
-	public class FlywheelIOInputs {
-		public double appliedVoltage = 0.0;
-		public double tempCelcius = 0.0;
-		public double motorVelocity = 0.0; // rotations per second
-		public double flywheelVelocity = 0.0; // rotations per second
-	}
+    @AutoLog
+    public class FlywheelIOInputs {
+        public boolean leftMotorConnected = false;
+        public boolean rightMotorConnected = false;
 
-	public void updateInputs(FlywheelIOInputs inputs);
+        public AngularVelocity velocity = RotationsPerSecond.zero();
+        public AngularAcceleration acceleration = RotationsPerSecondPerSecond.zero();
+        public AngularVelocity setpointVelocity = RotationsPerSecond.zero();
+        public AngularAcceleration setpointAcceleration = RotationsPerSecondPerSecond.zero();
 
-	public void setVoltage(double voltage);
+        public double appliedVoltage = 0.0;
+        public double currentDrawAmps = 0.0;
+        public double tempCelsius = 0.0;
+        public boolean atGoal = false;
+    }
 
-	public void stop();
+    public void updateInputs(FlywheelIOInputs inputs);
 
-	/**
-	 * @return the angular velocity of the <b>motor shaft</b>, in rotations per second
-	 */
-	public AngularVelocity getMotorVelocity();
+    public void setVelocity(AngularVelocity targetVelocity);
 
-	/**
-	 * @return the angular velocity of the <b>flywheel</b>, in rotations per second
-	 */
-	public AngularVelocity getFlywheelVelocity();
+    public void stop();
 
-	public double getMotorVoltage();
+    public boolean atGoal();
 
-	public double getMotorTemp();
+    public void setGains(double kP, double kD, double kS, double kV);
+
 }

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter.hood;
+package frc.robot.subsystems.shooter2.hood2;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;

@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
-import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
+import frc.robot.subsystems.shooter2.aiming.Aiming.TargetLocation;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;

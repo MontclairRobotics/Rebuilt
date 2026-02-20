@@ -1,69 +1,96 @@
 package frc.robot.subsystems.shooter.flywheel;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.constants.FlywheelConstants.*;
-
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static frc.robot.constants.FlywheelConstants.*;
 
 public class FlywheelIOSim implements FlywheelIO {
 
-	private FlywheelSim sim;
-	private double appliedVoltage;
+    private final FlywheelSim sim;
+    private double appliedVoltage;
 
-	public FlywheelIOSim() {
-		sim = new FlywheelSim(
-			LinearSystemId.createFlywheelSystem(
-				DCMotor.getKrakenX60(2),
-				MOMENT_OF_INERTIA,
-				GEARING
-			),
-			DCMotor.getKrakenX60(2),
-			0.0
-		);
-	}
+    private ProfiledPIDController pidController;
+    private SimpleMotorFeedforward feedforward;
 
-	@Override
-	public void updateInputs(FlywheelIOInputs inputs) {
+    public FlywheelIOSim() {
+        sim = new FlywheelSim(
+            LinearSystemId.createFlywheelSystem(
+                DCMotor.getKrakenX60Foc(2),
+                MOMENT_OF_INERTIA,
+                GEARING
+            ),
+            DCMotor.getKrakenX60Foc(2),
+            0.0
+        );
 
-		sim.setInputVoltage(appliedVoltage);
-		sim.update(0.02);
+        pidController = new ProfiledPIDController(
+            kP, 0, kD,
+            new Constraints(0, 0)
+        );
 
-		inputs.appliedVoltage = appliedVoltage;
-		inputs.tempCelcius = getMotorTemp();
-		inputs.motorVelocity = getMotorVelocity().in(RotationsPerSecond);
-		inputs.flywheelVelocity = getFlywheelVelocity().in(RotationsPerSecond);
-	}
+        pidController.setTolerance(VELOCITY_TOLERANCE.in(RotationsPerSecond));
 
-	@Override
-	public void setVoltage(double voltage) {
-		appliedVoltage = voltage;
-	}
+        feedforward = new SimpleMotorFeedforward(kS, kV);
+    }
 
-	@Override
-	public void stop() {
-		setVoltage(0);
-	}
+    @Override
+    public void updateInputs(FlywheelIOInputs inputs) {
+        sim.setInputVoltage(appliedVoltage);
+        sim.update(0.02);
 
-	@Override
-	public AngularVelocity getMotorVelocity() {
-		return RotationsPerSecond.of(getFlywheelVelocity().in(RotationsPerSecond) * GEARING);
-	}
+        inputs.leftMotorConnected = true;
+        inputs.rightMotorConnected = true;
 
-	@Override
-	public AngularVelocity getFlywheelVelocity() {
-		return sim.getAngularVelocity();
-	}
+        inputs.velocity = RadiansPerSecond.of(sim.getAngularVelocityRadPerSec());
+        inputs.acceleration = RadiansPerSecondPerSecond.of(sim.getAngularAccelerationRadPerSecSq());
+        inputs.setpointVelocity = RotationsPerSecond.of(pidController.getGoal().position); // for a flywheel, 'position' = velocity setpoint
+        inputs.setpointAcceleration = RotationsPerSecondPerSecond.of(pidController.getGoal().velocity); // for a flywheel, 'velocity' = acceleration setpoint
 
-	@Override
-	public double getMotorVoltage() {
-		return sim.getInputVoltage();
-	}
+        inputs.appliedVoltage = appliedVoltage;
+        inputs.currentDrawAmps = sim.getCurrentDrawAmps();
+        inputs.tempCelsius = 0;
+        inputs.atGoal = pidController.atGoal();
+    }
 
-	@Override
-	public double getMotorTemp() {
-		return 0;
-	}
+    @Override
+    public void setVelocity(AngularVelocity targetVelocity) {
+        double pidOutput = pidController.calculate(
+            RadiansPerSecond.of(sim.getAngularVelocityRadPerSec()).in(RotationsPerSecond),
+            targetVelocity.in(RotationsPerSecond)
+        );
+		double ffOutput = feedforward.calculate(targetVelocity.in(RotationsPerSecond));
+		double totalOutput = pidOutput + ffOutput;
+        appliedVoltage = MathUtil.clamp(totalOutput, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
+    }
+
+    @Override
+    public void stop() {
+        appliedVoltage = 0;
+    }
+
+    @Override
+    public boolean atGoal() {
+        return pidController.atGoal();
+    }
+
+    @Override
+    public void setGains(double kP, double kD, double kS, double kV) {
+        pidController.setP(kP);
+        pidController.setD(kD);
+        feedforward.setKs(kS);
+        feedforward.setKv(kV);
+    }
+
 }
