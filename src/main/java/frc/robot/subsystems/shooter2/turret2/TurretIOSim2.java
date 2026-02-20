@@ -14,12 +14,12 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.RobotContainer;
 
-public class TurretIOSim implements TurretIO {
+public class TurretIOSim2 implements TurretIO2 {
 
 	private SingleJointedArmSim sim;
 	private double appliedVoltage = 0;
 
-	public TurretIOSim() {
+	public TurretIOSim2() {
 		sim = new SingleJointedArmSim(
 			DCMotor.getKrakenX60(1),
 			GEARING,
@@ -35,7 +35,7 @@ public class TurretIOSim implements TurretIO {
 	}
 
 	@Override
-	public void updateInputs(TurretIOInputs inputs) {
+	public void updateInputs(TurretIOInputs2 inputs) {
 		// updates the simulator
 		sim.setInputVoltage(appliedVoltage);
 		sim.update(0.02);

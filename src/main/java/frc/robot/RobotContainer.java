@@ -30,18 +30,15 @@ import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.shooter2.Shooter;
 import frc.robot.subsystems.shooter2.aiming.Aiming;
 import frc.robot.subsystems.shooter2.aiming.AimingConstants.SimShootingParameters;
-import frc.robot.subsystems.shooter2.flywheel2.Flywheel2;
-import frc.robot.subsystems.shooter2.flywheel2.FlywheelIOSim2;
-import frc.robot.subsystems.shooter2.flywheel2.FlywheelIOTalonFX2;
 import frc.robot.subsystems.shooter2.hood2.Hood;
 import frc.robot.subsystems.shooter2.hood2.HoodIOSim;
 import frc.robot.subsystems.shooter2.hood2.HoodIOTalonFX;
 import frc.robot.subsystems.shooter2.spindexer.Spindexer;
 import frc.robot.subsystems.shooter2.spindexer.SpindexerIOSim;
 import frc.robot.subsystems.shooter2.spindexer.SpindexerIOTalonFX;
-import frc.robot.subsystems.shooter2.turret2.Turret;
-import frc.robot.subsystems.shooter2.turret2.TurretIOSim;
-import frc.robot.subsystems.shooter2.turret2.TurretIOTalonFX;
+import frc.robot.subsystems.shooter2.turret2.Turret2;
+import frc.robot.subsystems.shooter2.turret2.TurretIOSim2;
+import frc.robot.subsystems.shooter2.turret2.TurretIOTalonFX2;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -68,8 +65,8 @@ public class RobotContainer {
 	public static CommandSwerveDrivetrain drivetrain;
 
 	public static Shooter shooter;
-	public static Flywheel2 flywheel;
-	public static Turret turret;
+	// public static Flywheel2 flywheel;
+	public static Turret2 turret;
 	public static Hood hood;
 	public static Spindexer spindexer;
 
@@ -106,15 +103,15 @@ public class RobotContainer {
 			fuelSim.spawnStartingFuel();
 		switch (Constants.CURRENT_MODE) {
 		case REAL:
-			flywheel = new Flywheel2(new FlywheelIOTalonFX2());
+			// flywheel = new Flywheel2(new FlywheelIOTalonFX2());
 			drivetrain = TunerConstants.createDrivetrain();
-			turret = new Turret(new TurretIOTalonFX());
+			turret = new Turret2(new TurretIOTalonFX2());
 			hood = new Hood(new HoodIOTalonFX());
 			spindexer = new Spindexer(new SpindexerIOTalonFX());
-			shooter = new Shooter(
-				hood, flywheel, turret, spindexer,
-				withConstantVelocity, whileMoving
-			);
+			// shooter = new Shooter(
+			// 	hood, flywheel, turret, spindexer,
+			// 	withConstantVelocity, whileMoving
+			// );
 			pivot = new Pivot(new PivotIOTalonFX());
 			rollers = new Rollers(new RollersIOTalonFX());
 			intake = new Intake(pivot, rollers);
@@ -130,16 +127,16 @@ public class RobotContainer {
 
 
 		case SIM:
-			flywheel = new Flywheel2(new FlywheelIOSim2());
+			// flywheel = new Flywheel2(new FlywheelIOSim2());
 			drivetrain = TunerConstants.createDrivetrain();
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
-			turret = new Turret(new TurretIOSim());
+			turret = new Turret2(new TurretIOSim2());
 			hood = new Hood(new HoodIOSim());
 			spindexer = new Spindexer(new SpindexerIOSim());
-			shooter = new Shooter(
-				hood, flywheel, turret, spindexer,
-				withConstantVelocity, whileMoving
-			);
+			// shooter = new Shooter(
+			// 	hood, flywheel, turret, spindexer,
+			// 	withConstantVelocity, whileMoving
+			// );
 			pivot = new Pivot(new PivotIOSim());
 			rollers = new Rollers(new RollersIOSim());
 			intake = new Intake(pivot, rollers);

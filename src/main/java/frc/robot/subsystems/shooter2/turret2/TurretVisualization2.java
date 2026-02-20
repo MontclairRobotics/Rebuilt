@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.RobotContainer;
 import frc.robot.constants.TurretConstants;
 
-public class TurretVisualization {
+public class TurretVisualization2 {
 
 	public Pose3d turretPose = new Pose3d();
 

@@ -30,9 +30,11 @@ public interface FlywheelIO {
 
     public void setVelocity(AngularVelocity targetVelocity);
 
+    public void setVoltage(double voltage);
+
     public void stop();
 
-    public boolean atGoal();
+    public boolean isAtSetpoint();
 
     public void setGains(double kP, double kD, double kS, double kV);
 

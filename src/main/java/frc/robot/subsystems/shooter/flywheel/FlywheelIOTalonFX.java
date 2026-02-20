@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
@@ -116,12 +117,17 @@ public class FlywheelIOTalonFX implements FlywheelIO{
     }
 
     @Override
+    public void setVoltage(double voltage) {
+        leftMotor.setControl(new VoltageOut(voltage));
+    }
+
+    @Override
     public void stop() {
         leftMotor.setControl(neutralOut);
     }
 
     @Override
-    public boolean atGoal() {
+    public boolean isAtSetpoint() {
         double error = leftMotor.getClosedLoopError().getValueAsDouble();
         return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
     }

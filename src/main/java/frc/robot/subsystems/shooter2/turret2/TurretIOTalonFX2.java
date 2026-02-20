@@ -9,16 +9,16 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.RobotContainer;
 
-public class TurretIOTalonFX implements TurretIO {
+public class TurretIOTalonFX2 implements TurretIO2 {
 
 	private TalonFX motor;
 
-	public TurretIOTalonFX() {
+	public TurretIOTalonFX2() {
 		motor = new TalonFX(CAN_ID);
 	}
 
 	@Override
-	public void updateInputs(TurretIOInputs inputs) {
+	public void updateInputs(TurretIOInputs2 inputs) {
 		inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
 		inputs.motorVelocity = getMotorVelocity().in(RotationsPerSecond);
 		inputs.turretVelocity = getTurretVelocity().in(RotationsPerSecond);

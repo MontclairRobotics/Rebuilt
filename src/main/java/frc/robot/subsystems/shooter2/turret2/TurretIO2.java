@@ -5,10 +5,10 @@ import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 
-public interface TurretIO {
+public interface TurretIO2 {
 
 	@AutoLog
-	public static class TurretIOInputs {
+	public static class TurretIOInputs2 {
 		public double appliedVoltage;
 
 		// velocities are in rotations per second
@@ -20,7 +20,7 @@ public interface TurretIO {
 		public double fieldRelativeAngle;
 	}
 
-	public void updateInputs(TurretIOInputs inputs);
+	public void updateInputs(TurretIOInputs2 inputs);
 
 	public void setVoltage(double volts);
 

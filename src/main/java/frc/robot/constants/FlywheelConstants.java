@@ -1,5 +1,6 @@
 package frc.robot.constants;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -14,6 +15,8 @@ public class FlywheelConstants {
 
 	public static final int LEFT_CAN_ID = 0;
 	public static final int RIGHT_CAN_ID = 0;
+
+	public static final CANBus CAN_BUS = new CANBus("");
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(1);
 

@@ -18,15 +18,15 @@ import frc.robot.subsystems.shooter2.aiming.AimingConstants.ShootingParameters;
 import frc.robot.subsystems.shooter2.aiming.AimingConstants.ShotSettings;
 import frc.robot.subsystems.shooter2.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter2.aiming.AimingConstants.SimShotSettings;
-import frc.robot.subsystems.shooter2.turret2.Turret;
+import frc.robot.subsystems.shooter2.turret2.Turret2;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 
 public class Aiming {
 
-	private final Turret turret;
+	private final Turret2 turret;
 
-	public Aiming(Turret turret) {
+	public Aiming(Turret2 turret) {
 		this.turret = turret;
 		TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
 	}

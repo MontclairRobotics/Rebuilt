@@ -1,0 +1,37 @@
+package frc.robot.subsystems.shooter.turret;
+
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
+import org.littletonrobotics.junction.AutoLog;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+
+public interface TurretIO {
+
+    @AutoLog
+    public class TurretIOInputs {
+        public boolean motorConnected = false;
+
+        public double appliedVoltage = 0.0;
+        public double currentDrawAmps = 0.0;
+        public double tempCelcius = 0.0;
+
+        public AngularVelocity velocity = RotationsPerSecond.zero();
+        public Angle robotRelativeAngle = Rotations.zero();
+        public Angle fieldRelativeAngle = Rotations.zero();
+        public Angle robotRelativeAngleSetpoint = Rotations.zero();
+    }
+
+    public void updateInputs(TurretIOInputs inputs);
+
+    public void setRobotRelativeAngle(Angle angle);
+
+    public void stop();
+
+    public boolean isAtSetpoint();
+
+    public void setGains(double kP, double kD, double kS);
+
+}

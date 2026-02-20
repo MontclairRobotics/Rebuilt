@@ -29,13 +29,13 @@ import frc.robot.subsystems.shooter2.aiming.AimingConstants.ShootingParameters;
 import frc.robot.subsystems.shooter2.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter2.hood2.Hood;
 import frc.robot.subsystems.shooter2.spindexer.Spindexer;
-import frc.robot.subsystems.shooter2.turret2.Turret;
+import frc.robot.subsystems.shooter2.turret2.Turret2;
 
 public class Shooter extends SubsystemBase {
 
     private Hood hood;
     private Flywheel flywheel;
-    private Turret turret;
+    private Turret2 turret;
     private Spindexer spindexer;
 
     public boolean withConstantVelocity;
@@ -43,7 +43,7 @@ public class Shooter extends SubsystemBase {
 
     private  double lastSimShotTime = 0.0;
 
-    public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean withConstantVelocity, boolean whileMoving) {
+    public Shooter(Hood hood, Flywheel flywheel, Turret2 turret, Spindexer spindexer, boolean withConstantVelocity, boolean whileMoving) {
         this.hood = hood;
         this.flywheel = flywheel;
         this.turret = turret;

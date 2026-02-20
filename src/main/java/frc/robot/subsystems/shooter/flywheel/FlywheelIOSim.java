@@ -15,6 +15,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static frc.robot.constants.FlywheelConstants.*;
+import static frc.robot.constants.FlywheelConstants.GEARING;
 
 public class FlywheelIOSim implements FlywheelIO {
 
@@ -53,10 +54,12 @@ public class FlywheelIOSim implements FlywheelIO {
         inputs.leftMotorConnected = true;
         inputs.rightMotorConnected = true;
 
-        inputs.velocity = RadiansPerSecond.of(sim.getAngularVelocityRadPerSec());
-        inputs.acceleration = RadiansPerSecondPerSecond.of(sim.getAngularAccelerationRadPerSecSq());
-        inputs.setpointVelocity = RotationsPerSecond.of(pidController.getGoal().position); // for a flywheel, 'position' = velocity setpoint
-        inputs.setpointAcceleration = RotationsPerSecondPerSecond.of(pidController.getGoal().velocity); // for a flywheel, 'velocity' = acceleration setpoint
+        // sim returns MECHANISM values, so we multiply by gearing to convert to MOTOR SHAFT values
+        // this is because the VelocityTorqueCurrentFOC request tunes PID gains based on MOTOR SHAFT properties, velocities, and setpoints
+        inputs.velocity = RadiansPerSecond.of(sim.getAngularVelocityRadPerSec()).times(GEARING);
+        inputs.acceleration = RadiansPerSecondPerSecond.of(sim.getAngularAccelerationRadPerSecSq()).times(GEARING);
+        inputs.setpointVelocity = RotationsPerSecond.of(pidController.getGoal().position).times(GEARING); // for a flywheel, 'position' = velocity setpoint
+        inputs.setpointAcceleration = RotationsPerSecondPerSecond.of(pidController.getGoal().velocity).times(GEARING); // for a flywheel, 'velocity' = acceleration setpoint
 
         inputs.appliedVoltage = appliedVoltage;
         inputs.currentDrawAmps = sim.getCurrentDrawAmps();
@@ -66,8 +69,9 @@ public class FlywheelIOSim implements FlywheelIO {
 
     @Override
     public void setVelocity(AngularVelocity targetVelocity) {
+        // again, we multiply the sim value by gearing to convert values to MOTOR SHAFT values
         double pidOutput = pidController.calculate(
-            RadiansPerSecond.of(sim.getAngularVelocityRadPerSec()).in(RotationsPerSecond),
+            RadiansPerSecond.of(sim.getAngularVelocityRadPerSec()).times(GEARING).in(RotationsPerSecond),
             targetVelocity.in(RotationsPerSecond)
         );
 		double ffOutput = feedforward.calculate(targetVelocity.in(RotationsPerSecond));
@@ -76,12 +80,17 @@ public class FlywheelIOSim implements FlywheelIO {
     }
 
     @Override
+    public void setVoltage(double voltage) {
+        appliedVoltage = voltage;
+    }
+
+    @Override
     public void stop() {
         appliedVoltage = 0;
     }
 
     @Override
-    public boolean atGoal() {
+    public boolean isAtSetpoint() {
         return pidController.atGoal();
     }
 
