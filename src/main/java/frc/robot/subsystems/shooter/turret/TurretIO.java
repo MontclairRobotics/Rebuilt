@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter.turret;
 
+import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -18,15 +19,21 @@ public interface TurretIO {
         public double currentDrawAmps = 0.0;
         public double tempCelcius = 0.0;
 
-        public AngularVelocity velocity = RotationsPerSecond.zero();
+        public AngularVelocity motorVelocity = RotationsPerSecond.zero();
+        public Angle motorPosition = Rotations.zero();
+
         public Angle robotRelativeAngle = Rotations.zero();
         public Angle fieldRelativeAngle = Rotations.zero();
+
         public Angle robotRelativeAngleSetpoint = Rotations.zero();
+        public Angle motorPositionSetpoint = Rotations.zero();
     }
 
     public void updateInputs(TurretIOInputs inputs);
 
     public void setRobotRelativeAngle(Angle angle);
+
+    public void setVoltage(double voltage);
 
     public void stop();
 

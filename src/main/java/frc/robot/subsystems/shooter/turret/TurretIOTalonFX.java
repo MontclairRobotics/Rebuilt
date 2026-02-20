@@ -5,6 +5,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -37,7 +38,7 @@ public class TurretIOTalonFX implements TurretIO {
     private final NeutralOut neutralOut = new NeutralOut();
 
     public TurretIOTalonFX() {
-        motor = new TalonFX(CAN_ID);
+        motor = new TalonFX(CAN_ID, CAN_BUS);
         encoder = new CANcoder(ENCODER_PORT);
 
         config = new TalonFXConfiguration()
@@ -84,16 +85,31 @@ public class TurretIOTalonFX implements TurretIO {
         inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
         inputs.tempCelcius = tempCelsiusSignal.getValueAsDouble();
 
-        inputs.velocity = velocitySignal.getValue();
+        // these status signals are already in the MOTORS frame of reference
+        inputs.motorVelocity = velocitySignal.getValue();
+        inputs.motorPosition = positionSignal.getValue();
+
+        // because positionSignal is in the MOTORS frame of reference, we divide by GEARING to convert back 
+        // to the MECHANISMS frame of reference
         inputs.robotRelativeAngle = positionSignal.getValue().div(GEARING);
         inputs.fieldRelativeAngle = Turret.toFieldRelativeAngle(inputs.robotRelativeAngle);
+
+        // setpointPositionSignal is in the MOTORS frame of reference, we divide by GEARING to convert back 
+        // to the MECHANISMS frame of reference
         inputs.robotRelativeAngleSetpoint = Rotations.of(setpointPositionSignal.getValueAsDouble()).div(GEARING);
+        inputs.motorPositionSetpoint = Rotations.of(setpointPositionSignal.getValueAsDouble());
     }
 
     @Override
     public void setRobotRelativeAngle(Angle angle) {
+        // we take in a robot relative angle, but the PIDController uses MOTOR SHAFT rotations
         double targetMotorPosition = angle.times(GEARING).in(Rotations);
         motor.setControl(request.withPosition(targetMotorPosition));
+    }
+
+    @Override
+    public void setVoltage(double voltage) {
+        motor.setControl(new VoltageOut(voltage));
     }
 
     @Override

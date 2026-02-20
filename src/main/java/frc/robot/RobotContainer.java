@@ -27,6 +27,8 @@ import frc.robot.subsystems.intake.pivot.PivotIOTalonFX;
 import frc.robot.subsystems.intake.rollers.Rollers;
 import frc.robot.subsystems.intake.rollers.RollersIOSim;
 import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
+import frc.robot.subsystems.shooter.turret.Turret;
+import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
 import frc.robot.subsystems.shooter2.Shooter;
 import frc.robot.subsystems.shooter2.aiming.Aiming;
 import frc.robot.subsystems.shooter2.aiming.AimingConstants.SimShootingParameters;
@@ -66,7 +68,7 @@ public class RobotContainer {
 
 	public static Shooter shooter;
 	// public static Flywheel2 flywheel;
-	public static Turret2 turret;
+	public static Turret turret;
 	public static Hood hood;
 	public static Spindexer spindexer;
 
@@ -105,7 +107,7 @@ public class RobotContainer {
 		case REAL:
 			// flywheel = new Flywheel2(new FlywheelIOTalonFX2());
 			drivetrain = TunerConstants.createDrivetrain();
-			turret = new Turret2(new TurretIOTalonFX2());
+			turret = new Turret(new TurretIOTalonFX());
 			hood = new Hood(new HoodIOTalonFX());
 			spindexer = new Spindexer(new SpindexerIOTalonFX());
 			// shooter = new Shooter(

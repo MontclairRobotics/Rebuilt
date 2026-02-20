@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter2.turret2;
+package frc.robot.subsystems.shooter.turret;
 
 import static edu.wpi.first.units.Units.Rotations;
 
@@ -9,9 +9,9 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.RobotContainer;
 import frc.robot.constants.TurretConstants;
 
-public class TurretVisualization2 {
-
-	public Pose3d turretPose = new Pose3d();
+public class TurretVisualization {
+    
+    public Pose3d turretPose = new Pose3d();
 
 	public void update() {
 		turretPose = new Pose3d(
@@ -25,6 +25,7 @@ public class TurretVisualization2 {
 	}
 
 	public void log() {
-		Logger.recordOutput("Turret/TurretPose", turretPose);
+		Logger.recordOutput("Turret/Turret Pose", turretPose);
 	}
+
 }

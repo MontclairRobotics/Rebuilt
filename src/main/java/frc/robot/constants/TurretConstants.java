@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
@@ -31,6 +32,7 @@ public class TurretConstants {
 	// ports
 	public static final int CAN_ID = -1;
 	public static final int ENCODER_PORT = -1;
+	public static final CANBus CAN_BUS = new CANBus("");
 
 	// constraints
 	public static final Angle MIN_ANGLE = Rotations.of(-0.5);

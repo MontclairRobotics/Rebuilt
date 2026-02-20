@@ -16,9 +16,11 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.CAN;
 import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.constants.FlywheelConstants.CAN_BUS;
 import static frc.robot.constants.FlywheelConstants.CURRENT_LIMITS_CONFIGS;
 import static frc.robot.constants.FlywheelConstants.LEFT_CAN_ID;
 import static frc.robot.constants.FlywheelConstants.LEFT_MOTOR_OUTPUT_CONFIGS;
@@ -47,8 +49,8 @@ public class FlywheelIOTalonFX implements FlywheelIO{
     private final NeutralOut neutralOut = new NeutralOut();
 
     public FlywheelIOTalonFX() {
-        leftMotor = new TalonFX(LEFT_CAN_ID);
-        rightMotor = new TalonFX(RIGHT_CAN_ID);
+        leftMotor = new TalonFX(LEFT_CAN_ID, CAN_BUS);
+        rightMotor = new TalonFX(RIGHT_CAN_ID, CAN_BUS);
         rightMotor.setControl(new Follower(LEFT_CAN_ID, MotorAlignmentValue.Aligned));
 
         leftMotorConfig = new TalonFXConfiguration()
