@@ -1,4 +1,4 @@
-// package frc.robot.subsystems.shooter.turret;
+package frc.robot.subsystems.shooter.turret;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
@@ -22,73 +22,73 @@ import frc.robot.constants.TurretConstants;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 
-// import java.util.function.Supplier;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
-// /**
-//  * The TurretIOHardware class interfaces with the TalonFX motor controller and CANCoders to manage
-//  * turret movement and sensor readings.
-//  */
-// public class Turret extends SubsystemBase {
+/**
+ * The TurretIOHardware class interfaces with the TalonFX motor controller and CANCoders to manage
+ * turret movement and sensor readings.
+ */
+public class Turret extends SubsystemBase {
 
-// 	public final TurretIO io;
-// 	private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
-// 	private final TurretVisualization visualization;
+	public final TurretIO io;
+	private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+	private final TurretVisualization visualization;
 
-// 	private PIDController pidController;
+	private PIDController pidController;
 
-// 	@SuppressWarnings("unused")
-// 	public Turret(TurretIO io) {
-// 		this.io = io;
-// 		visualization = new TurretVisualization();
+	@SuppressWarnings("unused")
+	public Turret(TurretIO io) {
+		this.io = io;
+		visualization = new TurretVisualization();
 
 		pidController = new PIDController(TurretConstants.kP, TurretConstants.kI, TurretConstants.kD);
 		pidController.setTolerance(TurretConstants.ANGLE_TOLERANCE.in(Rotations));
 	}
 
-// 	/**
-// 	 * Handles turret wrapping through the max and min angles
-// 	 * @param angle the angle to be constrained to a possible turret angle, in rotations
-// 	 * @return the new angle, constrained between our min and max angles
-// 	 */
-// 	public Angle constrainAngle(Angle angle) {
-// 		if(angle.in(Rotations) > MAX_ANGLE.in(Rotations)) {
-// 			return angle.minus(Rotations.of(1));
-// 		} else if (angle.in(Rotations) < MIN_ANGLE.in(Rotations)) {
-// 			return angle.plus(Rotations.of(1));
-// 		} else {
-// 			return angle;
-// 		}
-// 	}
+	/**
+	 * Handles turret wrapping through the max and min angles
+	 * @param angle the angle to be constrained to a possible turret angle, in rotations
+	 * @return the new angle, constrained between our min and max angles
+	 */
+	public Angle constrainAngle(Angle angle) {
+		if(angle.in(Rotations) > MAX_ANGLE.in(Rotations)) {
+			return angle.minus(Rotations.of(1));
+		} else if (angle.in(Rotations) < MIN_ANGLE.in(Rotations)) {
+			return angle.plus(Rotations.of(1));
+		} else {
+			return angle;
+		}
+	}
 
-// 	/**
-// 	 * @param fieldRelativeAngle target field relative angle of the turret
-// 	 * @return the corresponding target robot relative angle needed to achieve the stated field relative angle
-// 	 */
-// 	public Angle toRobotRelativeAngle(Angle fieldRelativeAngle) {
-// 		return constrainAngle(fieldRelativeAngle
-// 			.minus(Rotations.of(RobotContainer.drivetrain.getWrappedHeading().getRotations()))
-// 			.minus(ANGLE_OFFSET));
-// 	}
+	/**
+	 * @param fieldRelativeAngle target field relative angle of the turret
+	 * @return the corresponding target robot relative angle needed to achieve the stated field relative angle
+	 */
+	public Angle toRobotRelativeAngle(Angle fieldRelativeAngle) {
+		return constrainAngle(fieldRelativeAngle
+			.minus(Rotations.of(RobotContainer.drivetrain.getWrappedHeading().getRotations()))
+			.minus(ANGLE_OFFSET));
+	}
 
-// 	/**
-// 	 * @param robotRelativeAngle target robot relative angle of the turret
-// 	 * @return the corresponding field relative angle the turret would point at the specified robot relative angle
-// 	 */
-// 	public Angle toFieldRelativeAngle(Angle robotRelativeAngle) {
-// 		return constrainAngle(robotRelativeAngle
-// 			.plus(Rotations.of(RobotContainer.drivetrain.getWrappedHeading().getRotations()))
-// 			.plus(ANGLE_OFFSET));
-// 	}
+	/**
+	 * @param robotRelativeAngle target robot relative angle of the turret
+	 * @return the corresponding field relative angle the turret would point at the specified robot relative angle
+	 */
+	public Angle toFieldRelativeAngle(Angle robotRelativeAngle) {
+		return constrainAngle(robotRelativeAngle
+			.plus(Rotations.of(RobotContainer.drivetrain.getWrappedHeading().getRotations()))
+			.plus(ANGLE_OFFSET));
+	}
 
-// 	public Angle getRobotRelativeAngle() {
-// 		return io.getRobotRelativeAngle();
-// 	}
+	public Angle getRobotRelativeAngle() {
+		return io.getRobotRelativeAngle();
+	}
 
-// 	public Angle getFieldRelativeAngle() {
-// 		return io.getFieldRelativeAngle();
-// 	}
+	public Angle getFieldRelativeAngle() {
+		return io.getFieldRelativeAngle();
+	}
 
 	/**
 	 * @return the target turret velocity for a given robot angular velocity, which is just that angular velocity
@@ -142,24 +142,24 @@ import org.littletonrobotics.junction.Logger;
 		setRobotRelativeAngle(angleSupplier.get());
 	}
 
-// 	public void setFieldRelativeAngle(Angle angle) {
-// 		setRobotRelativeAngle(toRobotRelativeAngle(angle));
-// 	}
+	public void setFieldRelativeAngle(Angle angle) {
+		setRobotRelativeAngle(toRobotRelativeAngle(angle));
+	}
 
-// 	public Command stopCommand() {
-// 		return Commands.runOnce(() -> io.stop());
-// 	}
+	public Command stopCommand() {
+		return Commands.runOnce(() -> io.stop());
+	}
 
 	public Command setRobotRelativeAngleCommand(Supplier<Angle> angleSupplier) {
 		return Commands.run(() -> setRobotRelativeAngle(angleSupplier.get()));
 	}
 
-// 	public Translation2d getFieldRelativePosition() {
-// 		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
-// 		Rotation2d robotHeading = robotPose.getRotation();
-// 		Translation2d fieldRelativeOffset = TURRET_OFFSET.rotateBy(robotHeading);
-// 		return robotPose.getTranslation().plus(fieldRelativeOffset);
-// 	}
+	public Translation2d getFieldRelativePosition() {
+		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+		Rotation2d robotHeading = robotPose.getRotation();
+		Translation2d fieldRelativeOffset = TURRET_OFFSET.rotateBy(robotHeading);
+		return robotPose.getTranslation().plus(fieldRelativeOffset);
+	}
 
 
 	public Translation2d getFieldRelativeVelocity() {
@@ -168,8 +168,8 @@ import org.littletonrobotics.junction.Logger;
 		Rotation2d robotHeading = robotPose.getRotation();
 		Translation2d fieldRelativeOffset = TURRET_OFFSET.rotateBy(robotHeading);
 
-// 		Rotation2d offsetAngle = fieldRelativeOffset.getAngle();
-// 		Rotation2d tangentialDirection = offsetAngle.plus(Rotation2d.fromDegrees(90));
+		Rotation2d offsetAngle = fieldRelativeOffset.getAngle();
+		Rotation2d tangentialDirection = offsetAngle.plus(Rotation2d.fromDegrees(90));
 
 		double offsetMagnitude = fieldRelativeOffset.getNorm();
 		double tangentialVelocityMagnitude = fieldSpeeds.omegaRadiansPerSecond * offsetMagnitude;

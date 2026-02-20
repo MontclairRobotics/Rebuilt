@@ -4,20 +4,18 @@
 
 package frc.robot;
 
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.Logger;
-
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import frc.robot.commands.JoystickDriveCommand;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
@@ -65,12 +63,13 @@ public class RobotContainer {
 	public static CommandPS5Controller operatorController = new CommandPS5Controller(1);
 
 	// Subsystems
-	// public static Vision vision;
+	public static Vision vision;
 	public static CommandSwerveDrivetrain drivetrain;
+
+	public static Shooter shooter;
 	public static Flywheel flywheel;
 	public static Turret turret;
 	public static Hood hood;
-	public static Shooter shooter;
 	public static Spindexer spindexer;
 
 	public static Pivot pivot;
@@ -106,10 +105,10 @@ public class RobotContainer {
 			fuelSim.spawnStartingFuel();
 		switch (Constants.CURRENT_MODE) {
 		case REAL:
-			// flywheel = new Flywheel(new FlywheelIOTalonFX());
+			flywheel = new Flywheel(new FlywheelIOTalonFX());
 			drivetrain = TunerConstants.createDrivetrain();
-			// turret = new Turret(new TurretIOTalonFX());
-			// hood = new Hood(new HoodIOTalonFX());
+			turret = new Turret(new TurretIOTalonFX());
+			hood = new Hood(new HoodIOTalonFX());
 			spindexer = new Spindexer(new SpindexerIOTalonFX());
 			shooter = new Shooter(
 				hood, flywheel, turret, spindexer,
@@ -130,11 +129,11 @@ public class RobotContainer {
 
 
 		case SIM:
-			// flywheel = new Flywheel(new FlywheelIOSim());
+			flywheel = new Flywheel(new FlywheelIOSim());
 			drivetrain = TunerConstants.createDrivetrain();
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
-			// turret = new Turret(new TurretIOSim());
-			// hood = new Hood(new HoodIOSim());
+			turret = new Turret(new TurretIOSim());
+			hood = new Hood(new HoodIOSim());
 			spindexer = new Spindexer(new SpindexerIOSim());
 			shooter = new Shooter(
 				hood, flywheel, turret, spindexer,
@@ -160,10 +159,10 @@ public class RobotContainer {
 				break;
 
 			default:
-				// vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+				vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 		}
 
-		// drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
+		drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
 
 		configureBindings();
 
