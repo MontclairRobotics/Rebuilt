@@ -154,7 +154,7 @@ public class RobotContainer {
 			fuelSim.enableAirResistance();
 			fuelSim.start();
 			aiming = new Aiming(turret);
-			NamedCommands.registerCommand("shootToHub", shooter.setSimAutoParameters(() -> RobotContainer.aiming.calculateSimShot(Aiming.TargetLocation.HUB, shooter.withConstantVelocity, shooter.whileMoving)));
+			NamedCommands.registerCommand("shootToHub", shooter.indexAndShootCommand(()-> Aiming.calculateShot(Aiming.TargetLocation.HUB, true, false).flywheelVelocity()));
 			// vision =
 			// 	new Vision(
 			// 		drivetrain::addVisionMeasurement,

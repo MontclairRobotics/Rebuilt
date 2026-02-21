@@ -20,6 +20,7 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Mode;
 import frc.robot.constants.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LeftTrench;
@@ -53,22 +54,30 @@ public class Superstructure extends SubsystemBase {
 					() -> RobotContainer.aiming.calculateSimShot(
 						FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
+			autoScoringTrigger.whileTrue(
+				shooter.setSimParameters(
+					() -> RobotContainer.aiming.calculateSimShot(
+						HUB, shooter.withConstantVelocity, shooter.whileMoving)
+				));
 		} else {
 			shouldStowHoodTrigger.whileTrue(
 				shooter.stowCommand());
 			scoringModeTrigger.whileTrue(
 				shooter.setParameters(
-					() -> RobotContainer.aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryLeftTrigger.whileTrue(
 				shooter.setParameters(
-					() -> RobotContainer.aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryRightTrigger.whileTrue(
 				shooter.setParameters(
-					() -> RobotContainer.aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
-
+			autoScoringTrigger.whileTrue(
+				shooter.setParameters(
+					() -> Aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
+				));
 		}
 	}
 
@@ -83,6 +92,9 @@ public class Superstructure extends SubsystemBase {
 
 	public final Trigger shouldStowHoodTrigger =
 			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldStowHood());
+
+	public final Trigger autoScoringTrigger =
+			new Trigger(() -> DriverStation.isAutonomous() && shouldBeScoring());
 
 	@Override
 	public void periodic() {
