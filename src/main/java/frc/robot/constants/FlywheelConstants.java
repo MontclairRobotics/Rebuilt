@@ -42,11 +42,10 @@ public class FlywheelConstants {
 		.withSupplyCurrentLimitEnable(true);
 
 	public static final MotorOutputConfigs LEFT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
-		.withInverted(InvertedValue.CounterClockwise_Positive)
+		.withInverted(InvertedValue.Clockwise_Positive)
 		.withNeutralMode(NeutralModeValue.Coast);
 
 	public static final MotorOutputConfigs RIGHT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
-		.withInverted(InvertedValue.CounterClockwise_Positive)
 		.withNeutralMode(NeutralModeValue.Coast);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()

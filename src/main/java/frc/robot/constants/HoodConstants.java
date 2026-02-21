@@ -35,7 +35,7 @@ public class HoodConstants {
 
 	// CAN
 	public static final int CAN_ID = 33;
-	public static final int ENCODER_PORT = 34;
+	public static final int ENCODER_ID = 34;
 	public static final CANBus CAN_BUS = new CANBus("turret");
 
 	// Constraints
@@ -84,7 +84,7 @@ public class HoodConstants {
 		.withNeutralMode(NeutralModeValue.Brake);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()
-		.withFeedbackRemoteSensorID(ENCODER_PORT)
+		.withFeedbackRemoteSensorID(ENCODER_ID)
 		.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
 		.withRotorToSensorRatio(ROTOR_TO_SENSOR_RATIO)
 		.withSensorToMechanismRatio(SENSOR_TO_MECHANISM_RATIO);

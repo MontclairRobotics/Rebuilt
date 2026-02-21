@@ -4,7 +4,6 @@ import static frc.robot.constants.FlywheelConstants.SLOT0_CONFIGS;
 
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -45,9 +44,9 @@ public class Flywheel extends SubsystemBase {
     }
 
     public void periodic() {
-        io.updateInputs(inputs);
-        Logger.processInputs("Flywheel", inputs);
-        updateTunables();
+        // io.updateInputs(inputs);
+        // Logger.processInputs("Flywheel", inputs);
+        // updateTunables();
     }
 
     public void setVelocity(AngularVelocity targetVelocity) {

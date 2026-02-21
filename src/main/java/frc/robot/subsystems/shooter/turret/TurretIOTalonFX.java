@@ -5,6 +5,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -37,10 +38,11 @@ public class TurretIOTalonFX implements TurretIO {
 
     private final MotionMagicVoltage request = new MotionMagicVoltage(0);
     private final NeutralOut neutralOut = new NeutralOut();
+    private final VoltageOut voltageRequest = new VoltageOut(0);
 
     public TurretIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
-        encoder = new CANcoder(ENCODER_PORT);
+        encoder = new CANcoder(ENCODER_ID);
 
         config = new TalonFXConfiguration()
             .withSlot0(SLOT0_CONFIGS)
@@ -74,7 +76,7 @@ public class TurretIOTalonFX implements TurretIO {
             tempCelsiusSignal
         );
 
-        motor.optimizeBusUtilization();
+        // motor.optimizeBusUtilization();
     }
 
     @Override
@@ -105,7 +107,7 @@ public class TurretIOTalonFX implements TurretIO {
 
     @Override
     public void setVoltage(double voltage) {
-        motor.setVoltage(voltage);
+        motor.setControl(voltageRequest.withOutput(voltage));
     }
 
     @Override

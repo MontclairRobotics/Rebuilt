@@ -12,13 +12,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.constants.Constants;
-import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.pivot.Pivot;
@@ -36,16 +34,11 @@ import frc.robot.subsystems.shooter.spindexer.SpindexerIOSim;
 import frc.robot.subsystems.shooter.spindexer.SpindexerIOTalonFX;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
-import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
-import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
-import frc.robot.util.sim.FuelSim;
-import frc.robot.util.tunables.Tunable;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -78,8 +71,8 @@ public class RobotContainer {
 	public static SimShootingParameters simShootingParameters = new SimShootingParameters(Degrees.zero(), Degrees.zero(), MetersPerSecond.zero());
 
 	private SwerveDriveSimulation driveSimulation;
-	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
-	public static FuelSim fuelSim = new FuelSim("fuel");
+	// private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
+	// public static FuelSim fuelSim = new FuelSim("fuel");
 
 	private boolean withConstantVelocity = false;
 	private boolean whileMoving = true;
@@ -88,15 +81,15 @@ public class RobotContainer {
 
 		switch (Constants.CURRENT_MODE) {
 			case REAL:
-				drivetrain = TunerConstants.createDrivetrain();
+				// drivetrain = TunerConstants.createDrivetrain();
 				flywheel = new Flywheel(new FlywheelIOTalonFX());
-				turret = new Turret(new TurretIOTalonFX());
-				hood = new Hood(new HoodIOTalonFX());
+				// turret = new Turret(new TurretIOTalonFX());
+				// hood = new Hood(new HoodIOTalonFX());
 				spindexer = new Spindexer(new SpindexerIOTalonFX());
-				shooter = new Shooter(
-					hood, flywheel, turret, spindexer,
-					withConstantVelocity, whileMoving
-				);
+				// shooter = new Shooter(
+				// 	hood, flywheel, turret, spindexer,
+				// 	withConstantVelocity, whileMoving
+				// );
 				// pivot = new Pivot(new PivotIOTalonFX());
 				// rollers = new Rollers(new RollersIOTalonFX());
 				// intake = new Intake(pivot, rollers);
@@ -125,19 +118,19 @@ public class RobotContainer {
 				rollers = new Rollers(new RollersIOSim());
 				intake = new Intake(pivot, rollers);
 				superstructure = new Superstructure(shooter);
-				fuelSim.enableAirResistance();
-				fuelSim.start();
-				aiming = new Aiming(turret);
+				// fuelSim.enableAirResistance();
+				// fuelSim.start();
+				// aiming = new Aiming(turret);
 
-				fuelSim.registerRobot(
-					Constants.BUMPER_WIDTH,
-					Constants.BUMPER_WIDTH,
-					Inches.of(6),
-					() -> drivetrain.getRobotPose(),
-					() -> drivetrain.getFieldRelativeSpeeds()
-				);
-				fuelSim.registerIntake(Inches.of(15), Inches.of(22), Inches.of(-15), Inches.of(15));
-				fuelSim.spawnStartingFuel();
+				// fuelSim.registerRobot(
+				// 	Constants.BUMPER_WIDTH,
+				// 	Constants.BUMPER_WIDTH,
+				// 	Inches.of(6),
+				// 	() -> drivetrain.getRobotPose(),
+				// 	() -> drivetrain.getFieldRelativeSpeeds()
+				// );
+				// fuelSim.registerIntake(Inches.of(15), Inches.of(22), Inches.of(-15), Inches.of(15));
+				// fuelSim.spawnStartingFuel();
 
 				// vision =
 				// 	new Vision(
@@ -159,7 +152,7 @@ public class RobotContainer {
 
 		configureBindings();
 
-    	drivetrain.registerTelemetry(logger::telemeterize);
+    	// drivetrain.registerTelemetry(logger::telemeterize);
 	}
 
 	private void configureBindings() {
@@ -168,13 +161,14 @@ public class RobotContainer {
 		// turret.setDefaultCommand(turret.joystickControlCommand());
 		// flywheel.setDefaultCommand(flywheel.joystickControlCommand());
 
-		driverController.cross().whileTrue(flywheel.setVoltageCommand(3)).onFalse(flywheel.stopCommand());
-		driverController.circle()
-			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunedAngleDegrees)))
-			.onFalse(hood.stopCommand());
+		driverController.circle().whileTrue(spindexer.spinCommand()).onFalse(spindexer.stopCommand());
+		driverController.cross().whileTrue(flywheel.setVoltageCommand(8)).onFalse(flywheel.stopCommand());
+		// driverController.circle()
+		// 	.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunedAngleDegrees)))
+		// 	.onFalse(hood.stopCommand());
 
 		driverController.square()
-			.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(turret.tunnedAngleDegrees)))
+			.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(turret.tunedAngleDegrees)))
 			.onFalse(turret.stopCommand());
 
 		driverController.triangle()
@@ -192,7 +186,7 @@ public class RobotContainer {
 		// driverController.circle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
-		driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
+		// driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
 		// zeros gyro
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 	}

@@ -1,7 +1,6 @@
 package frc.robot.subsystems.shooter.hood;
 
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.HoodConstants.*;
 
 import java.util.function.Supplier;
@@ -14,13 +13,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.PoseUtils;
-import frc.robot.util.tunables.Tunable;
 
 public class Hood extends SubsystemBase {
 
@@ -32,109 +29,109 @@ public class Hood extends SubsystemBase {
 
 	public double tunedAngleDegrees = 0;
 
-	private final Tunable kPTunable;
-	private final Tunable kDTunable;
-	private final Tunable kSTunable;
-	private final Tunable kGTunable;
+	// private final Tunable kPTunable;
+	// private final Tunable kDTunable;
+	// private final Tunable kSTunable;
+	// private final Tunable kGTunable;
 
-	private final Tunable tunableMotionMagicCruiseVelocity;
-	private final Tunable tunableMotionMagicAcceleration;
-	private final Tunable tunableMotionMagicJerk;
+	// private final Tunable tunableMotionMagicCruiseVelocity;
+	// private final Tunable tunableMotionMagicAcceleration;
+	// private final Tunable tunableMotionMagicJerk;
 
-	private final Tunable tunableMaxVelocityAtSetpoint;
-	public final Tunable tunableHoodAngle;
+	// private final Tunable tunableMaxVelocityAtSetpoint;
+	// public final Tunable tunableHoodAngle;
 
 	public Hood(HoodIO io) {
         this.io = io;
         feedforward = new ArmFeedforward(kS, kG, 0);
 
-		kPTunable = new Tunable(
-			"Hood/Hood kP", 
-			kP, 
-			(value) -> {
-				io.setGains(value, SLOT0_CONFIGS.kD, SLOT0_CONFIGS.kS, SLOT0_CONFIGS.kG);
-			}
-		);
+		// kPTunable = new Tunable(
+		// 	"Hood/Hood kP",
+		// 	kP,
+		// 	(value) -> {
+		// 		io.setGains(value, SLOT0_CONFIGS.kD, SLOT0_CONFIGS.kS, SLOT0_CONFIGS.kG);
+		// 	}
+		// );
 
-		kDTunable = new Tunable(
-			"Hood/Hood kD", 
-			kP, 
-			(value) -> {
-				io.setGains(SLOT0_CONFIGS.kP, value, SLOT0_CONFIGS.kS, SLOT0_CONFIGS.kG);
-			}
-		);
+		// kDTunable = new Tunable(
+		// 	"Hood/Hood kD",
+		// 	kP,
+		// 	(value) -> {
+		// 		io.setGains(SLOT0_CONFIGS.kP, value, SLOT0_CONFIGS.kS, SLOT0_CONFIGS.kG);
+		// 	}
+		// );
 
-		kSTunable = new Tunable(
-			"Hood/Hood kS", 
-			kP, 
-			(value) -> {
-				io.setGains(SLOT0_CONFIGS.kP, SLOT0_CONFIGS.kD, value, SLOT0_CONFIGS.kG);
-			}
-		);
+		// kSTunable = new Tunable(
+		// 	"Hood/Hood kS",
+		// 	kP,
+		// 	(value) -> {
+		// 		io.setGains(SLOT0_CONFIGS.kP, SLOT0_CONFIGS.kD, value, SLOT0_CONFIGS.kG);
+		// 	}
+		// );
 
-		kGTunable = new Tunable(
-			"Hood/Hood kG", 
-			kP, 
-			(value) -> {
-				io.setGains(SLOT0_CONFIGS.kP, SLOT0_CONFIGS.kD, SLOT0_CONFIGS.kS, value);
-			}
-		);
+		// kGTunable = new Tunable(
+		// 	"Hood/Hood kG",
+		// 	kP,
+		// 	(value) -> {
+		// 		io.setGains(SLOT0_CONFIGS.kP, SLOT0_CONFIGS.kD, SLOT0_CONFIGS.kS, value);
+		// 	}
+		// );
 
-		tunableMotionMagicCruiseVelocity = new Tunable(
-			"Hood/Motion Magic Cruise Velocity", 
-			MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, 
-			(value) -> {
-				io.setMotionMagic(
-					value, 
-					MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, 
-					MOTION_MAGIC_CONFIGS.MotionMagicJerk
-				);
-			}
-		);
+		// tunableMotionMagicCruiseVelocity = new Tunable(
+		// 	"Hood/Motion Magic Cruise Velocity",
+		// 	MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity,
+		// 	(value) -> {
+		// 		io.setMotionMagic(
+		// 			value,
+		// 			MOTION_MAGIC_CONFIGS.MotionMagicAcceleration,
+		// 			MOTION_MAGIC_CONFIGS.MotionMagicJerk
+		// 		);
+		// 	}
+		// );
 
-		tunableMotionMagicAcceleration = new Tunable(
-			"Hood/Motion Magic Acceleration", 
-			MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, 
-			(value) -> {
-				io.setMotionMagic(
-					MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, 
-					value, 
-					MOTION_MAGIC_CONFIGS.MotionMagicJerk
-				);
-			}
-		);
+		// tunableMotionMagicAcceleration = new Tunable(
+		// 	"Hood/Motion Magic Acceleration",
+		// 	MOTION_MAGIC_CONFIGS.MotionMagicAcceleration,
+		// 	(value) -> {
+		// 		io.setMotionMagic(
+		// 			MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity,
+		// 			value,
+		// 			MOTION_MAGIC_CONFIGS.MotionMagicJerk
+		// 		);
+		// 	}
+		// );
 
-		tunableMotionMagicJerk = new Tunable(
-			"Hood/Motion Magic Jerk", 
-			MOTION_MAGIC_CONFIGS.MotionMagicJerk, 
-			(value) -> {
-				io.setMotionMagic(
-					MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, 
-					MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, 
-					value
-				);
-			}
-		);
+		// tunableMotionMagicJerk = new Tunable(
+		// 	"Hood/Motion Magic Jerk",
+		// 	MOTION_MAGIC_CONFIGS.MotionMagicJerk,
+		// 	(value) -> {
+		// 		io.setMotionMagic(
+		// 			MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity,
+		// 			MOTION_MAGIC_CONFIGS.MotionMagicAcceleration,
+		// 			value
+		// 		);
+		// 	}
+		// );
 
-		tunableMaxVelocityAtSetpoint = new Tunable(
-			"Hood/Max Velocity At Setpoint",
-			MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond), 
-			(value) -> MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(value)
-		);
+		// tunableMaxVelocityAtSetpoint = new Tunable(
+		// 	"Hood/Max Velocity At Setpoint",
+		// 	MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond),
+		// 	(value) -> MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(value)
+		// );
 
-		tunableHoodAngle = new Tunable(
-			"Hood/Tunable Hood Angle",
-			0, 
-			(value) -> tunedAngleDegrees = value
-		);
+		// tunableHoodAngle = new Tunable(
+		// 	"Hood/Tunable Hood Angle",
+		// 	0,
+		// 	(value) -> tunedAngleDegrees = value
+		// );
 	}
 
 	@Override
 	public void periodic() {
-		// io.updateInputs(new HoodIOInputsAutoLogged());
-		Logger.processInputs("Hood", inputs);
-		visualization.update();
-		visualization.log();
+		// io.updateInputs(inputs);
+		// Logger.processInputs("Hood", inputs);
+		// visualization.update();
+		// visualization.log();
         // updateTunables();
 	}
 
@@ -190,6 +187,10 @@ public class Hood extends SubsystemBase {
 
 	public void setNeutralMode(NeutralModeValue value) {
 		io.setNeutralMode(value);
+	}
+
+	public Command setVoltageCommand(double voltage) {
+		return Commands.run(() -> io.setVoltage(voltage));
 	}
 
     public Command stopCommand() {

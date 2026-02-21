@@ -2,10 +2,7 @@ package frc.robot.subsystems.shooter.turret;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
-import static frc.robot.constants.TurretConstants.kD;
-import static frc.robot.constants.TurretConstants.kS;
 
 import java.util.function.Supplier;
 
@@ -19,7 +16,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -27,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
-import frc.robot.util.tunables.Tunable;
 
 public class Turret extends SubsystemBase {
 
@@ -37,102 +32,102 @@ public class Turret extends SubsystemBase {
 
 	public double tunedAngleDegrees = 0;
 
-	private final Tunable kPTunable;
-	private final Tunable kDTunable;
-	private final Tunable kSTunable;
+	// private final Tunable kPTunable;
+	// private final Tunable kDTunable;
+	// private final Tunable kSTunable;
 
-	private final Tunable tunableMotionMagicCruiseVelocity;
-	private final Tunable tunableMotionMagicAcceleration;
-	private final Tunable tunableMotionMagicJerk;
+	// private final Tunable tunableMotionMagicCruiseVelocity;
+	// private final Tunable tunableMotionMagicAcceleration;
+	// private final Tunable tunableMotionMagicJerk;
 
-	private final Tunable tunableMaxVelocityAtSetpoint;
-	public final Tunable tunableTurretAngle;
+	// private final Tunable tunableMaxVelocityAtSetpoint;
+	// public final Tunable tunableTurretAngle;
 
     public Turret(TurretIO io) {
         this.io = io;
 
-		kPTunable = new Tunable(
-			"Turret/Turret kP", 
-			kP, 
-			(value) -> {
-				io.setGains(value, SLOT0_CONFIGS.kD, SLOT0_CONFIGS.kS);
-			}
-		);
+		// kPTunable = new Tunable(
+		// 	"Turret/Turret kP",
+		// 	kP,
+		// 	(value) -> {
+		// 		io.setGains(value, SLOT0_CONFIGS.kD, SLOT0_CONFIGS.kS);
+		// 	}
+		// );
 
-		kDTunable = new Tunable(
-			"Turret/Turret kD", 
-			kP, 
-			(value) -> {
-				io.setGains(SLOT0_CONFIGS.kP, value, SLOT0_CONFIGS.kS);
-			}
-		);
+		// kDTunable = new Tunable(
+		// 	"Turret/Turret kD",
+		// 	kP,
+		// 	(value) -> {
+		// 		io.setGains(SLOT0_CONFIGS.kP, value, SLOT0_CONFIGS.kS);
+		// 	}
+		// );
 
-		kSTunable = new Tunable(
-			"Turret/Turret kS", 
-			kP, 
-			(value) -> {
-				io.setGains(SLOT0_CONFIGS.kP, SLOT0_CONFIGS.kD, value);
-			}
-		);
+		// kSTunable = new Tunable(
+		// 	"Turret/Turret kS",
+		// 	kP,
+		// 	(value) -> {
+		// 		io.setGains(SLOT0_CONFIGS.kP, SLOT0_CONFIGS.kD, value);
+		// 	}
+		// );
 
-		tunableMotionMagicCruiseVelocity = new Tunable(
-			"Turret/Motion Magic Cruise Velocity", 
-			MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, 
-			(value) -> {
-				io.setMotionMagic(
-					value, 
-					MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, 
-					MOTION_MAGIC_CONFIGS.MotionMagicJerk
-				);
-			}
-		);
+		// tunableMotionMagicCruiseVelocity = new Tunable(
+		// 	"Turret/Motion Magic Cruise Velocity",
+		// 	MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity,
+		// 	(value) -> {
+		// 		io.setMotionMagic(
+		// 			value,
+		// 			MOTION_MAGIC_CONFIGS.MotionMagicAcceleration,
+		// 			MOTION_MAGIC_CONFIGS.MotionMagicJerk
+		// 		);
+		// 	}
+		// );
 
-		tunableMotionMagicAcceleration = new Tunable(
-			"Turret/Motion Magic Acceleration", 
-			MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, 
-			(value) -> {
-				io.setMotionMagic(
-					MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, 
-					value, 
-					MOTION_MAGIC_CONFIGS.MotionMagicJerk
-				);
-			}
-		);
+		// tunableMotionMagicAcceleration = new Tunable(
+		// 	"Turret/Motion Magic Acceleration",
+		// 	MOTION_MAGIC_CONFIGS.MotionMagicAcceleration,
+		// 	(value) -> {
+		// 		io.setMotionMagic(
+		// 			MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity,
+		// 			value,
+		// 			MOTION_MAGIC_CONFIGS.MotionMagicJerk
+		// 		);
+		// 	}
+		// );
 
-		tunableMotionMagicJerk = new Tunable(
-			"Turret/Motion Magic Jerk", 
-			MOTION_MAGIC_CONFIGS.MotionMagicJerk, 
-			(value) -> {
-				io.setMotionMagic(
-					MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, 
-					MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, 
-					value
-				);
-			}
-		);
+		// tunableMotionMagicJerk = new Tunable(
+		// 	"Turret/Motion Magic Jerk",
+		// 	MOTION_MAGIC_CONFIGS.MotionMagicJerk,
+		// 	(value) -> {
+		// 		io.setMotionMagic(
+		// 			MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity,
+		// 			MOTION_MAGIC_CONFIGS.MotionMagicAcceleration,
+		// 			value
+		// 		);
+		// 	}
+		// );
 
-		tunableMaxVelocityAtSetpoint = new Tunable(
-			"Turret/Max Velocity At Setpoint",
-			MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond), 
-			(value) -> MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(value)
-		);
+		// tunableMaxVelocityAtSetpoint = new Tunable(
+		// 	"Turret/Max Velocity At Setpoint",
+		// 	MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond),
+		// 	(value) -> MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(value)
+		// );
 
-		tunableTurretAngle = new Tunable(
-			"Turret/Tunable Turret Angle",
-			0, 
-			(value) -> tunedAngleDegrees = value
-		);
+		// tunableTurretAngle = new Tunable(
+		// 	"Turret/Tunable Turret Angle",
+		// 	0,
+		// 	(value) -> tunedAngleDegrees = value
+		// );
     }
 
 	@Override
 	public void periodic() {
-		io.updateInputs(inputs);
-		Logger.processInputs("Turret", inputs);
-		visualization.update();
-		visualization.log();
+		// io.updateInputs(inputs);
+		// Logger.processInputs("Turret", inputs);
+		// visualization.update();
+		// visualization.log();
 		// updateTunables();
-		io.setGains(kPTunable.getValue(), kDTunable.getValue(), kSTunable.getValue());
-		io.setMotionMagic(tunableMotionMagicCruiseVelocity.getValue(), tunableMotionMagicAcceleration.getValue(), tunableMotionMagicJerk.getValue());
+		// io.setGains(kPTunable.getValue(), kDTunable.getValue(), kSTunable.getValue());
+		// io.setMotionMagic(tunableMotionMagicCruiseVelocity.getValue(), tunableMotionMagicAcceleration.getValue(), tunableMotionMagicJerk.getValue());
 	}
 
     /**
@@ -270,6 +265,10 @@ public class Turret extends SubsystemBase {
 
 	public void setRobotRelativeAngle(Supplier<Angle> angleSupplier) {
 		io.setRobotRelativeAngle(angleSupplier.get());
+	}
+
+	public Command setVoltageCommand(double voltage) {
+		return Commands.run(() -> io.setVoltage(voltage));
 	}
 
 	public Command joystickControlCommand() {

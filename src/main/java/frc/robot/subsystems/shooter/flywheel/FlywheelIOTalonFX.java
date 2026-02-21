@@ -46,11 +46,13 @@ public class FlywheelIOTalonFX implements FlywheelIO{
 
     private final VelocityTorqueCurrentFOC request = new VelocityTorqueCurrentFOC(0);
     private final NeutralOut neutralOut = new NeutralOut();
+    private final VoltageOut voltageRequest = new VoltageOut(0);
+
 
     public FlywheelIOTalonFX() {
         leftMotor = new TalonFX(LEFT_CAN_ID, CAN_BUS);
         rightMotor = new TalonFX(RIGHT_CAN_ID, CAN_BUS);
-        rightMotor.setControl(new Follower(LEFT_CAN_ID, MotorAlignmentValue.Aligned));
+        rightMotor.setControl(new Follower(LEFT_CAN_ID, MotorAlignmentValue.Opposed));
 
         leftMotorConfig = new TalonFXConfiguration()
             .withSlot0(SLOT0_CONFIGS)
@@ -83,8 +85,8 @@ public class FlywheelIOTalonFX implements FlywheelIO{
             currentDrawAmpsSignal
         );
 
-        leftMotor.optimizeBusUtilization();
-        rightMotor.optimizeBusUtilization();
+        // leftMotor.optimizeBusUtilization();
+        // rightMotor.optimizeBusUtilization();
     }
 
     @Override
@@ -119,7 +121,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
 
     @Override
     public void setVoltage(double voltage) {
-        leftMotor.setControl(new VoltageOut(voltage));
+        leftMotor.setControl(voltageRequest.withOutput(voltage));
     }
 
     @Override

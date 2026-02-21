@@ -13,7 +13,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.RobotContainer;
 
 public class HoodVisualization {
-public Pose3d hoodPose = new Pose3d();
+	public Pose3d hoodPose = new Pose3d();
 
 	public void update() {
 		Translation3d turretToHoodFieldRelative = new Translation3d(

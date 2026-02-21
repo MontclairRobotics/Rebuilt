@@ -1,14 +1,11 @@
 package frc.robot.subsystems.shooter.hood;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.constants.HoodConstants.CAN_BUS;
 import static frc.robot.constants.HoodConstants.CAN_ID;
-import static frc.robot.constants.HoodConstants.ENCODER_PORT;
+import static frc.robot.constants.HoodConstants.ENCODER_ID;
 import static frc.robot.constants.HoodConstants.SLOT0_CONFIGS;
 import static frc.robot.constants.HoodConstants.TOLERANCE;
 import static frc.robot.constants.HoodConstants.MAX_ANGLE;
@@ -24,6 +21,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -51,10 +49,11 @@ public class HoodIOTalonFX implements HoodIO {
 
     private final MotionMagicVoltage request = new MotionMagicVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
+    private final VoltageOut voltageRequest = new VoltageOut(0);
 
     public HoodIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
-        encoder = new CANcoder(ENCODER_PORT);
+        encoder = new CANcoder(ENCODER_ID, CAN_BUS);
 
         config = new TalonFXConfiguration()
             .withSlot0(SLOT0_CONFIGS)
@@ -88,7 +87,16 @@ public class HoodIOTalonFX implements HoodIO {
             tempCelsiusSignal
         );
 
-        motor.optimizeBusUtilization();
+        // BaseStatusSignal.setUpdateFrequencyForAll(
+        //     100,
+        //     positionSignal,
+        //     velocitySignal,
+        //     appliedVoltageSignal,
+        //     currentDrawAmpsSignal,
+        //     tempCelsiusSignal
+        // );
+
+        // motor.optimizeBusUtilization();
     }
 
     @Override
@@ -102,9 +110,17 @@ public class HoodIOTalonFX implements HoodIO {
         //     tempCelsiusSignal
         // );
 
-        inputs.appliedVoltage = appliedVoltageSignal.getValue().in(Volts);
-        inputs.currentDrawAmps = currentDrawAmpsSignal.getValue().in(Amps);
-        inputs.tempCelcius = tempCelsiusSignal.getValue().in(Celsius);
+        // BaseStatusSignal.refreshAll(
+        //     positionSignal,
+        //     velocitySignal,
+        //     appliedVoltageSignal,
+        //     currentDrawAmpsSignal,
+        //     tempCelsiusSignal
+        // );
+
+        // inputs.appliedVoltage = appliedVoltageSignal.getValue().in(Volts);
+        // inputs.currentDrawAmps = currentDrawAmpsSignal.getValue().in(Amps);
+        // inputs.tempCelcius = tempCelsiusSignal.getValue().in(Celsius);
 
         // inputs.hoodAngle = positionSignal.getValue();
         // inputs.hoodAngleSetpoint = Rotations.of(setpointPositionSignal.getValue());
@@ -120,7 +136,7 @@ public class HoodIOTalonFX implements HoodIO {
 
     @Override
     public void setVoltage(double voltage) {
-        motor.setVoltage(voltage);;
+        motor.setControl(voltageRequest.withOutput(voltage));
     }
 
     @Override

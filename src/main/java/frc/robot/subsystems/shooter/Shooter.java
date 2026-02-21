@@ -5,9 +5,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
 import java.util.function.Supplier;
@@ -111,12 +109,12 @@ public class Shooter extends SubsystemBase {
                 Logger.recordOutput("launchFuelCommand()/Hood Angle", hoodAngle.in(Rotations));
                 Logger.recordOutput("launchFuelCommand()/Exit Velocity", exitVelocity.in(MetersPerSecond));
 
-                RobotContainer.fuelSim.launchFuel(
-                    exitVelocity,
-                    Degrees.of(90).plus(hoodAngle),
-                    robotRelativeTurretAngle.plus(Radians.of(RobotContainer.drivetrain.getWrappedHeading().getRadians())),
-                    TurretConstants.ORIGIN_TO_TURRET.getMeasureZ()
-                );
+                // RobotContainer.fuelSim.launchFuel(
+                //     exitVelocity,
+                //     Degrees.of(90).plus(hoodAngle),
+                //     robotRelativeTurretAngle.plus(Radians.of(RobotContainer.drivetrain.getWrappedHeading().getRadians())),
+                //     TurretConstants.ORIGIN_TO_TURRET.getMeasureZ()
+                // );
             }
         }
     }

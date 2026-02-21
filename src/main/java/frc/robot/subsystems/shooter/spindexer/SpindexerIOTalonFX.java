@@ -1,12 +1,16 @@
 package frc.robot.subsystems.shooter.spindexer;
 
 import static frc.robot.constants.SpindexerConstants.*;
+
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 public class SpindexerIOTalonFX implements SpindexerIO {
 
 	private TalonFX spinMotor;
 	private TalonFX indexMotor;
+
+	private final VoltageOut request = new VoltageOut(0);
 
 	public SpindexerIOTalonFX() {
 		spinMotor = new TalonFX(SPIN_ID);
@@ -35,11 +39,11 @@ public class SpindexerIOTalonFX implements SpindexerIO {
 
 	@Override
 	public void setSpinVoltage(double voltage) {
-		spinMotor.setVoltage(voltage);
+		spinMotor.setControl(request.withOutput(voltage));
 	}
 
 	@Override
 	public void setIndexVoltage(double voltage) {
-		indexMotor.setVoltage(voltage);
+		indexMotor.setControl(request.withOutput(voltage));
 	}
 }

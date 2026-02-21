@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 
-import org.littletonrobotics.junction.Logger;
 
 public class Spindexer extends SubsystemBase {
 
@@ -20,8 +19,8 @@ public class Spindexer extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		io.updateInputs(inputs);
-		Logger.processInputs("Spindexer", inputs);
+		// io.updateInputs(inputs);
+		// Logger.processInputs("Spindexer", inputs);
 	}
 
 	public void spin() {
@@ -39,8 +38,11 @@ public class Spindexer extends SubsystemBase {
 		io.stopIndex();
 	}
 
+	public Command stopCommand() {
+		return Commands.run(() -> stop(), this);
+	}
 	public Command spinCommand() {
-		return Commands.run(() -> spin());
+		return Commands.run(() -> spin(), this);
 	}
 
 	public Command reverseSpinCommand() {

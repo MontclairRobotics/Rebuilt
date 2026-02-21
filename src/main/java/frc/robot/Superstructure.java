@@ -88,11 +88,11 @@ public class Superstructure extends SubsystemBase {
 		// Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
 		// Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
 		// Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowHood());
-		if(movingIntoObstacle()) {
-			updateTrenchZonesVeloBased();
-		} else {
-			resetTrenchZones();
-		}
+		// if(movingIntoObstacle()) {
+		// 	updateTrenchZonesVeloBased();
+		// } else {
+		// 	resetTrenchZones();
+		// }
 		// Logger.recordOutput("Trench/Trench Danger Zones", FieldConstants.Zones.TRENCH_DANGER_ZONES);
 	};
 
