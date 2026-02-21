@@ -41,6 +41,7 @@ public class Hood extends SubsystemBase {
 	private final Tunable tunableMotionMagicCruiseVelocity = new Tunable("Hood/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicCruiseVelocity(value));
 	private final Tunable tunableMotionMagicAcceleration = new Tunable("Hood/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicAcceleration(value));
 	private final Tunable tunableMotionMagicJerk = new Tunable("Hood/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicJerk(value));
+
 	private final Tunable tunableMaxVelocityAtSetpoint = new Tunable("Hood/Max Velocity At Setpoint", MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond), (value) -> MAX_VELOCITY_AT_SETPOINT = AngularVelocity.ofBaseUnits(value, RotationsPerSecond));
 
 	public final Tunable tunableHoodAngle = new Tunable("Hood/Tunable Hood Angle", 0, (value) -> tunnedAngleDegrees = value);
@@ -56,6 +57,8 @@ public class Hood extends SubsystemBase {
 		visualization.update();
 		visualization.log();
         // updateTunables();
+		io.setGains(kPTunable.getValue(), kDTunable.getValue(), kSTunable.getValue(), kGTunable.getValue());
+		io.setMotionMagic(tunableMotionMagicCruiseVelocity.getValue(), tunableMotionMagicAcceleration.getValue(), tunableMotionMagicJerk.getValue());
 	}
 
     public Angle getAngle() {
@@ -127,5 +130,4 @@ public class Hood extends SubsystemBase {
 	public Command joystickControlCommand() {
 		return Commands.run(() -> applyJoystickInput(), this);
 	}
-
 }

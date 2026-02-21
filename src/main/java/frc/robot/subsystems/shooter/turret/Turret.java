@@ -3,15 +3,9 @@ package frc.robot.subsystems.shooter.turret;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.constants.TurretConstants.SLOT0_CONFIGS;
-import static frc.robot.constants.TurretConstants.MOTION_MAGIC_CONFIGS;
+import static frc.robot.constants.TurretConstants.*;
 import static frc.robot.constants.HoodConstants.kD;
 import static frc.robot.constants.HoodConstants.kS;
-import static frc.robot.constants.TurretConstants.ANGLE_OFFSET;
-import static frc.robot.constants.TurretConstants.MAX_ANGLE;
-import static frc.robot.constants.TurretConstants.MAX_VELOCITY_AT_SETPOINT;
-import static frc.robot.constants.TurretConstants.MIN_ANGLE;
-import static frc.robot.constants.TurretConstants.TURRET_OFFSET;
 
 import java.util.function.Supplier;
 
@@ -48,9 +42,10 @@ public class Turret extends SubsystemBase {
 	private final Tunable kDTunable = new Tunable("Turret/kD", kD, (value) -> SLOT0_CONFIGS.withKD(value));
 	private final Tunable kSTunable = new Tunable("Turret/kS", kS, (value) -> SLOT0_CONFIGS.withKS(value));
 
-	private final Tunable tunableMotionMagicCruiseVelocity = new Tunable("Turret/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicCruiseVelocity(value));
+	private final Tunable tunableMotionMagicCruiseVelocity = new Tunable("Turret/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, (value) -> {MOTION_MAGIC_CONFIGS.withMotionMagicCruiseVelocity(value);});
 	private final Tunable tunableMotionMagicAcceleration = new Tunable("Turret/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicAcceleration(value));
 	private final Tunable tunableMotionMagicJerk = new Tunable("Turret/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicJerk(value));
+
 	private final Tunable tunableMaxVelocityAtSetpoint = new Tunable("Turret/Max Velocity At Setpoint", MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond), (value) -> MAX_VELOCITY_AT_SETPOINT = AngularVelocity.ofBaseUnits(value, RotationsPerSecond));
 
 	public final Tunable tunableRobotRelativeTurretAngleDegrees = new Tunable("Turret/Tunable Robot Relative Angle", 0, (value) -> tunnedAngleDegrees = value);
@@ -66,6 +61,8 @@ public class Turret extends SubsystemBase {
 		visualization.update();
 		visualization.log();
 		// updateTunables();
+		io.setGains(kPTunable.getValue(), kDTunable.getValue(), kSTunable.getValue());
+		io.setMotionMagic(tunableMotionMagicCruiseVelocity.getValue(), tunableMotionMagicAcceleration.getValue(), tunableMotionMagicJerk.getValue());
 	}
 
     /**
