@@ -49,7 +49,7 @@ public class TurretIOTalonFX implements TurretIO {
             .withMotorOutput(MOTOR_OUTPUT_CONFIGS)
             .withFeedback(FEEDBACK_CONFIGS)
             .withMotionMagic(MOTION_MAGIC_CONFIGS);
-            
+
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAX_ANGLE.in(Rotations);
