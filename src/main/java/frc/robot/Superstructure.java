@@ -2,7 +2,6 @@ package frc.robot;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,7 +14,6 @@ import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.FERRY_LE
 import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.FERRY_RIGHT;
 import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.HUB;
 
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Constants;
@@ -36,7 +34,7 @@ public class Superstructure extends SubsystemBase {
 	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.2);
 
 	public Superstructure(Shooter shooter) {
-		this.shooter = shooter;		
+		this.shooter = shooter;
 		if(CURRENT_MODE == Mode.SIM) {
 			shouldStowHoodTrigger.whileTrue(
 				shooter.stowCommand());

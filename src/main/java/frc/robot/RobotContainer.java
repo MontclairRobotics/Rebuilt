@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -39,6 +41,7 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import frc.robot.subsystems.shooter.Shooter;
@@ -60,6 +63,8 @@ import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 
 public class RobotContainer {
+
+	private final SendableChooser<Command> autoChooser;
 
 	// Controllers
 	public static CommandPS5Controller driverController = new CommandPS5Controller(0);
@@ -129,7 +134,7 @@ public class RobotContainer {
 					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading));
 			NamedCommands.registerCommand("shootToHub", shooter.setParameters(() -> RobotContainer.aiming.calculateShot(Aiming.TargetLocation.HUB, shooter.withConstantVelocity, shooter.whileMoving)));
 				break;
-			
+
 
 		case SIM:
 			flywheel = new Flywheel(new FlywheelIOSim());
@@ -167,6 +172,9 @@ public class RobotContainer {
 
 		}
 
+    // Another option that allows you to specify the default auto by its name
+        autoChooser = AutoBuilder.buildAutoChooser("LL1LD2");
+   		SmartDashboard.putData("Auto Chooser", autoChooser);
 		drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
 
 		configureBindings();
@@ -192,7 +200,7 @@ public class RobotContainer {
 	}
 
 	public Command getAutonomousCommand() {
-		return Commands.print("No autonomous command configured");
+		return autoChooser.getSelected();
 	}
 
 	/**
