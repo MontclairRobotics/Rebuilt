@@ -1,8 +1,11 @@
 package frc.robot.subsystems.shooter.hood;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.constants.HoodConstants.CAN_BUS;
 import static frc.robot.constants.HoodConstants.CAN_ID;
 import static frc.robot.constants.HoodConstants.ENCODER_PORT;
@@ -101,9 +104,9 @@ public class HoodIOTalonFX implements HoodIO {
             tempCelsiusSignal
         );
 
-        inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
-        inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
-        inputs.tempCelcius = tempCelsiusSignal.getValueAsDouble();
+        inputs.appliedVoltage = appliedVoltageSignal.getValue().in(Volts);
+        inputs.currentDrawAmps = currentDrawAmpsSignal.getValue().in(Amps);
+        inputs.tempCelcius = tempCelsiusSignal.getValue().in(Celsius);
 
         inputs.hoodAngle = positionSignal.getValue();
         inputs.hoodAngleSetpoint = Rotations.of(setpointPositionSignal.getValue());
