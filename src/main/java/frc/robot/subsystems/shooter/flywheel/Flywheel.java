@@ -47,7 +47,7 @@ public class Flywheel extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Flywheel", inputs);
-        // updateTunables();
+        updateTunables();
     }
 
     public void setVelocity(AngularVelocity targetVelocity) {

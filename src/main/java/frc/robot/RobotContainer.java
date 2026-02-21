@@ -84,11 +84,6 @@ public class RobotContainer {
 	private boolean withConstantVelocity = false;
 	private boolean whileMoving = true;
 
-	double launchSpeed = 10;
-	double hoodAngle = 30;
-	Tunable launchSpeedTunable = new Tunable("launch speed (MPS)",10,(value)->launchSpeed = value);
-	Tunable hoodAngleTunable = new Tunable("launch angle (degree)",hoodAngle,(value)->hoodAngle = value);
-
 	public RobotContainer() {
 
 		switch (Constants.CURRENT_MODE) {
@@ -114,7 +109,6 @@ public class RobotContainer {
 				// 		new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading));
 
 				// 	break;
-
 
 			case SIM:
 				drivetrain = TunerConstants.createDrivetrain();
@@ -176,7 +170,7 @@ public class RobotContainer {
 
 		driverController.cross().whileTrue(flywheel.setVoltageCommand(3)).onFalse(flywheel.stopCommand());
 		driverController.circle()
-			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunnedAngleDegrees)))
+			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunedAngleDegrees)))
 			.onFalse(hood.stopCommand());
 
 		driverController.square()

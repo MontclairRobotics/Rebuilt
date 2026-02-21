@@ -30,25 +30,104 @@ public class Hood extends SubsystemBase {
 
     private ArmFeedforward feedforward;
 
-	public double tunnedAngleDegrees = 0;
+	public double tunedAngleDegrees = 0;
 
-	private final Tunable kPTunable = new Tunable("Hood/Hood kP", kP, (value) -> SLOT0_CONFIGS.withKP(value));
-	private final Tunable kDTunable = new Tunable("Hood/Hood kD", kD, (value) -> SLOT0_CONFIGS.withKD(value));
-	private final Tunable kSTunable = new Tunable("Hood/Hood kS", kS, (value) -> SLOT0_CONFIGS.withKS(value));
-	private final Tunable kGTunable = new Tunable("Hood/Hood kG", kG, (value) -> SLOT0_CONFIGS.withKG(value));
+	private final Tunable kPTunable;
+	private final Tunable kDTunable;
+	private final Tunable kSTunable;
+	private final Tunable kGTunable;
 
-	private final Tunable tunableMotionMagicCruiseVelocity = new Tunable("Hood/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicCruiseVelocity(value));
-	private final Tunable tunableMotionMagicAcceleration = new Tunable("Hood/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicAcceleration(value));
-	private final Tunable tunableMotionMagicJerk = new Tunable("Hood/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicJerk(value));
+	private final Tunable tunableMotionMagicCruiseVelocity;
+	private final Tunable tunableMotionMagicAcceleration;
+	private final Tunable tunableMotionMagicJerk;
 
-	private final Tunable tunableMaxVelocityAtSetpoint = new Tunable("Hood/Max Velocity At Setpoint", MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond), (value) -> MAX_VELOCITY_AT_SETPOINT = AngularVelocity.ofBaseUnits(value, RotationsPerSecond));
+	private final Tunable tunableMaxVelocityAtSetpoint;
+	public final Tunable tunableHoodAngle;
 
-	public final Tunable tunableHoodAngle = new Tunable("Hood/Tunable Hood Angle", 0, (value) -> tunnedAngleDegrees = value);
-
-    public Hood(HoodIO io) {
+	public Hood(HoodIO io) {
         this.io = io;
         feedforward = new ArmFeedforward(kS, kG, 0);
-    }
+
+		kPTunable = new Tunable(
+			"Hood/Hood kP", 
+			kP, 
+			(value) -> {
+				io.setGains(value, SLOT0_CONFIGS.kD, SLOT0_CONFIGS.kS, SLOT0_CONFIGS.kG);
+			}
+		);
+
+		kDTunable = new Tunable(
+			"Hood/Hood kD", 
+			kP, 
+			(value) -> {
+				io.setGains(SLOT0_CONFIGS.kP, value, SLOT0_CONFIGS.kS, SLOT0_CONFIGS.kG);
+			}
+		);
+
+		kSTunable = new Tunable(
+			"Hood/Hood kS", 
+			kP, 
+			(value) -> {
+				io.setGains(SLOT0_CONFIGS.kP, SLOT0_CONFIGS.kD, value, SLOT0_CONFIGS.kG);
+			}
+		);
+
+		kGTunable = new Tunable(
+			"Hood/Hood kG", 
+			kP, 
+			(value) -> {
+				io.setGains(SLOT0_CONFIGS.kP, SLOT0_CONFIGS.kD, SLOT0_CONFIGS.kS, value);
+			}
+		);
+
+		tunableMotionMagicCruiseVelocity = new Tunable(
+			"Hood/Motion Magic Cruise Velocity", 
+			MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, 
+			(value) -> {
+				io.setMotionMagic(
+					value, 
+					MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, 
+					MOTION_MAGIC_CONFIGS.MotionMagicJerk
+				);
+			}
+		);
+
+		tunableMotionMagicAcceleration = new Tunable(
+			"Hood/Motion Magic Acceleration", 
+			MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, 
+			(value) -> {
+				io.setMotionMagic(
+					MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, 
+					value, 
+					MOTION_MAGIC_CONFIGS.MotionMagicJerk
+				);
+			}
+		);
+
+		tunableMotionMagicJerk = new Tunable(
+			"Hood/Motion Magic Jerk", 
+			MOTION_MAGIC_CONFIGS.MotionMagicJerk, 
+			(value) -> {
+				io.setMotionMagic(
+					MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, 
+					MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, 
+					value
+				);
+			}
+		);
+
+		tunableMaxVelocityAtSetpoint = new Tunable(
+			"Hood/Max Velocity At Setpoint",
+			MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond), 
+			(value) -> MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(value)
+		);
+
+		tunableHoodAngle = new Tunable(
+			"Hood/Tunable Hood Angle",
+			0, 
+			(value) -> tunedAngleDegrees = value
+		);
+	}
 
 	@Override
 	public void periodic() {
@@ -57,8 +136,6 @@ public class Hood extends SubsystemBase {
 		visualization.update();
 		visualization.log();
         // updateTunables();
-		io.setGains(kPTunable.getValue(), kDTunable.getValue(), kSTunable.getValue(), kGTunable.getValue());
-		io.setMotionMagic(tunableMotionMagicCruiseVelocity.getValue(), tunableMotionMagicAcceleration.getValue(), tunableMotionMagicJerk.getValue());
 	}
 
     public Angle getAngle() {
@@ -98,15 +175,15 @@ public class Hood extends SubsystemBase {
     //         io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get(), tunableKG.get());
     //     }
 
-		if(tunableMotionMagicAcceleration.hasChanged(hashCode())
-				|| tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
-				|| tunableMotionMagicJerk.hasChanged(hashCode())) {
-			io.setMotionMagic(
-				tunableMotionMagicCruiseVelocity.get(),
-				tunableMotionMagicAcceleration.get(),
-				tunableMotionMagicJerk.get()
-			);
-		}
+		// if(tunableMotionMagicAcceleration.hasChanged(hashCode())
+		// 		|| tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
+		// 		|| tunableMotionMagicJerk.hasChanged(hashCode())) {
+		// 	io.setMotionMagic(
+		// 		tunableMotionMagicCruiseVelocity.get(),
+		// 		tunableMotionMagicAcceleration.get(),
+		// 		tunableMotionMagicJerk.get()
+		// 	);
+		// }
 
 	// 	if(tunableMaxVelocityAtSetpoint.hasChanged(hashCode())) MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(tunableMaxVelocityAtSetpoint.get());
     // }
