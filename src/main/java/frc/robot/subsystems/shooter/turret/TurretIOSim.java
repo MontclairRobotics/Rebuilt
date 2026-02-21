@@ -94,6 +94,11 @@ public class TurretIOSim implements TurretIO {
     }
 
     @Override
+    public void setMotionMagic(double velocity, double acceleration, double jerk) {
+        // does nothing
+    }
+
+    @Override
     public void setNeutralMode(NeutralModeValue value) {
        // does nothing
     }

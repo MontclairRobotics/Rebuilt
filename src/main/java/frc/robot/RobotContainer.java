@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -30,6 +31,9 @@ import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
+import frc.robot.subsystems.shooter.flywheel.Flywheel;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 import frc.robot.subsystems.shooter.spindexer.SpindexerIOSim;
 import frc.robot.subsystems.shooter.spindexer.SpindexerIOTalonFX;
@@ -65,9 +69,9 @@ public class RobotContainer {
 	public static CommandSwerveDrivetrain drivetrain;
 
 	public static Shooter shooter;
-	// public static Flywheel2 flywheel;
 	public static Turret turret;
-	public static frc.robot.subsystems.shooter.hood.Hood hood;
+	public static Flywheel flywheel;
+	public static Hood hood;
 	public static Spindexer spindexer;
 
 	public static Pivot pivot;
@@ -92,72 +96,75 @@ public class RobotContainer {
 	Tunable hoodAngleTunable = new Tunable("launch angle (degree)",hoodAngle,(value)->hoodAngle = value);
 
 	public RobotContainer() {
-			fuelSim.registerRobot(
-				Constants.BUMPER_WIDTH,
-				Constants.BUMPER_WIDTH,
-				Inches.of(6),
-				() -> drivetrain.getRobotPose(),
-				() -> drivetrain.getFieldRelativeSpeeds()
-			);
-			fuelSim.registerIntake(Inches.of(15), Inches.of(22), Inches.of(-15), Inches.of(15));
-			fuelSim.spawnStartingFuel();
+			
 		switch (Constants.CURRENT_MODE) {
-		case REAL:
-			// flywheel = new Flywheel2(new FlywheelIOTalonFX2());
-			drivetrain = TunerConstants.createDrivetrain();
-			turret = new Turret(new TurretIOTalonFX());
-			hood = new Hood(new HoodIOTalonFX());
-			spindexer = new Spindexer(new SpindexerIOTalonFX());
-			// shooter = new Shooter(
-			// 	hood, flywheel, turret, spindexer,
-			// 	withConstantVelocity, whileMoving
-			// );
-			pivot = new Pivot(new PivotIOTalonFX());
-			rollers = new Rollers(new RollersIOTalonFX());
-			intake = new Intake(pivot, rollers);
-			superstructure = new Superstructure(shooter);
-			aiming = new Aiming(turret);
-			vision =
-				new Vision(
-					drivetrain::addVisionMeasurement,
-					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
-					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading));
+			case REAL:
+				drivetrain = TunerConstants.createDrivetrain();
+				flywheel = new Flywheel(new FlywheelIOTalonFX());
+				turret = new Turret(new TurretIOTalonFX());
+				hood = new Hood(new HoodIOTalonFX());
+				spindexer = new Spindexer(new SpindexerIOTalonFX());
+				shooter = new Shooter(
+					hood, flywheel, turret, spindexer,
+					withConstantVelocity, whileMoving
+				);
+				// pivot = new Pivot(new PivotIOTalonFX());
+				// rollers = new Rollers(new RollersIOTalonFX());
+				// intake = new Intake(pivot, rollers);
+				// superstructure = new Superstructure(shooter);
+				// aiming = new Aiming(turret);
+				// vision =
+				// 	new Vision(
+				// 		drivetrain::addVisionMeasurement,
+				// 		new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
+				// 		new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading));
 
-				break;
+				// 	break;
 
 
-		case SIM:
-			// flywheel = new Flywheel2(new FlywheelIOSim2());
-			drivetrain = TunerConstants.createDrivetrain();
-			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
-			turret = new Turret(new TurretIOSim());
-			hood = new Hood(new HoodIOSim());
-			spindexer = new Spindexer(new SpindexerIOSim());
-			// shooter = new Shooter(
-			// 	hood, flywheel, turret, spindexer,
-			// 	withConstantVelocity, whileMoving
-			// );
-			pivot = new Pivot(new PivotIOSim());
-			rollers = new Rollers(new RollersIOSim());
-			intake = new Intake(pivot, rollers);
-			superstructure = new Superstructure(shooter);
-			fuelSim.enableAirResistance();
-			fuelSim.start();
-			aiming = new Aiming(turret);
-			// vision =
-			// 	new Vision(
-			// 		drivetrain::addVisionMeasurement,
-			// 		new VisionIOPhotonVisionSim(
-			// 			"camera0Name", robotToCamera0, drivetrain::getRobotPose),
-			// 		new VisionIOPhotonVisionSim(
-			// 			"camera1Name", robotToCamera1, drivetrain::getRobotPose));
+			case SIM:
+				drivetrain = TunerConstants.createDrivetrain();
+				driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
+				flywheel = new Flywheel(new FlywheelIOSim());
+				turret = new Turret(new TurretIOSim());
+				hood = new Hood(new HoodIOSim());
+				spindexer = new Spindexer(new SpindexerIOSim());
+				shooter = new Shooter(
+					hood, flywheel, turret, spindexer,
+					withConstantVelocity, whileMoving
+				);
+				pivot = new Pivot(new PivotIOSim());
+				rollers = new Rollers(new RollersIOSim());
+				intake = new Intake(pivot, rollers);
+				superstructure = new Superstructure(shooter);
+				fuelSim.enableAirResistance();
+				fuelSim.start();
+				aiming = new Aiming(turret);
 
-				//TODO: Fix vision simulation! (It is causing loop overruns and memory issues with advantage kit logging)
+				fuelSim.registerRobot(
+					Constants.BUMPER_WIDTH,
+					Constants.BUMPER_WIDTH,
+					Inches.of(6),
+					() -> drivetrain.getRobotPose(),
+					() -> drivetrain.getFieldRelativeSpeeds()
+				);
+				fuelSim.registerIntake(Inches.of(15), Inches.of(22), Inches.of(-15), Inches.of(15));
+				fuelSim.spawnStartingFuel();
+			
+				// vision =
+				// 	new Vision(
+				// 		drivetrain::addVisionMeasurement,
+				// 		new VisionIOPhotonVisionSim(
+				// 			"camera0Name", robotToCamera0, drivetrain::getRobotPose),
+				// 		new VisionIOPhotonVisionSim(
+				// 			"camera1Name", robotToCamera1, drivetrain::getRobotPose));
 
-				break;
+					//TODO: Fix vision simulation! (It is causing loop overruns and memory issues with advantage kit logging)
 
-			default:
-				vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+					break;
+
+				default:
+					vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 		}
 
 		drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
@@ -168,7 +175,24 @@ public class RobotContainer {
 	}
 
 	private void configureBindings() {
-		drivetrain.setDefaultCommand(new JoystickDriveCommand());//.times(1).minus(Rotations.of(drivetrain.getWrappedHeading().getRotations()))
+		// drivetrain.setDefaultCommand(new JoystickDriveCommand());
+		hood.setDefaultCommand(hood.joystickControlCommand());
+		turret.setDefaultCommand(turret.joystickControlCommand());
+		flywheel.setDefaultCommand(flywheel.joystickControlCommand());
+
+		driverController.circle()
+			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
+			.onFalse(hood.stopCommand());
+
+		driverController.square()
+			.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
+			.onFalse(turret.stopCommand());
+
+		driverController.triangle()
+			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get())))
+			.onFalse(flywheel.stopCommand());
+
+		//.times(1).minus(Rotations.of(drivetrain.getWrappedHeading().getRotations()))
 		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed),Degrees.of(90-hoodAngle),turret.getAngleToHub(),TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
 		// driverController.triangle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
@@ -179,7 +203,7 @@ public class RobotContainer {
 		// driverController.circle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
-		driverController.PS().whileTrue(Commands.runOnce(()->fuelSim.clearFuel()));
+		driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
 		// zeros gyro
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 	}

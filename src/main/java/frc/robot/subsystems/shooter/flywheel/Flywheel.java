@@ -25,7 +25,7 @@ public class Flywheel extends SubsystemBase {
     private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Flywheel/kS", SLOT0_CONFIGS.kS);
     private final LoggedTunableNumber tunableKV = new LoggedTunableNumber("Flywheel/kV", SLOT0_CONFIGS.kV);
 
-    private final LoggedTunableNumber tuningFlywheelSpeed = new LoggedTunableNumber("Flywheel/TuningFlywheelRPM", 0);
+    public final LoggedTunableNumber tuningFlywheelSpeed = new LoggedTunableNumber("Flywheel/TuningFlywheelRPM", 0);
 
     public Flywheel(FlywheelIO io) {
         this.io = io;
@@ -58,12 +58,15 @@ public class Flywheel extends SubsystemBase {
         io.setVelocity(targetVelocitySupplier.get());
     }
 
-    public void joystickControl() {
+    public void applyJoystickInput() {
         double input = MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
         double voltage = input * RobotController.getBatteryVoltage();
         io.setVoltage(voltage);
     }
 
+    public Command stopCommand() {
+        return Commands.runOnce(() -> io.stop(), this);
+    }
     public Command setVelocityCommand(AngularVelocity targetVelocity) {
         return Commands.run(() -> io.setVelocity(targetVelocity));
     }
@@ -73,7 +76,7 @@ public class Flywheel extends SubsystemBase {
     }
 
     public Command joystickControlCommand() {
-        return Commands.run(() -> joystickControl(), this);
+        return Commands.run(() -> applyJoystickInput(), this);
     }
 
 }

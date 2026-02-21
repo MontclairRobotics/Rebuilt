@@ -1,7 +1,11 @@
 package frc.robot.subsystems.shooter.hood;
 
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.HoodConstants.SLOT0_CONFIGS;
+import static frc.robot.constants.HoodConstants.MAX_VELOCITY_AT_SETPOINT;
+import static frc.robot.constants.HoodConstants.MOTION_MAGIC_CONFIGS;
 import static frc.robot.constants.HoodConstants.kG;
 import static frc.robot.constants.HoodConstants.kS;
 
@@ -15,6 +19,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,7 +40,12 @@ public class Hood extends SubsystemBase {
     private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Hood/kS", SLOT0_CONFIGS.kS);
     private final LoggedTunableNumber tunableKG = new LoggedTunableNumber("Hood/kG", SLOT0_CONFIGS.kG);
 
-	private final LoggedTunableNumber tunableHoodAngle = new LoggedTunableNumber("Hood/Tunable Hood Angle", 0);
+	private final LoggedTunableNumber tunableMotionMagicCruiseVelocity = new LoggedTunableNumber("Hood/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity);
+	private final LoggedTunableNumber tunableMotionMagicAcceleration = new LoggedTunableNumber("Hood/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration);
+	private final LoggedTunableNumber tunableMotionMagicJerk = new LoggedTunableNumber("Hood/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk);
+	private final LoggedTunableNumber tunableMaxVelocityAtSetpoint = new LoggedTunableNumber("Hood/Max Velocity At Setpoint", MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond));
+
+	public final LoggedTunableNumber tunableHoodAngle = new LoggedTunableNumber("Hood/Tunable Hood Angle", 0);
 	
     public Hood(HoodIO io) {
         this.io = io;
@@ -61,7 +71,7 @@ public class Hood extends SubsystemBase {
 	}
 
     public void applyJoystickInput() {
-		double voltage = Math.pow(MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.04), 3) * 3;
+		double voltage = Math.pow(MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.04), 3) * RobotController.getBatteryVoltage();
 		double ffVoltage = feedforward.calculate(getAngle().in(Radians), 0);
 		Logger.recordOutput("Hood/Feedforward Voltage", ffVoltage);
 		io.setVoltage(voltage + ffVoltage);
@@ -86,6 +96,18 @@ public class Hood extends SubsystemBase {
                 || tunableKG.hasChanged(hashCode())) {
             io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get(), tunableKG.get());
         }
+
+		if(tunableMotionMagicAcceleration.hasChanged(hashCode())
+				|| tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
+				|| tunableMotionMagicJerk.hasChanged(hashCode())) {
+			io.setMotionMagic(
+				tunableMotionMagicCruiseVelocity.get(), 
+				tunableMotionMagicAcceleration.get(), 
+				tunableMotionMagicJerk.get()
+			);
+		}
+
+		if(tunableMaxVelocityAtSetpoint.hasChanged(hashCode())) MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(tunableMaxVelocityAtSetpoint.get());
     }
 
 	public void setNeutralMode(NeutralModeValue value) {
@@ -104,7 +126,7 @@ public class Hood extends SubsystemBase {
 		return Commands.run(() -> setAngle(angle), this).until(() -> atSetpoint());
 	}
 
-	public Command joystickCommand() {
+	public Command joystickControlCommand() {
 		return Commands.run(() -> applyJoystickInput(), this);
 	}
 

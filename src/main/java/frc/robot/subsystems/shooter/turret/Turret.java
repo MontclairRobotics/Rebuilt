@@ -2,9 +2,12 @@ package frc.robot.subsystems.shooter.turret;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.SLOT0_CONFIGS;
+import static frc.robot.constants.TurretConstants.MOTION_MAGIC_CONFIGS;
 import static frc.robot.constants.TurretConstants.ANGLE_OFFSET;
 import static frc.robot.constants.TurretConstants.MAX_ANGLE;
+import static frc.robot.constants.TurretConstants.MAX_VELOCITY_AT_SETPOINT;
 import static frc.robot.constants.TurretConstants.MIN_ANGLE;
 import static frc.robot.constants.TurretConstants.TURRET_OFFSET;
 
@@ -14,20 +17,23 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.tunables.LoggedTunableNumber;
 
-public class Turret {
+public class Turret extends SubsystemBase {
 
     private final TurretIO io;
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
@@ -37,12 +43,18 @@ public class Turret {
     private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Turret/kD", SLOT0_CONFIGS.kD);
     private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Turret/kS", SLOT0_CONFIGS.kS);
 	
-	private final LoggedTunableNumber tunableRobotRelativeTurretAngle = new LoggedTunableNumber("Turret/Tunable Robot Relative Angle", 0);
+	private final LoggedTunableNumber tunableMotionMagicCruiseVelocity = new LoggedTunableNumber("Turret/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity);
+	private final LoggedTunableNumber tunableMotionMagicAcceleration = new LoggedTunableNumber("Turret/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration);
+	private final LoggedTunableNumber tunableMotionMagicJerk = new LoggedTunableNumber("Turret/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk);
+	private final LoggedTunableNumber tunableMaxVelocityAtSetpoint = new LoggedTunableNumber("Turret/Max Velocity At Setpoint", MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond));
+
+	public final LoggedTunableNumber tunableRobotRelativeTurretAngle = new LoggedTunableNumber("Turret/Tunable Robot Relative Angle", 0);
 
     public Turret(TurretIO io) {
         this.io = io;
     }
 
+	@Override
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Turret", inputs);
@@ -96,6 +108,24 @@ public class Turret {
                 || tunableKS.hasChanged(hashCode())) {
             io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get());
         }
+
+		if(tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
+				|| tunableMotionMagicAcceleration.hasChanged(hashCode())
+				|| tunableMotionMagicJerk.hasChanged(hashCode())) {
+			io.setMotionMagic(
+				tunableMotionMagicCruiseVelocity.get(), 
+				tunableMotionMagicAcceleration.get(),
+				tunableMotionMagicJerk.get()
+			);
+		}
+
+		if(tunableMaxVelocityAtSetpoint.hasChanged(hashCode())) MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(tunableMaxVelocityAtSetpoint.get());
+	}
+
+	public void applyJoystickInput() {
+		double input = MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
+		double voltage = input * RobotController.getBatteryVoltage();
+		io.setVoltage(voltage);
 	}
 
     public Angle getRobotRelativeAngle() {
@@ -168,6 +198,10 @@ public class Turret {
 
 	public void setRobotRelativeAngle(Supplier<Angle> angleSupplier) {
 		io.setRobotRelativeAngle(angleSupplier.get());
+	}
+
+	public Command joystickControlCommand() {
+		return Commands.run(() -> applyJoystickInput(), this);
 	}
 
 	public Command stopCommand() {

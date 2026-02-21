@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.AutoLog;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public interface HoodIO {
@@ -38,6 +39,8 @@ public interface HoodIO {
     public boolean isAtSetpoint();
 
     public void setGains(double kP, double kD, double kS, double kG);
+
+    public void setMotionMagic(double velocity, double acceleration, double jerk);
 
     public void setNeutralMode(NeutralModeValue value);
 

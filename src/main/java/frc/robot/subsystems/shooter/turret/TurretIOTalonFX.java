@@ -131,6 +131,15 @@ public class TurretIOTalonFX implements TurretIO {
     }
 
     @Override
+    public void setMotionMagic(double velocity, double acceleration, double jerk) {
+        config.MotionMagic.MotionMagicCruiseVelocity = velocity;
+        config.MotionMagic.MotionMagicAcceleration = acceleration;
+        config.MotionMagic.MotionMagicJerk = jerk;
+
+        motor.getConfigurator().apply(config.MotionMagic);
+    }
+
+    @Override
     public void setNeutralMode(NeutralModeValue value) {
         motor.setNeutralMode(value);
     }

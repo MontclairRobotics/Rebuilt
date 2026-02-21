@@ -18,6 +18,8 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
@@ -96,6 +98,12 @@ public class HoodIOSim implements HoodIO {
         feedforward.setKs(kS);
         feedforward.setKg(kG);
     }
+
+    @Override
+    public void setMotionMagic(double velocity, double acceleration, double jerk) {
+        // does nothing, not necessary
+    }
+
 
     @Override
     public void setNeutralMode(NeutralModeValue value) {

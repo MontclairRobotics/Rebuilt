@@ -46,7 +46,6 @@ public class HoodConstants {
 	public static final double GEARING = 176; // from Max Pearson on 2026.02.20
 	public static final double SENSOR_TO_MECHANISM_RATIO = 176.0 / 10;
 	public static final double ROTOR_TO_SENSOR_RATIO = 10;
-	public static final double ENCODER_TO_HOOD = 10/176; // based on Max Pearson on 2026.02.20, not confirmed
 	public static final double MOMENT_OF_INERTIA = 0.03038161694; // from CAD on 3/3/2026
 	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0); // absolute encoder
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
@@ -63,10 +62,10 @@ public class HoodConstants {
 	public static final double STATOR_CURRENT_LIMIT = 80; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 40; // Amps
 
-	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(3);
-	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(6);
-	public static final double MOTION_MAGIC_JERK = 50; // Rotations Per Second Per Second Per Second
-	public static final AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(0.05);
+	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(1);
+	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(2);
+	public static final double MOTION_MAGIC_JERK = 40; // Rotations Per Second Per Second Per Second
+	public static AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(0.05);
 
 	// Configs
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
