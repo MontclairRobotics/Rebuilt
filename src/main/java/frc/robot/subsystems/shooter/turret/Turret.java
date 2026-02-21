@@ -102,6 +102,9 @@ public class Turret extends SubsystemBase {
 	  Translation2d hublocation = PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION);
       return getFieldRelativePosition().getDistance(hublocation);
   	}
+	public double getDistanceToPoint(Translation2d location) {
+      return getFieldRelativePosition().getDistance(location);
+  	}
 
 	/**
 	 * @return the field relative angle to align the turret to in order to point at the hub
@@ -114,9 +117,9 @@ public class Turret extends SubsystemBase {
 	}
 
 	public Angle getAngleToPoint(Translation2d point) {
-		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
-		Translation2d location = PoseUtils.flipTranslationAlliance(point);
-		Translation2d robotToPoint = location.minus(robotPose.getTranslation());
+		Translation2d robotPose = getFieldRelativePosition();
+		// Translation2d location = PoseUtils.flipTranslationAlliance(point);
+		Translation2d robotToPoint = point.minus(robotPose);
 		Logger.recordOutput("Turret/getAngletoPoint", robotToPoint.getAngle().getRotations());
 		return robotToPoint.getAngle().getMeasure();
 	}

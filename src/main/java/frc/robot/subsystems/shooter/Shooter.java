@@ -95,8 +95,50 @@ public class Shooter extends SubsystemBase {
         );
     }
 
+    public Command setSimAutoParameters(Supplier<SimShootingParameters> paramsSupplier) {
+        return Commands.parallel(
+            Commands.runOnce(() -> {
+                SimShootingParameters params = paramsSupplier.get();
+                Logger.recordOutput("launchFuel()/At Setpoint", RobotContainer.shooter.atSetpoint());
+                launchFuel(() -> params.exitVelocity(), 6);
+                Logger.recordOutput("setSimParameters()/Robot Relative Turret Angle", params.robotRelativeTurretAngle().in(Rotations));
+                Logger.recordOutput("setSimParameters()/Hood Angle", params.hoodAngle().in(Rotations));
+                Logger.recordOutput("setSimParameters()/Exit Velocity", params.exitVelocity().in(MetersPerSecond));
+                turret.setRobotRelativeAngle(() -> params.robotRelativeTurretAngle());
+                hood.setAngle(() -> params.hoodAngle());
+            })
+        );
+    }
+    
+
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
-        if (RobotContainer.driverController.circle().getAsBoolean() && RobotContainer.shooter.atSetpoint()) {
+        if (RobotContainer.driverController.R2().getAsBoolean() && RobotContainer.shooter.atSetpoint()) {
+            double currentTime = Timer.getFPGATimestamp();
+            double interval = 1.0 / fireRate;
+
+            if(currentTime - lastSimShotTime >= interval) {
+                lastSimShotTime = currentTime;
+
+                LinearVelocity exitVelocity = velocitySupplier.get();
+                Angle robotRelativeTurretAngle = RobotContainer.turret.getRobotRelativeAngle();
+                Angle hoodAngle = RobotContainer.hood.getAngle();
+
+                Logger.recordOutput("launchFuelCommand()/Robot Relative Turret Angle", robotRelativeTurretAngle.in(Rotations));
+                Logger.recordOutput("launchFuelCommand()/Hood Angle", hoodAngle.in(Rotations));
+                Logger.recordOutput("launchFuelCommand()/Exit Velocity", exitVelocity.in(MetersPerSecond));
+
+                RobotContainer.fuelSim.launchFuel(
+                    exitVelocity,
+                    Degrees.of(90).plus(hoodAngle),
+                    robotRelativeTurretAngle.plus(Radians.of(RobotContainer.drivetrain.getWrappedHeading().getRadians())),
+                    TurretConstants.ORIGIN_TO_TURRET.getMeasureZ()
+                );
+            }
+        }
+    }
+
+    public void launchFuelAuto(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
+        if (RobotContainer.shooter.atSetpoint()) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
 
@@ -123,7 +165,7 @@ public class Shooter extends SubsystemBase {
 
     public Command indexAndShootCommand(Supplier<AngularVelocity> flywheelVelocitySupplier) {
         return Commands.run(() -> {
-            if (RobotContainer.driverController.circle().getAsBoolean() && this.atSetpoint()) {
+            if (RobotContainer.driverController.R2().getAsBoolean() && this.atSetpoint()) {
                 spindexer.spin();
                 flywheel.setVelocityRPS(flywheelVelocitySupplier);
             }

@@ -2,8 +2,11 @@ package frc.robot;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import static edu.wpi.first.units.Units.Meters;
@@ -12,23 +15,31 @@ import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.FERRY_LE
 import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.FERRY_RIGHT;
 import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.HUB;
 
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Mode;
+import frc.robot.constants.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
+import frc.robot.util.FieldConstants.LeftTrench;
+import frc.robot.util.FieldConstants.LinesVertical;
 import frc.robot.util.HubTracker;
 import frc.robot.util.PoseUtils;
 
+
 public class Superstructure extends SubsystemBase {
 
-    private Shooter shooter;
+	private Shooter shooter;
+	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.2);
 
-    public Superstructure(Shooter shooter) {
+	public Superstructure(Shooter shooter) {
 		this.shooter = shooter;
 		if(CURRENT_MODE == Mode.SIM) {
+			shouldStowHoodTrigger.whileTrue(
+				shooter.stowCommand());
 			scoringModeTrigger.whileTrue(
 				shooter.setSimParameters(
 					() -> RobotContainer.aiming.calculateSimShot(
@@ -44,9 +55,9 @@ public class Superstructure extends SubsystemBase {
 					() -> RobotContainer.aiming.calculateSimShot(
 						FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
+		} else {
 			shouldStowHoodTrigger.whileTrue(
 				shooter.stowCommand());
-		} else {
 			scoringModeTrigger.whileTrue(
 				shooter.setParameters(
 					() -> RobotContainer.aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
@@ -59,11 +70,11 @@ public class Superstructure extends SubsystemBase {
 				shooter.setParameters(
 					() -> RobotContainer.aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
-			shouldStowHoodTrigger.whileTrue(
-				shooter.stowCommand());
-		}
 
-    }
+		NamedCommands.registerCommand("shootToHub", shooter.setParameters(() -> RobotContainer.aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)));
+		NamedCommands.registerCommand("simShootToHub", shooter.setSimAutoParameters(() -> RobotContainer.aiming.calculateSimShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)));
+		}
+	}
 
 	public final Trigger scoringModeTrigger =
 			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldBeScoring());
@@ -77,15 +88,79 @@ public class Superstructure extends SubsystemBase {
 	public final Trigger shouldStowHoodTrigger =
 			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldStowHood());
 
-    @Override
-    public void periodic() {
+	@Override
+	public void periodic() {
 		Logger.recordOutput("Superstructure/isallianceknown", AllianceManager.isAllianceKnown());
 		Logger.recordOutput("Superstructure/currentshiftempty", HubTracker.getCurrentShift().isEmpty());
-        Logger.recordOutput("Superstructure/shouldBeScoring", shouldBeScoring());
-        Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
-        Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
-        Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowHood());
-    };
+		Logger.recordOutput("Superstructure/shouldBeScoring", shouldBeScoring());
+		Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
+		Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
+		Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowHood());
+		if(movingIntoObstacle()) {
+			updateTrenchZonesVeloBased();
+		} else {
+			resetTrenchZones();
+		}
+		Logger.recordOutput("Trench/Trench Danger Zones", FieldConstants.Zones.TRENCH_DANGER_ZONES);
+	};
+
+	public void resetTrenchZones() {
+		FieldConstants.Zones.TRENCH_DANGER_ZONES = new Translation2d[][]{
+			// near right trench
+			new Translation2d[] {
+				new Translation2d(LinesVertical.HUB_CENTER.minus(TRENCH_ZONE_OFFSET), Meters.zero()),
+				new Translation2d(LinesVertical.HUB_CENTER.plus(TRENCH_ZONE_OFFSET), FieldConstants.RightTrench.WIDTH)
+			},
+
+			// near left trench
+			new Translation2d[] {
+				new Translation2d(LinesVertical.HUB_CENTER.minus(TRENCH_ZONE_OFFSET), FieldConstants.FIELD_WIDTH.minus(LeftTrench.WIDTH)),
+				new Translation2d(LinesVertical.HUB_CENTER.plus(TRENCH_ZONE_OFFSET), FieldConstants.FIELD_WIDTH)
+			},
+
+			// far right trench
+			new Translation2d[] {
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_ZONE_OFFSET), Meters.zero()),
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_ZONE_OFFSET), FieldConstants.RightTrench.WIDTH)
+			},
+
+			// far left trench
+			new Translation2d[] {
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_ZONE_OFFSET), FieldConstants.FIELD_WIDTH.minus(LeftTrench.WIDTH)),
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_ZONE_OFFSET), FieldConstants.FIELD_WIDTH)
+			}
+		};
+	}
+
+	public void updateTrenchZonesVeloBased() {
+		//Updates width of zone based on robot velocity
+		Distance dynamicTrenchDangerZoneWidth = Meters.of(TRENCH_ZONE_OFFSET.in(Meters) + Math.abs(RobotContainer.drivetrain.getFieldRelativeVelocity().getX())* HoodConstants.HOOD_LOWER_TIME);
+		FieldConstants.Zones.TRENCH_DANGER_ZONES = new Translation2d[][]{
+			// near right trench
+			new Translation2d[] {
+				new Translation2d(LinesVertical.HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), Meters.zero()),
+				new Translation2d(LinesVertical.HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.RightTrench.WIDTH)
+			},
+
+			// near left trench
+			new Translation2d[] {
+				new Translation2d(LinesVertical.HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH.minus(LeftTrench.WIDTH)),
+				new Translation2d(LinesVertical.HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH)
+			},
+
+			// far right trench
+			new Translation2d[] {
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), Meters.zero()),
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.RightTrench.WIDTH)
+			},
+
+			// far left trench
+			new Translation2d[] {
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH.minus(LeftTrench.WIDTH)),
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH)
+			}
+		};
+	}
 
     public boolean isRedAlliance() {
 		return AllianceManager.isRed();
@@ -98,9 +173,9 @@ public class Superstructure extends SubsystemBase {
 			!shouldStowHood()
 			&&
 			(AllianceManager.isRed() ?
-				pos.getX() >= PoseUtils.flipTranslationAlliance(new Translation2d(FieldConstants.LinesVertical.STARTING.in(Meters), 0)).getX()
+				pos.getX() >= PoseUtils.flipTranslationAlliance(new Translation2d(FieldConstants.LinesVertical.HUB_CENTER.in(Meters), 0)).getX()
         		:
-				pos.getX() <= FieldConstants.LinesVertical.STARTING.in(Meters)
+				pos.getX() <= FieldConstants.LinesVertical.HUB_CENTER.in(Meters)
 			);
     }
 
@@ -179,12 +254,12 @@ public class Superstructure extends SubsystemBase {
     }
 
 	public static boolean inTrenchDangerZone() {
-		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+		Translation2d turretPose = RobotContainer.turret.getFieldRelativePosition();
         for (Translation2d[] zone : FieldConstants.Zones.TRENCH_DANGER_ZONES) {
-            if (robotPose.getX() >= zone[0].getX()
-                    && robotPose.getX() <= zone[1].getX()
-                    && robotPose.getY() >= zone[0].getY()
-                    && robotPose.getY() <= zone[1].getY()) {
+            if (turretPose.getX() >= zone[0].getX()
+                    && turretPose.getX() <= zone[1].getX()
+                    && turretPose.getY() >= zone[0].getY()
+                    && turretPose.getY() <= zone[1].getY()) {
                 return true;
             }
         }
