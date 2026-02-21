@@ -38,6 +38,9 @@ import frc.robot.util.tunables.Tunable;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
+
+import com.pathplanner.lib.auto.NamedCommands;
+
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
@@ -124,9 +127,9 @@ public class RobotContainer {
 					drivetrain::addVisionMeasurement,
 					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
 					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading));
-
+			NamedCommands.registerCommand("shootToHub", shooter.setParameters(() -> RobotContainer.aiming.calculateShot(Aiming.TargetLocation.HUB, shooter.withConstantVelocity, shooter.whileMoving)));
 				break;
-
+			
 
 		case SIM:
 			flywheel = new Flywheel(new FlywheelIOSim());
@@ -146,6 +149,7 @@ public class RobotContainer {
 			fuelSim.enableAirResistance();
 			fuelSim.start();
 			aiming = new Aiming(turret);
+			NamedCommands.registerCommand("simShootToHub", shooter.setSimAutoParameters(() -> RobotContainer.aiming.calculateSimShot(Aiming.TargetLocation.HUB, shooter.withConstantVelocity, shooter.whileMoving)));
 			// vision =
 			// 	new Vision(
 			// 		drivetrain::addVisionMeasurement,
@@ -160,6 +164,7 @@ public class RobotContainer {
 
 			default:
 				vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+
 		}
 
 		drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));

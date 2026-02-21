@@ -36,10 +36,7 @@ public class Superstructure extends SubsystemBase {
 	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.2);
 
 	public Superstructure(Shooter shooter) {
-		this.shooter = shooter;
-		NamedCommands.registerCommand("shootToHub", shooter.setParameters(() -> RobotContainer.aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)));
-		NamedCommands.registerCommand("simShootToHub", shooter.setSimAutoParameters(() -> RobotContainer.aiming.calculateSimShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)));
-		
+		this.shooter = shooter;		
 		if(CURRENT_MODE == Mode.SIM) {
 			shouldStowHoodTrigger.whileTrue(
 				shooter.stowCommand());
