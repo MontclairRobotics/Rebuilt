@@ -34,9 +34,9 @@ public class HoodConstants {
 	public static final Translation3d TURRET_TO_HOOD = new Translation3d(-0.113, 0, 0.08128);
 
 	// CAN
-	public static final int CAN_ID = -1;
-	public static final int ENCODER_PORT = -1;
-	public static final CANBus CAN_BUS = new CANBus("");
+	public static final int CAN_ID = 33;
+	public static final int ENCODER_PORT = 34;
+	public static final CANBus CAN_BUS = new CANBus("turret");
 
 	// Constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);

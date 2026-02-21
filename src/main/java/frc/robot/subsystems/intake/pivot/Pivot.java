@@ -49,10 +49,10 @@ public class Pivot extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		io.updateInputs(inputs);
-		Logger.processInputs("Pivot", inputs);
-		visualization.update();
-		visualization.log();
+		// io.updateInputs(inputs);
+		// Logger.processInputs("Pivot", inputs);
+		// visualization.update();
+		// visualization.log();
 	}
 
 	public boolean atSetpoint() {

@@ -3,7 +3,6 @@ package frc.robot.subsystems.shooter.hood;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static frc.robot.constants.HoodConstants.CAN_BUS;
 import static frc.robot.constants.HoodConstants.CAN_ID;
 import static frc.robot.constants.HoodConstants.ENCODER_PORT;
@@ -18,19 +17,15 @@ import static frc.robot.constants.HoodConstants.ENCODER_CONFIGS;
 import static frc.robot.constants.HoodConstants.MOTOR_OUTPUT_CONFIGS;
 import static frc.robot.constants.HoodConstants.FEEDBACK_CONFIGS;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
@@ -65,8 +60,8 @@ public class HoodIOTalonFX implements HoodIO {
             .withFeedback(FEEDBACK_CONFIGS)
             .withMotionMagic(MOTION_MAGIC_CONFIGS);
 
-        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAX_ANGLE.in(Rotations);
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MIN_ANGLE.in(Rotations);
 
@@ -95,24 +90,26 @@ public class HoodIOTalonFX implements HoodIO {
 
     @Override
     public void updateInputs(HoodIOInputs inputs) {
-        inputs.motorConnected = BaseStatusSignal.isAllGood(
-            positionSignal,
-            setpointPositionSignal,
-            velocitySignal,
-            appliedVoltageSignal,
-            currentDrawAmpsSignal,
-            tempCelsiusSignal
-        );
+        // inputs.motorConnected = BaseStatusSignal.isAllGood(
+        //     positionSignal,
+        //     setpointPositionSignal,
+        //     velocitySignal,
+        //     appliedVoltageSignal,
+        //     currentDrawAmpsSignal,
+        //     tempCelsiusSignal
+        // );
 
-        inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
-        inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
-        inputs.tempCelcius = tempCelsiusSignal.getValueAsDouble();
+        // inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
 
-        inputs.hoodAngle = positionSignal.getValue();
-        inputs.hoodAngleSetpoint = Rotations.of(setpointPositionSignal.getValue());
-        inputs.hoodVelocity = velocitySignal.getValue();
+        // inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
+        // inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
+        // inputs.tempCelcius = tempCelsiusSignal.getValueAsDouble();
 
-        inputs.isAtSetpoint = isAtSetpoint();
+        // inputs.hoodAngle = positionSignal.getValue();
+        // inputs.hoodAngleSetpoint = Rotations.of(setpointPositionSignal.getValue());
+        // inputs.hoodVelocity = velocitySignal.getValue();
+
+        // inputs.isAtSetpoint = isAtSetpoint();
     }
 
     @Override
@@ -122,7 +119,7 @@ public class HoodIOTalonFX implements HoodIO {
 
     @Override
     public void setVoltage(double voltage) {
-        motor.setControl(new VoltageOut(voltage));
+        motor.setVoltage(voltage);;
     }
 
     @Override

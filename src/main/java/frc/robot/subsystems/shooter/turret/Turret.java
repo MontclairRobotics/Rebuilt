@@ -24,7 +24,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -42,7 +41,7 @@ public class Turret extends SubsystemBase {
 	private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Turret/kP", SLOT0_CONFIGS.kP);
     private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Turret/kD", SLOT0_CONFIGS.kD);
     private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Turret/kS", SLOT0_CONFIGS.kS);
-	
+
 	private final LoggedTunableNumber tunableMotionMagicCruiseVelocity = new LoggedTunableNumber("Turret/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity);
 	private final LoggedTunableNumber tunableMotionMagicAcceleration = new LoggedTunableNumber("Turret/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration);
 	private final LoggedTunableNumber tunableMotionMagicJerk = new LoggedTunableNumber("Turret/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk);
@@ -58,9 +57,9 @@ public class Turret extends SubsystemBase {
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Turret", inputs);
-		visualization.update();
-		visualization.log();
-		updateTunables();
+		// visualization.update();
+		// visualization.log();
+		// updateTunables();
 	}
 
     /**
@@ -113,7 +112,7 @@ public class Turret extends SubsystemBase {
 				|| tunableMotionMagicAcceleration.hasChanged(hashCode())
 				|| tunableMotionMagicJerk.hasChanged(hashCode())) {
 			io.setMotionMagic(
-				tunableMotionMagicCruiseVelocity.get(), 
+				tunableMotionMagicCruiseVelocity.get(),
 				tunableMotionMagicAcceleration.get(),
 				tunableMotionMagicJerk.get()
 			);
@@ -124,7 +123,7 @@ public class Turret extends SubsystemBase {
 
 	public void applyJoystickInput() {
 		double input = MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
-		double voltage = input * RobotController.getBatteryVoltage();
+		double voltage = input * 12;
 		io.setVoltage(voltage);
 	}
 

@@ -5,7 +5,6 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -49,7 +48,7 @@ public class TurretIOTalonFX implements TurretIO {
             .withMotorOutput(MOTOR_OUTPUT_CONFIGS)
             .withFeedback(FEEDBACK_CONFIGS)
             .withMotionMagic(MOTION_MAGIC_CONFIGS);
-            
+
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAX_ANGLE.in(Rotations);
@@ -106,7 +105,7 @@ public class TurretIOTalonFX implements TurretIO {
 
     @Override
     public void setVoltage(double voltage) {
-        motor.setControl(new VoltageOut(voltage));
+        motor.setVoltage(voltage);
     }
 
     @Override

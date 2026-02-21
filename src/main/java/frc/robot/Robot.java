@@ -20,14 +20,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
-import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
-import frc.robot.util.AllianceManager;
-import frc.robot.util.FieldConstants;
-import frc.robot.util.PoseUtils;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -64,7 +59,7 @@ public class Robot extends LoggedRobot {
 		switch (Constants.CURRENT_MODE) {
 		case REAL:
 			// Running on a real robot, log to a USB stick ("/U/logs")
-			Logger.addDataReceiver(new WPILOGWriter());
+			// Logger.addDataReceiver(new WPILOGWriter());
 			Logger.addDataReceiver(new NT4Publisher());
 			break;
 
@@ -105,14 +100,14 @@ public class Robot extends LoggedRobot {
 	/** This function is called periodically during all modes. */
 	@Override
 	public void robotPeriodic() {
-		AllianceManager.update();
+		// AllianceManager.update();
 		// TODO: fix this
-		if(!hasAppliedTargetLocation && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-			hasAppliedTargetLocation = true;
-			TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
-			TargetLocation.FERRY_LEFT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT));
-			TargetLocation.FERRY_RIGHT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT));
-		}
+		// if(!hasAppliedTargetLocation && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+		// 	hasAppliedTargetLocation = true;
+		// 	TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
+		// 	TargetLocation.FERRY_LEFT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT));
+		// 	TargetLocation.FERRY_RIGHT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT));
+		// }
 		CommandScheduler.getInstance().run();
 	}
 

@@ -1,7 +1,6 @@
 package frc.robot.subsystems.shooter.hood;
 
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.HoodConstants.SLOT0_CONFIGS;
 import static frc.robot.constants.HoodConstants.MAX_VELOCITY_AT_SETPOINT;
@@ -19,7 +18,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -46,18 +44,19 @@ public class Hood extends SubsystemBase {
 	private final LoggedTunableNumber tunableMaxVelocityAtSetpoint = new LoggedTunableNumber("Hood/Max Velocity At Setpoint", MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond));
 
 	public final LoggedTunableNumber tunableHoodAngle = new LoggedTunableNumber("Hood/Tunable Hood Angle", 0);
-	
+
     public Hood(HoodIO io) {
         this.io = io;
         feedforward = new ArmFeedforward(kS, kG, 0);
     }
 
+	@Override
 	public void periodic() {
-		io.updateInputs(inputs);
+		// io.updateInputs(new HoodIOInputsAutoLogged());
 		Logger.processInputs("Hood", inputs);
-		visualization.update();
-		visualization.log();
-        updateTunables();
+		// visualization.update();
+		// visualization.log();
+        // updateTunables();
 	}
 
     public Angle getAngle() {
@@ -71,7 +70,7 @@ public class Hood extends SubsystemBase {
 	}
 
     public void applyJoystickInput() {
-		double voltage = Math.pow(MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.04), 3) * RobotController.getBatteryVoltage();
+		double voltage = Math.pow(MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.04), 3) * 12;
 		double ffVoltage = feedforward.calculate(getAngle().in(Radians), 0);
 		Logger.recordOutput("Hood/Feedforward Voltage", ffVoltage);
 		io.setVoltage(voltage + ffVoltage);
@@ -101,8 +100,8 @@ public class Hood extends SubsystemBase {
 				|| tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
 				|| tunableMotionMagicJerk.hasChanged(hashCode())) {
 			io.setMotionMagic(
-				tunableMotionMagicCruiseVelocity.get(), 
-				tunableMotionMagicAcceleration.get(), 
+				tunableMotionMagicCruiseVelocity.get(),
+				tunableMotionMagicAcceleration.get(),
 				tunableMotionMagicJerk.get()
 			);
 		}

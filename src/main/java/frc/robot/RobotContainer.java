@@ -17,17 +17,14 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.pivot.Pivot;
 import frc.robot.subsystems.intake.pivot.PivotIOSim;
-import frc.robot.subsystems.intake.pivot.PivotIOTalonFX;
 import frc.robot.subsystems.intake.rollers.Rollers;
 import frc.robot.subsystems.intake.rollers.RollersIOSim;
-import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
@@ -45,7 +42,6 @@ import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.sim.FuelSim;
@@ -55,8 +51,6 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 
-import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
-import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 
 public class RobotContainer {
 
@@ -96,7 +90,7 @@ public class RobotContainer {
 	Tunable hoodAngleTunable = new Tunable("launch angle (degree)",hoodAngle,(value)->hoodAngle = value);
 
 	public RobotContainer() {
-			
+
 		switch (Constants.CURRENT_MODE) {
 			case REAL:
 				drivetrain = TunerConstants.createDrivetrain();
@@ -124,7 +118,7 @@ public class RobotContainer {
 
 			case SIM:
 				drivetrain = TunerConstants.createDrivetrain();
-				driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
+				// driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 				flywheel = new Flywheel(new FlywheelIOSim());
 				turret = new Turret(new TurretIOSim());
 				hood = new Hood(new HoodIOSim());
@@ -150,7 +144,7 @@ public class RobotContainer {
 				);
 				fuelSim.registerIntake(Inches.of(15), Inches.of(22), Inches.of(-15), Inches.of(15));
 				fuelSim.spawnStartingFuel();
-			
+
 				// vision =
 				// 	new Vision(
 				// 		drivetrain::addVisionMeasurement,
@@ -176,10 +170,11 @@ public class RobotContainer {
 
 	private void configureBindings() {
 		// drivetrain.setDefaultCommand(new JoystickDriveCommand());
-		hood.setDefaultCommand(hood.joystickControlCommand());
-		turret.setDefaultCommand(turret.joystickControlCommand());
-		flywheel.setDefaultCommand(flywheel.joystickControlCommand());
+		// hood.setDefaultCommand(hood.joystickControlCommand());
+		// turret.setDefaultCommand(turret.joystickControlCommand());
+		// flywheel.setDefaultCommand(flywheel.joystickControlCommand());
 
+		driverController.cross().whileTrue(flywheel.setVoltageCommand(3)).onFalse(flywheel.stopCommand());
 		driverController.circle()
 			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
 			.onFalse(hood.stopCommand());

@@ -13,10 +13,10 @@ import static edu.wpi.first.units.Units.*;
 
 public class FlywheelConstants {
 
-	public static final int LEFT_CAN_ID = 0;
-	public static final int RIGHT_CAN_ID = 0;
+	public static final int LEFT_CAN_ID = 32;
+	public static final int RIGHT_CAN_ID = 31;
 
-	public static final CANBus CAN_BUS = new CANBus("");
+	public static final CANBus CAN_BUS = new CANBus("turret");
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(1);
 

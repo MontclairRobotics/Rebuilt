@@ -47,7 +47,7 @@ public class Flywheel extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Flywheel", inputs);
-        updateTunables();
+        // updateTunables();
     }
 
     public void setVelocity(AngularVelocity targetVelocity) {
@@ -62,6 +62,10 @@ public class Flywheel extends SubsystemBase {
         double input = MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
         double voltage = input * RobotController.getBatteryVoltage();
         io.setVoltage(voltage);
+    }
+
+    public Command setVoltageCommand(double voltage) {
+        return Commands.run(() -> io.setVoltage(voltage));
     }
 
     public Command stopCommand() {

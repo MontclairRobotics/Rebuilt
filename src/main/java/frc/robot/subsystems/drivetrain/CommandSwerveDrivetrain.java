@@ -207,7 +207,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 		tagLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
 		fieldRelative = true;
-		configureAutoBuilder();
+		// configureAutoBuilder();
 
 	}
 

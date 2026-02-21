@@ -31,8 +31,8 @@ public class TurretConstants {
 	public static final Translation2d TURRET_OFFSET = ORIGIN_TO_TURRET.toTranslation2d();
 
 	// ports
-	public static final int CAN_ID = -1;
-	public static final int ENCODER_PORT = -1;
+	public static final int CAN_ID = 30;
+	public static final int ENCODER_PORT = 29;
 	public static final CANBus CAN_BUS = new CANBus(""); // on RoboRio CAN Bus
 
 	// constraints
