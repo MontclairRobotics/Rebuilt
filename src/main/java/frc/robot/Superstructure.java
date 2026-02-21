@@ -37,6 +37,9 @@ public class Superstructure extends SubsystemBase {
 
 	public Superstructure(Shooter shooter) {
 		this.shooter = shooter;
+		NamedCommands.registerCommand("shootToHub", shooter.setParameters(() -> RobotContainer.aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)));
+		NamedCommands.registerCommand("simShootToHub", shooter.setSimAutoParameters(() -> RobotContainer.aiming.calculateSimShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)));
+		
 		if(CURRENT_MODE == Mode.SIM) {
 			shouldStowHoodTrigger.whileTrue(
 				shooter.stowCommand());
@@ -71,8 +74,6 @@ public class Superstructure extends SubsystemBase {
 					() -> RobotContainer.aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 
-		NamedCommands.registerCommand("shootToHub", shooter.setParameters(() -> RobotContainer.aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)));
-		NamedCommands.registerCommand("simShootToHub", shooter.setSimAutoParameters(() -> RobotContainer.aiming.calculateSimShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)));
 		}
 	}
 
