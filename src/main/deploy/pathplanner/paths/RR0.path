@@ -8,7 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.088858773181169,
+        "x": 8.593466476462195,
         "y": 0.6774179743223976
       },
       "isLocked": false,
@@ -32,16 +32,16 @@
     },
     {
       "anchor": {
-        "x": 8.282938659058486,
-        "y": 1.2079029957203988
+        "x": 8.464079885877318,
+        "y": 0.9750071326676175
       },
       "prevControl": {
-        "x": 8.798033493024123,
-        "y": 1.5738914303801947
+        "x": 8.92219131628661,
+        "y": 1.4102129915564459
       },
       "nextControl": {
-        "x": 7.791269614835947,
-        "y": 0.8585592011412255
+        "x": 7.946533523537804,
+        "y": 0.48333808844507864
       },
       "isLocked": false,
       "linkedName": null
@@ -52,8 +52,8 @@
         "y": 0.63
       },
       "prevControl": {
-        "x": 7.881840228245363,
-        "y": 0.6774179743223976
+        "x": 7.23490727532097,
+        "y": 0.6386019971469341
       },
       "nextControl": null,
       "isLocked": false,
@@ -82,6 +82,32 @@
       "constraints": {
         "maxVelocity": 2.0,
         "maxAcceleration": 11.7,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 2818.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.3484132343011431,
+      "maxWaypointRelativePos": 0.8831870357866283,
+      "constraints": {
+        "maxVelocity": 3.93,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 2818.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.2478055367994645,
+      "maxWaypointRelativePos": 2.228224172856183,
+      "constraints": {
+        "maxVelocity": 3.93,
+        "maxAcceleration": 8.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 2818.0,
         "nominalVoltage": 12.0,
