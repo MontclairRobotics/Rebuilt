@@ -2,6 +2,8 @@ package frc.robot;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
@@ -13,6 +15,7 @@ import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.FERRY_LE
 import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.FERRY_RIGHT;
 import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.HUB;
 
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Constants;
@@ -25,6 +28,7 @@ import frc.robot.util.FieldConstants.LeftTrench;
 import frc.robot.util.FieldConstants.LinesVertical;
 import frc.robot.util.HubTracker;
 import frc.robot.util.PoseUtils;
+
 
 public class Superstructure extends SubsystemBase {
 
@@ -66,8 +70,10 @@ public class Superstructure extends SubsystemBase {
 				shooter.setParameters(
 					() -> RobotContainer.aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
-		}
 
+		NamedCommands.registerCommand("shootToHub", shooter.setParameters(() -> RobotContainer.aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)));
+		NamedCommands.registerCommand("simShootToHub", shooter.setSimAutoParameters(() -> RobotContainer.aiming.calculateSimShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)));
+		}
 	}
 
 	public final Trigger scoringModeTrigger =
