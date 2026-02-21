@@ -102,5 +102,4 @@ public class TurretIOSim implements TurretIO {
     public void setNeutralMode(NeutralModeValue value) {
        // does nothing
     }
-
 }

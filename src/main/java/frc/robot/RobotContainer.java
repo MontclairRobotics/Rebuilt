@@ -176,11 +176,11 @@ public class RobotContainer {
 
 		driverController.cross().whileTrue(flywheel.setVoltageCommand(3)).onFalse(flywheel.stopCommand());
 		driverController.circle()
-			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
+			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunnedAngleDegrees)))
 			.onFalse(hood.stopCommand());
 
 		driverController.square()
-			.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
+			.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(turret.tunnedAngleDegrees)))
 			.onFalse(turret.stopCommand());
 
 		driverController.triangle()

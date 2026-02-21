@@ -3,13 +3,9 @@ package frc.robot.subsystems.shooter.turret;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.constants.TurretConstants.SLOT0_CONFIGS;
-import static frc.robot.constants.TurretConstants.MOTION_MAGIC_CONFIGS;
-import static frc.robot.constants.TurretConstants.ANGLE_OFFSET;
-import static frc.robot.constants.TurretConstants.MAX_ANGLE;
-import static frc.robot.constants.TurretConstants.MAX_VELOCITY_AT_SETPOINT;
-import static frc.robot.constants.TurretConstants.MIN_ANGLE;
-import static frc.robot.constants.TurretConstants.TURRET_OFFSET;
+import static frc.robot.constants.TurretConstants.*;
+import static frc.robot.constants.HoodConstants.kD;
+import static frc.robot.constants.HoodConstants.kS;
 
 import java.util.function.Supplier;
 
@@ -23,6 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -30,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
-import frc.robot.util.tunables.LoggedTunableNumber;
+import frc.robot.util.tunables.Tunable;
 
 public class Turret extends SubsystemBase {
 
@@ -38,16 +35,19 @@ public class Turret extends SubsystemBase {
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 	private final TurretVisualization visualization = new TurretVisualization();
 
-	private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Turret/kP", SLOT0_CONFIGS.kP);
-    private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Turret/kD", SLOT0_CONFIGS.kD);
-    private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Turret/kS", SLOT0_CONFIGS.kS);
+	public double tunnedAngleDegrees = 0;
 
-	private final LoggedTunableNumber tunableMotionMagicCruiseVelocity = new LoggedTunableNumber("Turret/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity);
-	private final LoggedTunableNumber tunableMotionMagicAcceleration = new LoggedTunableNumber("Turret/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration);
-	private final LoggedTunableNumber tunableMotionMagicJerk = new LoggedTunableNumber("Turret/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk);
-	private final LoggedTunableNumber tunableMaxVelocityAtSetpoint = new LoggedTunableNumber("Turret/Max Velocity At Setpoint", MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond));
+	private final Tunable kPTunable = new Tunable("Turret/kP", SLOT0_CONFIGS.kP, (value) -> SLOT0_CONFIGS.withKP(value));
+	private final Tunable kDTunable = new Tunable("Turret/kD", kD, (value) -> SLOT0_CONFIGS.withKD(value));
+	private final Tunable kSTunable = new Tunable("Turret/kS", kS, (value) -> SLOT0_CONFIGS.withKS(value));
 
-	public final LoggedTunableNumber tunableRobotRelativeTurretAngle = new LoggedTunableNumber("Turret/Tunable Robot Relative Angle", 0);
+	private final Tunable tunableMotionMagicCruiseVelocity = new Tunable("Turret/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, (value) -> {MOTION_MAGIC_CONFIGS.withMotionMagicCruiseVelocity(value);});
+	private final Tunable tunableMotionMagicAcceleration = new Tunable("Turret/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicAcceleration(value));
+	private final Tunable tunableMotionMagicJerk = new Tunable("Turret/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicJerk(value));
+
+	private final Tunable tunableMaxVelocityAtSetpoint = new Tunable("Turret/Max Velocity At Setpoint", MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond), (value) -> MAX_VELOCITY_AT_SETPOINT = AngularVelocity.ofBaseUnits(value, RotationsPerSecond));
+
+	public final Tunable tunableRobotRelativeTurretAngleDegrees = new Tunable("Turret/Tunable Robot Relative Angle", 0, (value) -> tunnedAngleDegrees = value);
 
     public Turret(TurretIO io) {
         this.io = io;
@@ -57,9 +57,11 @@ public class Turret extends SubsystemBase {
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Turret", inputs);
-		// visualization.update();
-		// visualization.log();
+		visualization.update();
+		visualization.log();
 		// updateTunables();
+		io.setGains(kPTunable.getValue(), kDTunable.getValue(), kSTunable.getValue());
+		io.setMotionMagic(tunableMotionMagicCruiseVelocity.getValue(), tunableMotionMagicAcceleration.getValue(), tunableMotionMagicJerk.getValue());
 	}
 
     /**
@@ -101,12 +103,12 @@ public class Turret extends SubsystemBase {
 		io.setNeutralMode(value);
 	}
 
-	public void updateTunables() {
-		if(tunableKP.hasChanged(hashCode())
-                || tunableKD.hasChanged(hashCode())
-                || tunableKS.hasChanged(hashCode())) {
-            io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get());
-        }
+	// public void updateTunables() {
+	// 	if(tunableKP.hasChanged(hashCode())
+    //             || tunableKD.hasChanged(hashCode())
+    //             || tunableKS.hasChanged(hashCode())) {
+    //         io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get());
+    //     }
 
 		if(tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
 				|| tunableMotionMagicAcceleration.hasChanged(hashCode())
@@ -118,8 +120,8 @@ public class Turret extends SubsystemBase {
 			);
 		}
 
-		if(tunableMaxVelocityAtSetpoint.hasChanged(hashCode())) MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(tunableMaxVelocityAtSetpoint.get());
-	}
+	// 	if(tunableMaxVelocityAtSetpoint.hasChanged(hashCode())) MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(tunableMaxVelocityAtSetpoint.get());
+	// }
 
 	public void applyJoystickInput() {
 		double input = MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);

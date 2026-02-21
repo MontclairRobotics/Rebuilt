@@ -142,5 +142,4 @@ public class TurretIOTalonFX implements TurretIO {
     public void setNeutralMode(NeutralModeValue value) {
         motor.setNeutralMode(value);
     }
-
 }

@@ -2,11 +2,7 @@ package frc.robot.subsystems.shooter.hood;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.constants.HoodConstants.SLOT0_CONFIGS;
-import static frc.robot.constants.HoodConstants.MAX_VELOCITY_AT_SETPOINT;
-import static frc.robot.constants.HoodConstants.MOTION_MAGIC_CONFIGS;
-import static frc.robot.constants.HoodConstants.kG;
-import static frc.robot.constants.HoodConstants.kS;
+import static frc.robot.constants.HoodConstants.*;
 
 import java.util.function.Supplier;
 
@@ -18,12 +14,13 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.PoseUtils;
-import frc.robot.util.tunables.LoggedTunableNumber;
+import frc.robot.util.tunables.Tunable;
 
 public class Hood extends SubsystemBase {
 
@@ -33,17 +30,20 @@ public class Hood extends SubsystemBase {
 
     private ArmFeedforward feedforward;
 
-	private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Hood/kP", SLOT0_CONFIGS.kP);
-    private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Hood/kD", SLOT0_CONFIGS.kD);
-    private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Hood/kS", SLOT0_CONFIGS.kS);
-    private final LoggedTunableNumber tunableKG = new LoggedTunableNumber("Hood/kG", SLOT0_CONFIGS.kG);
+	public double tunnedAngleDegrees = 0;
 
-	private final LoggedTunableNumber tunableMotionMagicCruiseVelocity = new LoggedTunableNumber("Hood/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity);
-	private final LoggedTunableNumber tunableMotionMagicAcceleration = new LoggedTunableNumber("Hood/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration);
-	private final LoggedTunableNumber tunableMotionMagicJerk = new LoggedTunableNumber("Hood/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk);
-	private final LoggedTunableNumber tunableMaxVelocityAtSetpoint = new LoggedTunableNumber("Hood/Max Velocity At Setpoint", MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond));
+	private final Tunable kPTunable = new Tunable("Hood/Hood kP", kP, (value) -> SLOT0_CONFIGS.withKP(value));
+	private final Tunable kDTunable = new Tunable("Hood/Hood kD", kD, (value) -> SLOT0_CONFIGS.withKD(value));
+	private final Tunable kSTunable = new Tunable("Hood/Hood kS", kS, (value) -> SLOT0_CONFIGS.withKS(value));
+	private final Tunable kGTunable = new Tunable("Hood/Hood kG", kG, (value) -> SLOT0_CONFIGS.withKG(value));
 
-	public final LoggedTunableNumber tunableHoodAngle = new LoggedTunableNumber("Hood/Tunable Hood Angle", 0);
+	private final Tunable tunableMotionMagicCruiseVelocity = new Tunable("Hood/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicCruiseVelocity(value));
+	private final Tunable tunableMotionMagicAcceleration = new Tunable("Hood/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicAcceleration(value));
+	private final Tunable tunableMotionMagicJerk = new Tunable("Hood/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk, (value) -> MOTION_MAGIC_CONFIGS.withMotionMagicJerk(value));
+
+	private final Tunable tunableMaxVelocityAtSetpoint = new Tunable("Hood/Max Velocity At Setpoint", MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond), (value) -> MAX_VELOCITY_AT_SETPOINT = AngularVelocity.ofBaseUnits(value, RotationsPerSecond));
+
+	public final Tunable tunableHoodAngle = new Tunable("Hood/Tunable Hood Angle", 0, (value) -> tunnedAngleDegrees = value);
 
     public Hood(HoodIO io) {
         this.io = io;
@@ -54,9 +54,11 @@ public class Hood extends SubsystemBase {
 	public void periodic() {
 		// io.updateInputs(new HoodIOInputsAutoLogged());
 		Logger.processInputs("Hood", inputs);
-		// visualization.update();
-		// visualization.log();
+		visualization.update();
+		visualization.log();
         // updateTunables();
+		io.setGains(kPTunable.getValue(), kDTunable.getValue(), kSTunable.getValue(), kGTunable.getValue());
+		io.setMotionMagic(tunableMotionMagicCruiseVelocity.getValue(), tunableMotionMagicAcceleration.getValue(), tunableMotionMagicJerk.getValue());
 	}
 
     public Angle getAngle() {
@@ -88,13 +90,13 @@ public class Hood extends SubsystemBase {
 		return io.isAtSetpoint();
 	}
 
-    public void updateTunables() {
-		if(tunableKP.hasChanged(hashCode())
-                || tunableKD.hasChanged(hashCode())
-                || tunableKS.hasChanged(hashCode())
-                || tunableKG.hasChanged(hashCode())) {
-            io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get(), tunableKG.get());
-        }
+    // public void updateTunables() {
+	// 	if(tunableKP.hasChanged(hashCode())
+    //             || tunableKD.hasChanged(hashCode())
+    //             || tunableKS.hasChanged(hashCode())
+    //             || tunableKG.hasChanged(hashCode())) {
+    //         io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get(), tunableKG.get());
+    //     }
 
 		if(tunableMotionMagicAcceleration.hasChanged(hashCode())
 				|| tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
@@ -106,8 +108,8 @@ public class Hood extends SubsystemBase {
 			);
 		}
 
-		if(tunableMaxVelocityAtSetpoint.hasChanged(hashCode())) MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(tunableMaxVelocityAtSetpoint.get());
-    }
+	// 	if(tunableMaxVelocityAtSetpoint.hasChanged(hashCode())) MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(tunableMaxVelocityAtSetpoint.get());
+    // }
 
 	public void setNeutralMode(NeutralModeValue value) {
 		io.setNeutralMode(value);
@@ -128,5 +130,4 @@ public class Hood extends SubsystemBase {
 	public Command joystickControlCommand() {
 		return Commands.run(() -> applyJoystickInput(), this);
 	}
-
 }
