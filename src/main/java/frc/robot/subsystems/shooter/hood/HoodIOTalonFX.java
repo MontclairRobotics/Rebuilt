@@ -2,15 +2,20 @@ package frc.robot.subsystems.shooter.hood;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static frc.robot.constants.HoodConstants.CAN_BUS;
 import static frc.robot.constants.HoodConstants.CAN_ID;
 import static frc.robot.constants.HoodConstants.ENCODER_PORT;
 import static frc.robot.constants.HoodConstants.SLOT0_CONFIGS;
 import static frc.robot.constants.HoodConstants.TOLERANCE;
+import static frc.robot.constants.HoodConstants.MAX_ANGLE;
+import static frc.robot.constants.HoodConstants.MAX_VELOCITY_AT_SETPOINT;
+import static frc.robot.constants.HoodConstants.MIN_ANGLE;
+import static frc.robot.constants.HoodConstants.MOTION_MAGIC_CONFIGS;
 import static frc.robot.constants.HoodConstants.CURRENT_LIMITS_CONFIGS;
 import static frc.robot.constants.HoodConstants.ENCODER_CONFIGS;
 import static frc.robot.constants.HoodConstants.MOTOR_OUTPUT_CONFIGS;
 import static frc.robot.constants.HoodConstants.FEEDBACK_CONFIGS;
-import static frc.robot.constants.HoodConstants.GEARING;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -20,6 +25,7 @@ import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -42,18 +48,24 @@ public class HoodIOTalonFX implements HoodIO {
     private final StatusSignal<Current> currentDrawAmpsSignal;
     private final StatusSignal<Temperature> tempCelsiusSignal;
 
-    private final MotionMagicVoltage request = new MotionMagicVoltage(0);
+    private final MotionMagicVoltage request = new MotionMagicVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
 
     public HoodIOTalonFX() {
-        motor = new TalonFX(CAN_ID);
+        motor = new TalonFX(CAN_ID, CAN_BUS);
         encoder = new CANcoder(ENCODER_PORT);
 
         config = new TalonFXConfiguration()
             .withSlot0(SLOT0_CONFIGS)
             .withCurrentLimits(CURRENT_LIMITS_CONFIGS)
             .withMotorOutput(MOTOR_OUTPUT_CONFIGS)
-            .withFeedback(FEEDBACK_CONFIGS);
+            .withFeedback(FEEDBACK_CONFIGS)
+            .withMotionMagic(MOTION_MAGIC_CONFIGS);
+
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAX_ANGLE.in(Rotations);
+        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MIN_ANGLE.in(Rotations);
 
         motor.getConfigurator().apply(config);
         encoder.getConfigurator().apply(ENCODER_CONFIGS);
@@ -76,7 +88,6 @@ public class HoodIOTalonFX implements HoodIO {
         );
 
         motor.optimizeBusUtilization();
-
     }
 
     @Override
@@ -94,20 +105,16 @@ public class HoodIOTalonFX implements HoodIO {
         inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
         inputs.tempCelcius = tempCelsiusSignal.getValueAsDouble();
 
-        // these status signals are already in the MOTORS frame of reference
-        inputs.motorPosition = positionSignal.getValue();
-        inputs.motorPositionSetpoint = Rotations.of(setpointPositionSignal.getValue());
-        inputs.motorVelocity = velocitySignal.getValue();
-
-        inputs.hoodAngle = positionSignal.getValue().div(GEARING);
-        inputs.hoodAngleSetpoint = Rotations.of(setpointPositionSignal.getValue()).div(GEARING);
+        inputs.hoodAngle = positionSignal.getValue();
+        inputs.hoodAngleSetpoint = Rotations.of(setpointPositionSignal.getValue());
         inputs.hoodVelocity = velocitySignal.getValue();
+
+        inputs.isAtSetpoint = isAtSetpoint();
     }
 
     @Override
     public void setAngle(Angle angle) {
-        double targetMotorPosition = angle.times(GEARING).in(Rotations);
-        motor.setControl(request.withPosition(targetMotorPosition).withEnableFOC(true));
+        motor.setControl(request.withPosition(angle));
     }
 
     @Override
@@ -123,7 +130,8 @@ public class HoodIOTalonFX implements HoodIO {
     @Override
     public boolean isAtSetpoint() {
         double error = motor.getClosedLoopError().getValueAsDouble();
-        return Math.abs(error) < TOLERANCE.times(GEARING).in(Rotations);
+        return Math.abs(error) < TOLERANCE.in(Rotations)
+            && Math.abs(velocitySignal.getValueAsDouble()) < MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond);
     }
 
     @Override
@@ -136,4 +144,8 @@ public class HoodIOTalonFX implements HoodIO {
         motor.getConfigurator().apply(config.Slot0);
     }
 
+    @Override
+    public void setNeutralMode(NeutralModeValue value) {
+        motor.setNeutralMode(value);
+    }
 }

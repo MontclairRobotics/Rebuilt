@@ -11,6 +11,8 @@ import static frc.robot.constants.TurretConstants.MIN_ANGLE;
 import static frc.robot.constants.TurretConstants.MOMENT_OF_INERTIA;
 import static frc.robot.constants.TurretConstants.SLOT0_CONFIGS;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -55,29 +57,16 @@ public class TurretIOSim implements TurretIO {
        inputs.currentDrawAmps = sim.getCurrentDrawAmps();
        inputs.tempCelcius = 0; // motor temperature is not simulated
 
-       // sim tracks everything relative to the MECHANISM, meaning we have to multiply each output
-       // by the GEARING value to convert it to MOTOR SHAFT values
-       inputs.motorVelocity = RadiansPerSecond.of(sim.getVelocityRadPerSec()).times(GEARING);
-       inputs.motorPosition = Radians.of(sim.getAngleRads()).times(GEARING);
-
+       inputs.velocity = RadiansPerSecond.of(sim.getVelocityRadPerSec());
        inputs.robotRelativeAngle = Radians.of(sim.getAngleRads());
        inputs.fieldRelativeAngle = Turret.toFieldRelativeAngle(inputs.robotRelativeAngle);
-
-       // the PIDController object's unit of reference is the ROTATIONS of the MOTOR SHAFT which means
-       // that we need to divide by GEARING to convert back to the MECHANISMS frame of reference
-       inputs.robotRelativeAngleSetpoint = Rotations.of(pidController.getSetpoint()).div(GEARING);
-       inputs.motorPositionSetpoint = Rotations.of(pidController.getSetpoint());
+       inputs.robotRelativeAngleSetpoint = Rotations.of(pidController.getSetpoint());
     }
 
     @Override
     public void setRobotRelativeAngle(Angle angle) {
-        // we constrain the angle between MIN_ANGLE and MAX_ANGLE, then multiply by gearing to convert
-        // the setpoint to the MOTOR SHAFTS frame of reference
-        double motorPositionSetpoint = Turret.constrainAngle(angle).times(GEARING).in(Rotations);
-        pidController.setSetpoint(motorPositionSetpoint);
-
-        // we need to multiply the sim anlge by GEARING here to convert MECHANISM rotations to MOTOR SHAFT rotations
-        double pidOutput = pidController.calculate(Radians.of(sim.getAngleRads()).times(GEARING).in(Rotations));
+        pidController.setSetpoint(angle.in(Rotations));
+        double pidOutput = pidController.calculate(Radians.of(sim.getAngleRads()).in(Rotations));
         double ffOutput = feedforward.calculate(0);
         appliedVoltage = MathUtil.clamp(pidOutput + ffOutput, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
     }
@@ -102,6 +91,11 @@ public class TurretIOSim implements TurretIO {
         pidController.setP(kP);
         pidController.setD(kD);
         feedforward.setKs(kS);
+    }
+
+    @Override
+    public void setNeutralMode(NeutralModeValue value) {
+       // does nothing
     }
 
 }

@@ -9,6 +9,8 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.PoseUtils;
+import frc.robot.util.tunables.LoggedTunableNumber;
 
 public class Hood extends SubsystemBase {
 
@@ -27,10 +30,25 @@ public class Hood extends SubsystemBase {
 
     private ArmFeedforward feedforward;
 
+	private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Hood/kP", SLOT0_CONFIGS.kP);
+    private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Hood/kD", SLOT0_CONFIGS.kD);
+    private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Hood/kS", SLOT0_CONFIGS.kS);
+    private final LoggedTunableNumber tunableKG = new LoggedTunableNumber("Hood/kG", SLOT0_CONFIGS.kG);
+
+	private final LoggedTunableNumber tunableHoodAngle = new LoggedTunableNumber("Hood/Tunable Hood Angle", 0);
+	
     public Hood(HoodIO io) {
         this.io = io;
         feedforward = new ArmFeedforward(kS, kG, 0);
     }
+
+	public void periodic() {
+		io.updateInputs(inputs);
+		Logger.processInputs("Hood", inputs);
+		visualization.update();
+		visualization.log();
+        updateTunables();
+	}
 
     public Angle getAngle() {
         return inputs.hoodAngle;
@@ -62,15 +80,16 @@ public class Hood extends SubsystemBase {
 	}
 
     public void updateTunables() {
-  
+		if(tunableKP.hasChanged(hashCode())
+                || tunableKD.hasChanged(hashCode())
+                || tunableKS.hasChanged(hashCode())
+                || tunableKG.hasChanged(hashCode())) {
+            io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get(), tunableKG.get());
+        }
     }
 
-    public void periodic() {
-		io.updateInputs(inputs);
-		Logger.processInputs("Hood", inputs);
-		visualization.update();
-		visualization.log();
-        updateTunables();
+	public void setNeutralMode(NeutralModeValue value) {
+		io.setNeutralMode(value);
 	}
 
     public Command stopCommand() {

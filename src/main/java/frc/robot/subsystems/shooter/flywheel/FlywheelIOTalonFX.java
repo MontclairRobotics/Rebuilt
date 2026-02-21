@@ -21,6 +21,7 @@ import frc.robot.util.PhoenixUtil;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.constants.FlywheelConstants.CAN_BUS;
 import static frc.robot.constants.FlywheelConstants.CURRENT_LIMITS_CONFIGS;
+import static frc.robot.constants.FlywheelConstants.FEEDBACK_CONFIGS;
 import static frc.robot.constants.FlywheelConstants.LEFT_CAN_ID;
 import static frc.robot.constants.FlywheelConstants.LEFT_MOTOR_OUTPUT_CONFIGS;
 import static frc.robot.constants.FlywheelConstants.RIGHT_CAN_ID;
@@ -56,7 +57,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
             .withSlot0(SLOT0_CONFIGS)
             .withCurrentLimits(CURRENT_LIMITS_CONFIGS)
             .withMotorOutput(LEFT_MOTOR_OUTPUT_CONFIGS)
-            .withFeedback(new FeedbackConfigs());
+            .withFeedback(FEEDBACK_CONFIGS);
 
         rightMotorConfig = new TalonFXConfiguration()
             .withCurrentLimits(CURRENT_LIMITS_CONFIGS)
@@ -109,7 +110,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
         inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
         inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
         inputs.tempCelsius = tempCelciuSignal.getValueAsDouble();
-        inputs.atGoal = false;
+        inputs.isAtSetpoint = false;
     }
 
     @Override

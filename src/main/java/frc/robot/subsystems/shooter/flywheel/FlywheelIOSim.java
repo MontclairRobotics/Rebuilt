@@ -1,11 +1,10 @@
 package frc.robot.subsystems.shooter.flywheel;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -22,7 +21,7 @@ public class FlywheelIOSim implements FlywheelIO {
     private final FlywheelSim sim;
     private double appliedVoltage;
 
-    private ProfiledPIDController pidController;
+    private PIDController pidController;
     private SimpleMotorFeedforward feedforward;
 
     public FlywheelIOSim() {
@@ -36,9 +35,8 @@ public class FlywheelIOSim implements FlywheelIO {
             0.0
         );
 
-        pidController = new ProfiledPIDController(
-            kP, 0, kD,
-            new Constraints(0, 0)
+        pidController = new PIDController(
+            kP, 0, kD
         );
 
         pidController.setTolerance(VELOCITY_TOLERANCE.in(RotationsPerSecond));
@@ -54,24 +52,21 @@ public class FlywheelIOSim implements FlywheelIO {
         inputs.leftMotorConnected = true;
         inputs.rightMotorConnected = true;
 
-        // sim returns MECHANISM values, so we multiply by gearing to convert to MOTOR SHAFT values
-        // this is because the VelocityTorqueCurrentFOC request tunes PID gains based on MOTOR SHAFT properties, velocities, and setpoints
-        inputs.velocity = RadiansPerSecond.of(sim.getAngularVelocityRadPerSec()).times(GEARING);
-        inputs.acceleration = RadiansPerSecondPerSecond.of(sim.getAngularAccelerationRadPerSecSq()).times(GEARING);
-        inputs.setpointVelocity = RotationsPerSecond.of(pidController.getGoal().position).times(GEARING); // for a flywheel, 'position' = velocity setpoint
-        inputs.setpointAcceleration = RotationsPerSecondPerSecond.of(pidController.getGoal().velocity).times(GEARING); // for a flywheel, 'velocity' = acceleration setpoint
+        inputs.velocity = RadiansPerSecond.of(sim.getAngularVelocityRadPerSec());
+        inputs.acceleration = RadiansPerSecondPerSecond.of(sim.getAngularAccelerationRadPerSecSq());
+        inputs.setpointVelocity = RotationsPerSecond.of(pidController.getSetpoint());
+        inputs.setpointAcceleration = RotationsPerSecondPerSecond.zero(); // PIDController does not set 'velocity' setpoints
 
         inputs.appliedVoltage = appliedVoltage;
         inputs.currentDrawAmps = sim.getCurrentDrawAmps();
         inputs.tempCelsius = 0;
-        inputs.atGoal = pidController.atGoal();
+        inputs.isAtSetpoint = isAtSetpoint();
     }
 
     @Override
     public void setVelocity(AngularVelocity targetVelocity) {
-        // again, we multiply the sim value by gearing to convert values to MOTOR SHAFT values
         double pidOutput = pidController.calculate(
-            RadiansPerSecond.of(sim.getAngularVelocityRadPerSec()).times(GEARING).in(RotationsPerSecond),
+            RadiansPerSecond.of(sim.getAngularVelocityRadPerSec()).in(RotationsPerSecond),
             targetVelocity.in(RotationsPerSecond)
         );
 		double ffOutput = feedforward.calculate(targetVelocity.in(RotationsPerSecond));
@@ -91,7 +86,7 @@ public class FlywheelIOSim implements FlywheelIO {
 
     @Override
     public boolean isAtSetpoint() {
-        return pidController.atGoal();
+        return pidController.atSetpoint();
     }
 
     @Override

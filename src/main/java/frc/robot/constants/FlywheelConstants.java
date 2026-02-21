@@ -26,13 +26,20 @@ public class FlywheelConstants {
 	public static final double kV = 0;
 
 	public static final double STATOR_CURRENT_LIMIT = 100; // Amps
+	public static final double SUPPLY_CURRENT_LIMIT = 60; // Amps
+
+	public static final double MOMENT_OF_INERTIA = 0.00233846427; // From CAD on 2026.02.11
+	public static final double GEARING = 1.10526315785; // to the big flywheel, from Max Pearson on 2026.02.20
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKD(kD)
 		.withKS(kS).withKV(kV);
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
-		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT);
+		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)
+		.withStatorCurrentLimitEnable(true)
+		.withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
+		.withSupplyCurrentLimitEnable(true);
 
 	public static final MotorOutputConfigs LEFT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
 		.withInverted(InvertedValue.CounterClockwise_Positive)
@@ -43,9 +50,7 @@ public class FlywheelConstants {
 		.withNeutralMode(NeutralModeValue.Coast);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()
-		.withVelocityFilterTimeConstant(Seconds.of(0.01));
-
-	public static final double MOMENT_OF_INERTIA = 0.00233846427; // From CAD on 2026.02.11
-	public static final double GEARING = 1; // gearing of motors to the BIG flywheel
+		.withVelocityFilterTimeConstant(Seconds.of(0.01))
+		.withSensorToMechanismRatio(GEARING);
 
 }

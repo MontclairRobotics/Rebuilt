@@ -15,15 +15,15 @@ public interface FlywheelIO {
         public boolean leftMotorConnected = false;
         public boolean rightMotorConnected = false;
 
-        public AngularVelocity velocity = RotationsPerSecond.zero();
-        public AngularAcceleration acceleration = RotationsPerSecondPerSecond.zero();
-        public AngularVelocity setpointVelocity = RotationsPerSecond.zero();
-        public AngularAcceleration setpointAcceleration = RotationsPerSecondPerSecond.zero();
+        public AngularVelocity velocity = RotationsPerSecond.zero(); // velocity of the BIG FLYWHEEL
+        public AngularAcceleration acceleration = RotationsPerSecondPerSecond.zero(); // acceleration of the BIG FLYWHEEL
+        public AngularVelocity setpointVelocity = RotationsPerSecond.zero(); // setpoint velocity of the BIG FLYWHEEL
+        public AngularAcceleration setpointAcceleration = RotationsPerSecondPerSecond.zero(); // setpoint acceleration of the BIG FLYWHEEL
 
         public double appliedVoltage = 0.0;
         public double currentDrawAmps = 0.0;
         public double tempCelsius = 0.0;
-        public boolean atGoal = false;
+        public boolean isAtSetpoint = false;
     }
 
     public void updateInputs(FlywheelIOInputs inputs);

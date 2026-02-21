@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 
@@ -18,14 +20,10 @@ public interface TurretIO {
         public double currentDrawAmps = 0.0;
         public double tempCelcius = 0.0;
 
-        public AngularVelocity motorVelocity = RotationsPerSecond.zero();
-        public Angle motorPosition = Rotations.zero();
-
+        public AngularVelocity velocity = RotationsPerSecond.zero();
         public Angle robotRelativeAngle = Rotations.zero();
         public Angle fieldRelativeAngle = Rotations.zero();
-
         public Angle robotRelativeAngleSetpoint = Rotations.zero();
-        public Angle motorPositionSetpoint = Rotations.zero();
     }
 
     public void updateInputs(TurretIOInputs inputs);
@@ -39,5 +37,7 @@ public interface TurretIO {
     public boolean isAtSetpoint();
 
     public void setGains(double kP, double kD, double kS);
+
+    public void setNeutralMode(NeutralModeValue value);
 
 }

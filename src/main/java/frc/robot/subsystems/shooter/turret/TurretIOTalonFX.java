@@ -8,6 +8,7 @@ import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -18,6 +19,7 @@ import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
 public class TurretIOTalonFX implements TurretIO {
@@ -45,7 +47,13 @@ public class TurretIOTalonFX implements TurretIO {
             .withSlot0(SLOT0_CONFIGS)
             .withCurrentLimits(CURRENT_LIMITS_CONFIGS)
             .withMotorOutput(MOTOR_OUTPUT_CONFIGS)
-            .withFeedback(FEEDBACK_CONFIGS);
+            .withFeedback(FEEDBACK_CONFIGS)
+            .withMotionMagic(MOTION_MAGIC_CONFIGS);
+            
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAX_ANGLE.in(Rotations);
+        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MIN_ANGLE.in(Rotations);
 
         motor.getConfigurator().apply(config);
         encoder.getConfigurator().apply(ENCODER_CONFIGS);
@@ -85,26 +93,15 @@ public class TurretIOTalonFX implements TurretIO {
         inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
         inputs.tempCelcius = tempCelsiusSignal.getValueAsDouble();
 
-        // these status signals are already in the MOTORS frame of reference
-        inputs.motorVelocity = velocitySignal.getValue();
-        inputs.motorPosition = positionSignal.getValue();
-
-        // because positionSignal is in the MOTORS frame of reference, we divide by GEARING to convert back
-        // to the MECHANISMS frame of reference
-        inputs.robotRelativeAngle = positionSignal.getValue().div(GEARING);
+        inputs.velocity = velocitySignal.getValue();
+        inputs.robotRelativeAngle = positionSignal.getValue();
         inputs.fieldRelativeAngle = Turret.toFieldRelativeAngle(inputs.robotRelativeAngle);
-
-        // setpointPositionSignal is in the MOTORS frame of reference, we divide by GEARING to convert back
-        // to the MECHANISMS frame of reference
-        inputs.robotRelativeAngleSetpoint = Rotations.of(setpointPositionSignal.getValueAsDouble()).div(GEARING);
-        inputs.motorPositionSetpoint = Rotations.of(setpointPositionSignal.getValueAsDouble());
+        inputs.robotRelativeAngleSetpoint = Rotations.of(setpointPositionSignal.getValueAsDouble());
     }
 
     @Override
     public void setRobotRelativeAngle(Angle angle) {
-        // we take in a robot relative angle, but the PIDController uses MOTOR SHAFT rotations
-        double targetMotorPosition = angle.times(GEARING).in(Rotations);
-        motor.setControl(request.withPosition(targetMotorPosition));
+        motor.setControl(request.withPosition(angle));
     }
 
     @Override
@@ -120,7 +117,8 @@ public class TurretIOTalonFX implements TurretIO {
     @Override
     public boolean isAtSetpoint() {
         double error = motor.getClosedLoopError().getValueAsDouble();
-        return Math.abs(error) < ANGLE_TOLERANCE.times(GEARING).in(Rotations);
+        return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations)
+            && Math.abs(velocitySignal.getValueAsDouble()) < MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond);
     }
 
     @Override
@@ -130,6 +128,11 @@ public class TurretIOTalonFX implements TurretIO {
         config.Slot0.kS = kS;
 
         motor.getConfigurator().apply(config.Slot0);
+    }
+
+    @Override
+    public void setNeutralMode(NeutralModeValue value) {
+        motor.setNeutralMode(value);
     }
 
 }

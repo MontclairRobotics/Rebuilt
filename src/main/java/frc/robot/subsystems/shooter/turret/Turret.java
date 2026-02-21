@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter.turret;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
+import static frc.robot.constants.TurretConstants.SLOT0_CONFIGS;
 import static frc.robot.constants.TurretConstants.ANGLE_OFFSET;
 import static frc.robot.constants.TurretConstants.MAX_ANGLE;
 import static frc.robot.constants.TurretConstants.MIN_ANGLE;
@@ -10,6 +11,8 @@ import static frc.robot.constants.TurretConstants.TURRET_OFFSET;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
+
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,12 +25,19 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
+import frc.robot.util.tunables.LoggedTunableNumber;
 
 public class Turret {
 
     private final TurretIO io;
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 	private final TurretVisualization visualization = new TurretVisualization();
+
+	private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Turret/kP", SLOT0_CONFIGS.kP);
+    private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Turret/kD", SLOT0_CONFIGS.kD);
+    private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Turret/kS", SLOT0_CONFIGS.kS);
+	
+	private final LoggedTunableNumber tunableRobotRelativeTurretAngle = new LoggedTunableNumber("Turret/Tunable Robot Relative Angle", 0);
 
     public Turret(TurretIO io) {
         this.io = io;
@@ -38,6 +48,7 @@ public class Turret {
 		Logger.processInputs("Turret", inputs);
 		visualization.update();
 		visualization.log();
+		updateTunables();
 	}
 
     /**
@@ -46,13 +57,13 @@ public class Turret {
 	 * @return the new angle, constrained between our min and max angles
 	 */
 	public static Angle constrainAngle(Angle angle) {
-		if(angle.in(Rotations) > MAX_ANGLE.in(Rotations)) {
-			return angle.minus(Rotations.of(1));
-		} else if (angle.in(Rotations) < MIN_ANGLE.in(Rotations)) {
-			return angle.plus(Rotations.of(1));
-		} else {
-			return angle;
+		while (angle.in(Rotations) > MAX_ANGLE.in(Rotations)) {
+    		angle = angle.minus(Rotations.of(1));
 		}
+		while (angle.in(Rotations) < MIN_ANGLE.in(Rotations)) {
+   			angle = angle.plus(Rotations.of(1));
+		}
+		return angle;
 	}
 
     /**
@@ -73,6 +84,18 @@ public class Turret {
 		return constrainAngle(robotRelativeAngle
 			.plus(Rotations.of(RobotContainer.drivetrain.getWrappedHeading().getRotations()))
 			.plus(ANGLE_OFFSET));
+	}
+
+	public void setNeutralMode(NeutralModeValue value) {
+		io.setNeutralMode(value);
+	}
+
+	public void updateTunables() {
+		if(tunableKP.hasChanged(hashCode())
+                || tunableKD.hasChanged(hashCode())
+                || tunableKS.hasChanged(hashCode())) {
+            io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get());
+        }
 	}
 
     public Angle getRobotRelativeAngle() {
