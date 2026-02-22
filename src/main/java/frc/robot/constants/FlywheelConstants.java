@@ -20,10 +20,10 @@ public class FlywheelConstants {
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(1);
 
-	public static final double kP = 0;
+	public static final double kP = 30;
 	public static final double kD = 0;
-	public static final double kS = 0;
-	public static final double kV = 0;
+	public static final double kS = 20.5; // tuned 2.22
+	public static final double kV = 0.8;
 
 	public static final double STATOR_CURRENT_LIMIT = 100; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 60; // Amps
@@ -42,7 +42,7 @@ public class FlywheelConstants {
 		.withSupplyCurrentLimitEnable(true);
 
 	public static final MotorOutputConfigs LEFT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
-		.withInverted(InvertedValue.CounterClockwise_Positive)
+		.withInverted(InvertedValue.Clockwise_Positive)
 		.withNeutralMode(NeutralModeValue.Coast);
 
 	public static final MotorOutputConfigs RIGHT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()

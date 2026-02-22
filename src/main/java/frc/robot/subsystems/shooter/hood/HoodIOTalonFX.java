@@ -40,7 +40,7 @@ public class HoodIOTalonFX implements HoodIO {
 
     public HoodIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
-        encoder = new CANcoder(ENCODER_ID);
+        encoder = new CANcoder(ENCODER_ID, CAN_BUS);
 
         config = new TalonFXConfiguration()
             .withSlot0(SLOT0_CONFIGS)
@@ -88,15 +88,17 @@ public class HoodIOTalonFX implements HoodIO {
             tempCelsiusSignal
         );
 
-        inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
-        inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
-        inputs.tempCelcius = tempCelsiusSignal.getValueAsDouble();
+        inputs.hoodAngle = motor.getPosition().getValue();
 
-        inputs.hoodAngle = positionSignal.getValue();
-        inputs.hoodAngleSetpoint = Rotations.of(setpointPositionSignal.getValue());
-        inputs.hoodVelocity = velocitySignal.getValue();
+        // inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
+        // inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
+        // inputs.tempCelcius = tempCelsiusSignal.getValueAsDouble();
 
-        inputs.isAtSetpoint = isAtSetpoint();
+        // inputs.hoodAngle = positionSignal.getValue();
+        // inputs.hoodAngleSetpoint = Rotations.of(setpointPositionSignal.getValue());
+        // inputs.hoodVelocity = velocitySignal.getValue();
+
+        // inputs.isAtSetpoint = isAtSetpoint();
     }
 
     @Override

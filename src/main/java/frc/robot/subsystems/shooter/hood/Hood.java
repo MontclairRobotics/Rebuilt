@@ -41,7 +41,7 @@ public class Hood extends SubsystemBase {
 	private final LoggedTunableNumber tunableMaxVelocityAtSetpoint = new LoggedTunableNumber("Hood/Max Velocity At Setpoint", MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond));
 
 	public final LoggedTunableNumber tunableHoodAngle = new LoggedTunableNumber("Hood/Tunable Hood Angle", 0);
-	
+
     public Hood(HoodIO io) {
         this.io = io;
         feedforward = new ArmFeedforward(kS, kG, 0);
@@ -66,7 +66,7 @@ public class Hood extends SubsystemBase {
 	}
 
     public void applyJoystickInput() {
-		double voltage = Math.pow(MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.04), 3) * RobotController.getBatteryVoltage();
+		double voltage = -Math.pow(MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.04), 3) * RobotController.getBatteryVoltage();
 		double ffVoltage = feedforward.calculate(getAngle().in(Radians), 0);
 		Logger.recordOutput("Hood/Feedforward Voltage", ffVoltage);
 		io.setVoltage(voltage + ffVoltage);
@@ -96,8 +96,8 @@ public class Hood extends SubsystemBase {
 				|| tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
 				|| tunableMotionMagicJerk.hasChanged(hashCode())) {
 			io.setMotionMagic(
-				tunableMotionMagicCruiseVelocity.get(), 
-				tunableMotionMagicAcceleration.get(), 
+				tunableMotionMagicCruiseVelocity.get(),
+				tunableMotionMagicAcceleration.get(),
 				tunableMotionMagicJerk.get()
 			);
 		}

@@ -6,7 +6,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import static frc.robot.constants.PivotConstants.ENCODER_OFFSET;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -47,7 +46,7 @@ public class HoodConstants {
 	public static final double SENSOR_TO_MECHANISM_RATIO = 176.0 / 10;
 	public static final double ROTOR_TO_SENSOR_RATIO = 10;
 	public static final double MOMENT_OF_INERTIA = 0.03038161694; // from CAD on 3/3/2026
-	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0); // absolute encoder
+	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.251944); // absolute encoder
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
 	public static final double HOOD_LOWER_TIME = 0.6;
 
@@ -98,7 +97,7 @@ public class HoodConstants {
         .withMagnetSensor(
             new MagnetSensorConfigs()
                 .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
-                .withMagnetOffset(ENCODER_OFFSET)
+                .withMagnetOffset(HOOD_ENCODER_OFFSET)
         );
 
 }
