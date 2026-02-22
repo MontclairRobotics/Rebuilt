@@ -54,8 +54,8 @@ public class HoodIOTalonFX implements HoodIO {
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAX_ANGLE.in(Rotations);
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MIN_ANGLE.in(Rotations);
 
-        motor.getConfigurator().apply(config);
         encoder.getConfigurator().apply(ENCODER_CONFIGS);
+        motor.getConfigurator().apply(config);
 
         positionSignal = motor.getPosition();
         setpointPositionSignal = motor.getClosedLoopReference();
@@ -74,11 +74,22 @@ public class HoodIOTalonFX implements HoodIO {
             tempCelsiusSignal
         );
 
+        motor.setPosition(encoder.getPosition().getValue().in(Rotations));
         motor.optimizeBusUtilization();
     }
 
     @Override
     public void updateInputs(HoodIOInputs inputs) {
+
+        BaseStatusSignal.refreshAll(
+            positionSignal,
+            setpointPositionSignal,
+            velocitySignal,
+            appliedVoltageSignal,
+            currentDrawAmpsSignal,
+            tempCelsiusSignal
+        );
+
         inputs.motorConnected = BaseStatusSignal.isAllGood(
             positionSignal,
             setpointPositionSignal,
@@ -88,17 +99,17 @@ public class HoodIOTalonFX implements HoodIO {
             tempCelsiusSignal
         );
 
-        inputs.hoodAngle = motor.getPosition().getValue();
+        // inputs.hoodAngle = motor.getPosition().getValue();
 
-        // inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
-        // inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
-        // inputs.tempCelcius = tempCelsiusSignal.getValueAsDouble();
+        inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
+        inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
+        inputs.tempCelcius = tempCelsiusSignal.getValueAsDouble();
 
-        // inputs.hoodAngle = positionSignal.getValue();
-        // inputs.hoodAngleSetpoint = Rotations.of(setpointPositionSignal.getValue());
-        // inputs.hoodVelocity = velocitySignal.getValue();
+        inputs.hoodAngle = positionSignal.getValue();
+        inputs.hoodAngleSetpoint = Rotations.of(setpointPositionSignal.getValue());
+        inputs.hoodVelocity = velocitySignal.getValue();
 
-        // inputs.isAtSetpoint = isAtSetpoint();
+        inputs.isAtSetpoint = isAtSetpoint();
     }
 
     @Override
