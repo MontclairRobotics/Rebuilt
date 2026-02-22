@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "shootToHub"
+          }
+        },
+        {
           "type": "wait",
           "data": {
             "waitTime": 5.0
