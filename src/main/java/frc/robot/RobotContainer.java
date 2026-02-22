@@ -90,13 +90,8 @@ public class RobotContainer {
 	private boolean withConstantVelocity = false;
 	private boolean whileMoving = true;
 
-	double launchSpeed = 10;
-	double hoodAngle = 30;
-	Tunable launchSpeedTunable = new Tunable("launch speed (MPS)",10,(value)->launchSpeed = value);
-	Tunable hoodAngleTunable = new Tunable("launch angle (degree)",hoodAngle,(value)->hoodAngle = value);
-
 	public RobotContainer() {
-			
+		System.out.println("Constants.CURRENT_MODE: " + Constants.CURRENT_MODE);
 		switch (Constants.CURRENT_MODE) {
 			case REAL:
 				drivetrain = TunerConstants.createDrivetrain();
@@ -119,8 +114,7 @@ public class RobotContainer {
 				// 		new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
 				// 		new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading));
 
-				// 	break;
-
+				break;
 
 			case SIM:
 				drivetrain = TunerConstants.createDrivetrain();
@@ -161,7 +155,7 @@ public class RobotContainer {
 
 					//TODO: Fix vision simulation! (It is causing loop overruns and memory issues with advantage kit logging)
 
-					break;
+				break;
 
 				default:
 					vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});

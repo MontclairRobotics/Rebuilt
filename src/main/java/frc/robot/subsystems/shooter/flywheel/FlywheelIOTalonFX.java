@@ -19,15 +19,7 @@ import edu.wpi.first.units.measure.Voltage;
 import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.constants.FlywheelConstants.CAN_BUS;
-import static frc.robot.constants.FlywheelConstants.CURRENT_LIMITS_CONFIGS;
-import static frc.robot.constants.FlywheelConstants.FEEDBACK_CONFIGS;
-import static frc.robot.constants.FlywheelConstants.LEFT_CAN_ID;
-import static frc.robot.constants.FlywheelConstants.LEFT_MOTOR_OUTPUT_CONFIGS;
-import static frc.robot.constants.FlywheelConstants.RIGHT_CAN_ID;
-import static frc.robot.constants.FlywheelConstants.RIGHT_MOTOR_OUTPUT_CONFIGS;
-import static frc.robot.constants.FlywheelConstants.SLOT0_CONFIGS;
-import static frc.robot.constants.FlywheelConstants.VELOCITY_TOLERANCE;
+import static frc.robot.constants.FlywheelConstants.*;
 
 public class FlywheelIOTalonFX implements FlywheelIO{
 
@@ -51,7 +43,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
     public FlywheelIOTalonFX() {
         leftMotor = new TalonFX(LEFT_CAN_ID, CAN_BUS);
         rightMotor = new TalonFX(RIGHT_CAN_ID, CAN_BUS);
-        rightMotor.setControl(new Follower(LEFT_CAN_ID, MotorAlignmentValue.Aligned));
+        rightMotor.setControl(new Follower(LEFT_CAN_ID, MotorAlignmentValue.Opposed));
 
         leftMotorConfig = new TalonFXConfiguration()
             .withSlot0(SLOT0_CONFIGS)
@@ -81,7 +73,8 @@ public class FlywheelIOTalonFX implements FlywheelIO{
             setpointVelocitySignal,
             setpointAccelerationSignal,
             appliedVoltageSignal,
-            currentDrawAmpsSignal
+            currentDrawAmpsSignal,
+            tempCelciuSignal
         );
 
         leftMotor.optimizeBusUtilization();
@@ -120,7 +113,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
 
     @Override
     public void setVoltage(double voltage) {
-        leftMotor.setControl(new VoltageOut(voltage));
+        leftMotor.setVoltage(voltage);
     }
 
     @Override

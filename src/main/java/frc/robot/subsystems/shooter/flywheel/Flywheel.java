@@ -1,6 +1,6 @@
 package frc.robot.subsystems.shooter.flywheel;
 
-import static frc.robot.constants.FlywheelConstants.SLOT0_CONFIGS;
+import static frc.robot.constants.FlywheelConstants.*;
 
 import java.util.function.Supplier;
 
@@ -67,6 +67,7 @@ public class Flywheel extends SubsystemBase {
     public Command stopCommand() {
         return Commands.runOnce(() -> io.stop(), this);
     }
+
     public Command setVelocityCommand(AngularVelocity targetVelocity) {
         return Commands.run(() -> io.setVelocity(targetVelocity));
     }

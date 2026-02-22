@@ -3,13 +3,7 @@ package frc.robot.subsystems.shooter.turret;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.constants.TurretConstants.SLOT0_CONFIGS;
-import static frc.robot.constants.TurretConstants.MOTION_MAGIC_CONFIGS;
-import static frc.robot.constants.TurretConstants.ANGLE_OFFSET;
-import static frc.robot.constants.TurretConstants.MAX_ANGLE;
-import static frc.robot.constants.TurretConstants.MAX_VELOCITY_AT_SETPOINT;
-import static frc.robot.constants.TurretConstants.MIN_ANGLE;
-import static frc.robot.constants.TurretConstants.TURRET_OFFSET;
+import static frc.robot.constants.TurretConstants.*;
 
 import java.util.function.Supplier;
 
@@ -58,8 +52,8 @@ public class Turret extends SubsystemBase {
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Turret", inputs);
-		visualization.update();
-		visualization.log();
+		// visualization.update();
+		// visualization.log();
 		updateTunables();
 	}
 
@@ -206,6 +200,10 @@ public class Turret extends SubsystemBase {
 
 	public Command stopCommand() {
 		return Commands.runOnce(() -> io.stop());
+	}
+
+	public Command setVoltageCommand(double voltage) {
+		return Commands.runOnce(() -> io.setVoltage(voltage));
 	}
 
 	public Command setRobotRelativeAngleCommand(Supplier<Angle> angleSupplier) {

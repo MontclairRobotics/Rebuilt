@@ -34,9 +34,9 @@ public class HoodConstants {
 	public static final Translation3d TURRET_TO_HOOD = new Translation3d(-0.113, 0, 0.08128);
 
 	// CAN
-	public static final int CAN_ID = -1;
-	public static final int ENCODER_PORT = -1;
-	public static final CANBus CAN_BUS = new CANBus("");
+	public static final int CAN_ID = 33;
+	public static final int ENCODER_ID = 34;
+	public static final CANBus CAN_BUS = new CANBus("turret");
 
 	// Constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);
@@ -52,10 +52,10 @@ public class HoodConstants {
 	public static final double HOOD_LOWER_TIME = 0.6;
 
 	// Gains
-	public static final double kP = 20;
-	public static final double kD = 1;
+	public static final double kP = 0;
+	public static final double kD = 0;
 	public static final double kS = 0;
-	public static final double kG = 0.482952;
+	public static final double kG = 0;
 
 	public static final Angle TOLERANCE = Degrees.of(1);
 
@@ -80,11 +80,11 @@ public class HoodConstants {
 		.withSupplyCurrentLimitEnable(true);
 
 	public static final MotorOutputConfigs MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
-		.withInverted(InvertedValue.CounterClockwise_Positive)
+		.withInverted(InvertedValue.Clockwise_Positive)
 		.withNeutralMode(NeutralModeValue.Brake);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()
-		.withFeedbackRemoteSensorID(ENCODER_PORT)
+		.withFeedbackRemoteSensorID(ENCODER_ID)
 		.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
 		.withRotorToSensorRatio(ROTOR_TO_SENSOR_RATIO)
 		.withSensorToMechanismRatio(SENSOR_TO_MECHANISM_RATIO);

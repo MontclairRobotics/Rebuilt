@@ -4,12 +4,7 @@ import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
-import static frc.robot.constants.HoodConstants.GEARING;
-import static frc.robot.constants.HoodConstants.HOOD_LENGTH;
-import static frc.robot.constants.HoodConstants.MAX_ANGLE;
-import static frc.robot.constants.HoodConstants.MIN_ANGLE;
-import static frc.robot.constants.HoodConstants.MOMENT_OF_INERTIA;
-import static frc.robot.constants.HoodConstants.SLOT0_CONFIGS;
+import static frc.robot.constants.HoodConstants.*;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -18,8 +13,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 

@@ -4,12 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
-import static frc.robot.constants.TurretConstants.GEARING;
-import static frc.robot.constants.TurretConstants.LENGTH;
-import static frc.robot.constants.TurretConstants.MAX_ANGLE;
-import static frc.robot.constants.TurretConstants.MIN_ANGLE;
-import static frc.robot.constants.TurretConstants.MOMENT_OF_INERTIA;
-import static frc.robot.constants.TurretConstants.SLOT0_CONFIGS;
+import static frc.robot.constants.TurretConstants.*;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 

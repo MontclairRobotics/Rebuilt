@@ -13,10 +13,10 @@ import static edu.wpi.first.units.Units.*;
 
 public class FlywheelConstants {
 
-	public static final int LEFT_CAN_ID = 0;
-	public static final int RIGHT_CAN_ID = 0;
+	public static final int LEFT_CAN_ID = 32;
+	public static final int RIGHT_CAN_ID = 31;
 
-	public static final CANBus CAN_BUS = new CANBus("");
+	public static final CANBus CAN_BUS = new CANBus("turret");
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(1);
 
@@ -46,7 +46,6 @@ public class FlywheelConstants {
 		.withNeutralMode(NeutralModeValue.Coast);
 
 	public static final MotorOutputConfigs RIGHT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
-		.withInverted(InvertedValue.CounterClockwise_Positive)
 		.withNeutralMode(NeutralModeValue.Coast);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()

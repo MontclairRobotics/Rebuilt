@@ -10,14 +10,18 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -31,8 +35,8 @@ public class TurretConstants {
 	public static final Translation2d TURRET_OFFSET = ORIGIN_TO_TURRET.toTranslation2d();
 
 	// ports
-	public static final int CAN_ID = -1;
-	public static final int ENCODER_PORT = -1;
+	public static final int CAN_ID = 30;
+	public static final int ENCODER_ID = 29;
 	public static final CANBus CAN_BUS = new CANBus(""); // on RoboRio CAN Bus
 
 	// constraints
@@ -43,10 +47,13 @@ public class TurretConstants {
 	// physical properties
 	public static final double MOMENT_OF_INERTIA = 0.154244993; //From CAD on 2026.02.12
 	public static final Distance LENGTH = Meters.of(0.3);
-	public static final double GEARING = 96; // from Max Pearson on 2026.02.20
+	public static final double ROTOR_TO_SENSOR_RATIO = 12;
+	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 16.0;
+	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
-	public static final Angle ANGLE_OFFSET = Rotations.of(0.5); // turret zero is perpendicular to gyro zero, pointed to the left
+	public static final Angle ANGLE_OFFSET = Rotations.of(-0.25); 
+	public static final Angle ENCODER_OFFSET = Rotations.of(0);
 
 	// pid + ff gains
 	public static final double kP = 0; // Tuned PID in Simulation
@@ -80,8 +87,15 @@ public class TurretConstants {
 		.withNeutralMode(NeutralModeValue.Brake);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()
-		.withSensorToMechanismRatio(GEARING);
+		.withFeedbackRemoteSensorID(ENCODER_ID)
+		.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
+		.withRotorToSensorRatio(ROTOR_TO_SENSOR_RATIO)
+		.withSensorToMechanismRatio(SENSOR_TO_MECHANISM_RATIO);
 
-	public static final MagnetSensorConfigs ENCODER_CONFIGS = new MagnetSensorConfigs();
-
+	public static final CANcoderConfiguration ENCODER_CONFIGS = new CANcoderConfiguration()
+		.withMagnetSensor(
+			new MagnetSensorConfigs()
+				.withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+				.withMagnetOffset(ENCODER_OFFSET)
+		);
 }

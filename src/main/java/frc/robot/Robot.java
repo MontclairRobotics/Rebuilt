@@ -106,13 +106,14 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void robotPeriodic() {
 		AllianceManager.update();
-		// TODO: fix this
+
 		if(!hasAppliedTargetLocation && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
 			hasAppliedTargetLocation = true;
 			TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
 			TargetLocation.FERRY_LEFT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT));
 			TargetLocation.FERRY_RIGHT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT));
 		}
+
 		CommandScheduler.getInstance().run();
 	}
 

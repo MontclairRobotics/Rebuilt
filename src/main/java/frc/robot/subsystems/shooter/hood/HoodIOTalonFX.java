@@ -3,34 +3,18 @@ package frc.robot.subsystems.shooter.hood;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import static frc.robot.constants.HoodConstants.CAN_BUS;
-import static frc.robot.constants.HoodConstants.CAN_ID;
-import static frc.robot.constants.HoodConstants.ENCODER_PORT;
-import static frc.robot.constants.HoodConstants.SLOT0_CONFIGS;
-import static frc.robot.constants.HoodConstants.TOLERANCE;
-import static frc.robot.constants.HoodConstants.MAX_ANGLE;
-import static frc.robot.constants.HoodConstants.MAX_VELOCITY_AT_SETPOINT;
-import static frc.robot.constants.HoodConstants.MIN_ANGLE;
-import static frc.robot.constants.HoodConstants.MOTION_MAGIC_CONFIGS;
-import static frc.robot.constants.HoodConstants.CURRENT_LIMITS_CONFIGS;
-import static frc.robot.constants.HoodConstants.ENCODER_CONFIGS;
-import static frc.robot.constants.HoodConstants.MOTOR_OUTPUT_CONFIGS;
-import static frc.robot.constants.HoodConstants.FEEDBACK_CONFIGS;
+import static frc.robot.constants.HoodConstants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
@@ -56,7 +40,7 @@ public class HoodIOTalonFX implements HoodIO {
 
     public HoodIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
-        encoder = new CANcoder(ENCODER_PORT);
+        encoder = new CANcoder(ENCODER_ID);
 
         config = new TalonFXConfiguration()
             .withSlot0(SLOT0_CONFIGS)
@@ -122,7 +106,7 @@ public class HoodIOTalonFX implements HoodIO {
 
     @Override
     public void setVoltage(double voltage) {
-        motor.setControl(new VoltageOut(voltage));
+        motor.setVoltage(voltage);
     }
 
     @Override

@@ -41,7 +41,7 @@ public class TurretIOTalonFX implements TurretIO {
 
     public TurretIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
-        encoder = new CANcoder(ENCODER_PORT);
+        encoder = new CANcoder(ENCODER_ID);
 
         config = new TalonFXConfiguration()
             .withSlot0(SLOT0_CONFIGS)

@@ -14,7 +14,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static frc.robot.constants.FlywheelConstants.*;
-import static frc.robot.constants.FlywheelConstants.GEARING;
 
 public class FlywheelIOSim implements FlywheelIO {
 
