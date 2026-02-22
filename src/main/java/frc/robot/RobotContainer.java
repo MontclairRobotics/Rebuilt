@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -36,9 +35,9 @@ import frc.robot.subsystems.shooter.spindexer.SpindexerIOSim;
 import frc.robot.subsystems.shooter.spindexer.SpindexerIOTalonFX;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
+import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
-import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.util.Telemetry;
@@ -88,8 +87,8 @@ public class RobotContainer {
 			case REAL:
 				drivetrain = TunerConstants.createDrivetrain();
 				flywheel = new Flywheel(new FlywheelIOTalonFX());
-				// turret = new Turret(new TurretIOTalonFX());
-				hood = new Hood(new HoodIOTalonFX());
+				turret = new Turret(new TurretIOTalonFX());
+				// hood = new Hood(new HoodIOTalonFX());
 				spindexer = new Spindexer(new SpindexerIOTalonFX());
 				// shooter = new Shooter(
 				// 	hood, flywheel, turret, spindexer,
@@ -163,21 +162,22 @@ public class RobotContainer {
 
 	private void configureBindings() {
 		// drivetrain.setDefaultCommand(new JoystickDriveCommand());
-		hood.setDefaultCommand(hood.joystickControlCommand());
-		// turret.setDefaultCommand(turret.joystickControlCommand());
-		flywheel.setDefaultCommand(flywheel.joystickControlCommand());
+		// hood.setDefaultCommand(hood.joystickControlCommand());
+		turret.setDefaultCommand(turret.joystickControlCommand());
+		// flywheel.setDefaultCommand(flywheel.joystickControlCommand());
 		driverController.L2().whileTrue(spindexer.spinCommand()).onFalse(spindexer.stopCommand());
-		driverController.circle()
-			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
-			.onFalse(hood.stopCommand());
+
+		// driverController.circle()
+		// 	.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
+		// 	.onFalse(hood.stopCommand());
 
 		// driverController.square()
 		// 	.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
 		// 	.onFalse(turret.stopCommand());
 
-		driverController.triangle()
-			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(22)))
-			.onFalse(flywheel.stopCommand());
+		// driverController.triangle()
+		// 	.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get())))
+		// 	.onFalse(flywheel.stopCommand());
 
 		//.times(1).minus(Rotations.of(drivetrain.getWrappedHeading().getRotations()))
 		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed),Degrees.of(90-hoodAngle),turret.getAngleToHub(),TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));

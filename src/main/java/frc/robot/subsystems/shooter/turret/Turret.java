@@ -117,7 +117,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void applyJoystickInput() {
-		double input = MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
+		double input = MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.1), 1.5);
 		double voltage = input * RobotController.getBatteryVoltage();
 		io.setVoltage(voltage);
 	}

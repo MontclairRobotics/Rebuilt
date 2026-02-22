@@ -56,6 +56,7 @@ public class HoodIOTalonFX implements HoodIO {
 
         encoder.getConfigurator().apply(ENCODER_CONFIGS);
         motor.getConfigurator().apply(config);
+        encoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
 
         positionSignal = motor.getPosition();
         setpointPositionSignal = motor.getClosedLoopReference();
@@ -74,7 +75,6 @@ public class HoodIOTalonFX implements HoodIO {
             tempCelsiusSignal
         );
 
-        motor.setPosition(encoder.getPosition().getValue().in(Rotations));
         motor.optimizeBusUtilization();
     }
 
@@ -132,6 +132,11 @@ public class HoodIOTalonFX implements HoodIO {
         double error = motor.getClosedLoopError().getValueAsDouble();
         return Math.abs(error) < TOLERANCE.in(Rotations)
             && Math.abs(velocitySignal.getValueAsDouble()) < MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond);
+    }
+
+    @Override
+    public void resetEncoderPosition() {
+        encoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
     }
 
     @Override

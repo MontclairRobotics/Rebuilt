@@ -47,12 +47,12 @@ public class TurretConstants {
 	public static final double MOMENT_OF_INERTIA = 0.154244993; //From CAD on 2026.02.12
 	public static final Distance LENGTH = Meters.of(0.3);
 	public static final double ROTOR_TO_SENSOR_RATIO = 12;
-	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 16.0;
+	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 18; //128.0 / 16.0
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
 	public static final Angle ANGLE_OFFSET = Rotations.of(-0.25);
-	public static final Angle ENCODER_OFFSET = Rotations.of(0);
+	public static final Angle ENCODER_OFFSET = Rotations.of(0.692);
 
 	// pid + ff gains
 	public static final double kP = 0; // Tuned PID in Simulation
@@ -82,7 +82,7 @@ public class TurretConstants {
 		.withSupplyCurrentLimitEnable(true);
 
 	public static final MotorOutputConfigs MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
-		.withInverted(InvertedValue.Clockwise_Positive)
+		.withInverted(InvertedValue.CounterClockwise_Positive)
 		.withNeutralMode(NeutralModeValue.Brake);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()
@@ -94,7 +94,7 @@ public class TurretConstants {
 	public static final CANcoderConfiguration ENCODER_CONFIGS = new CANcoderConfiguration()
 		.withMagnetSensor(
 			new MagnetSensorConfigs()
-				.withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+				.withSensorDirection(SensorDirectionValue.Clockwise_Positive)
 				.withMagnetOffset(ENCODER_OFFSET)
 		);
 }

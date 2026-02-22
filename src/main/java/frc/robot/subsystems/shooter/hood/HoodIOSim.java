@@ -85,6 +85,11 @@ public class HoodIOSim implements HoodIO {
     }
 
     @Override
+    public void resetEncoderPosition() {
+
+    }
+
+    @Override
     public void setGains(double kP, double kD, double kS, double kG) {
         pidController.setP(kP);
         pidController.setD(kD);

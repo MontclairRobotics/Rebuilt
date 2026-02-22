@@ -25,7 +25,7 @@ public class Flywheel extends SubsystemBase {
     private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Flywheel/kS", SLOT0_CONFIGS.kS);
     private final LoggedTunableNumber tunableKV = new LoggedTunableNumber("Flywheel/kV", SLOT0_CONFIGS.kV);
 
-    public final LoggedTunableNumber tuningFlywheelSpeed = new LoggedTunableNumber("Flywheel/TuningFlywheelRPM", 0);
+    public final LoggedTunableNumber tuningFlywheelSpeed = new LoggedTunableNumber("Flywheel/TuningFlywheelRPS", 0);
 
     public Flywheel(FlywheelIO io) {
         this.io = io;

@@ -120,8 +120,8 @@ public class Robot extends LoggedRobot {
 	/** This function is called once when the robot is disabled. */
 	@Override
 	public void disabledInit() {
-		// RobotContainer.turret.setNeutralMode(NeutralModeValue.Coast);
-		RobotContainer.hood.setNeutralMode(NeutralModeValue.Coast);
+		RobotContainer.turret.setNeutralMode(NeutralModeValue.Coast);
+		// RobotContainer.hood.setNeutralMode(NeutralModeValue.Coast);
 
 		if (!RobotBase.isReal()) {
 			// robotContainer.resetSdimulation();
@@ -150,8 +150,8 @@ public class Robot extends LoggedRobot {
 	/** This function is called once when teleop is enabled. */
 	@Override
 	public void teleopInit() {
-		// RobotContainer.turret.setNeutralMode(NeutralModeValue.Brake);
-		RobotContainer.hood.setNeutralMode(NeutralModeValue.Brake);
+		RobotContainer.turret.setNeutralMode(NeutralModeValue.Brake);
+		// RobotContainer.hood.setNeutralMode(NeutralModeValue.Brake);
 		if (autonomousCommand != null) {
 			autonomousCommand.cancel();
 		}

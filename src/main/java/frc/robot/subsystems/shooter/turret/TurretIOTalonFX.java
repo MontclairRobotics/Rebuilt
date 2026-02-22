@@ -55,8 +55,9 @@ public class TurretIOTalonFX implements TurretIO {
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAX_ANGLE.in(Rotations);
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MIN_ANGLE.in(Rotations);
 
-        motor.getConfigurator().apply(config);
         encoder.getConfigurator().apply(ENCODER_CONFIGS);
+        motor.getConfigurator().apply(config);
+        encoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
 
         positionSignal = motor.getPosition();
         setpointPositionSignal = motor.getClosedLoopReference();

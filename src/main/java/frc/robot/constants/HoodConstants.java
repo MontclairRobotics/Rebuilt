@@ -39,7 +39,7 @@ public class HoodConstants {
 
 	// Constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);
-	public static final Angle MAX_ANGLE = Degrees.of(40);
+	public static final Angle MAX_ANGLE = Rotations.of(0.93);
 
 	// Physical properties
 	public static final double GEARING = 176; // from Max Pearson on 2026.02.20
@@ -50,11 +50,11 @@ public class HoodConstants {
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
 	public static final double HOOD_LOWER_TIME = 0.6;
 
-	// Gains
-	public static final double kP = 0;
+	// Gains (Tuned 2/22)
+	public static final double kP = 1600;
 	public static final double kD = 0;
 	public static final double kS = 0;
-	public static final double kG = 0;
+	public static final double kG = 0.3;
 
 	public static final Angle TOLERANCE = Degrees.of(1);
 
