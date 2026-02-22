@@ -30,8 +30,8 @@ import static frc.robot.constants.FlywheelConstants.VELOCITY_TOLERANCE;
 
 public class FlywheelIOTalonFX implements FlywheelIO{
 
-    private TalonFX leftMotor;
-    private TalonFX rightMotor;
+    public TalonFX leftMotor;
+    public TalonFX rightMotor;
 
     private TalonFXConfiguration leftMotorConfig;
     private TalonFXConfiguration rightMotorConfig;
@@ -46,7 +46,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
 
     private final VelocityTorqueCurrentFOC request = new VelocityTorqueCurrentFOC(0);
     private final NeutralOut neutralOut = new NeutralOut();
-    private final VoltageOut voltageRequest = new VoltageOut(0);
+    public final VoltageOut voltageRequest = new VoltageOut(0);
 
 
     public FlywheelIOTalonFX() {

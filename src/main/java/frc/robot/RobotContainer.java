@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -65,7 +64,7 @@ public class RobotContainer {
 	public static Rollers rollers;
 	public static Intake intake;
 
-	public static Superstructure superstructure;
+	// public static Superstructure superstructure;
 	public static Aiming aiming;
 
 	public static SimShootingParameters simShootingParameters = new SimShootingParameters(Degrees.zero(), Degrees.zero(), MetersPerSecond.zero());
@@ -117,7 +116,7 @@ public class RobotContainer {
 				pivot = new Pivot(new PivotIOSim());
 				rollers = new Rollers(new RollersIOSim());
 				intake = new Intake(pivot, rollers);
-				superstructure = new Superstructure(shooter);
+				// superstructure = new Superstructure(shooter);
 				// fuelSim.enableAirResistance();
 				// fuelSim.start();
 				// aiming = new Aiming(turret);
@@ -162,18 +161,18 @@ public class RobotContainer {
 		// flywheel.setDefaultCommand(flywheel.joystickControlCommand());
 
 		driverController.circle().whileTrue(spindexer.spinCommand()).onFalse(spindexer.stopCommand());
-		driverController.cross().whileTrue(flywheel.setVoltageCommand(8)).onFalse(flywheel.stopCommand());
+		driverController.cross().whileFalse(flywheel.setVoltageCommand(3));
 		// driverController.circle()
 		// 	.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunedAngleDegrees)))
 		// 	.onFalse(hood.stopCommand());
 
-		driverController.square()
-			.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(turret.tunedAngleDegrees)))
-			.onFalse(turret.stopCommand());
+		// driverController.square()
+		// 	.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(turret.tunedAngleDegrees)))
+		// 	.onFalse(turret.stopCommand());
 
-		driverController.triangle()
-			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get())))
-			.onFalse(flywheel.stopCommand());
+		// driverController.triangle()
+		// 	.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get())))
+		// 	.onFalse(flywheel.stopCommand());
 
 		//.times(1).minus(Rotations.of(drivetrain.getWrappedHeading().getRotations()))
 		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed),Degrees.of(90-hoodAngle),turret.getAngleToHub(),TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
@@ -188,7 +187,7 @@ public class RobotContainer {
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
 		// driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
 		// zeros gyro
-		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
+		// driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 	}
 
 	public Command getAutonomousCommand() {

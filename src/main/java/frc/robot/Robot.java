@@ -109,6 +109,7 @@ public class Robot extends LoggedRobot {
 		// 	TargetLocation.FERRY_RIGHT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT));
 		// }
 		CommandScheduler.getInstance().run();
+		// RobotContainer.flywheel.io.setVoltage(3);
 	}
 
 	/** This function is called once when the robot is disabled. */

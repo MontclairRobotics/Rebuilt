@@ -21,6 +21,8 @@ public class Spindexer extends SubsystemBase {
 	public void periodic() {
 		// io.updateInputs(inputs);
 		// Logger.processInputs("Spindexer", inputs);
+		// io.setSpinVoltage(12);
+		// io.setIndexVoltage(-12);
 	}
 
 	public void spin() {

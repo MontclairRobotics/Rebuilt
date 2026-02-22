@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
-import frc.robot.Superstructure;
+// import frc.robot.Superstructure;
 
 import static frc.robot.constants.DriveConstants.SIGNIFICANT_VELOCITY;
 import static frc.robot.constants.DriveConstants.TRENCH_TRANSLATION_kD;
@@ -72,12 +72,14 @@ public class JoystickDriveCommand extends Command {
 	}
 
 	private boolean shouldTrenchLock() {
-		return Superstructure.inTrenchZone() && drivingBiasedForwards() && Superstructure.movingIntoObstacle();
+		// return Superstructure.inTrenchZone() && drivingBiasedForwards() && Superstructure.movingIntoObstacle();
+		return false;
 	}
 
 	private boolean shouldBumpLock() {
-		return Superstructure.inBumpZone() && drivingBiasedForwards()
-			&& Superstructure.movingIntoObstacle() && Math.abs(omegaVelocitySupplier.getAsDouble()) < 1;
+		return false;
+		// return Superstructure.inBumpZone() && drivingBiasedForwards()
+		// 	&& Superstructure.movingIntoObstacle() && Math.abs(omegaVelocitySupplier.getAsDouble()) < 1;
 	}
 
 	private boolean drivingBiasedForwards() {

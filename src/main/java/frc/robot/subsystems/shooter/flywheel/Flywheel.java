@@ -16,7 +16,7 @@ import frc.robot.util.tunables.LoggedTunableNumber;
 
 public class Flywheel extends SubsystemBase {
 
-    private final FlywheelIO io;
+    public final FlywheelIO io;
     private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
     private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Flywheel/kP", SLOT0_CONFIGS.kP);
@@ -47,6 +47,7 @@ public class Flywheel extends SubsystemBase {
         // io.updateInputs(inputs);
         // Logger.processInputs("Flywheel", inputs);
         // updateTunables();
+        // io.setVoltage(6);
     }
 
     public void setVelocity(AngularVelocity targetVelocity) {
@@ -64,7 +65,7 @@ public class Flywheel extends SubsystemBase {
     }
 
     public Command setVoltageCommand(double voltage) {
-        return Commands.run(() -> io.setVoltage(voltage));
+        return Commands.run(() -> io.setVoltage(voltage), this);
     }
 
     public Command stopCommand() {
