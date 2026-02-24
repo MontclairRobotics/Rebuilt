@@ -34,8 +34,8 @@ public class Auto extends SubsystemBase {
 
   public Auto() {
     autoTab = Shuffleboard.getTab("Auto");
-    autoString = autoTab.add("Auto string","Enter auto string").getEntry();
-    error = autoTab.add("Error", "No errors").getEntry();
+    autoString = autoTab.add("Auto string","Enter auto string").withSize(2,1).getEntry();
+    error = autoTab.add("Error", "No errors").withSize(2,1).withPosition(0,1).getEntry();
   }
 
   public boolean isAutoValid(String autoString) {
