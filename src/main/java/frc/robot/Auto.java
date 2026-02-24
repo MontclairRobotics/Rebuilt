@@ -5,13 +5,11 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringEntry;
-import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.networktables.StringTopic;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -21,11 +19,9 @@ public class Auto extends SubsystemBase {
   private char currentPos;
   private double timeToEmptyFuel = 6.0; //TODO: get the actual value
   private double maxFuel = 24.0; //TODO: get the actual value
-  private NetworkTableInstance inst = NetworkTableInstance.getDefault();
-  private NetworkTable auto = inst.getTable("Auto");
-  private StringTopic testTopic = auto.getStringTopic("Auto String");
-  private StringPublisher testPub = testTopic.publish();
-  StringEntry stringEnt = testTopic.getEntry("");
+  private ShuffleboardTab autoTab;
+  private GenericEntry autoString;
+  private GenericEntry error;
 
   // private NetworkTable autoTable;
   // private StringTopic autoTopic;
@@ -35,43 +31,54 @@ public class Auto extends SubsystemBase {
   // private BooleanEntry pushAutoEntry = pushAutoTopic.getEntry(false);
 
   private Command autoCommand;
-  private StringPublisher errorPub;
 
   public Auto() {
-    // stringEnt.set("");
+    autoTab = Shuffleboard.getTab("Auto");
+    autoString = autoTab.add("Auto string","Enter auto string").getEntry();
+    error = autoTab.add("Error", "No errors").getEntry();
   }
 
   public boolean isAutoValid(String autoString) {
+    if(autoString == "Enter auto string") {
+      error.setString("Enter a string into Auto String");
+      return false;
+    }
+
     if(autoString.length() < 3) {
-      // errorPub.set("Auto length is too short");
+      error.setString("Auto length is too short");
+      return false;
     }
 
     if(autoString.length() % 2 == 0) {
-      // errorPub.set("One of the paths has too many or few characters");
+      error.setString("One of the paths has an invalid length");
       return false;
     }
 
     String currentAutoString = autoString.substring(0,3);
+    String currentPos = autoString.substring(1,2);
     try {
       AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentAutoString));
     } catch(Exception e) {
-      // errorPub.set("Path " + currentAutoString + " doesn\'t exist");
+      error.setString("Path " + currentAutoString + " doesn\'t exist");
+      return false;
     }
 
     for(int i = 3; i < autoString.length(); i += 2) {
+      currentAutoString = currentPos + autoString.substring(i, i + 2);
       try {
         AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentAutoString));
       } catch(Exception e) {
-        // errorPub.set("Path " + currentAutoString + "doesn\'t exist");
+        error.setString("Path " + currentAutoString + " doesn\'t exist");
+        return false;
       }
+      currentPos = autoString.substring(i, i + 1);
     }
 
+    error.setString("No errors");
     return true;
   }
 
   public Command buildAuto(String autoString) {
-
-    //RR0R1
     SequentialCommandGroup autoCommand = new SequentialCommandGroup();
 
     if (!isAutoValid(autoString)) {
@@ -81,23 +88,15 @@ public class Auto extends SubsystemBase {
       } catch(Exception e) {
 
       }
-
     }
-
-    //Valid
-
     currentPos = autoString.charAt(1);
-    //'R'
-
     try {
       if(currentPos != 'D' || autoString.charAt(2) == '0' && currentPos != 'O' || autoString.charAt(2) == '0') {
-        //Runs
         if(DriverStation.getAlliance().get() == Alliance.Blue) {
           autoCommand.addCommands(
             //RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
             Commands.race(
               AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)))
-              //Follow path: RR0
               //RobotContainer.rollers.intakeCommand()
             )
           );
@@ -147,7 +146,7 @@ public class Auto extends SubsystemBase {
         }
       }
     } catch (Exception e) {
-      // errorPub.set("Unknown error");
+      error.setString("Unknown error");
     }
 
     for (int i = 3; i < autoString.length(); i += 2) {
@@ -155,8 +154,6 @@ public class Auto extends SubsystemBase {
         if(DriverStation.getAlliance().get() == Alliance.Blue) {
           autoCommand.addCommands(
             // RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-            //i = 3
-            //
             AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentPos + autoString.substring(i, i + 2)))
           );
         } else {
@@ -175,7 +172,7 @@ public class Auto extends SubsystemBase {
         }
         currentPos = autoString.charAt(i);
       } catch (Exception e) {
-        // errorPub.set("Unknown issue");
+        error.setString("Unknown issue");
       }
     }
 
@@ -186,12 +183,13 @@ public class Auto extends SubsystemBase {
     autoCommand = buildAuto(autoString);
   }
 
-  public Command getAutoCommand(String str) {
-    return buildAuto(str);
+  public Command getAutoCommand() {
+    return autoCommand;
   }
 
 
   public void periodic() {
+    createAuto(autoString.getString(""));
     // createAuto("LL0");
     //testPub.set(stringEnt.get());
     // if(DriverStation.isDisabled()) {

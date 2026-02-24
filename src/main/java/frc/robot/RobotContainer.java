@@ -194,7 +194,7 @@ public class RobotContainer {
 	}
 
 	public Command getAutonomousCommand() {
-		return auto.getAutoCommand("LD0L1");
+		return auto.getAutoCommand();
 	}
 
 	/**

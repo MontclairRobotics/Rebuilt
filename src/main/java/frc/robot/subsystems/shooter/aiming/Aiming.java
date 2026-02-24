@@ -92,7 +92,7 @@ public class Aiming {
 		}
 
 		Translation2d aimingVector = virtualTarget.minus(futureTurretPosition);
-		robotRelativeTurretAngle = turret.toRobotRelativeAngle(Rotations.of(aimingVector.getAngle().getRotations()));
+		robotRelativeTurretAngle = RobotContainer.turret.toRobotRelativeAngle(Rotations.of(aimingVector.getAngle().getRotations()));
 		hoodAngle = map.get(virtualDistance).angle();
 		flywheelVelocity = map.get(virtualDistance).flywheelVelocity();
 
