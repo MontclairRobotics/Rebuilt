@@ -30,6 +30,10 @@ import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
+import frc.robot.subsystems.shooter.spindexer.Spindexer;
+import frc.robot.subsystems.shooter.spindexer.indexer.Indexer;
+import frc.robot.subsystems.shooter.spindexer.indexer.IndexerIOSim;
+import frc.robot.subsystems.shooter.spindexer.indexer.IndexerIOTalonFX;
 import frc.robot.subsystems.shooter.spindexer.serializer.Serializer;
 import frc.robot.subsystems.shooter.spindexer.serializer.SerializerIOSim;
 import frc.robot.subsystems.shooter.spindexer.serializer.SerializerIOTalonFX;
@@ -64,7 +68,9 @@ public class RobotContainer {
 	public static Turret turret;
 	public static Flywheel flywheel;
 	public static Hood hood;
-	public static Serializer spindexer;
+	public static Serializer serializer;
+	public static Indexer indexer;
+	public static Spindexer spindexer;
 
 	public static Pivot pivot;
 	public static Rollers rollers;
@@ -90,7 +96,9 @@ public class RobotContainer {
 				flywheel = new Flywheel(new FlywheelIOTalonFX());
 				turret = new Turret(new TurretIOTalonFX());
 				hood = new Hood(new HoodIOTalonFX());
-				spindexer = new Spindexer(new SpindexerIOTalonFX());
+				serializer = new Serializer(new SerializerIOTalonFX());
+				indexer = new Indexer(new IndexerIOTalonFX());
+				spindexer = new Spindexer(serializer, indexer);
 				// shooter = new Shooter(
 				// 	hood, flywheel, turret, spindexer,
 				// 	withConstantVelocity, whileMoving
@@ -115,7 +123,9 @@ public class RobotContainer {
 				flywheel = new Flywheel(new FlywheelIOSim());
 				turret = new Turret(new TurretIOSim());
 				hood = new Hood(new HoodIOSim());
-				spindexer = new Serializer(new SerializerIOSim());
+				serializer = new Serializer(new SerializerIOSim());
+				indexer = new Indexer(new IndexerIOSim());
+				spindexer = new Spindexer(serializer, indexer);
 				shooter = new Shooter(
 					hood, flywheel, turret, spindexer,
 					withConstantVelocity, whileMoving

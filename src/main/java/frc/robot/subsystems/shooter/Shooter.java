@@ -30,6 +30,7 @@ import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.util.sim.FuelSim.Hub;
 import frc.robot.subsystems.shooter.hood.Hood;
+import frc.robot.subsystems.shooter.spindexer.Spindexer;
 import frc.robot.subsystems.shooter.spindexer.serializer.Serializer;
 
 public class Shooter extends SubsystemBase {
@@ -37,7 +38,7 @@ public class Shooter extends SubsystemBase {
     private Hood hood;
     private Flywheel flywheel;
     private Turret turret;
-    private Serializer spindexer;
+    private Spindexer spindexer;
 
     public boolean withConstantVelocity;
     public boolean whileMoving;
@@ -48,7 +49,7 @@ public class Shooter extends SubsystemBase {
 
     private  double lastSimShotTime = 0.0;
 
-    public Shooter(Hood hood, Flywheel flywheel, Turret turret, Serializer spindexer, boolean withConstantVelocity, boolean whileMoving) {
+    public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean withConstantVelocity, boolean whileMoving) {
         this.hood = hood;
         this.flywheel = flywheel;
         this.turret = turret;
@@ -165,7 +166,7 @@ public class Shooter extends SubsystemBase {
     public Command indexAndShootCommand(Supplier<AngularVelocity> flywheelVelocitySupplier) {
         return Commands.run(() -> {
             if (RobotContainer.driverController.R2().getAsBoolean() && this.atSetpoint()) {
-                spindexer.spin();
+                spindexer.spinUp();
                 flywheel.setVelocity(flywheelVelocitySupplier);
             }
         });

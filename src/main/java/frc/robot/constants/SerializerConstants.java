@@ -12,21 +12,22 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public class SerializerConstants {
-   
+
     public static final int CAN_ID = -1;
     public static final CANBus CAN_BUS = new CANBus(""); // on roborio can bus
-    
-    public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.5);
+
+    public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.1);
+	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(4.5);
 
     public static final double kP = 0;
 	public static final double kD = 0;
-	public static final double kS = 0; 
+	public static final double kS = 0;
 	public static final double kV = 0;
 
     public static final double STATOR_CURRENT_LIMIT = 60;
     public static final double SUPPLY_CURRENT_LIMIT = 40;
 
-    public static final double GEARING = 4; // TODO: get
+    public static final double GEARING = 20; // TODO: get
     public static final double MOMENT_OF_INERTIA = 0.02;
 
     public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
@@ -48,4 +49,3 @@ public class SerializerConstants {
 		.withSensorToMechanismRatio(GEARING);
 
 }
-
