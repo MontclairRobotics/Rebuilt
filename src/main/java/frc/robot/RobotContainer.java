@@ -16,6 +16,7 @@ import static edu.wpi.first.units.Units.Inches;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
@@ -43,6 +44,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.sim.FuelSim;
+import frc.robot.util.sim.FuelSim.Hub;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -110,7 +112,7 @@ public class RobotContainer {
 
 			case SIM:
 				drivetrain = TunerConstants.createDrivetrain();
-				// driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
+				driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 				flywheel = new Flywheel(new FlywheelIOSim());
 				turret = new Turret(new TurretIOSim());
 				hood = new Hood(new HoodIOSim());
@@ -134,7 +136,14 @@ public class RobotContainer {
 					() -> drivetrain.getRobotPose(),
 					() -> drivetrain.getFieldRelativeSpeeds()
 				);
-				fuelSim.registerIntake(Inches.of(15), Inches.of(22), Inches.of(-15), Inches.of(15));
+				fuelSim.registerIntake(
+					Inches.of(15),
+					Inches.of(22),
+					Inches.of(-15),
+					Inches.of(15),
+					shooter::shouldIntake,
+					shooter::addBall
+				);
 				fuelSim.spawnStartingFuel();
 
 				// vision =
@@ -161,11 +170,11 @@ public class RobotContainer {
 	}
 
 	private void configureBindings() {
-		// drivetrain.setDefaultCommand(new JoystickDriveCommand());
+		drivetrain.setDefaultCommand(new JoystickDriveCommand());
 		// hood.setDefaultCommand(hood.joystickControlCommand());
-		turret.setDefaultCommand(turret.joystickControlCommand());
+		// turret.setDefaultCommand(turret.joystickControlCommand());
 		// flywheel.setDefaultCommand(flywheel.joystickControlCommand());
-		driverController.L2().whileTrue(spindexer.spinCommand()).onFalse(spindexer.stopCommand());
+		// driverController.L2().whileTrue(spindexer.spinCommand()).onFalse(spindexer.stopCommand());
 
 		// driverController.circle()
 		// 	.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))

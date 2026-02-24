@@ -29,10 +29,10 @@ public class FuelSim {
     protected static final Translation3d GRAVITY = new Translation3d(0, 0, -9.81); // m/s^2
     // Room temperature dry air density: https://en.wikipedia.org/wiki/Density_of_air#Dry_air
     protected static final double AIR_DENSITY = 1.2041; // kg/m^3
-    protected static final double FIELD_COR = Math.sqrt(22 / 51.5); // coefficient of restitution with the field
-    protected static final double FUEL_COR = 0.5; // coefficient of restitution with another fuel
-    protected static final double NET_COR = 0.2; // coefficient of restitution with the net
-    protected static final double ROBOT_COR = 0.1; // coefficient of restitution with a robot
+    protected static final double FIELD_COR = 0.05; // coefficient of restitution with the field
+    protected static final double FUEL_COR = 0.1; // coefficient of restitution with another fuel
+    protected static final double NET_COR = 0.02; // coefficient of restitution with the net
+    protected static final double ROBOT_COR = 0.02; // coefficient of restitution with a robot
     protected static final double FUEL_RADIUS = 0.075;
     protected static final double FIELD_LENGTH = 16.51;
     protected static final double FIELD_WIDTH = 8.04;
@@ -41,7 +41,7 @@ public class FuelSim {
     protected static final double TRENCH_HEIGHT = 0.565;
     protected static final double TRENCH_BAR_HEIGHT = 0.102;
     protected static final double TRENCH_BAR_WIDTH = 0.152;
-    protected static final double FRICTION = 0.1; // proportion of horizontal vel to lose per sec while on ground
+    protected static final double FRICTION = 0.4; // proportion of horizontal vel to lose per sec while on ground
     protected static final double FUEL_MASS = 0.448 * 0.45392; // kgs
     protected static final double FUEL_CROSS_AREA = Math.PI * FUEL_RADIUS * FUEL_RADIUS;
     // Drag coefficient of smooth sphere: https://en.wikipedia.org/wiki/Drag_coefficient#/media/File:14ilf1l.svg
@@ -317,7 +317,7 @@ public class FuelSim {
     protected double robotLength; // size along the robot's x axis
     protected double bumperHeight;
     protected ArrayList<SimIntake> intakes = new ArrayList<>();
-    protected int subticks = 5;
+    protected int subticks = 8;
 
     /**
      * Creates a new instance of FuelSim

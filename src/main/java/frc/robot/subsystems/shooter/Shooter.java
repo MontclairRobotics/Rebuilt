@@ -29,6 +29,7 @@ import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 import frc.robot.subsystems.shooter.turret.Turret;
+import frc.robot.util.sim.FuelSim.Hub;
 import frc.robot.subsystems.shooter.hood.Hood;
 
 public class Shooter extends SubsystemBase {
@@ -41,6 +42,10 @@ public class Shooter extends SubsystemBase {
     public boolean withConstantVelocity;
     public boolean whileMoving;
 
+    public final int HOPPER_CAPACITY = 40;
+    private final int FIRE_RATE = 6;
+    public int hopperCount;
+
     private  double lastSimShotTime = 0.0;
 
     public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean withConstantVelocity, boolean whileMoving) {
@@ -50,6 +55,41 @@ public class Shooter extends SubsystemBase {
         this.spindexer = spindexer;
         this.withConstantVelocity = withConstantVelocity;
         this.whileMoving = whileMoving;
+        this.hopperCount = 0;
+    }
+
+
+    @Override
+    public void periodic() {
+        Logger.recordOutput("Fuel/Hopper Count", hopperCount);
+        Logger.recordOutput("Fuel/Blue Score", Hub.BLUE_HUB.getScore());
+        Logger.recordOutput("Fuel/Red Score", Hub.RED_HUB.getScore());
+    }
+
+    public int getHopperCount() {
+        return hopperCount;
+    }
+
+    public void addBall() {
+        if (hopperCount < HOPPER_CAPACITY) {
+            hopperCount++;
+        }
+    }
+
+    public void removeBall() {
+        if (hopperCount > 0) {
+            hopperCount--;
+        }
+    }
+
+    public boolean shouldIntake() {
+        double intakeProbability = Math.max(0, 1 - RobotContainer.drivetrain.getFieldRelativeLinearSpeed().in(MetersPerSecond) / 2);
+        return hopperCount < HOPPER_CAPACITY 
+            && Math.random() < intakeProbability;
+    }
+
+    public boolean hasBalls() {
+        return hopperCount > 0;
     }
 
 	public Pose3d getFieldRelativePosition() {
@@ -85,7 +125,7 @@ public class Shooter extends SubsystemBase {
             Commands.run(() -> {
                 SimShootingParameters params = paramsSupplier.get();
                 Logger.recordOutput("launchFuel()/At Setpoint", RobotContainer.shooter.atSetpoint());
-                launchFuel(() -> params.exitVelocity(), 6);
+                launchFuel(() -> params.exitVelocity(), FIRE_RATE);
                 Logger.recordOutput("setSimParameters()/Robot Relative Turret Angle", params.robotRelativeTurretAngle().in(Rotations));
                 Logger.recordOutput("setSimParameters()/Hood Angle", params.hoodAngle().in(Rotations));
                 Logger.recordOutput("setSimParameters()/Exit Velocity", params.exitVelocity().in(MetersPerSecond));
@@ -96,12 +136,13 @@ public class Shooter extends SubsystemBase {
     }
 
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
-        if (RobotContainer.driverController.R2().getAsBoolean() && RobotContainer.shooter.atSetpoint()) {
+        if (RobotContainer.driverController.R2().getAsBoolean() && RobotContainer.shooter.atSetpoint() && hasBalls()) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
 
             if(currentTime - lastSimShotTime >= interval) {
                 lastSimShotTime = currentTime;
+                removeBall();
 
                 LinearVelocity exitVelocity = velocitySupplier.get();
                 Angle robotRelativeTurretAngle = RobotContainer.turret.getRobotRelativeAngle();
@@ -114,7 +155,7 @@ public class Shooter extends SubsystemBase {
                 RobotContainer.fuelSim.launchFuel(
                     exitVelocity,
                     Degrees.of(90).plus(hoodAngle),
-                    robotRelativeTurretAngle.plus(Radians.of(RobotContainer.drivetrain.getWrappedHeading().getRadians())),
+                    robotRelativeTurretAngle.plus(Radians.of(RobotContainer.drivetrain.getWrappedHeading().getRadians())).minus(Rotations.of(0.125)),
                     TurretConstants.ORIGIN_TO_TURRET.getMeasureZ()
                 );
             }

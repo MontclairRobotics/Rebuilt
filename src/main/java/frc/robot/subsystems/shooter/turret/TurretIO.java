@@ -24,6 +24,8 @@ public interface TurretIO {
         public Angle robotRelativeAngle = Rotations.zero();
         public Angle fieldRelativeAngle = Rotations.zero();
         public Angle robotRelativeAngleSetpoint = Rotations.zero();
+
+        public boolean isAtSetpoint = false;
     }
 
     public void updateInputs(TurretIOInputs inputs);

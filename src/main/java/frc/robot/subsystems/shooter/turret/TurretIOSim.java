@@ -37,8 +37,8 @@ public class TurretIOSim implements TurretIO {
 			0
 		);
 
-        pidController = new PIDController(SLOT0_CONFIGS.kP, SLOT0_CONFIGS.kI, SLOT0_CONFIGS.kD);
-        feedforward = new SimpleMotorFeedforward(SLOT0_CONFIGS.kS, SLOT0_CONFIGS.kV);
+        pidController = new PIDController(SIM_SLOT0_CONFIGS.kP, SIM_SLOT0_CONFIGS.kI, SIM_SLOT0_CONFIGS.kD);
+        feedforward = new SimpleMotorFeedforward(SIM_SLOT0_CONFIGS.kS, SIM_SLOT0_CONFIGS.kV);
 	}
 
     @Override
@@ -56,6 +56,8 @@ public class TurretIOSim implements TurretIO {
        inputs.robotRelativeAngle = Radians.of(sim.getAngleRads());
        inputs.fieldRelativeAngle = Turret.toFieldRelativeAngle(inputs.robotRelativeAngle);
        inputs.robotRelativeAngleSetpoint = Rotations.of(pidController.getSetpoint());
+
+       inputs.isAtSetpoint = isAtSetpoint();
     }
 
     @Override

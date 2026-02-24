@@ -30,7 +30,7 @@ public class HoodConstants {
 
 	// CAD values
 	public static final Translation3d ORIGIN_TO_HOOD = new Translation3d(-0.1651, 0.2782, 0.4395);
-	public static final Translation3d TURRET_TO_HOOD = new Translation3d(-0.113, 0, 0.08128);
+	public static final Translation3d TURRET_TO_HOOD = new Translation3d(-0.08, 0.08, 0.08128);
 
 	// CAN
 	public static final int CAN_ID = 33;
@@ -71,6 +71,10 @@ public class HoodConstants {
 		.withKP(kP).withKD(kD)
 		.withKS(kS).withKG(kG)
 		.withGravityType(GravityTypeValue.Arm_Cosine);
+
+	public static final Slot0Configs SIM_SLOT0_CONFIGS = new Slot0Configs()
+		.withKP(2000).withKD(0)
+		.withKS(0).withKG(0.3);
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
 		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)

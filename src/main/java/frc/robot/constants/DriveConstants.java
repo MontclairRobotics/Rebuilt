@@ -43,6 +43,6 @@ public class DriveConstants {
 	public static final double TRENCH_TRANSLATION_kI = 0;
 	public static final double TRENCH_TRANSLATION_kD = 0;
 
-	public static final LinearVelocity SIGNIFICANT_VELOCITY = MetersPerSecond.of(1);
+	public static final LinearVelocity SIGNIFICANT_VELOCITY = MetersPerSecond.of(1.5);
 
 }

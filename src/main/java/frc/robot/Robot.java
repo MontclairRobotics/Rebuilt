@@ -18,6 +18,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -180,6 +181,10 @@ public class Robot extends LoggedRobot {
 	/** This function is called periodically whilst in simulation. */
 	@Override
 	public void simulationPeriodic() {
+		Logger.recordOutput("Zero Pose/1", new Pose3d());
+		Logger.recordOutput("Zero Pose/2", new Pose3d());
+		Logger.recordOutput("Zero Pose/3", new Pose3d());
+		Logger.recordOutput("Zero Pose/4", new Pose3d());
 		robotContainer.fuelSim.updateSim();
 		RobotContainer.drivetrain.mapleSimSwerveDrivetrain.update();
 		robotContainer.displaySimFieldToAdvantageScope();

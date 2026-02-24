@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.HoodConstants.*;
+import static frc.robot.constants.HoodConstants.SIM_SLOT0_CONFIGS;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -38,8 +39,8 @@ public class HoodIOSim implements HoodIO {
 			0.0
 		);
 
-        pidController = new PIDController(SLOT0_CONFIGS.kP, SLOT0_CONFIGS.kI, SLOT0_CONFIGS.kD);
-        feedforward = new ArmFeedforward(SLOT0_CONFIGS.kS, SLOT0_CONFIGS.kG, SLOT0_CONFIGS.kV);
+        pidController = new PIDController(SIM_SLOT0_CONFIGS.kP, SIM_SLOT0_CONFIGS.kI, SIM_SLOT0_CONFIGS.kD);
+        feedforward = new ArmFeedforward(SIM_SLOT0_CONFIGS.kS, SIM_SLOT0_CONFIGS.kG, SIM_SLOT0_CONFIGS.kV);
 
     }
 

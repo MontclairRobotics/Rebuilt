@@ -50,8 +50,8 @@ public class Hood extends SubsystemBase {
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Hood", inputs);
-		// visualization.update();
-		// visualization.log();
+		visualization.update();
+		visualization.log();
         updateTunables();
 	}
 

@@ -51,11 +51,11 @@ public class TurretConstants {
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
-	public static final Angle ANGLE_OFFSET = Rotations.of(-0.25);
+	public static final Angle ANGLE_OFFSET = Rotations.of(0.375);
 	public static final Angle ENCODER_OFFSET = Rotations.of(0.692);
 
 	// pid + ff gains
-	public static final double kP = 0; // Tuned PID in Simulation
+	public static final double kP = 400;
 	public static final double kD = 0;
 	public static final double kS = 0;
 
@@ -74,6 +74,10 @@ public class TurretConstants {
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKD(kD).withKS(kS);
+
+	public static final Slot0Configs SIM_SLOT0_CONFIGS = new Slot0Configs()
+		.withKP(400).withKI(0).withKD(0)
+		.withKS(0).withKV(0);
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
 		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)

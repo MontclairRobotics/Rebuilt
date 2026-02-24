@@ -25,8 +25,8 @@ public Pose3d hoodPose = new Pose3d();
 		hoodPose = new Pose3d(
 			ORIGIN_TO_TURRET.plus(turretToHoodFieldRelative),
 			new Rotation3d(
-				Rotations.zero(),
-				Rotations.of(-RobotContainer.hood.getAngle().in(Rotations)),
+				Rotations.of(-RobotContainer.hood.getAngle().in(Rotations)).times(0.7071),
+				Rotations.of(-RobotContainer.hood.getAngle().in(Rotations)).times(0.7071),
 				RobotContainer.turret.getRobotRelativeAngle()
 			)
 		);
