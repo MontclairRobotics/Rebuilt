@@ -37,8 +37,9 @@ public class TurretIOSim implements TurretIO {
 			0
 		);
 
-        pidController = new PIDController(SIM_SLOT0_CONFIGS.kP, SIM_SLOT0_CONFIGS.kI, SIM_SLOT0_CONFIGS.kD);
-        feedforward = new SimpleMotorFeedforward(SIM_SLOT0_CONFIGS.kS, SIM_SLOT0_CONFIGS.kV);
+        pidController = new PIDController(100, 0, 0);
+        pidController.setTolerance(ANGLE_TOLERANCE.in(Rotations));
+        feedforward = new SimpleMotorFeedforward(0, 0);
 	}
 
     @Override
@@ -85,9 +86,9 @@ public class TurretIOSim implements TurretIO {
 
     @Override
     public void setGains(double kP, double kD, double kS) {
-        pidController.setP(kP);
-        pidController.setD(kD);
-        feedforward.setKs(kS);
+        // pidController.setP(kP);
+        // pidController.setD(kD);
+        // feedforward.setKs(kS);
     }
 
     @Override

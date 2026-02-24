@@ -46,7 +46,7 @@ public class TurretConstants {
 	// physical properties
 	public static final double MOMENT_OF_INERTIA = 0.154244993; //From CAD on 2026.02.12
 	public static final Distance LENGTH = Meters.of(0.3);
-	public static final double ROTOR_TO_SENSOR_RATIO = 12;
+	public static final double ROTOR_TO_SENSOR_RATIO = 3;
 	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 18; //128.0 / 16.0
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
 
@@ -55,7 +55,7 @@ public class TurretConstants {
 	public static final Angle ENCODER_OFFSET = Rotations.of(0.692);
 
 	// pid + ff gains
-	public static final double kP = 400;
+	public static final double kP = 0;
 	public static final double kD = 0;
 	public static final double kS = 0;
 
@@ -74,10 +74,6 @@ public class TurretConstants {
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKD(kD).withKS(kS);
-
-	public static final Slot0Configs SIM_SLOT0_CONFIGS = new Slot0Configs()
-		.withKP(400).withKI(0).withKD(0)
-		.withKS(0).withKV(0);
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
 		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)

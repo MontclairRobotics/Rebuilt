@@ -44,7 +44,6 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.sim.FuelSim;
-import frc.robot.util.sim.FuelSim.Hub;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
