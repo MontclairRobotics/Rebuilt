@@ -30,9 +30,9 @@ import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
-import frc.robot.subsystems.shooter.spindexer.Spindexer;
-import frc.robot.subsystems.shooter.spindexer.SpindexerIOSim;
-import frc.robot.subsystems.shooter.spindexer.SpindexerIOTalonFX;
+import frc.robot.subsystems.shooter.spindexer.serializer.Serializer;
+import frc.robot.subsystems.shooter.spindexer.serializer.SerializerIOSim;
+import frc.robot.subsystems.shooter.spindexer.serializer.SerializerIOTalonFX;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
 import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
@@ -64,7 +64,7 @@ public class RobotContainer {
 	public static Turret turret;
 	public static Flywheel flywheel;
 	public static Hood hood;
-	public static Spindexer spindexer;
+	public static Serializer spindexer;
 
 	public static Pivot pivot;
 	public static Rollers rollers;
@@ -115,7 +115,7 @@ public class RobotContainer {
 				flywheel = new Flywheel(new FlywheelIOSim());
 				turret = new Turret(new TurretIOSim());
 				hood = new Hood(new HoodIOSim());
-				spindexer = new Spindexer(new SpindexerIOSim());
+				spindexer = new Serializer(new SerializerIOSim());
 				shooter = new Shooter(
 					hood, flywheel, turret, spindexer,
 					withConstantVelocity, whileMoving
