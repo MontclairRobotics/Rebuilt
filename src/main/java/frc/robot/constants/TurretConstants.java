@@ -40,24 +40,24 @@ public class TurretConstants {
 
 	// constraints
 	public static final Angle MIN_ANGLE = Rotations.of(-0.5);
-	public static final Angle MAX_ANGLE = Rotations.of(0.5);
+	public static final Angle MAX_ANGLE = Rotations.of(0.47);
 	public static final Angle ANGLE_TOLERANCE = Degrees.of(3);
 
 	// physical properties
 	public static final double MOMENT_OF_INERTIA = 0.154244993; //From CAD on 2026.02.12
 	public static final Distance LENGTH = Meters.of(0.3);
 	public static final double ROTOR_TO_SENSOR_RATIO = 3;
-	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 18; //128.0 / 16.0
+	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 17; //128.0 / 16.0
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
 	public static final Angle ANGLE_OFFSET = Rotations.of(0.375);
-	public static final Angle ENCODER_OFFSET = Rotations.of(0.692);
+	public static final Angle ENCODER_OFFSET = Rotations.of(-0.14306640625);
 
 	// pid + ff gains
-	public static final double kP = 0;
+	public static final double kP = 130.0555;
 	public static final double kD = 0;
-	public static final double kS = 0;
+	public static final double kS = 2;
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(3);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(6);
@@ -94,7 +94,7 @@ public class TurretConstants {
 	public static final CANcoderConfiguration ENCODER_CONFIGS = new CANcoderConfiguration()
 		.withMagnetSensor(
 			new MagnetSensorConfigs()
-				.withSensorDirection(SensorDirectionValue.Clockwise_Positive)
+				.withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
 				.withMagnetOffset(ENCODER_OFFSET)
 		);
 }

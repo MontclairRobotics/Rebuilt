@@ -42,11 +42,12 @@ public class HoodConstants {
 	public static final Angle MAX_ANGLE = Rotations.of(0.93);
 
 	// Physical properties
-	public static final double GEARING = 176; // from Max Pearson on 2026.02.20
 	public static final double SENSOR_TO_MECHANISM_RATIO = 176.0 / 10;
-	public static final double ROTOR_TO_SENSOR_RATIO = 10;
+	public static final double ROTOR_TO_SENSOR_RATIO = 5;
+	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
+
 	public static final double MOMENT_OF_INERTIA = 0.03038161694; // from CAD on 3/3/2026
-	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.251944); // absolute encoder
+	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.2236328125); // absolute encoder
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
 	public static final double HOOD_LOWER_TIME = 0.6;
 

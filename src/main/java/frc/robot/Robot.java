@@ -122,7 +122,7 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void disabledInit() {
 		RobotContainer.turret.setNeutralMode(NeutralModeValue.Coast);
-		// RobotContainer.hood.setNeutralMode(NeutralModeValue.Coast);
+		RobotContainer.hood.setNeutralMode(NeutralModeValue.Coast);
 
 		if (!RobotBase.isReal()) {
 			// robotContainer.resetSdimulation();
@@ -152,7 +152,7 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void teleopInit() {
 		RobotContainer.turret.setNeutralMode(NeutralModeValue.Brake);
-		// RobotContainer.hood.setNeutralMode(NeutralModeValue.Brake);
+		RobotContainer.hood.setNeutralMode(NeutralModeValue.Brake);
 		if (autonomousCommand != null) {
 			autonomousCommand.cancel();
 		}
