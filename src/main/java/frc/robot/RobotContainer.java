@@ -82,7 +82,7 @@ public class RobotContainer {
 	public static Auto auto;
 
 	public static double startingX = 4.430;
-	public static double startingY = 7.440;
+	public static double startingY = 0.630;
 
 	public static SimShootingParameters simShootingParameters = new SimShootingParameters(Degrees.zero(), Degrees.zero(), MetersPerSecond.zero());
 

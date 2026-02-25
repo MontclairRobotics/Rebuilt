@@ -1,5 +1,3 @@
-//TODO: Send why there is an error
-
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -14,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.PivotConstants;
 
 public class Auto extends SubsystemBase {
   private char currentPos;
@@ -22,13 +21,6 @@ public class Auto extends SubsystemBase {
   private ShuffleboardTab autoTab;
   private GenericEntry autoString;
   private GenericEntry error;
-
-  // private NetworkTable autoTable;
-  // private StringTopic autoTopic;
-  // private StringPublisher autoPub;
-  // private BooleanTopic pushAutoTopic = autoTable.getBooleanTopic("Push Auto");
-  // private StringEntry autoPathEntry = autoTopic.getEntry("");
-  // private BooleanEntry pushAutoEntry = pushAutoTopic.getEntry(false);
 
   private Command autoCommand;
 
@@ -39,8 +31,9 @@ public class Auto extends SubsystemBase {
   }
 
   public boolean isAutoValid(String autoString) {
-    if(autoString == "Enter auto string") {
-      error.setString("Enter a string into Auto String");
+
+    if(this.autoString.getString("").equals("Enter auto string")) {
+      error.setString("Enter a string into Auto string");
       return false;
     }
 
@@ -94,53 +87,44 @@ public class Auto extends SubsystemBase {
       if(currentPos != 'D' || autoString.charAt(2) == '0' && currentPos != 'O' || autoString.charAt(2) == '0') {
         if(DriverStation.getAlliance().get() == Alliance.Blue) {
           autoCommand.addCommands(
-            //RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
             Commands.race(
-              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)))
-              //RobotContainer.rollers.intakeCommand()
+              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3))),
+              RobotContainer.rollers.intakeCommand()
             )
           );
         } else {
           autoCommand.addCommands(
-            // RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
             Commands.race(
-              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)).flipPath())
-              //RobotContainer.rollers.intakeCommand()
+              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)).flipPath()),
+              RobotContainer.rollers.intakeCommand()
             )
-          );
-        }
-
-        if(autoString.charAt(1) == 'L' || autoString.charAt(1) == 'R' && autoString.substring(0,2) != "LR" && autoString.substring(0,2) != "RL") {
-          autoCommand.addCommands(
-            //RobotContainer.pivot.goToAngleCommand(PivotConstants.MAX_ANGLE),
-            //RobotContainer.shooter.indexAndShootCommand(() -> Units.RadiansPerSecond.of(0.0)).withTimeout(timeToEmptyFuel)
           );
         }
       } else {
         if(DriverStation.getAlliance().get() == Alliance.Blue) {
           autoCommand.addCommands(
-            // RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
             Commands.race(
-              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)))
-              //Commands.sequence(
-                // Commands.waitUntil(() -> Superstructure.isInScoringZone()),
-                // RobotContainer.pivot.goToAngleCommand(PivotConstants.MAX_ANGLE)
-                //RobotContainer.shooter.whileScoring() //IDK how they have implemented scoring while dirving so this is a placeholder
-              //),
-              // RobotContainer.rollers.intakeCommand()
+              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3))),
+              Commands.sequence(
+                Commands.waitUntil(() -> Superstructure.isInScoringZone()),
+                RobotContainer.pivot.goToAngleCommand(PivotConstants.MAX_ANGLE)
+              ),
+              RobotContainer.rollers.intakeCommand()
             )
           );
         } else {
           autoCommand.addCommands(
-           // RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+           RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
             Commands.race(
-              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)).flipPath())
-              /*Commands.sequence(
-                // Commands.waitUntil(() -> Superstructure.isInScoringZone()),
+              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)).flipPath()),
+              Commands.sequence(
+                Commands.waitUntil(() -> Superstructure.isInScoringZone()),
                 RobotContainer.pivot.goToAngleCommand(PivotConstants.MAX_ANGLE)
-                // RobotContainer.shooter.whileScoring().until(() -> !Superstructure.isInScoringZone()) IDK how they have implemented scoring while dirving so this is a placeholder
               ),
-              RobotContainer.rollers.intakeCommand()*/
+              RobotContainer.rollers.intakeCommand()
             )
           );
         }
@@ -153,21 +137,20 @@ public class Auto extends SubsystemBase {
       try {
         if(DriverStation.getAlliance().get() == Alliance.Blue) {
           autoCommand.addCommands(
-            // RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
             AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentPos + autoString.substring(i, i + 2)))
           );
         } else {
           autoCommand.addCommands(
-            // RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
             AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentPos + autoString.substring(i, i + 2)).flipPath())
           );
         }
 
         currentPos = autoString.charAt(i);
-        if(autoString.charAt(i) == 'L' || autoString.charAt(i) == 'R') {
+        if(currentPos == 'D') {
           autoCommand.addCommands(
-            // RobotContainer.pivot.goToAngleCommand(PivotConstants.MAX_ANGLE),
-            // RobotContainer.shooter.indexAndShootCommand(() -> Units.RadiansPerSecond.of(0.0)).withTimeout(timeToEmptyFuel)
+            RobotContainer.pivot.goToAngleCommand(PivotConstants.MAX_ANGLE)
           );
         }
         currentPos = autoString.charAt(i);
@@ -190,13 +173,5 @@ public class Auto extends SubsystemBase {
 
   public void periodic() {
     createAuto(autoString.getString(""));
-    // createAuto("LL0");
-    //testPub.set(stringEnt.get());
-    // if(DriverStation.isDisabled()) {
-      // String autoString = autoPathEntry.get("");
-      // if(pushAutoEntry.get()) {
-        // createAuto(autoString);
-      // }
-    // }
   }
 }
