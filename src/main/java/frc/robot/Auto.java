@@ -134,7 +134,10 @@ public class Auto extends SubsystemBase {
       Commands.parallel(
         Commands.runOnce(
           () -> {try {
-            RobotContainer.drivetrain.resetPose(new Pose2d(PathPlannerPath.fromPathFile(autoString.substring(0,3)).getPoint(0).position, PathPlannerPath.fromPathFile(autoString.substring(0,3)).getInitialHeading()));
+            RobotContainer.drivetrain.resetPose(
+              new Pose2d(PathPlannerPath.fromPathFile(autoString.substring(0,3)).getPoint(0).position, 
+              PathPlannerPath.fromPathFile(autoString.substring(0,3)).getInitialHeading())
+            );
           } catch (FileVersionException | IOException | ParseException e) {
             e.printStackTrace();
           }}
