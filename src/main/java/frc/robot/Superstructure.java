@@ -54,7 +54,7 @@ public class Superstructure extends SubsystemBase {
 					() -> RobotContainer.aiming.calculateSimShot(
 						FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
-			autoScoringTrigger.whileTrue(
+			shouldAutoScoreTrigger.whileTrue(
 				shooter.setSimParameters(
 					() -> RobotContainer.aiming.calculateSimShot(
 						HUB, shooter.withConstantVelocity, shooter.whileMoving)
@@ -74,7 +74,7 @@ public class Superstructure extends SubsystemBase {
 				shooter.setParameters(
 					() -> Aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
-			autoScoringTrigger.whileTrue(
+			shouldAutoScoreTrigger.whileTrue(
 				shooter.setParameters(
 					() -> Aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
 				));
@@ -82,19 +82,19 @@ public class Superstructure extends SubsystemBase {
 	}
 
 	public final Trigger scoringModeTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldBeScoring());
+			new Trigger(() -> DriverStation.isEnabled() && shouldBeScoring());
 
 	public final Trigger ferryLeftTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryLeft());
+			new Trigger(() -> DriverStation.isEnabled() && shouldFerryLeft());
 
 	public final Trigger ferryRightTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryRight());
+			new Trigger(() -> DriverStation.isEnabled() && shouldFerryRight());
 
 	public final Trigger shouldStowHoodTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldStowHood());
+			new Trigger(() -> DriverStation.isEnabled() && shouldStowHood());
 
-	public final Trigger autoScoringTrigger =
-			new Trigger(() -> DriverStation.isAutonomous() && shouldBeScoring());
+	public final Trigger shouldAutoScoreTrigger =
+			new Trigger(() -> DriverStation.isAutonomous() && shouldAutoScore());
 
 	@Override
 	public void periodic() {
@@ -201,6 +201,18 @@ public class Superstructure extends SubsystemBase {
         // 	&& isInScoringZone()
         // 	&& HubTracker.isActive(DriverStation.getAlliance().get(), HubTracker.getCurrentShift().get());
 	}
+
+	public boolean shouldAutoScore(){
+		if(!AllianceManager.isAllianceKnown()) return false;
+		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+		for (Translation2d[] zone : FieldConstants.Zones.TRENCH_ZONES) {
+            if (robotPose.getX() >= zone[0].getX()
+                    && robotPose.getX() <= zone[1].getX()
+                    && robotPose.getY() >= zone[0].getY()
+                    && robotPose.getY() <= zone[1].getY()) {
+                return true;
+		}
+	}}
 
     public boolean shouldFerryLeft() {
 		if(!AllianceManager.isAllianceKnown()) return false;
