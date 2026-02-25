@@ -97,10 +97,10 @@ public class Shooter extends SubsystemBase {
 
     public Command setSimAutoParameters(Supplier<SimShootingParameters> paramsSupplier) {
         return Commands.parallel(
-            Commands.runOnce(() -> {
+            Commands.run(() -> {
                 SimShootingParameters params = paramsSupplier.get();
                 Logger.recordOutput("launchFuel()/At Setpoint", RobotContainer.shooter.atSetpoint());
-                launchFuel(() -> params.exitVelocity(), 6);
+                launchFuelAuto(() -> params.exitVelocity(), 6);
                 Logger.recordOutput("setSimParameters()/Robot Relative Turret Angle", params.robotRelativeTurretAngle().in(Rotations));
                 Logger.recordOutput("setSimParameters()/Hood Angle", params.hoodAngle().in(Rotations));
                 Logger.recordOutput("setSimParameters()/Exit Velocity", params.exitVelocity().in(MetersPerSecond));
