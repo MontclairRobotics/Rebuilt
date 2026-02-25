@@ -32,7 +32,6 @@ import frc.robot.util.HubTracker;
 import frc.robot.util.sim.FuelSim.Hub;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
-import frc.robot.subsystems.shooter.spindexer.serializer.Serializer;
 
 public class Shooter extends SubsystemBase {
 
