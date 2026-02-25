@@ -61,4 +61,28 @@ public class PivotIOSim implements PivotIO {
     public Angle getAngle() {
         return Radians.of(sim.getAngleRads());
     }
+
+	@Override
+	public void setGains(double kP, double kD, double kS, double kG) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setGains'");
+	}
+
+	@Override
+	public void setMotionMagic(double velocity, double acceleration, double jerk) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setMotionMagic'");
+	}
+
+	@Override
+	public void setAngle(Angle angle) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setAngle'");
+	}
+
+	@Override
+	public boolean isAtSetpoint() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'isAtSetpoint'");
+	}
 }

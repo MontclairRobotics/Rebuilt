@@ -33,7 +33,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
     private final StatusSignal<Double> setpointAccelerationSignal;
     private final StatusSignal<Voltage> appliedVoltageSignal;
     private final StatusSignal<Current> currentDrawAmpsSignal;
-    private final StatusSignal<Temperature> tempCelciuSignal;
+    private final StatusSignal<Temperature> tempCelciusSignal;
 
     private final VelocityTorqueCurrentFOC request = new VelocityTorqueCurrentFOC(0);
     private final NeutralOut neutralOut = new NeutralOut();
@@ -62,7 +62,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
         setpointAccelerationSignal = leftMotor.getClosedLoopReferenceSlope();
         appliedVoltageSignal = leftMotor.getMotorVoltage();
         currentDrawAmpsSignal = leftMotor.getTorqueCurrent();
-        tempCelciuSignal = leftMotor.getDeviceTemp();
+        tempCelciusSignal = leftMotor.getDeviceTemp();
 
         PhoenixUtil.registerStatusSignals(
             Hertz.of(50),
@@ -72,7 +72,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
             setpointAccelerationSignal,
             appliedVoltageSignal,
             currentDrawAmpsSignal,
-            tempCelciuSignal
+            tempCelciusSignal
         );
 
         leftMotor.optimizeBusUtilization();
@@ -88,7 +88,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
             setpointAccelerationSignal,
             appliedVoltageSignal,
             currentDrawAmpsSignal,
-            tempCelciuSignal
+            tempCelciusSignal
         );
 
         inputs.rightMotorConnected = inputs.leftMotorConnected;
@@ -100,7 +100,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
 
         inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
         inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
-        inputs.tempCelsius = tempCelciuSignal.getValueAsDouble();
+        inputs.tempCelsius = tempCelciusSignal.getValueAsDouble();
         inputs.isAtSetpoint = isAtSetpoint();
     }
 

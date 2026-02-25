@@ -2,9 +2,25 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 
 public class PivotConstants {
@@ -13,6 +29,10 @@ public class PivotConstants {
 	public static final int CAN_ID = -1;
 	public static final int ENCODER_PORT = 0; //TODO: set this number
 	public static final double ENCODER_OFFSET = 0;
+
+	public static final double ROTOR_TO_SENSOR_RATIO = 0; //TODO: Set
+	public static final double SENSOR_TO_MECHANISM_RATIO = 0; //TODO: Set
+	public static final double PIVOT_ENCODER_OFFSET = 0; //TODO: Set
 
 	// constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);
@@ -33,5 +53,51 @@ public class PivotConstants {
 	public static final double kG = 0;
 	public static final double kV = 0;
 
-	public static final Angle TOLERANCE = Rotations.of(0.002);
+	public static final Angle TOLERANCE = Degrees.of(1);
+
+	public static final double STATOR_CURRENT_LIMIT = 80; // Amps
+	public static final double SUPPLY_CURRENT_LIMIT = 40; // Amps
+
+	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(1);
+	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(2);
+	public static final double MOTION_MAGIC_JERK = 40; // Rotations Per Second Per Second Per Second
+	public static AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(0.05);
+
+	// Configs
+	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
+		.withKP(kP).withKD(kD)
+		.withKS(kS).withKG(kG)
+		.withGravityType(GravityTypeValue.Arm_Cosine);
+
+	public static final Slot0Configs SIM_SLOT0_CONFIGS = new Slot0Configs()
+		.withKP(0).withKD(0)
+		.withKS(0).withKG(0); //TODO: SET THESE
+
+	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
+		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)
+		.withStatorCurrentLimitEnable(true)
+		.withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
+		.withSupplyCurrentLimitEnable(true);
+
+	public static final MotorOutputConfigs MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
+		.withInverted(InvertedValue.Clockwise_Positive)
+		.withNeutralMode(NeutralModeValue.Brake);
+
+	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()
+		.withFeedbackRemoteSensorID(ENCODER_PORT)
+		.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
+		.withRotorToSensorRatio(ROTOR_TO_SENSOR_RATIO)
+		.withSensorToMechanismRatio(SENSOR_TO_MECHANISM_RATIO);
+
+	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
+		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)
+		.withMotionMagicAcceleration(MOTION_MAGIC_ACCELERATION)
+		.withMotionMagicJerk(MOTION_MAGIC_JERK);
+
+	public static final CANcoderConfiguration ENCODER_CONFIGS = new CANcoderConfiguration()
+        .withMagnetSensor(
+            new MagnetSensorConfigs()
+                .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+                .withMagnetOffset(PIVOT_ENCODER_OFFSET)
+        );
 }

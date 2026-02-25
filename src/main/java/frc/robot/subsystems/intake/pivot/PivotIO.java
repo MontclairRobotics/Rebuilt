@@ -1,6 +1,9 @@
 package frc.robot.subsystems.intake.pivot;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+
 import org.littletonrobotics.junction.AutoLog;
 
 public interface PivotIO {
@@ -24,4 +27,12 @@ public interface PivotIO {
      * @return the Angle of the pivot
      */
     public Angle getAngle();
+
+    public void setAngle(Angle angle);
+
+    public boolean isAtSetpoint();
+
+    public void setGains(double kP, double kD, double kS, double kG);
+
+    public void setMotionMagic(AngularVelocity velocity, AngularAcceleration acceleration, double jerk);
   }
