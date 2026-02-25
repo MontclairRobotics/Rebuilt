@@ -1,8 +1,14 @@
 package frc.robot;
 
+import java.io.IOException;
+
+import org.json.simple.parser.ParseException;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.FileVersionException;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -82,82 +88,61 @@ public class Auto extends SubsystemBase {
 
       }
     }
+
+    SequentialCommandGroup followPathCommands = new SequentialCommandGroup();
+
     currentPos = autoString.charAt(1);
     try {
-      if(currentPos != 'D' || autoString.charAt(2) == '0' && currentPos != 'O' || autoString.charAt(2) == '0') {
-        if(DriverStation.getAlliance().get() == Alliance.Blue) {
-          autoCommand.addCommands(
-            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-            Commands.race(
-              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3))),
-              RobotContainer.rollers.intakeCommand()
-            )
-          );
-        } else {
-          autoCommand.addCommands(
-            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-            Commands.race(
-              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)).flipPath()),
-              RobotContainer.rollers.intakeCommand()
-            )
-          );
-        }
+      if(DriverStation.getAlliance().get() == Alliance.Blue) {
+        followPathCommands.addCommands(
+          Commands.race(
+            AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)))
+          )
+        );
       } else {
-        if(DriverStation.getAlliance().get() == Alliance.Blue) {
-          autoCommand.addCommands(
-            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-            Commands.race(
-              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3))),
-              Commands.sequence(
-                Commands.waitUntil(() -> Superstructure.isInScoringZone()),
-                RobotContainer.pivot.goToAngleCommand(PivotConstants.MAX_ANGLE)
-              ),
-              RobotContainer.rollers.intakeCommand()
-            )
-          );
-        } else {
-          autoCommand.addCommands(
-           RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-            Commands.race(
-              AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)).flipPath()),
-              Commands.sequence(
-                Commands.waitUntil(() -> Superstructure.isInScoringZone()),
-                RobotContainer.pivot.goToAngleCommand(PivotConstants.MAX_ANGLE)
-              ),
-              RobotContainer.rollers.intakeCommand()
-            )
-          );
-        }
+        followPathCommands.addCommands(
+          RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+          Commands.race(
+            AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)).flipPath())
+          )
+        );
       }
     } catch (Exception e) {
-      error.setString("Unknown error");
+      error.setString("Unknown error 1");
     }
 
     for (int i = 3; i < autoString.length(); i += 2) {
       try {
         if(DriverStation.getAlliance().get() == Alliance.Blue) {
-          autoCommand.addCommands(
-            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+          followPathCommands.addCommands(
             AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentPos + autoString.substring(i, i + 2)))
           );
         } else {
-          autoCommand.addCommands(
-            RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+          followPathCommands.addCommands(
             AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentPos + autoString.substring(i, i + 2)).flipPath())
           );
         }
 
         currentPos = autoString.charAt(i);
-        if(currentPos == 'D') {
-          autoCommand.addCommands(
-            RobotContainer.pivot.goToAngleCommand(PivotConstants.MAX_ANGLE)
-          );
-        }
         currentPos = autoString.charAt(i);
       } catch (Exception e) {
-        error.setString("Unknown issue");
+        error.setString("Unknown error 2");
       }
     }
+
+    autoCommand.addCommands(
+      Commands.parallel(
+        Commands.runOnce(
+          () -> {try {
+            RobotContainer.drivetrain.resetPose(new Pose2d(PathPlannerPath.fromPathFile(autoString.substring(0,3)).getPoint(0).position, PathPlannerPath.fromPathFile(autoString.substring(0,3)).getInitialHeading()));
+          } catch (FileVersionException | IOException | ParseException e) {
+            e.printStackTrace();
+          }}
+        ),
+        followPathCommands,
+        RobotContainer.rollers.intakeCommand()
+      )
+    );
 
     return autoCommand;
   }
