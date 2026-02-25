@@ -52,7 +52,7 @@ public class Hood extends SubsystemBase {
 		Logger.processInputs("Hood", inputs);
 		visualization.update();
 		visualization.log();
-        updateTunables();
+        // updateTunables();
 	}
 
     public Angle getAngle() {

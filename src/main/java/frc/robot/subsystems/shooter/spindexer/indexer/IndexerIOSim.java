@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter.spindexer.indexer;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.IndexerConstants.*;
 
 import edu.wpi.first.math.MathUtil;
@@ -8,7 +9,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -20,7 +20,6 @@ public class IndexerIOSim implements IndexerIO {
 
 	private PIDController pidController;
 	private SimpleMotorFeedforward feedforward;
-    private AngularVelocityUnit RotationsPerSecond;
 
 	public IndexerIOSim() {
 		sim = new FlywheelSim(
@@ -29,7 +28,8 @@ public class IndexerIOSim implements IndexerIO {
 				MOMENT_OF_INERTIA,
 				GEARING
 			),
-			DCMotor.getKrakenX60Foc(CAN_ID), null
+			DCMotor.getKrakenX60Foc(CAN_ID),
+			0.0
 		);
 
 		pidController = new PIDController(

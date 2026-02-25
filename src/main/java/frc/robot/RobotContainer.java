@@ -16,6 +16,7 @@ import static edu.wpi.first.units.Units.Inches;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
@@ -179,9 +180,9 @@ public class RobotContainer {
 	}
 
 	private void configureBindings() {
-		// drivetrain.setDefaultCommand(new JoystickDriveCommand());
-		hood.setDefaultCommand(hood.joystickControlCommand());
-		turret.setDefaultCommand(turret.joystickControlCommand());
+		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
+		// hood.setDefaultCommand(hood.joystickControlCommand());
+		// turret.setDefaultCommand(turret.joystickControlCommand());
 		// flywheel.setDefaultCommand(flywheel.joystickControlCommand());
 		// driverController.L2().whileTrue(spindexer.spinCommand()).onFalse(spindexer.stopCommand());
 

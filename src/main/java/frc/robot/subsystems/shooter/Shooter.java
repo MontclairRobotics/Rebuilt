@@ -28,6 +28,7 @@ import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.turret.Turret;
+import frc.robot.util.HubTracker;
 import frc.robot.util.sim.FuelSim.Hub;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
@@ -65,6 +66,7 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Fuel/Hopper Count", hopperCount);
         Logger.recordOutput("Fuel/Blue Score", Hub.BLUE_HUB.getScore());
         Logger.recordOutput("Fuel/Red Score", Hub.RED_HUB.getScore());
+        Logger.recordOutput("Hub/Match Time", HubTracker.getMatchTime());
     }
 
     public int getHopperCount() {

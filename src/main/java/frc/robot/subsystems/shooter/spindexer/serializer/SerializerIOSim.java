@@ -28,7 +28,8 @@ public class SerializerIOSim implements SerializerIO {
 				MOMENT_OF_INERTIA,
 				GEARING
 			),
-			DCMotor.getKrakenX60Foc(CAN_ID), null
+			DCMotor.getKrakenX60Foc(CAN_ID),
+			0.0
 		);
 
 		pidController = new PIDController(

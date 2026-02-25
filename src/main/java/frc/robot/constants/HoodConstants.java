@@ -74,7 +74,7 @@ public class HoodConstants {
 		.withGravityType(GravityTypeValue.Arm_Cosine);
 
 	public static final Slot0Configs SIM_SLOT0_CONFIGS = new Slot0Configs()
-		.withKP(2000).withKD(0)
+		.withKP(1000).withKD(0)
 		.withKS(0).withKG(0.3);
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
