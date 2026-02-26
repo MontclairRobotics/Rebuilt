@@ -17,7 +17,7 @@ public class Intake {
 
     public Command stopCommand(){
         return Commands.parallel(
-            rollers.stopCommand(),
+            rollers.spinDownCommand(),
             pivot.stopCommand()
         );
     }
@@ -25,15 +25,8 @@ public class Intake {
     public Command intakeCommand(){
         return Commands.parallel(
             pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-            rollers.intakeCommand()
+            rollers.spinUpCommand()
         );
     }
 
-    public Command wiggleCommand(){
-        return Commands.sequence(
-            rollers.intakeCommand().withTimeout(0.13),
-            rollers.outtakeCommand().withTimeout(0.13),
-            rollers.intakeCommand().withTimeout(0.13)
-        );
-    }
 }
