@@ -211,8 +211,11 @@ public class Superstructure extends SubsystemBase {
                     && robotPose.getY() >= zone[0].getY()
                     && robotPose.getY() <= zone[1].getY()) {
                 return true;
+		 	}
 		}
-	}}
+
+		return false;
+	}
 
     public boolean shouldFerryLeft() {
 		if(!AllianceManager.isAllianceKnown()) return false;

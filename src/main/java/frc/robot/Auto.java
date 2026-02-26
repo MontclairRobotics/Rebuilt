@@ -11,14 +11,12 @@ import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.PivotConstants;
 
 public class Auto extends SubsystemBase {
   private char currentPos;
@@ -27,6 +25,7 @@ public class Auto extends SubsystemBase {
   private ShuffleboardTab autoTab;
   private GenericEntry autoString;
   private GenericEntry error;
+  private GenericEntry alliance;
 
   private Command autoCommand;
 
@@ -34,6 +33,7 @@ public class Auto extends SubsystemBase {
     autoTab = Shuffleboard.getTab("Auto");
     autoString = autoTab.add("Auto string","Enter auto string").withSize(2,1).getEntry();
     error = autoTab.add("Error", "No errors").withSize(2,1).withPosition(0,1).getEntry();
+    alliance = autoTab.add("Alliance", "Unkown alliance").withSize(2,1).withPosition(0,2).getEntry();
   }
 
   public boolean isAutoValid(String autoString) {
@@ -93,59 +93,60 @@ public class Auto extends SubsystemBase {
 
     currentPos = autoString.charAt(1);
     try {
-      if(DriverStation.getAlliance().get() == Alliance.Blue) {
-        followPathCommands.addCommands(
-          Commands.race(
-            AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)))
-          )
-        );
-      } else {
-        followPathCommands.addCommands(
-          RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-          Commands.race(
-            AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)).flipPath())
-          )
-        );
-      }
-    } catch (Exception e) {
-      error.setString("Unknown error 1");
+      followPathCommands.addCommands(
+        AutoBuilder.followPath(PathPlannerPath.fromPathFile(autoString.substring(0, 3)))
+      );
+    } catch(Exception e) {
+      error.setString("Path issue");
     }
 
     for (int i = 3; i < autoString.length(); i += 2) {
       try {
-        if(DriverStation.getAlliance().get() == Alliance.Blue) {
-          followPathCommands.addCommands(
-            AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentPos + autoString.substring(i, i + 2)))
-          );
-        } else {
-          followPathCommands.addCommands(
-            AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentPos + autoString.substring(i, i + 2)).flipPath())
-          );
-        }
-
-        currentPos = autoString.charAt(i);
-        currentPos = autoString.charAt(i);
-      } catch (Exception e) {
-        error.setString("Unknown error 2");
+        followPathCommands.addCommands(
+          AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentPos + autoString.substring(i, i + 2)))
+        );
+      } catch(Exception e) {
+        error.setString("Path issue");
       }
+      currentPos = autoString.charAt(i);
+      currentPos = autoString.charAt(i);
     }
 
-    autoCommand.addCommands(
-      Commands.parallel(
-        Commands.runOnce(
-          () -> {try {
-            RobotContainer.drivetrain.resetPose(
-              new Pose2d(PathPlannerPath.fromPathFile(autoString.substring(0,3)).getPoint(0).position, 
-              PathPlannerPath.fromPathFile(autoString.substring(0,3)).getInitialHeading())
-            );
-          } catch (FileVersionException | IOException | ParseException e) {
-            e.printStackTrace();
-          }}
-        ),
-        followPathCommands,
-        RobotContainer.rollers.intakeCommand()
-      )
-    );
+    if(DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+      autoCommand.addCommands(
+        Commands.parallel(
+          Commands.runOnce(
+            () -> {try {
+              RobotContainer.drivetrain.resetPose(
+                new Pose2d(PathPlannerPath.fromPathFile(autoString.substring(0,3)).getPoint(0).position,
+                PathPlannerPath.fromPathFile(autoString.substring(0,3)).getInitialHeading())
+              );
+            } catch (FileVersionException | IOException | ParseException e) {
+              e.printStackTrace();
+            }}
+          ),
+          followPathCommands,
+          RobotContainer.rollers.intakeCommand()
+        )
+      );
+    } else {
+      autoCommand.addCommands(
+        Commands.parallel(
+          Commands.runOnce(
+            () -> {try {
+              RobotContainer.drivetrain.resetPose(
+                new Pose2d(PathPlannerPath.fromPathFile(autoString.substring(0,3)).flipPath().getPoint(0).position,
+                PathPlannerPath.fromPathFile(autoString.substring(0,3)).flipPath().getInitialHeading())
+              );
+            } catch (FileVersionException | IOException | ParseException e) {
+              e.printStackTrace();
+            }}
+          ),
+          followPathCommands,
+          RobotContainer.rollers.intakeCommand()
+        )
+      );
+    }
 
     return autoCommand;
   }
@@ -160,6 +161,7 @@ public class Auto extends SubsystemBase {
 
 
   public void periodic() {
+    alliance.setString(DriverStation.getAlliance().get().toString());
     createAuto(autoString.getString(""));
   }
 }
