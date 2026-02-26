@@ -140,7 +140,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
-        if (RobotContainer.driverController.R2().getAsBoolean() && RobotContainer.shooter.atSetpoint() && hasBalls()) {
+        if (RobotContainer.shotTrigger.getAsBoolean() && RobotContainer.shooter.atSetpoint() && hasBalls()) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
 

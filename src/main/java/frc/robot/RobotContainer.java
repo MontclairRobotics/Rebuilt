@@ -16,6 +16,7 @@ import static edu.wpi.first.units.Units.Inches;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
@@ -46,6 +47,7 @@ import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.util.PoseUtils;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.sim.FuelSim;
@@ -88,6 +90,8 @@ public class RobotContainer {
 
 	private boolean withConstantVelocity = false;
 	private boolean whileMoving = true;
+
+	public static Trigger shotTrigger;
 
 	public RobotContainer() {
 		System.out.println("Constants.CURRENT_MODE: " + Constants.CURRENT_MODE);
@@ -181,9 +185,25 @@ public class RobotContainer {
 
 	private void configureBindings() {
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
-		pivot.setDefaultCommand(pivot.joystickControlCommand());
-		driverController.circle().onTrue(Commands.run(() -> pivot.setPivotAngle(Degrees.of(120)), pivot)).onFalse(pivot.stopCommand());
-		driverController.triangle().onTrue(Commands.run(() -> pivot.setPivotAngle(Degrees.of(0)), pivot)).onFalse(pivot.stopCommand());
+
+		driverController.triangle()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
+		driverController.square()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
+		driverController.cross()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
+		driverController.circle()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
+		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
+
+		shotTrigger = operatorController.circle();
+		operatorController.R1()
+			.onTrue(Commands.run(() -> pivot.setPivotAngle(Degrees.of(120)), pivot))
+			.onFalse(pivot.stopCommand());
+		operatorController.L1()
+			.onTrue(Commands.run(() -> pivot.setPivotAngle(Degrees.of(0)), pivot))
+			.onFalse(pivot.stopCommand());
+		
 
 		// hood.setDefaultCommand(hood.joystickControlCommand());
 		// turret.setDefaultCommand(turret.joystickControlCommand());
@@ -204,18 +224,10 @@ public class RobotContainer {
 
 		//.times(1).minus(Rotations.of(drivetrain.getWrappedHeading().getRotations()))
 		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed),Degrees.of(90-hoodAngle),turret.getAngleToHub(),TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
-		// driverController.triangle()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
-		// driverController.square()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
-		// driverController.cross()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
-		// driverController.circle()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
+		
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
-		driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
+		// driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
 		// zeros gyro
-		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 	}
 
 	public Command getAutonomousCommand() {
