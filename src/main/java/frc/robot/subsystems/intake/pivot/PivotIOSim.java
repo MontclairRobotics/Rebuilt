@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.PivotConstants.*;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -13,16 +15,16 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class PivotIOSim implements PivotIO {
 
- public DCMotor motor;
-	public SingleJointedArmSim sim;
+	private SingleJointedArmSim sim;
+	private PIDController pidController = new  PIDController(0, 0, 0);
+	private ArmFeedforward feedforward = new ArmFeedforward(0, 0, 0);
 
 	private double appliedVoltage;
 
 	public PivotIOSim() {
-		motor = DCMotor.getKrakenX60(1);
 
 		sim = new SingleJointedArmSim(
-			motor,
+			DCMotor.getKrakenX44Foc(1),
 			GEARING,
 			MOMENT_OF_INERTIA,
 			ARM_LENGTH.in(Meters),
@@ -46,7 +48,7 @@ public class PivotIOSim implements PivotIO {
 		inputs.angle = getAngle().in(Rotations);
 		inputs.tempCelsius = 0;
 		inputs.encoderConnected = false;
-
+		inputs.isAtSetpoint = isAtSetpoint();
 	}
 
 	@Override
@@ -65,26 +67,30 @@ public class PivotIOSim implements PivotIO {
     }
 
 	@Override
-	public void setGains(double kP, double kD, double kS, double kG) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'setGains'");
-	}
-
-	@Override
 	public void setAngle(Angle angle) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'setAngle'");
+
 	}
 
 	@Override
 	public boolean isAtSetpoint() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'isAtSetpoint'");
+		return pidController.atSetpoint();
 	}
 
-	@Override
-	public void setMotionMagic(AngularVelocity velocity, AngularAcceleration acceleration, double jerk) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'setMotionMagic'");
-	}
+    @Override
+    public void setGains(double kP, double kD, double kS, double kG) {
+        pidController.setP(kP);
+        pidController.setD(kD);
+        feedforward.setKs(kS);
+        feedforward.setKg(kG);
+    }
+
+    @Override
+    public void setMotionMagic(AngularVelocity velocity, AngularAcceleration acceleration, double jerk) {
+        // does nothing, not necessary
+    }
+
+    @Override
+    public void resetEncoderPosition() {
+
+    }
 }

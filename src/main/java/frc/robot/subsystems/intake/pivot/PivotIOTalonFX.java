@@ -27,10 +27,26 @@ public class PivotIOTalonFX implements PivotIO {
 
 
 	public PivotIOTalonFX() {
-		motor = new TalonFX(CAN_ID);
-		motor.setNeutralMode(NeutralModeValue.Brake);
+        encoder = new CANcoder(ENCODER_PORT);
 
-        encoder = new CANcoder(ENCODER_ID, CAN_BUS);
+        configs = new TalonFXConfiguration()
+            .withSlot0(SLOT0_CONFIGS)
+            .withCurrentLimits(CURRENT_LIMITS_CONFIGS)
+            .withMotorOutput(MOTOR_OUTPUT_CONFIGS)
+            .withFeedback(FEEDBACK_CONFIGS)
+            .withMotionMagic(MOTION_MAGIC_CONFIGS);
+
+        configs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        configs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        configs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAX_ANGLE.in(Rotations);
+        configs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MIN_ANGLE.in(Rotations);
+
+        encoder.getConfigurator().apply(ENCODER_CONFIGS);
+        motor.getConfigurator().apply(configs);
+        encoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
+
+		motor = new TalonFX(MOTOR_PORT);
+		motor.setNeutralMode(NeutralModeValue.Brake);
 	}
 
 	public void updateInputs(PivotIOInputs inputs) {
@@ -39,6 +55,7 @@ public class PivotIOTalonFX implements PivotIO {
 		inputs.tempCelsius = motor.getDeviceTemp().getValueAsDouble();
 		inputs.angle = getAngle().in(Rotations);
 		inputs.encoderConnected = encoder.isConnected();
+		inputs.isAtSetpoint = isAtSetpoint();
 	}
 
 	@Override
@@ -55,6 +72,11 @@ public class PivotIOTalonFX implements PivotIO {
 	public void stop() {
 		motor.stopMotor();
 	}
+
+    @Override
+    public void resetEncoderPosition() {
+        encoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
+    }
 
     @Override
     public void setGains(double kP, double kD, double kS, double kG) {
@@ -85,7 +107,8 @@ public class PivotIOTalonFX implements PivotIO {
 
 	@Override
 	public boolean isAtSetpoint() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'isAtSetpoint'");
+        double error = motor.getClosedLoopError().getValueAsDouble();
+        return Math.abs(error) < TOLERANCE.in(Rotations)
+            && Math.abs(motor.getVelocity().getValueAsDouble()) < MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond);
 	}
 }

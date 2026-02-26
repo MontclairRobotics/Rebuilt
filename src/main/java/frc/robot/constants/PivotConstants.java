@@ -26,9 +26,9 @@ import edu.wpi.first.units.measure.Distance;
 public class PivotConstants {
 
 	// ports & offsets
-	public static final int CAN_ID = -1;
-	public static final int ENCODER_PORT = 0; //TODO: set this number
-	public static final double ENCODER_OFFSET = 0;
+	public static final int MOTOR_PORT = -1;
+	public static final int ENCODER_PORT = -1; //TODO: set this number
+	public static final double ENCODER_OFFSET = 0; //TODO: set number
 
 	public static final double ROTOR_TO_SENSOR_RATIO = 0; //TODO: Set
 	public static final double SENSOR_TO_MECHANISM_RATIO = 0; //TODO: Set
@@ -61,7 +61,7 @@ public class PivotConstants {
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(1);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(2);
 	public static final double MOTION_MAGIC_JERK = 40; // Rotations Per Second Per Second Per Second
-	public static AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(0.05);
+	public static final AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(0.05);
 
 	// Configs
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
