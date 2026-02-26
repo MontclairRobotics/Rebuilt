@@ -181,6 +181,10 @@ public class RobotContainer {
 
 	private void configureBindings() {
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
+		pivot.setDefaultCommand(pivot.joystickControlCommand());
+		driverController.circle().onTrue(Commands.run(() -> pivot.setPivotAngle(Degrees.of(120)), pivot)).onFalse(pivot.stopCommand());
+		driverController.triangle().onTrue(Commands.run(() -> pivot.setPivotAngle(Degrees.of(0)), pivot)).onFalse(pivot.stopCommand());
+
 		// hood.setDefaultCommand(hood.joystickControlCommand());
 		// turret.setDefaultCommand(turret.joystickControlCommand());
 		// flywheel.setDefaultCommand(flywheel.joystickControlCommand());

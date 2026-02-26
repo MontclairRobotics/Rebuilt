@@ -16,7 +16,7 @@ public class PivotConstants {
 
 	// constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);
-	public static final Angle MAX_ANGLE = Degrees.of(90);
+	public static final Angle MAX_ANGLE = Degrees.of(120);
 
 	// physical properties
 	public static final double GEARING = 50; // rotations of the motor shaft per rotations of the intake pivot
@@ -24,13 +24,13 @@ public class PivotConstants {
 	public static final double MOMENT_OF_INERTIA = 1; // TODO: set
 
 	// pid gains
-	public static final double kP = 0;
+	public static final double kP = 50;
 	public static final double kI = 0;
 	public static final double kD = 0;
 
 	// ff gains
 	public static final double kS = 0;
-	public static final double kG = 0;
+	public static final double kG = 1;
 	public static final double kV = 0;
 
 	public static final Angle TOLERANCE = Rotations.of(0.002);

@@ -85,9 +85,11 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean shouldIntake() {
-        double intakeProbability = Math.max(0, 1 - RobotContainer.drivetrain.getFieldRelativeLinearSpeed().in(MetersPerSecond) / 3);
+        double intakeProbability = Math.max(0, 1 - RobotContainer.drivetrain.getFieldRelativeLinearSpeed().in(MetersPerSecond) / 4);
         return hopperCount < HOPPER_CAPACITY
-            && Math.random() < intakeProbability;
+            && Math.random() < intakeProbability
+            && RobotContainer.pivot.io.getAngle().in(Degrees) < 3
+            && RobotContainer.operatorController.L1().getAsBoolean();
     }
 
     public boolean hasBalls() {
@@ -146,7 +148,7 @@ public class Shooter extends SubsystemBase {
                 lastSimShotTime = currentTime;
                 removeBall();
 
-                LinearVelocity exitVelocity = velocitySupplier.get().times(1 + ((Math.random() * 0.1)-0.05));
+                LinearVelocity exitVelocity = velocitySupplier.get().times(1 + ((Math.random() * 0.05)-0.025));
                 Angle robotRelativeTurretAngle = RobotContainer.turret.getRobotRelativeAngle();
                 Angle hoodAngle = RobotContainer.hood.getAngle();
 

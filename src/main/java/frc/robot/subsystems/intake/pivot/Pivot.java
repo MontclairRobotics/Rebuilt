@@ -72,6 +72,7 @@ public class Pivot extends SubsystemBase {
 
 	public void joystickControl() {
 		double voltage = MathUtil.copyDirectionPow(MathUtil.applyDeadband(-RobotContainer.driverController.getRightY(), 0.04), 1.5) * 12;
+		voltage += feedforward.calculate(io.getAngle().in(Radians), 0);
 		Logger.recordOutput("Pivot/JoystickVoltage", voltage);
 		Logger.recordOutput("Pivot/RawAxis", RobotContainer.driverController.getRightY());
 		io.setVoltage(voltage);
