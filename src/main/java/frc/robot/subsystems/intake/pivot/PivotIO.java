@@ -15,6 +15,7 @@ public interface PivotIO {
       public double tempCelsius;
       public double angle;
       public boolean encoderConnected;
+      public boolean isAtSetpoint;
     }
 
     public void updateInputs(PivotIOInputs inputs);
@@ -31,6 +32,8 @@ public interface PivotIO {
     public void setAngle(Angle angle);
 
     public boolean isAtSetpoint();
+
+    public void resetEncoderPosition();
 
     public void setGains(double kP, double kD, double kS, double kG);
 
