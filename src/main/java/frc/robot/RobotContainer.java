@@ -22,8 +22,10 @@ import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.pivot.Pivot;
 import frc.robot.subsystems.intake.pivot.PivotIOSim;
+import frc.robot.subsystems.intake.pivot.PivotIOTalonFX;
 import frc.robot.subsystems.intake.rollers.Rollers;
 import frc.robot.subsystems.intake.rollers.RollersIOSim;
+import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
@@ -99,6 +101,8 @@ public class RobotContainer {
 				serializer = new Serializer(new SerializerIOTalonFX());
 				indexer = new Indexer(new IndexerIOTalonFX());
 				spindexer = new Spindexer(serializer, indexer);
+				pivot = new Pivot(new PivotIOTalonFX());
+				rollers = new Rollers(new RollersIOTalonFX());
 				// shooter = new Shooter(
 				// 	hood, flywheel, turret, spindexer,
 				// 	withConstantVelocity, whileMoving

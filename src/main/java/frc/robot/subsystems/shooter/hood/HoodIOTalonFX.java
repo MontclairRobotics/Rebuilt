@@ -39,8 +39,8 @@ public class HoodIOTalonFX implements HoodIO {
     private final NeutralOut neutralOut = new NeutralOut();
 
     public HoodIOTalonFX() {
-        motor = new TalonFX(CAN_ID, CAN_BUS);
-        encoder = new CANcoder(ENCODER_ID, CAN_BUS);
+        motor = new TalonFX(CAN_ID);
+        encoder = new CANcoder(ENCODER_ID);
 
         config = new TalonFXConfiguration()
             .withSlot0(SLOT0_CONFIGS)

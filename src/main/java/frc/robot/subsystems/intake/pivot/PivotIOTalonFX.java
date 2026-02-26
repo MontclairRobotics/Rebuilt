@@ -4,36 +4,35 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static frc.robot.constants.PivotConstants.*;
-import static frc.robot.constants.TurretConstants.CAN_BUS;
-import static frc.robot.constants.TurretConstants.ENCODER_ID;
+
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public class PivotIOTalonFX implements PivotIO {
 
-	private TalonFX motor;
+	private final TalonFX motor;
+	private final CANcoder encoder;
 
-	private CANcoder encoder;
 	private TalonFXConfiguration configs = new TalonFXConfiguration();
 
     private final MotionMagicVoltage request = new MotionMagicVoltage(0).withEnableFOC(true);
 
 
 	public PivotIOTalonFX() {
-        encoder = new CANcoder(ENCODER_PORT);
+        motor = new TalonFX(MOTOR_PORT, CAN_BUS);
+        encoder = new CANcoder(ENCODER_PORT, CAN_BUS);
 
         configs = new TalonFXConfiguration()
             .withSlot0(SLOT0_CONFIGS)
             .withCurrentLimits(CURRENT_LIMITS_CONFIGS)
-            .withMotorOutput(MOTOR_OUTPUT_CONFIGS)
             .withFeedback(FEEDBACK_CONFIGS)
+            .withMotorOutput(MOTOR_OUTPUT_CONFIGS)
             .withMotionMagic(MOTION_MAGIC_CONFIGS);
 
         configs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
@@ -44,9 +43,6 @@ public class PivotIOTalonFX implements PivotIO {
         encoder.getConfigurator().apply(ENCODER_CONFIGS);
         motor.getConfigurator().apply(configs);
         encoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
-
-		motor = new TalonFX(MOTOR_PORT);
-		motor.setNeutralMode(NeutralModeValue.Brake);
 	}
 
 	public void updateInputs(PivotIOInputs inputs) {

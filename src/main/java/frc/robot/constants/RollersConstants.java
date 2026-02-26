@@ -15,21 +15,21 @@ import edu.wpi.first.units.measure.AngularVelocity;
 
 public class RollersConstants {
 
-	public static final int CAN_ID = -1; // TODO: get
-    public static final CANBus CAN_BUS = new CANBus(""); // on roborio can bus
+	public static final int CAN_ID = 41; // TODO: get
+    public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on roborio can bus
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(1); // TODO: set
 	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(30);
 
-    public static final double kP = 0;
+    public static final double kP = 1;
 	public static final double kD = 0;
-	public static final double kS = 0;
-	public static final double kV = 0;
+	public static final double kS = 12;
+	public static final double kV = 0.29;
 
     public static final double STATOR_CURRENT_LIMIT = 60;
     public static final double SUPPLY_CURRENT_LIMIT = 40;
 
-    public static final double GEARING = 1; // TODO: get
+    public static final double GEARING = 3; // TODO: get
     public static final double MOMENT_OF_INERTIA = 0.02; //TODO: get
 
     public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
@@ -43,7 +43,7 @@ public class RollersConstants {
 		.withSupplyCurrentLimitEnable(true);
 
 	public static final MotorOutputConfigs MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
-		.withInverted(InvertedValue.Clockwise_Positive)
+		.withInverted(InvertedValue.CounterClockwise_Positive)
 		.withNeutralMode(NeutralModeValue.Coast);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()

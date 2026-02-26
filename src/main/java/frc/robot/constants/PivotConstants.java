@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -26,20 +27,21 @@ import edu.wpi.first.units.measure.Distance;
 public class PivotConstants {
 
 	// ports & offsets
-	public static final int MOTOR_PORT = -1;
-	public static final int ENCODER_PORT = -1; //TODO: set this number
-	public static final double ENCODER_OFFSET = 0; //TODO: set number
+	public static final int MOTOR_PORT = 40;
+	public static final int ENCODER_PORT = 39; //TODO: set this number
 
-	public static final double ROTOR_TO_SENSOR_RATIO = 0; //TODO: Set
-	public static final double SENSOR_TO_MECHANISM_RATIO = 0; //TODO: Set
-	public static final double PIVOT_ENCODER_OFFSET = 0; //TODO: Set
+	public static final CANBus CAN_BUS = new CANBus("drivetrain");
+
+	public static final double ROTOR_TO_SENSOR_RATIO = 64; //TODO: Set
+	public static final double SENSOR_TO_MECHANISM_RATIO = 1; //TODO: Set
+	public static final double PIVOT_ENCODER_OFFSET = -0.607689453125; //TODO: Set
 
 	// constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);
 	public static final Angle MAX_ANGLE = Degrees.of(90);
 
 	// physical properties
-	public static final double GEARING = 50; // rotations of the motor shaft per rotations of the intake pivot
+	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // rotations of the motor shaft per rotations of the intake pivot
 	public static final Distance ARM_LENGTH = Meters.of(0.5);
 	public static final double MOMENT_OF_INERTIA = 1; // TODO: set
 
@@ -97,7 +99,7 @@ public class PivotConstants {
 	public static final CANcoderConfiguration ENCODER_CONFIGS = new CANcoderConfiguration()
         .withMagnetSensor(
             new MagnetSensorConfigs()
-                .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+                .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
                 .withMagnetOffset(PIVOT_ENCODER_OFFSET)
         );
 }

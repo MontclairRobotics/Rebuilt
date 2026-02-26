@@ -29,7 +29,7 @@ public class IndexerIOTalonFX implements IndexerIO {
 	private final NeutralOut neutralOut = new NeutralOut();
 
 	public IndexerIOTalonFX() {
-		motor = new TalonFX(CAN_ID);
+		motor = new TalonFX(CAN_ID, CAN_BUS);
 
 		config = new TalonFXConfiguration()
 			.withSlot0(SLOT0_CONFIGS)

@@ -33,14 +33,12 @@ public class RollersIOTalonFX implements RollersIO {
 	private final NeutralOut neutralOut = new NeutralOut();
 
 	public RollersIOTalonFX() {
-		motor = new TalonFX(CAN_ID);
+		motor = new TalonFX(CAN_ID, CAN_BUS);
 
 		TalonFXConfiguration config = new TalonFXConfiguration();
 		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; // default
 		config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 		motor.getConfigurator().apply(config);
-
-		motor = new TalonFX(CAN_ID);
 
 		config = new TalonFXConfiguration()
 			.withSlot0(SLOT0_CONFIGS)
