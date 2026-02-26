@@ -203,7 +203,7 @@ public class RobotContainer {
 		operatorController.L1()
 			.onTrue(Commands.run(() -> pivot.setPivotAngle(Degrees.of(0)), pivot))
 			.onFalse(pivot.stopCommand());
-		
+
 
 		// hood.setDefaultCommand(hood.joystickControlCommand());
 		// turret.setDefaultCommand(turret.joystickControlCommand());
@@ -224,7 +224,7 @@ public class RobotContainer {
 
 		//.times(1).minus(Rotations.of(drivetrain.getWrappedHeading().getRotations()))
 		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed),Degrees.of(90-hoodAngle),turret.getAngleToHub(),TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
-		
+
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
 		// driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
 		// zeros gyro
