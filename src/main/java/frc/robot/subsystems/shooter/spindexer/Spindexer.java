@@ -22,7 +22,7 @@ public class Spindexer {
 
     public void spinDown() {
         serializer.spinDown();
-        indexer.spinUp();
+        indexer.spinDown();
     }
 
     public Command spinUpCommand() {

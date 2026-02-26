@@ -40,7 +40,7 @@ public class TurretConstants {
 
 	// constraints
 	public static final Angle MIN_ANGLE = Rotations.of(-0.5);
-	public static final Angle MAX_ANGLE = Rotations.of(0.47);
+	public static final Angle MAX_ANGLE = Rotations.of(0.5);
 	public static final Angle ANGLE_TOLERANCE = Degrees.of(3);
 
 	// physical properties
@@ -52,7 +52,7 @@ public class TurretConstants {
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
 	public static final Angle ANGLE_OFFSET = Rotations.of(0.375);
-	public static final Angle ENCODER_OFFSET = Rotations.of(-0.14306640625);
+	public static final Angle ENCODER_OFFSET = Rotations.of(-0.276822265625);
 
 	// pid + ff gains
 	public static final double kP = 130.0555;

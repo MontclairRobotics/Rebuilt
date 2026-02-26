@@ -13,16 +13,16 @@ import edu.wpi.first.units.measure.AngularVelocity;
 
 public class SerializerConstants {
 
-    public static final int CAN_ID = -1;
+    public static final int CAN_ID = 20;
     public static final CANBus CAN_BUS = new CANBus(""); // on roborio can bus
 
     public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.1);
-	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(4.5);
+	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(6);
 
-    public static final double kP = 0;
-	public static final double kD = 0;
-	public static final double kS = 0;
-	public static final double kV = 0;
+    public static final double kP = 4;
+	public static final double kD = 0.2;
+	public static final double kS = 3;
+	public static final double kV = 1.6;
 
     public static final double STATOR_CURRENT_LIMIT = 60;
     public static final double SUPPLY_CURRENT_LIMIT = 40;
@@ -41,7 +41,7 @@ public class SerializerConstants {
 		.withSupplyCurrentLimitEnable(true);
 
 	public static final MotorOutputConfigs MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
-		.withInverted(InvertedValue.Clockwise_Positive)
+		.withInverted(InvertedValue.CounterClockwise_Positive)
 		.withNeutralMode(NeutralModeValue.Coast);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()

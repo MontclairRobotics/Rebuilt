@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static frc.robot.constants.PivotConstants.*;
+import static frc.robot.constants.TurretConstants.CAN_BUS;
+import static frc.robot.constants.TurretConstants.ENCODER_ID;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -13,7 +15,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class PivotIOTalonFX implements PivotIO {
 
@@ -67,7 +68,7 @@ public class PivotIOTalonFX implements PivotIO {
 
 	public Angle getAngle() {
 		if (encoder.isConnected()) {
-			return Rotations.of(encoder.get());
+			return encoder.getPosition().getValue();
 		} else {
 			return motor.getPosition().getValue().div(GEARING);
 		}

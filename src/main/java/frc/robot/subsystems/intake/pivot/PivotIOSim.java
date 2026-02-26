@@ -7,6 +7,8 @@ import static frc.robot.constants.PivotConstants.*;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class PivotIOSim implements PivotIO {
@@ -69,12 +71,6 @@ public class PivotIOSim implements PivotIO {
 	}
 
 	@Override
-	public void setMotionMagic(double velocity, double acceleration, double jerk) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'setMotionMagic'");
-	}
-
-	@Override
 	public void setAngle(Angle angle) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'setAngle'");
@@ -84,5 +80,11 @@ public class PivotIOSim implements PivotIO {
 	public boolean isAtSetpoint() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'isAtSetpoint'");
+	}
+
+	@Override
+	public void setMotionMagic(AngularVelocity velocity, AngularAcceleration acceleration, double jerk) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setMotionMagic'");
 	}
 }

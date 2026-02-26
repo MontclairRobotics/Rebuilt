@@ -47,15 +47,15 @@ public class HoodConstants {
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
 
 	public static final double MOMENT_OF_INERTIA = 0.03038161694; // from CAD on 3/3/2026
-	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.2236328125); // absolute encoder
+	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.2956328125); // absolute encoder
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
 	public static final double HOOD_LOWER_TIME = 0.6;
 
 	// Gains (Tuned 2/22)
-	public static final double kP = 1600;
+	public static final double kP = 600;
 	public static final double kD = 0;
 	public static final double kS = 0;
-	public static final double kG = 0.3;
+	public static final double kG = 0.45;
 
 	public static final Angle TOLERANCE = Degrees.of(1);
 
