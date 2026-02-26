@@ -31,7 +31,7 @@ public class Auto extends SubsystemBase {
 
   public Auto() {
     autoTab = Shuffleboard.getTab("Auto");
-    autoString = autoTab.add("Auto string","Enter auto string").withSize(2,1).getEntry();
+    autoString = autoTab.add("Auto string","").withSize(2,1).getEntry();
     error = autoTab.add("Error", "No errors").withSize(2,1).withPosition(0,1).getEntry();
     alliance = autoTab.add("Alliance", "Unkown alliance").withSize(2,1).withPosition(0,2).getEntry();
   }

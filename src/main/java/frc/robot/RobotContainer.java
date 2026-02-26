@@ -107,7 +107,7 @@ public class RobotContainer {
 				() -> drivetrain.getFieldRelativeSpeeds()
 			);
 			fuelSim.registerIntake(Inches.of(15), Inches.of(22), Inches.of(-15), Inches.of(15));
-			// fuelSim.spawnStartingFuel();
+			fuelSim.spawnStartingFuel();
 		switch (Constants.CURRENT_MODE) {
 		case REAL:
 			flywheel = new Flywheel(new FlywheelIOTalonFX());
