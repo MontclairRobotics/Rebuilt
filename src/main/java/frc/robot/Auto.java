@@ -193,8 +193,6 @@ public class Auto extends SubsystemBase {
       );
     } else {
       autoCommand.addCommands(
-        RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-        Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
         Commands.runOnce(
           () -> {try {
             RobotContainer.drivetrain.resetPose(
@@ -205,10 +203,12 @@ public class Auto extends SubsystemBase {
             e.printStackTrace();
           }}
         ),
-      Commands.parallel(
-        followPathCommands,
-        RobotContainer.rollers.intakeCommand()
-      )
+        RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+        Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
+        Commands.parallel(
+          followPathCommands,
+          RobotContainer.rollers.intakeCommand()
+        )
       );
     }
 
