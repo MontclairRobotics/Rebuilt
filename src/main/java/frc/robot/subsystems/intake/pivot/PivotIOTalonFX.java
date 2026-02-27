@@ -88,7 +88,7 @@ public class PivotIOTalonFX implements PivotIO {
 		if (encoder.isConnected()) {
 			return encoder.getPosition().getValue();
 		} else {
-			return motor.getPosition().getValue().div(GEARING);
+			return motor.getPosition().getValue();
 		}
 	}
 

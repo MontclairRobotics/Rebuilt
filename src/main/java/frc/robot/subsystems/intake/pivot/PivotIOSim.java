@@ -39,7 +39,6 @@ public class PivotIOSim implements PivotIO {
 
 	@Override
 	public void updateInputs(PivotIOInputs inputs) {
-
 		sim.setInputVoltage(appliedVoltage);
 		sim.update(0.02);
 
@@ -91,6 +90,6 @@ public class PivotIOSim implements PivotIO {
 
     @Override
     public void resetEncoderPosition() {
-
+		// does nothing, not necessary
     }
 }
