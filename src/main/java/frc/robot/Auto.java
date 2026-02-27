@@ -20,10 +20,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.PivotConstants;
 
 public class Auto extends SubsystemBase {
   private char currentPos;
-  private char prevPos;
   private double timeToEmptyFuel = 6.0; //TODO: get the actual value
   private double maxFuel = 24.0; //TODO: get the actual value
   private ShuffleboardTab autoTab;
@@ -203,10 +203,12 @@ public class Auto extends SubsystemBase {
             e.printStackTrace();
           }}
         ),
-      Commands.parallel(
-        followPathCommands,
-        RobotContainer.rollers.intakeCommand()
-      )
+        RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+        Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
+        Commands.parallel(
+          followPathCommands,
+          RobotContainer.rollers.intakeCommand()
+        )
       );
     }
 
