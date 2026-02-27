@@ -31,7 +31,7 @@ public class Aiming {
 		TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
 	}
 
-	public ShootingParameters calculateShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
+	public static ShootingParameters calculateShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
 
 		Translation2d targetLocation = target.getLocation();
 		InterpolatingTreeMap<Double, ShotSettings> map;
@@ -92,7 +92,7 @@ public class Aiming {
 		}
 
 		Translation2d aimingVector = virtualTarget.minus(futureTurretPosition);
-		robotRelativeTurretAngle = turret.toRobotRelativeAngle(Rotations.of(aimingVector.getAngle().getRotations()));
+		robotRelativeTurretAngle = RobotContainer.turret.toRobotRelativeAngle(Rotations.of(aimingVector.getAngle().getRotations()));
 		hoodAngle = map.get(virtualDistance).angle();
 		flywheelVelocity = map.get(virtualDistance).flywheelVelocity();
 

@@ -17,6 +17,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -95,8 +96,9 @@ public class Shooter extends SubsystemBase {
         );
     }
 
+
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
-        if (RobotContainer.driverController.R2().getAsBoolean() && RobotContainer.shooter.atSetpoint()) {
+        if ((RobotContainer.driverController.R2().getAsBoolean() || DriverStation.isAutonomous()) && RobotContainer.shooter.atSetpoint()) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
 

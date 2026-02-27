@@ -16,8 +16,6 @@ import static edu.wpi.first.units.Units.Inches;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
@@ -81,6 +79,11 @@ public class RobotContainer {
 	public static Superstructure superstructure;
 	public static Aiming aiming;
 
+	public static Auto auto;
+
+	public static double startingX = 4.430;
+	public static double startingY = 7.440;
+
 	public static SimShootingParameters simShootingParameters = new SimShootingParameters(Degrees.zero(), Degrees.zero(), MetersPerSecond.zero());
 
 	private SwerveDriveSimulation driveSimulation;
@@ -133,6 +136,7 @@ public class RobotContainer {
 		case SIM:
 			flywheel = new Flywheel(new FlywheelIOSim());
 			drivetrain = TunerConstants.createDrivetrain();
+			drivetrain.resetPose(new Pose2d(new Translation2d(4.430,7.440), new Rotation2d(0.0)));
 			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 			turret = new Turret(new TurretIOSim());
 			hood = new Hood(new HoodIOSim());
@@ -148,6 +152,7 @@ public class RobotContainer {
 			fuelSim.enableAirResistance();
 			fuelSim.start();
 			aiming = new Aiming(turret);
+			auto = new Auto();
 			// vision =
 			// 	new Vision(
 			// 		drivetrain::addVisionMeasurement,
@@ -164,7 +169,7 @@ public class RobotContainer {
 				vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 		}
 
-		drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
+		drivetrain.resetPose(new Pose2d(startingX, startingY, new Rotation2d()));
 
 		configureBindings();
 
@@ -173,7 +178,7 @@ public class RobotContainer {
 
 	private void configureBindings() {
 		drivetrain.setDefaultCommand(new JoystickDriveCommand());//.times(1).minus(Rotations.of(drivetrain.getWrappedHeading().getRotations()))
-		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed),Degrees.of(90-hoodAngle),turret.getAngleToHub(),TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
+		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed),Degrees.of(90-hoodAngle),turret.getAngleToPoint(new Translation2d(2,7)),TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
 		// driverController.triangle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
 		// driverController.square()
@@ -189,7 +194,7 @@ public class RobotContainer {
 	}
 
 	public Command getAutonomousCommand() {
-		return Commands.print("No autonomous command configured");
+		return auto.getAutoCommand();
 	}
 
 	/**
@@ -200,7 +205,7 @@ public class RobotContainer {
 	 */
 	public void resetSimulation() {
 		if (Constants.CURRENT_MODE != Constants.Mode.SIM) return;
-		drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
+		drivetrain.resetPose(new Pose2d(startingX, startingY, new Rotation2d()));
 		SimulatedArena.getInstance().resetFieldForAuto();
 	}
 

@@ -1,0 +1,155 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.1313798051912518,
+        "y": 0.1779485802167239
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.43,
+        "y": 0.63
+      },
+      "prevControl": {
+        "x": 4.088531847938564,
+        "y": 0.7769724032640044
+      },
+      "nextControl": {
+        "x": 4.675426812976187,
+        "y": 0.5243650577344446
+      },
+      "isLocked": false,
+      "linkedName": "Right Trench (R)"
+    },
+    {
+      "anchor": {
+        "x": 3.6,
+        "y": 4.035
+      },
+      "prevControl": {
+        "x": 3.0113449472115463,
+        "y": 3.7279391711219283
+      },
+      "nextControl": {
+        "x": 3.8955207565975996,
+        "y": 4.189152840516166
+      },
+      "isLocked": false,
+      "linkedName": "Center (C)"
+    },
+    {
+      "anchor": {
+        "x": 4.43,
+        "y": 7.44
+      },
+      "prevControl": {
+        "x": 4.48399882082211,
+        "y": 7.775267243033205
+      },
+      "nextControl": {
+        "x": 4.301986857719463,
+        "y": 6.645193509210134
+      },
+      "isLocked": false,
+      "linkedName": "Left Trench (L)"
+    },
+    {
+      "anchor": {
+        "x": 0.42,
+        "y": 5.7885333333333335
+      },
+      "prevControl": {
+        "x": 1.3160056847504171,
+        "y": 7.210407946697837
+      },
+      "nextControl": {
+        "x": -0.3044605446131445,
+        "y": 4.638884314023166
+      },
+      "isLocked": false,
+      "linkedName": "Depot (D)"
+    },
+    {
+      "anchor": {
+        "x": 0.42,
+        "y": 0.66
+      },
+      "prevControl": {
+        "x": 0.5053126158120999,
+        "y": 1.2407778577531103
+      },
+      "nextControl": {
+        "x": 0.37464962335908597,
+        "y": 0.35127081214087924
+      },
+      "isLocked": false,
+      "linkedName": "Outpost (O)"
+    },
+    {
+      "anchor": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "prevControl": {
+        "x": 0.43665637911763017,
+        "y": 0.10976176406625798
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 2,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 3,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 4,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 5,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.93,
+    "maxAcceleration": 11.7,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 2818.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}
