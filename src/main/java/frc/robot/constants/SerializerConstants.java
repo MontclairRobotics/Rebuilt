@@ -14,7 +14,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 public class SerializerConstants {
 
     public static final int CAN_ID = 20;
-    public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on roborio can bus
+    public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the canivore
 
     public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.1);
 	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(6);

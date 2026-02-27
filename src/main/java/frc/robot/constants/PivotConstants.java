@@ -27,18 +27,18 @@ import edu.wpi.first.units.measure.Distance;
 public class PivotConstants {
 
 	// ports & offsets
-	public static final int MOTOR_PORT = 40;
-	public static final int ENCODER_PORT = 39; //TODO: set this number
+	public static final int CAN_ID = 40;
+	public static final int ENCODER_ID = 39;
 
-	public static final CANBus CAN_BUS = new CANBus("drivetrain");
+	public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the canivore
 
-	public static final double ROTOR_TO_SENSOR_RATIO = 64; //TODO: Set
-	public static final double SENSOR_TO_MECHANISM_RATIO = 1; //TODO: Set
-	public static final double PIVOT_ENCODER_OFFSET = -0.607689453125; //TODO: Set
+	public static final double ROTOR_TO_SENSOR_RATIO = 64; 
+	public static final double SENSOR_TO_MECHANISM_RATIO = 1; // CANcoder is on the mechanism
+	public static final double ENCODER_OFFSET = -0.607689453125; 
 
 	// constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);
-	public static final Angle MAX_ANGLE = Degrees.of(90);
+	public static final Angle MAX_ANGLE = Degrees.of(120);
 
 	// physical properties
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // rotations of the motor shaft per rotations of the intake pivot
@@ -60,9 +60,9 @@ public class PivotConstants {
 	public static final double STATOR_CURRENT_LIMIT = 80; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 40; // Amps
 
-	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(1);
-	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(2);
-	public static final double MOTION_MAGIC_JERK = 40; // Rotations Per Second Per Second Per Second
+	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(4);
+	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(40);
+	public static final double MOTION_MAGIC_JERK = 100; // Rotations Per Second Per Second Per Second
 	public static final AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(0.05);
 
 	// Configs
@@ -86,7 +86,7 @@ public class PivotConstants {
 		.withNeutralMode(NeutralModeValue.Brake);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()
-		.withFeedbackRemoteSensorID(ENCODER_PORT)
+		.withFeedbackRemoteSensorID(ENCODER_ID)
 		.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
 		.withRotorToSensorRatio(ROTOR_TO_SENSOR_RATIO)
 		.withSensorToMechanismRatio(SENSOR_TO_MECHANISM_RATIO);
@@ -100,6 +100,6 @@ public class PivotConstants {
         .withMagnetSensor(
             new MagnetSensorConfigs()
                 .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
-                .withMagnetOffset(PIVOT_ENCODER_OFFSET)
+                .withMagnetOffset(ENCODER_OFFSET)
         );
 }

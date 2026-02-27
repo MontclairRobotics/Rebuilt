@@ -36,7 +36,7 @@ public class TurretConstants {
 	// ports
 	public static final int CAN_ID = 30;
 	public static final int ENCODER_ID = 29;
-	public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on RoboRio CAN Bus
+	public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the canivore
 
 	// constraints
 	public static final Angle MIN_ANGLE = Rotations.of(-0.5);

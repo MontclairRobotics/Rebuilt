@@ -35,7 +35,7 @@ public class HoodConstants {
 	// CAN
 	public static final int CAN_ID = 33;
 	public static final int ENCODER_ID = 34;
-	public static final CANBus CAN_BUS = new CANBus("turret");
+	public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
 	// Constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);
@@ -65,7 +65,7 @@ public class HoodConstants {
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(1);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(2);
 	public static final double MOTION_MAGIC_JERK = 40; // Rotations Per Second Per Second Per Second
-	public static AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(0.05);
+	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.05);
 
 	// Configs
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()

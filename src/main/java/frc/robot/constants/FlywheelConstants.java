@@ -16,19 +16,19 @@ public class FlywheelConstants {
 	public static final int LEFT_CAN_ID = 32;
 	public static final int RIGHT_CAN_ID = 31;
 
-	public static final CANBus CAN_BUS = new CANBus("turret");
+	public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(1);
 
 	public static final double kP = 30;
 	public static final double kD = 0;
-	public static final double kS = 20.5; // tuned 2.22
+	public static final double kS = 20.5; // tuned 2/22
 	public static final double kV = 0.8;
 
 	public static final double STATOR_CURRENT_LIMIT = 100; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 60; // Amps
 
-	public static final double MOMENT_OF_INERTIA = 0.00233846427; // From CAD on 2026.02.11
+	public static final double MOMENT_OF_INERTIA = 0.00233846427; // From CAD on 2026.02.11, probably wrong
 	public static final double GEARING = 1.10526315785; // to the big flywheel, from Max Pearson on 2026.02.20
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()

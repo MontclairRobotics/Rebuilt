@@ -25,8 +25,8 @@ public class PivotIOTalonFX implements PivotIO {
 
 
 	public PivotIOTalonFX() {
-        motor = new TalonFX(MOTOR_PORT, CAN_BUS);
-        encoder = new CANcoder(ENCODER_PORT, CAN_BUS);
+        motor = new TalonFX(CAN_ID, CAN_BUS);
+        encoder = new CANcoder(ENCODER_ID, CAN_BUS);
 
         configs = new TalonFXConfiguration()
             .withSlot0(SLOT0_CONFIGS)
