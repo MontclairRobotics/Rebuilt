@@ -6,6 +6,7 @@ package frc.robot.subsystems.vision;
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
@@ -18,11 +19,14 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
+
+import com.pathplanner.lib.config.RobotConfig;
 
 public class Vision extends SubsystemBase {
 	private final VisionConsumer consumer; // lamda expression that takes in values and records a vision measurement
@@ -127,7 +131,9 @@ public class Vision extends SubsystemBase {
 						|| observation.pose().getX() < 0.0
 						|| observation.pose().getX() > aprilTagLayout.getFieldLength()
 						|| observation.pose().getY() < 0.0
-						|| observation.pose().getY() > aprilTagLayout.getFieldWidth();
+						|| observation.pose().getY() > aprilTagLayout.getFieldWidth()
+						|| RobotContainer.drivetrain.getAngularSpeed().in(DegreesPerSecond) > 720
+						|| observation.averageTagDistance() > 5.0;
 
 				// Add pose to log
 				if (logCounter % 5 == 0) {

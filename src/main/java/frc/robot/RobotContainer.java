@@ -47,9 +47,12 @@ import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.sim.FuelSim;
+
+import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -113,11 +116,12 @@ public class RobotContainer {
 				// intake = new Intake(pivot, rollers);
 				// superstructure = new Superstructure(shooter);
 				// aiming = new Aiming(turret);
-				// vision =
-				// 	new Vision(
-				// 		drivetrain::addVisionMeasurement,
-				// 		new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
-				// 		new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading));
+				vision =
+					new Vision(
+						drivetrain::addVisionMeasurement,
+						new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
+						new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading),
+						new VisionIOLimelight(camera3Name, () -> drivetrain.odometryHeading));
 
 				break;
 
