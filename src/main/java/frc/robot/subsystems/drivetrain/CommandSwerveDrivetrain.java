@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -86,6 +87,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	/** Swerve request to apply during robot-centric path following */
 	private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds =
 		new SwerveRequest.ApplyRobotSpeeds();
+
+	private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric()
+		.withDeadband(MAX_SPEED.times(0.05))
+		.withRotationalDeadband(MAX_ANGULAR_SPEED.times(0.1))
+		.withDriveRequestType(DriveRequestType.Velocity);
 
 	/* Swerve requests to apply during SysId characterization */
 	private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization =
@@ -202,38 +208,36 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 		try {
 			config = RobotConfig.fromGUISettings();
-		}
-		catch (Exception e) {}
+		} catch (Exception e) {}
 
 		tagLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
 		fieldRelative = true;
-		// configureAutoBuilder();
+		configureAutoBuilder();
 
 	}
 
 	private void configureAutoBuilder() {
 		try {
-		var config = RobotConfig.fromGUISettings();
-		AutoBuilder.configure(
-			() -> getState().Pose, // Supplier of current robot pose
-			this::resetPose, // Consumer for seeding pose against auto
-			() -> getState().Speeds, // Supplier of current robot speeds
-			// Consumer of ChassisSpeeds and feedforwards to drive the robot
-			(speeds, feedforwards) ->
-				setControl(
-					m_pathApplyRobotSpeeds
-						.withSpeeds(speeds)
-						.withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-						.withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-			new PPHolonomicDriveController(
-				// PID constants for translation
-				new PIDConstants(10, 0, 0),
-				// PID constants for rotation
-				new PIDConstants(7, 0, 0)),
-			config,
-			// Assume the path needs to be flipped for Red vs Blue, this is normally the case
-			() -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-			this // Subsystem for requirements
+			AutoBuilder.configure(
+				() -> getState().Pose, // Supplier of current robot pose
+				this::resetPose, // Consumer for seeding pose against auto
+				() -> getState().Speeds, // Supplier of current robot speeds
+				// Consumer of ChassisSpeeds and feedforwards to drive the robot
+				(speeds, feedforwards) ->
+					setControl(
+						m_pathApplyRobotSpeeds
+							.withSpeeds(speeds)
+							.withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+							.withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
+				new PPHolonomicDriveController(
+					// PID constants for translation
+					new PIDConstants(10, 0, 0),
+					// PID constants for rotation
+					new PIDConstants(7, 0, 0)),
+				config,
+				// Assume the path needs to be flipped for Red vs Blue, this is normally the case
+				() -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+				this // Subsystem for requirements
 			);
 		} catch (Exception ex) {
 		DriverStation.reportError(
@@ -259,11 +263,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	 */
 	public static Rotation2d wrapAngle(Rotation2d ang) {
 		double angle = ang.getDegrees();
-		angle = (angle + 180) % 360; // Step 1 and 2
+		angle = (angle + 180) % 360; 
 		if (angle < 0) {
-			angle += 360; // Make sure it's positive
+			angle += 360; 
 		}
-		return Rotation2d.fromDegrees(angle - 180); // Step 3
+		return Rotation2d.fromDegrees(angle - 180); 
 	}
 
 	public Rotation2d getWrappedHeading() {
@@ -281,7 +285,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		);
 	}
 
-	public LinearVelocity getFieldRelativeLinearSpeed() {
+	public LinearVelocity getFieldRelativeLinearVelocity() {
 		return MetersPerSecond.of(getFieldRelativeVelocity().getNorm());
 	}
 
@@ -348,15 +352,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 		ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed);
 
-		if (fieldRelative) {
-			speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getWrappedHeading());
-		}
+		if (!fieldRelative) {
+			speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getWrappedHeading());
+		}	
 
-		SwerveRequest req = new SwerveRequest.ApplyRobotSpeeds()
-			.withSpeeds(speeds)
-			.withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-
-		setControl(req); // actually drives
+		setControl (
+			driveRequest
+				.withVelocityX(speeds.vxMetersPerSecond)
+				.withVelocityY(speeds.vyMetersPerSecond)
+				.withRotationalRate(speeds.omegaRadiansPerSecond)
+		); // actually drives
 	}
 
 	public void setRobotRelativeAngle(Rotation2d angDeg) {
@@ -481,12 +486,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 		odometryHeading = this.getState().Pose.getRotation();
 		fieldRelative = !RobotContainer.driverController.L2().getAsBoolean();
-		Logger.recordOutput("DriveState/FieldRelative", fieldRelative);
-		Logger.recordOutput("DriveState/zero", new Pose3d());
-		Logger.recordOutput("DriveState/zero2", new Pose3d());
-		Logger.recordOutput("DriveState/odometryHeading", odometryHeading);
-		Logger.recordOutput("DriveState/robotPose", getRobotPose());
-		Logger.recordOutput("DriveState/omegaRotationsPerSecond", Radians.of(this.getState().Speeds.omegaRadiansPerSecond).in(Rotations));
+		Logger.recordOutput("Drive/FieldRelative", fieldRelative);
+		Logger.recordOutput("Drive/odometryHeading", odometryHeading);
 		isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
 		/*
@@ -510,9 +511,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		}
 
 		DogLog.log("BatteryVoltage", RobotController.getBatteryVoltage());
-		DogLog.log("Drive/OdometryPose", getState().Pose);
-		DogLog.log("Drive/TargetStates", getState().ModuleTargets);
-		DogLog.log("Drive/MeasuredStates", getState().ModuleStates);
+		DogLog.log("Drive/OdometryPose", getRobotPose());
+		// DogLog.log("Drive/TargetStates", getState().ModuleTargets);
+		// DogLog.log("Drive/MeasuredStates", getState().ModuleStates);
 		DogLog.log("Drive/RobotRelativeSpeeds", getState().Speeds);
 
 		if (mapleSimSwerveDrivetrain != null) {

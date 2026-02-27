@@ -85,7 +85,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean shouldIntake() {
-        double intakeProbability = Math.max(0, 1 - RobotContainer.drivetrain.getFieldRelativeLinearSpeed().in(MetersPerSecond) / 3);
+        double intakeProbability = Math.max(0, 1 - RobotContainer.drivetrain.getFieldRelativeLinearVelocity().in(MetersPerSecond) / 3);
         return hopperCount < HOPPER_CAPACITY
             && Math.random() < intakeProbability;
     }
