@@ -153,7 +153,7 @@ public class Auto extends SubsystemBase {
     for (int i = 3; i < autoString.length(); i += 2) {
       if(
       (currentPos == 'L' || currentPos == 'R')
-       && currentPos == autoString.charAt(i) 
+       && currentPos == autoString.charAt(i)
        || ((autoString.charAt(i+1) == '0')
         && (currentPos == 'D' || currentPos == 'O'))) {
           followPathCommands.addCommands(Commands.waitSeconds(timeToEmptyFuel));
