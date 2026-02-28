@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -38,6 +40,9 @@ import frc.robot.util.tunables.Tunable;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
@@ -57,6 +62,8 @@ import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 
 public class RobotContainer {
+
+	private final SendableChooser<Command> autoChooser;
 
 	// Controllers
 	public static CommandPS5Controller driverController = new CommandPS5Controller(0);
@@ -169,6 +176,9 @@ public class RobotContainer {
 				vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 		}
 
+		autoChooser = AutoBuilder.buildAutoChooser();
+		SmartDashboard.putData("Auto Chooser", autoChooser);
+
 		drivetrain.resetPose(new Pose2d(startingX, startingY, new Rotation2d()));
 
 		configureBindings();
@@ -194,7 +204,7 @@ public class RobotContainer {
 	}
 
 	public Command getAutonomousCommand() {
-		return auto.getAutoCommand();
+		return autoChooser.getSelected();
 	}
 
 	/**
