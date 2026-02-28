@@ -17,9 +17,9 @@ public class VisionConstants {
 
 	// Camera names, must match names configured on coprocessor
 	// TODO: name these better
-	public static String camera1Name = "limelight-one"; // back limelight
-	public static String camera2Name = "limelight-two"; // other limelight
-	public static String camera3Name = "limelight-three"; // limelight 3
+	public static String camera0Name = "limelight-one"; // back limelight
+	public static String camera1Name = "limelight-two"; // other limelight, on the right
+	public static String camera2Name = "limelight-three"; // limelight 3, on the left (shooter side)
 
 
 	// Basic filtering thresholds

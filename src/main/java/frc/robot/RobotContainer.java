@@ -96,6 +96,8 @@ public class RobotContainer {
 	private boolean withConstantVelocity = false;
 	private boolean whileMoving = true;
 
+	public static boolean VISION_DEBUG = false;
+
 	public RobotContainer() {
 		System.out.println("Constants.CURRENT_MODE: " + Constants.CURRENT_MODE);
 		switch (Constants.CURRENT_MODE) {
@@ -122,9 +124,9 @@ public class RobotContainer {
 				vision =
 					new Vision(
 						drivetrain::addVisionMeasurement,
+						// new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
 						new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
-						new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading),
-						new VisionIOLimelight(camera3Name, () -> drivetrain.odometryHeading));
+						new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading));
 
 
 

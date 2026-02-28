@@ -32,7 +32,7 @@ public class VisionIOLimelight implements VisionIO {
 	private final DoubleSubscriber latencySubscriber;
 	private final DoubleSubscriber txSubscriber;
 	private final DoubleSubscriber tySubscriber;
-	private final DoubleArraySubscriber megatag1Subscriber;
+	// private final DoubleArraySubscriber megatag1Subscriber;
 	private final DoubleArraySubscriber megatag2Subscriber;
 
 	private String name;
@@ -51,59 +51,27 @@ public class VisionIOLimelight implements VisionIO {
 		latencySubscriber = table.getDoubleTopic("tl").subscribe(0.0);
 		txSubscriber = table.getDoubleTopic("tx").subscribe(0.0);
 		tySubscriber = table.getDoubleTopic("ty").subscribe(0.0);
-		megatag1Subscriber = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
-		megatag2Subscriber =
-			table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
+		// megatag1Subscriber = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
+		megatag2Subscriber = table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
 	}
 
 	@Override
 	public void updateInputs(VisionIOInputs inputs) {
-		LimelightHelpers.SetRobotOrientation(name, RobotContainer.drivetrain.odometryHeading.getDegrees(), 0, 0, 0, 0, 0);
 		// Update connection status based on whether an update has been seen in the last
 		// 250ms
-		inputs.connected =
-			((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
+		inputs.connected = ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
 
 		// Update target observation
-		inputs.latestTargetObservation =
-			new TargetObservation(
-				Rotation2d.fromDegrees(txSubscriber.get()), Rotation2d.fromDegrees(tySubscriber.get()));
+		inputs.latestTargetObservation = new TargetObservation(Rotation2d.fromDegrees(txSubscriber.get()), Rotation2d.fromDegrees(tySubscriber.get()));
 
 		// Update orientation for MegaTag 2
-		orientationPublisher.accept(
-			new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
-		NetworkTableInstance.getDefault()
-			.flush(); // Increases network traffic but recommended by Limelight
+		orientationPublisher.accept(new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
+	
 
 		// Read new pose observations from NetworkTables
 		Set<Integer> tagIds = new HashSet<>();
 		List<PoseObservation> poseObservations = new LinkedList<>();
-		for (var rawSample : megatag1Subscriber.readQueue()) {
-		if (rawSample.value.length == 0) continue;
-		for (int i = 11; i < rawSample.value.length; i += 7) {
-			tagIds.add((int) rawSample.value[i]);
-		}
-		poseObservations.add(
-			new PoseObservation(
-				// Timestamp, based on server timestamp of publish and latency
-				rawSample.timestamp * 1.0e-6 - rawSample.value[6] * 1.0e-3,
-
-				// 3D pose estimate
-				parsePose(rawSample.value),
-
-				// Ambiguity, using only the first tag because ambiguity isn't applicable for
-				// multitag
-				rawSample.value.length >= 18 ? rawSample.value[17] : 0.0,
-
-				// Tag count
-				(int) rawSample.value[7],
-
-				// Average tag distance
-				rawSample.value[9],
-
-				// Observation type
-				PoseObservationType.MEGATAG_1));
-		}
+		
 		for (var rawSample : megatag2Subscriber.readQueue()) {
 		if (rawSample.value.length == 0) continue;
 		for (int i = 11; i < rawSample.value.length; i += 7) {
@@ -133,14 +101,14 @@ public class VisionIOLimelight implements VisionIO {
 		// Save pose observations to inputs object
 		inputs.poseObservations = new PoseObservation[poseObservations.size()];
 		for (int i = 0; i < poseObservations.size(); i++) {
-		inputs.poseObservations[i] = poseObservations.get(i);
+			inputs.poseObservations[i] = poseObservations.get(i);
 		}
 
 		// Save tag IDs to inputs objects
 		inputs.tagIds = new int[tagIds.size()];
 		int i = 0;
 		for (int id : tagIds) {
-		inputs.tagIds[i++] = id;
+			inputs.tagIds[i++] = id;
 		}
 	}
 
