@@ -50,6 +50,7 @@ import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.sim.FuelSim;
@@ -110,27 +111,27 @@ public class RobotContainer {
 				spindexer = new Spindexer(serializer, indexer);
 				pivot = new Pivot(new PivotIOTalonFX());
 				rollers = new Rollers(new RollersIOTalonFX());
-				// shooter = new Shooter(
-				// 	hood, flywheel, turret, spindexer,
-				// 	withConstantVelocity, whileMoving
-				// );
+				shooter = new Shooter(
+					hood, flywheel, turret, spindexer,
+					withConstantVelocity, whileMoving
+				);
 
 				// pivot = new Pivot(new PivotIOTalonFX());
 				// rollers = new Rollers(new RollersIOTalonFX());
 				// intake = new Intake(pivot, rollers);
-				// superstructure = new Superstructure(shooter);
-				// aiming = new Aiming(turret);
+				superstructure = new Superstructure(shooter);
+				aiming = new Aiming(turret);
 				// vision =
 				// 	new Vision(
 				// 		drivetrain::addVisionMeasurement,
 				// 		// new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
 				// 		new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
 				// 		new VisionIOLiion =
-				// 	new Vision(
-				// 		drivetrain::addVisionMeasurement,
-				// 		// new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
-				// 		new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
-				// 		new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading));
+					new Vision(
+						drivetrain::addVisionMeasurement,
+						// new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
+						new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
+						new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading));
 
 
 
@@ -199,7 +200,7 @@ public class RobotContainer {
 
 	private void configureBindings() {
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
-		driverController.triangle().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
+		driverController.triangle().whileTrue(spindexer.setVoltageCommand(5)).onFalse(spindexer.setVoltageCommand(0));
 		driverController.R1().whileTrue(rollers.setVoltageCommand(12)).onFalse(rollers.setVoltageCommand(0));
 		// driverController.circle().whileTrue(rollers.spinUpCommand()).onFalse(rollers.spinDownCommand());
 		// hood.setDefaultCommand(hood.joystickControlCommand());

@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.Utils;
+
 
 public class Vision extends SubsystemBase {
 	private final VisionConsumer consumer; // lamda expression that takes in values and records a vision measurement
@@ -177,10 +179,14 @@ public class Vision extends SubsystemBase {
 					angularStdDev *= cameraStdDevFactors[cameraIndex];
 				}
 
+				linearStdDev = 0;
+
+				Logger.recordOutput("Vision/linearStdDev", linearStdDev);
+				Logger.recordOutput("Vision/angularStdDev", angularStdDev);
 				// Send vision observation
 				consumer.accept(
 					observation.pose().toPose2d(),
-					observation.timestamp(),
+					Utils.fpgaToCurrentTime(observation.timestamp()),
 					VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
 			}
 

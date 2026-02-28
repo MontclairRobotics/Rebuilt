@@ -114,9 +114,9 @@ public class Shooter extends SubsystemBase {
 
     public Command setParameters(Supplier<ShootingParameters> paramsSupplier) {
         return Commands.parallel(
-            turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle()),
-            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
-            indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
+            turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle())
+            // hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
+            // indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
         );
     }
 

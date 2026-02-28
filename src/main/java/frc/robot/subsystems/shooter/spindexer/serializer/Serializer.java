@@ -42,6 +42,10 @@ public class Serializer extends SubsystemBase {
 		io.setVelocity(targetVelocitySupplier.get());
 	}
 
+	public void setVoltage(double voltage) {
+		io.setVoltage(voltage);
+	}
+
 	public void spinUp() {
 		setVelocity(SPIN_VELOCITY);
 	}

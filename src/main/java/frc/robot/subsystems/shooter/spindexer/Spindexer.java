@@ -25,6 +25,13 @@ public class Spindexer {
         indexer.spinDown();
     }
 
+    public Command setVoltageCommand(double voltage) {
+        return Commands.run(() -> {
+            serializer.setVoltage(voltage);
+            indexer.setVoltage(voltage);
+        }, serializer, indexer);
+    }
+
     public Command spinUpCommand() {
         return Commands.run(() -> spinUp(), serializer, indexer);
     }

@@ -83,6 +83,7 @@ public class AimingConstants {
 
 	static {
 
+		REAL_MAP.put(1.0, new ShotSettings(Rotations.zero(), RotationsPerSecond.of(1), Seconds.of(0), false));
 		SIM_CONSTANT_VELOCITY_MAP.put(0.8516690912634933, new SimShotSettings(Degrees.of(3), MetersPerSecond.of(9), Seconds.of(1.52), true));
 		SIM_CONSTANT_VELOCITY_MAP.put(2.0927103773901443, new SimShotSettings(Degrees.of(10), MetersPerSecond.of(9), Seconds.of(1.504), true));
 		SIM_CONSTANT_VELOCITY_MAP.put(3.3339369176475455, new SimShotSettings(Degrees.of(15), MetersPerSecond.of(9), Seconds.of(1.512), true));

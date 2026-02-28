@@ -11,6 +11,8 @@ import frc.robot.RobotContainer;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 public class Pivot extends SubsystemBase {
 
 	public PivotIO io;
@@ -69,8 +71,8 @@ public class Pivot extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// io.updateInputs(inputs);
-		// Logger.processInputs("Pivot", inputs);
+		io.updateInputs(inputs);
+		Logger.processInputs("Pivot", inputs);
 		// visualization.update();
 		// visualization.log();
 	}

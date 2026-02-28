@@ -17,7 +17,7 @@ public class SerializerConstants {
     public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the canivore
 
     public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.1);
-	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(6);
+	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(2.5);
 
     public static final double kP = 4;
 	public static final double kD = 0.2;

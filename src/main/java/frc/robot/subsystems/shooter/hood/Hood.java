@@ -5,6 +5,7 @@ import static frc.robot.constants.HoodConstants.*;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -45,8 +46,8 @@ public class Hood extends SubsystemBase {
     }
 
 	public void periodic() {
-		// io.updateInputs(inputs);
-		// Logger.processInputs("Hood", inputs);
+		io.updateInputs(inputs);
+		Logger.processInputs("Hood", inputs);
 		// visualization.update();
 		// visualization.log();
         // updateTunables();

@@ -38,6 +38,10 @@ public class Indexer extends SubsystemBase {
 		io.setVelocity(velocity);
 	}
 
+	public void setVoltage(double voltage) {
+		io.setVoltage(voltage);
+	}
+
 	public void setVelocity(Supplier<AngularVelocity> targetVelocitySupplier) {
 		io.setVelocity(targetVelocitySupplier.get());
 	}
