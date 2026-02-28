@@ -178,6 +178,10 @@ public class RobotContainer {
 
 		autoChooser = AutoBuilder.buildAutoChooser();
 		SmartDashboard.putData("Auto Chooser", autoChooser);
+		if(autoChooser.getSelected() != null) {
+			String autoName = autoChooser.getSelected().getName();
+			Auto.drawAuto(autoName);
+		}
 
 		drivetrain.resetPose(new Pose2d(startingX, startingY, new Rotation2d()));
 

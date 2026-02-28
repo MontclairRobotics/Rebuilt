@@ -50,7 +50,7 @@ public class Auto extends SubsystemBase {
     SmartDashboard.putData("Field", field);
 
   }
-  public static void drawPaths(String auto) {
+  public static void drawAuto(String auto) {
     int maxObjs = 0;
     Field2d field = new Field2d();
     for(int i = 0; i <= maxObjs; i++) {
