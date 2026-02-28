@@ -62,10 +62,10 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.recordOutput("Fuel/Hopper Count", hopperCount);
-        Logger.recordOutput("Fuel/Blue Score", Hub.BLUE_HUB.getScore());
-        Logger.recordOutput("Fuel/Red Score", Hub.RED_HUB.getScore());
-        Logger.recordOutput("Hub/Match Time", HubTracker.getMatchTime());
+        // Logger.recordOutput("Fuel/Hopper Count", hopperCount);
+        // Logger.recordOutput("Fuel/Blue Score", Hub.BLUE_HUB.getScore());
+        // Logger.recordOutput("Fuel/Red Score", Hub.RED_HUB.getScore());
+        // Logger.recordOutput("Hub/Match Time", HubTracker.getMatchTime());
     }
 
     public int getHopperCount() {

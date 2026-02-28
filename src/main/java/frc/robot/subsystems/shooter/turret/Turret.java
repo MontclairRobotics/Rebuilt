@@ -52,6 +52,8 @@ public class Turret extends SubsystemBase {
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Turret", inputs);
+		Logger.recordOutput("Turret/AngleToHub", getAngleToHub());
+		Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
 		// visualization.update();
 		// visualization.log();
 		updateTunables();
@@ -171,14 +173,12 @@ public class Turret extends SubsystemBase {
 	public Angle getAngleToHub() {
 		Translation2d hublocation = PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION);
 		Translation2d robotToHub = hublocation.minus(getFieldRelativePosition());
-		Logger.recordOutput("Turret/getAngleToHub", robotToHub.getAngle().getRotations());
 		return robotToHub.getAngle().getMeasure();
 	}
 
 	public Angle getAngleToPoint(Translation2d point) {
 		Translation2d robotPose = getFieldRelativePosition();
 		Translation2d robotToPoint = point.minus(robotPose);
-		Logger.recordOutput("Turret/getAngletoPoint", robotToPoint.getAngle().getRotations());
 		return robotToPoint.getAngle().getMeasure();
 	}
 

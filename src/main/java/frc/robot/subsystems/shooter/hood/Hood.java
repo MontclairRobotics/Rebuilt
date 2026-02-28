@@ -66,7 +66,7 @@ public class Hood extends SubsystemBase {
     public void applyJoystickInput() {
 		double voltage = -Math.pow(MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.04), 3) * RobotController.getBatteryVoltage();
 		double ffVoltage = feedforward.calculate(getAngle().in(Radians), 0);
-		Logger.recordOutput("Hood/Feedforward Voltage", ffVoltage);
+		// Logger.recordOutput("Hood/Feedforward Voltage", ffVoltage);
 		io.setVoltage(voltage + ffVoltage);
 	}
 

@@ -485,6 +485,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		fieldRelative = !RobotContainer.driverController.L2().getAsBoolean();
 		Logger.recordOutput("Drive/FieldRelative", fieldRelative);
 		Logger.recordOutput("Drive/odometryHeading", odometryHeading);
+		Logger.recordOutput("Drive/odometryPose", getRobotPose());
+		Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
+		Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
 		isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
 		/*
@@ -508,10 +511,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		}
 
 		DogLog.log("BatteryVoltage", RobotController.getBatteryVoltage());
-		DogLog.log("Drive/OdometryPose", getRobotPose());
-		// DogLog.log("Drive/TargetStates", getState().ModuleTargets);
-		// DogLog.log("Drive/MeasuredStates", getState().ModuleStates);
-		DogLog.log("Drive/RobotRelativeSpeeds", getState().Speeds);
 
 		if (mapleSimSwerveDrivetrain != null) {
 		DogLog.log(
