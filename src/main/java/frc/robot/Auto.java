@@ -85,7 +85,7 @@ public class Auto extends SubsystemBase {
         e.printStackTrace();
       }
     }
-    SmartDashboard.putData(field);
+    SmartDashboard.putData("Static field",field);
   }
 
   public void drawPaths() {
