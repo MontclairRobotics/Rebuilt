@@ -16,7 +16,6 @@ import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.RobotContainer;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -66,12 +65,12 @@ public class VisionIOLimelight implements VisionIO {
 
 		// Update orientation for MegaTag 2
 		orientationPublisher.accept(new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
-	
+
 
 		// Read new pose observations from NetworkTables
 		Set<Integer> tagIds = new HashSet<>();
 		List<PoseObservation> poseObservations = new LinkedList<>();
-		
+
 		for (var rawSample : megatag2Subscriber.readQueue()) {
 		if (rawSample.value.length == 0) continue;
 		for (int i = 11; i < rawSample.value.length; i += 7) {

@@ -50,7 +50,6 @@ import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.sim.FuelSim;
@@ -121,12 +120,17 @@ public class RobotContainer {
 				// intake = new Intake(pivot, rollers);
 				// superstructure = new Superstructure(shooter);
 				// aiming = new Aiming(turret);
-				vision =
-					new Vision(
-						drivetrain::addVisionMeasurement,
-						// new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
-						new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
-						new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading));
+				// vision =
+				// 	new Vision(
+				// 		drivetrain::addVisionMeasurement,
+				// 		// new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
+				// 		new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
+				// 		new VisionIOLiion =
+				// 	new Vision(
+				// 		drivetrain::addVisionMeasurement,
+				// 		// new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
+				// 		new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
+				// 		new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading));
 
 
 
@@ -195,14 +199,15 @@ public class RobotContainer {
 
 	private void configureBindings() {
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
-		// driverController.circle().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
-		driverController.circle().whileTrue(rollers.spinUpCommand()).onFalse(rollers.spinDownCommand());
+		driverController.triangle().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
+		driverController.R1().whileTrue(rollers.setVoltageCommand(12)).onFalse(rollers.setVoltageCommand(0));
+		// driverController.circle().whileTrue(rollers.spinUpCommand()).onFalse(rollers.spinDownCommand());
 		// hood.setDefaultCommand(hood.joystickControlCommand());
 		// turret.setDefaultCommand(turret.joystickControlCommand());
 		// flywheel.setDefaultCommand(flywheel.joystickControlCommand());
 		// driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
-		driverController.circle()
+		driverController.square()
 			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
 			.onFalse(hood.stopCommand());
 
@@ -210,7 +215,7 @@ public class RobotContainer {
 		// 	.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
 		// 	.onFalse(turret.stopCommand());
 
-		driverController.triangle()
+		driverController.circle()
 			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get())))
 			.onFalse(flywheel.stopCommand());
 

@@ -64,6 +64,10 @@ public class Rollers extends SubsystemBase {
 		return Commands.run(() -> setVelocity(SPIN_VELOCITY), this);
 	}
 
+	public Command setVoltageCommand(double voltage) {
+		return Commands.run(() -> io.setVoltage(voltage), this);
+	}
+
     public Command joystickControlCommand() {
         return Commands.run(() -> applyJoystickInput(), this);
     }

@@ -40,9 +40,9 @@ public class Vision extends SubsystemBase {
 	private final List<Pose3d> allRobotPoses = RobotContainer.VISION_DEBUG ? new ArrayList<>() : null;
 	private final List<Pose3d> allRobotPosesAccepted = RobotContainer.VISION_DEBUG ? new ArrayList<>() : null;
 	private final List<Pose3d> allRobotPosesRejected = RobotContainer.VISION_DEBUG ? new ArrayList<>() : null;
-	private final List<Pose3d> tagPoses = RobotContainer.VISION_DEBUG ? new ArrayList<>() : null;
-	
+
 	// always
+	private final List<Pose3d> tagPoses = new ArrayList<>();
 	private final List<Pose3d> robotPoses = new ArrayList<>();
 	private final List<Pose3d> robotPosesAccepted = new ArrayList<>();
 	private final List<Pose3d> robotPosesRejected = new ArrayList<>();
@@ -53,11 +53,11 @@ public class Vision extends SubsystemBase {
 	public Vision(VisionConsumer consumer, VisionIO... io) {
 		this.consumer = consumer;
 		this.io = io;
-		
+
 		// 5 hz logging normally, up to 10 hz when in debug
 		// 50 hz / 5 loops per log = 10 hz
 		// 50 hz / 10 loops per log = 5 hz
-		loopsPerLog = RobotContainer.VISION_DEBUG ? 5 : 10; 
+		loopsPerLog = RobotContainer.VISION_DEBUG ? 5 : 10;
 
 		// Initialize inputs
 		this.inputs = new VisionIOInputsAutoLogged[io.length];
@@ -94,7 +94,7 @@ public class Vision extends SubsystemBase {
 			allRobotPosesAccepted.clear();
 			allRobotPosesRejected.clear();
 		}
-					
+
 		// always
 		tagPoses.clear();
 		robotPoses.clear();
@@ -103,13 +103,13 @@ public class Vision extends SubsystemBase {
 
 		// loops through the different cameras
 		for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
-			
+
 			io[cameraIndex].updateInputs(inputs[cameraIndex]);
-		
-			if (logCounter % loopsPerLog == 0) { 
+
+			if (logCounter % loopsPerLog == 0) {
 				Logger.processInputs("Vision/Camera" + Integer.toString(cameraIndex), inputs[cameraIndex]);
 			}
-	
+
 			// Update disconnected alert
 			disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
@@ -184,7 +184,7 @@ public class Vision extends SubsystemBase {
 					VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
 			}
 
-			if(logCounter % loopsPerLog == 0) { 
+			if(logCounter % loopsPerLog == 0) {
 				Logger.recordOutput(
 					"Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
 					tagPoses.toArray(new Pose3d[0]));
