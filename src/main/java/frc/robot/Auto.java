@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.json.simple.parser.ParseException;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 
@@ -48,6 +49,42 @@ public class Auto extends SubsystemBase {
     prePos = autoTab.add("Previous position", "").getEntry();
     SmartDashboard.putData("Field", field);
 
+  }
+  public static void drawPaths(String auto) {
+    int maxObjs = 0;
+    Field2d field = new Field2d();
+    for(int i = 0; i <= maxObjs; i++) {
+      field.getObject("obj" + i).setPoses(new Pose2d());
+    }
+    maxObjs = 0;
+
+    if(DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+      try {
+        for(int i = 0; i < PathPlannerAuto.getPathGroupFromAutoFile(auto).size(); i++) {
+          field.getObject("obj" + i).setPoses(PathPlannerAuto.getPathGroupFromAutoFile(auto).get(i).getPathPoses());
+          if(i > maxObjs) {
+            maxObjs = i;
+          }
+        }
+      } catch (IOException | ParseException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
+
+    if(DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+      try {
+        for(int i = 0; i < PathPlannerAuto.getPathGroupFromAutoFile(auto).size(); i++) {
+          field.getObject("obj" + i).setPoses(PathPlannerAuto.getPathGroupFromAutoFile(auto).get(i).flipPath().getPathPoses());
+          if(i > maxObjs) {
+            maxObjs = i;
+          }
+        }
+      } catch (IOException | ParseException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
   }
 
   public void drawPaths() {
@@ -193,6 +230,7 @@ public class Auto extends SubsystemBase {
       );
     } else {
       autoCommand.addCommands(
+
         Commands.runOnce(
           () -> {try {
             RobotContainer.drivetrain.resetPose(
