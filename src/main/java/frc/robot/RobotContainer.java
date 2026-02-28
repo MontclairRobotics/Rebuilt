@@ -63,7 +63,7 @@ import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 
 public class RobotContainer {
 
-	private final SendableChooser<Command> autoChooser;
+	public static SendableChooser<Command> autoChooser;
 
 	// Controllers
 	public static CommandPS5Controller driverController = new CommandPS5Controller(0);
@@ -177,11 +177,7 @@ public class RobotContainer {
 		}
 
 		autoChooser = AutoBuilder.buildAutoChooser();
-		SmartDashboard.putData("Auto Chooser", autoChooser);
-		if(autoChooser.getSelected() != null) {
-			String autoName = autoChooser.getSelected().getName();
-			Auto.drawAuto(autoName);
-		}
+		SmartDashboard.putData("Auto Chooser", RobotContainer.autoChooser);
 
 		drivetrain.resetPose(new Pose2d(startingX, startingY, new Rotation2d()));
 

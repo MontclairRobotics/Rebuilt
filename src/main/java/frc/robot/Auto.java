@@ -36,6 +36,7 @@ public class Auto extends SubsystemBase {
   private Field2d field = new Field2d();
   private ArrayList<PathPlannerPath> allPaths = new  ArrayList<PathPlannerPath>();
   private ArrayList<PathPlannerPath> prevPaths = new ArrayList<PathPlannerPath>();
+  private ArrayList<PathPlannerPath> prevAuto = new ArrayList<PathPlannerPath>();
   private Command autoCommand;
   private int maxObjs;
   private char tempCurr;
@@ -50,13 +51,23 @@ public class Auto extends SubsystemBase {
     SmartDashboard.putData("Field", field);
 
   }
-  public static void drawAuto(String auto) {
+  public void drawAuto(String auto) {
     int maxObjs = 0;
     Field2d field = new Field2d();
-    for(int i = 0; i <= maxObjs; i++) {
-      field.getObject("obj" + i).setPoses(new Pose2d());
+    try {
+      if(!prevAuto.equals(new ArrayList<>(PathPlannerAuto.getPathGroupFromAutoFile(auto)))) {
+        for(int i = 0; i <= maxObjs; i++) {
+          field.getObject("obj" + i).setPoses(new Pose2d());
+        }
+        maxObjs = 0;
+      }
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
-    maxObjs = 0;
 
     if(DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
       try {
@@ -84,6 +95,16 @@ public class Auto extends SubsystemBase {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
+    }
+
+    try {
+      prevAuto = new ArrayList<>(PathPlannerAuto.getPathGroupFromAutoFile(auto));
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
     SmartDashboard.putData("Static field",field);
   }
@@ -267,6 +288,10 @@ public class Auto extends SubsystemBase {
 
 
   public void periodic() {
+		/*if(RobotContainer.autoChooser.getSelected() != null) {
+			String autoName = RobotContainer.autoChooser.getSelected().getName();
+			this.drawAuto(autoName);
+		}*/ //TODO: fix too many publishers issue
     alliance.setString(DriverStation.getAlliance().get().toString());
     createAuto(autoString.getString(""));
   }
