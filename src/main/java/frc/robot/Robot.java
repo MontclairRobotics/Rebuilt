@@ -45,8 +45,6 @@ public class Robot extends LoggedRobot {
 
 	public Robot() {
 
-		robotContainer = new RobotContainer();
-
 		// Record metadata
 		Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
 		Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -84,6 +82,8 @@ public class Robot extends LoggedRobot {
 		}
 
 		// Start AdvantageKit logger
+
+		robotContainer = new RobotContainer();
 		Logger.start();
 	}
 

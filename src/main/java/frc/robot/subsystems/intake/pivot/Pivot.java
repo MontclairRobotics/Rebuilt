@@ -72,7 +72,7 @@ public class Pivot extends SubsystemBase {
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Pivot", inputs);
-		visualization.update();
-		visualization.log();
+		// visualization.update();
+		// visualization.log();
 	}
 }

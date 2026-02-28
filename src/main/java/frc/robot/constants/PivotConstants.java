@@ -32,9 +32,9 @@ public class PivotConstants {
 
 	public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the canivore
 
-	public static final double ROTOR_TO_SENSOR_RATIO = 64; 
+	public static final double ROTOR_TO_SENSOR_RATIO = 64;
 	public static final double SENSOR_TO_MECHANISM_RATIO = 1; // CANcoder is on the mechanism
-	public static final double ENCODER_OFFSET = -0.607689453125; 
+	public static final double ENCODER_OFFSET = -0.607689453125;
 
 	// constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);

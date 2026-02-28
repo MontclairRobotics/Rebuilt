@@ -1,7 +1,6 @@
 package frc.robot.subsystems.shooter.hood;
 
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.HoodConstants.*;
 
 import java.util.function.Supplier;
@@ -49,8 +48,8 @@ public class Hood extends SubsystemBase {
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Hood", inputs);
-		visualization.update();
-		visualization.log();
+		// visualization.update();
+		// visualization.log();
         // updateTunables();
 	}
 

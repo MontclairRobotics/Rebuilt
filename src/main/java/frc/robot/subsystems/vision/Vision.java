@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.config.RobotConfig;
 
 public class Vision extends SubsystemBase {
 	private final VisionConsumer consumer; // lamda expression that takes in values and records a vision measurement

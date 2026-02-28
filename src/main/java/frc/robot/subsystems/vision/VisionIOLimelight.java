@@ -16,6 +16,8 @@ import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.RobotContainer;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +35,8 @@ public class VisionIOLimelight implements VisionIO {
 	private final DoubleArraySubscriber megatag1Subscriber;
 	private final DoubleArraySubscriber megatag2Subscriber;
 
+	private String name;
+
 	/**
 	 * Creates a new VisionIOLimelight.
 	 *
@@ -40,6 +44,7 @@ public class VisionIOLimelight implements VisionIO {
 	 * @param rotationSupplier Supplier for the current estimated rotation, used for MegaTag 2.
 	 */
 	public VisionIOLimelight(String name, Supplier<Rotation2d> rotationSupplier) {
+		this.name = name;
 		var table = NetworkTableInstance.getDefault().getTable(name);
 		this.rotationSupplier = rotationSupplier;
 		orientationPublisher = table.getDoubleArrayTopic("robot_orientation_set").publish();
@@ -53,6 +58,7 @@ public class VisionIOLimelight implements VisionIO {
 
 	@Override
 	public void updateInputs(VisionIOInputs inputs) {
+		LimelightHelpers.SetRobotOrientation(name, RobotContainer.drivetrain.odometryHeading.getDegrees(), 0, 0, 0, 0, 0);
 		// Update connection status based on whether an update has been seen in the last
 		// 250ms
 		inputs.connected =

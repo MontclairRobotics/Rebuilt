@@ -52,8 +52,8 @@ public class Turret extends SubsystemBase {
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs("Turret", inputs);
-		visualization.update();
-		visualization.log();
+		// visualization.update();
+		// visualization.log();
 		updateTunables();
 	}
 

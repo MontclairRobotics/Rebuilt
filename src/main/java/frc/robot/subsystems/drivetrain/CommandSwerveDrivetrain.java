@@ -7,7 +7,6 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -25,7 +24,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
@@ -39,7 +37,6 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -89,8 +86,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		new SwerveRequest.ApplyRobotSpeeds();
 
 	private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric()
-		.withDeadband(MAX_SPEED.times(0.05))
-		.withRotationalDeadband(MAX_ANGULAR_SPEED.times(0.1))
+		// .withDeadband(MAX_SPEED.times(0.05))
+		// .withRotationalDeadband(MAX_ANGULAR_SPEED.times(0.1))
 		.withDriveRequestType(DriveRequestType.Velocity);
 
 	/* Swerve requests to apply during SysId characterization */
@@ -263,11 +260,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	 */
 	public static Rotation2d wrapAngle(Rotation2d ang) {
 		double angle = ang.getDegrees();
-		angle = (angle + 180) % 360; 
+		angle = (angle + 180) % 360;
 		if (angle < 0) {
-			angle += 360; 
+			angle += 360;
 		}
-		return Rotation2d.fromDegrees(angle - 180); 
+		return Rotation2d.fromDegrees(angle - 180);
 	}
 
 	public Rotation2d getWrappedHeading() {
@@ -354,7 +351,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 		if (!fieldRelative) {
 			speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getWrappedHeading());
-		}	
+		}
 
 		setControl (
 			driveRequest
