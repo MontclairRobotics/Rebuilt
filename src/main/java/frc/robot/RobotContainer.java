@@ -18,6 +18,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
@@ -32,7 +33,6 @@ import frc.robot.subsystems.intake.rollers.RollersIOSim;
 import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.Aiming;
-import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
@@ -68,6 +68,7 @@ public class RobotContainer {
 	// Controllers
 	public static CommandPS5Controller driverController = new CommandPS5Controller(0);
 	public static CommandPS5Controller operatorController = new CommandPS5Controller(1);
+	public static CommandPS5Controller testController = new CommandPS5Controller(2);
 
 	// Subsystems
 	public static Superstructure superstructure;
@@ -252,6 +253,13 @@ public class RobotContainer {
 		
 		if(Constants.CURRENT_MODE == Mode.SIM) driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
 	
+
+		// SysId on the Flywheel - hold the button to run the routine, release to stop it.
+		SysIdRoutine flywheelSysIdRoutine = flywheel.getSysIdRoutine();
+		testController.circle().whileTrue(flywheelSysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward));
+		testController.triangle().whileTrue(flywheelSysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
+		testController.square().whileTrue(flywheelSysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
+		testController.cross().whileTrue(flywheelSysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
 	}
 
 	public Command getAutonomousCommand() {

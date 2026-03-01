@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter.flywheel;
 
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.constants.FlywheelConstants.*;
 
 import java.util.function.Supplier;
@@ -12,6 +13,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.RobotContainer;
 import frc.robot.util.tunables.LoggedTunableNumber;
 
@@ -55,7 +57,7 @@ public class Flywheel extends SubsystemBase {
             io.updateInputs(inputs);
             Logger.processInputs("Flywheel", inputs);
         }
-       
+                
         updateTunables();
     }
 
@@ -89,4 +91,21 @@ public class Flywheel extends SubsystemBase {
         return Commands.run(() -> applyJoystickInput(), this);
     }
 
+    /**
+     * SysId routines for the flywheel.
+     * These can be used with the SysId tool to characterize the flywheel's velocity control loop.
+     */
+    public SysIdRoutine getSysIdRoutine() {
+        return new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null, null, null, // Use default config
+                (state) -> Logger.recordOutput("SysIdTestState", state.toString())
+            ),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> io.setVoltage(voltage.in(Volts)),
+                null,
+                this
+            )
+        );
+    }
 }
