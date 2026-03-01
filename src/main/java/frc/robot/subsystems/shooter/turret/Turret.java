@@ -3,6 +3,7 @@ package frc.robot.subsystems.shooter.turret;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
 import java.util.function.Supplier;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -37,13 +39,21 @@ public class Turret extends SubsystemBase {
     private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Turret/kD", SLOT0_CONFIGS.kD);
     private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Turret/kS", SLOT0_CONFIGS.kS);
 
-	private final LoggedTunableNumber tunableMotionMagicCruiseVelocity = new LoggedTunableNumber("Turret/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity);
-	private final LoggedTunableNumber tunableMotionMagicAcceleration = new LoggedTunableNumber("Turret/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration);
-	private final LoggedTunableNumber tunableMotionMagicJerk = new LoggedTunableNumber("Turret/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk);
-	private final LoggedTunableNumber tunableMaxVelocityAtSetpoint = new LoggedTunableNumber("Turret/Max Velocity At Setpoint", MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond));
-
+	private final LoggedTunableNumber tunableMaxVelocityAtSetpoint = new LoggedTunableNumber("Turret/Max Velocity At Setpoint", VELOCITY_TOLERANCE.in(RotationsPerSecond));
 	public final LoggedTunableNumber tunableRobotRelativeTurretAngle = new LoggedTunableNumber("Turret/Tunable Robot Relative Angle", 0);
 
+	private TrapezoidProfile profile =
+    new TrapezoidProfile(
+        new TrapezoidProfile.Constraints(
+            MAX_VELOCITY.in(RotationsPerSecond),
+            MAX_ACCELERATION.in(RotationsPerSecondPerSecond)
+        )
+    );
+
+	private TrapezoidProfile.State setpoint = new TrapezoidProfile.State();
+
+	private Angle lastGoal = Rotations.zero();
+	
 	private int logCounter;
 	private final int loopsPerLog;
 
@@ -117,17 +127,7 @@ public class Turret extends SubsystemBase {
             io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get());
         }
 
-		if(tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
-				|| tunableMotionMagicAcceleration.hasChanged(hashCode())
-				|| tunableMotionMagicJerk.hasChanged(hashCode())) {
-			io.setMotionMagic(
-				tunableMotionMagicCruiseVelocity.get(),
-				tunableMotionMagicAcceleration.get(),
-				tunableMotionMagicJerk.get()
-			);
-		}
-
-		if(tunableMaxVelocityAtSetpoint.hasChanged(hashCode())) MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(tunableMaxVelocityAtSetpoint.get());
+		if(tunableMaxVelocityAtSetpoint.hasChanged(hashCode())) VELOCITY_TOLERANCE = RotationsPerSecond.of(tunableMaxVelocityAtSetpoint.get());
 	}
 
 	public void applyJoystickInput() {

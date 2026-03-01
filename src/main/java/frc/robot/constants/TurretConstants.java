@@ -42,6 +42,8 @@ public class TurretConstants {
 	public static final Angle MIN_ANGLE = Rotations.of(-0.5);
 	public static final Angle MAX_ANGLE = Rotations.of(0.5);
 	public static final Angle ANGLE_TOLERANCE = Degrees.of(3);
+	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.1);
+
 
 	// physical properties
 	public static final double MOMENT_OF_INERTIA = 0.154244993; //From CAD on 2026.02.12
@@ -59,18 +61,12 @@ public class TurretConstants {
 	public static final double kD = 0;
 	public static final double kS = 2;
 
-	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(3);
-	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(6);
-	public static final double MOTION_MAGIC_JERK = 50; // Rotations Per Second Per Second Per Second
-	public static AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(0.1);
+	public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(3);
+	public static final AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(6);
 
 	public static final double STATOR_CURRENT_LIMIT = 60; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 40; // Amps
 
-	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
-		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)
-		.withMotionMagicAcceleration(MOTION_MAGIC_ACCELERATION)
-		.withMotionMagicJerk(MOTION_MAGIC_JERK);
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKD(kD).withKS(kS);

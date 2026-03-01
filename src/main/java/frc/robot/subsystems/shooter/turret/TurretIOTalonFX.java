@@ -3,8 +3,8 @@ package frc.robot.subsystems.shooter.turret;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -36,7 +36,7 @@ public class TurretIOTalonFX implements TurretIO {
     private final StatusSignal<Current> currentDrawAmpsSignal;
     private final StatusSignal<Temperature> tempCelsiusSignal;
 
-    private final MotionMagicVoltage request = new MotionMagicVoltage(0);
+    private final PositionVoltage request = new PositionVoltage(0);
     private final NeutralOut neutralOut = new NeutralOut();
 
     public TurretIOTalonFX() {
@@ -47,8 +47,7 @@ public class TurretIOTalonFX implements TurretIO {
             .withSlot0(SLOT0_CONFIGS)
             .withCurrentLimits(CURRENT_LIMITS_CONFIGS)
             .withMotorOutput(MOTOR_OUTPUT_CONFIGS)
-            .withFeedback(FEEDBACK_CONFIGS)
-            .withMotionMagic(MOTION_MAGIC_CONFIGS);
+            .withFeedback(FEEDBACK_CONFIGS);
 
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
@@ -130,7 +129,7 @@ public class TurretIOTalonFX implements TurretIO {
     public boolean isAtSetpoint() {
         double error = motor.getClosedLoopError().getValueAsDouble();
         return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations)
-            && Math.abs(velocitySignal.getValueAsDouble()) < MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond);
+            && Math.abs(velocitySignal.getValueAsDouble()) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
     }
 
     @Override
@@ -142,14 +141,6 @@ public class TurretIOTalonFX implements TurretIO {
         motor.getConfigurator().apply(config.Slot0);
     }
 
-    @Override
-    public void setMotionMagic(double velocity, double acceleration, double jerk) {
-        config.MotionMagic.MotionMagicCruiseVelocity = velocity;
-        config.MotionMagic.MotionMagicAcceleration = acceleration;
-        config.MotionMagic.MotionMagicJerk = jerk;
-
-        motor.getConfigurator().apply(config.MotionMagic);
-    }
 
     @Override
     public void setNeutralMode(NeutralModeValue value) {
