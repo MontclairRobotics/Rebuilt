@@ -31,7 +31,13 @@ public class Superstructure extends SubsystemBase {
 	private Shooter shooter;
 	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.2);
 
+	private int logCounter;
+	private final int loopsPerLog;
+
 	public Superstructure(Shooter shooter) {
+
+		loopsPerLog = RobotContainer.SUPERSTRUCTURE_DEBUG ? 1 : 10;
+
 		this.shooter = shooter;
 		if(CURRENT_MODE == Mode.SIM) {
 			shouldStowHoodTrigger.whileTrue(
@@ -84,18 +90,24 @@ public class Superstructure extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		Logger.recordOutput("Superstructure/isallianceknown", AllianceManager.isAllianceKnown());
-		Logger.recordOutput("Superstructure/currentshiftempty", HubTracker.getCurrentShift().isEmpty());
-		Logger.recordOutput("Superstructure/shouldBeScoring", shouldBeScoring());
-		Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
-		Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
-		Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowHood());
+		logCounter++; 
+
 		if(movingIntoObstacle()) {
 			updateTrenchZonesVeloBased();
 		} else {
 			resetTrenchZones();
 		}
-		Logger.recordOutput("Trench/Trench Danger Zones", FieldConstants.Zones.TRENCH_DANGER_ZONES);
+
+		if(logCounter % loopsPerLog == 0) {
+			Logger.recordOutput("Superstructure/isallianceknown", AllianceManager.isAllianceKnown());
+			Logger.recordOutput("Superstructure/currentshiftempty", HubTracker.getCurrentShift().isEmpty());
+			Logger.recordOutput("Superstructure/shouldBeScoring", shouldBeScoring());
+			Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
+			Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
+			Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowHood());
+			Logger.recordOutput("Trench/Trench Danger Zones", FieldConstants.Zones.TRENCH_DANGER_ZONES);
+		}
+		
 	};
 
 	public void resetTrenchZones() {

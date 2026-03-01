@@ -186,7 +186,7 @@ public class Robot extends LoggedRobot {
 		Logger.recordOutput("Zero Pose/2", new Pose3d());
 		Logger.recordOutput("Zero Pose/3", new Pose3d());
 		Logger.recordOutput("Zero Pose/4", new Pose3d());
-		robotContainer.fuelSim.updateSim();
+		RobotContainer.fuelSim.updateSim();
 		RobotContainer.drivetrain.mapleSimSwerveDrivetrain.update();
 		robotContainer.displaySimFieldToAdvantageScope();
 	}

@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.tunables.LoggedTunableNumber;
@@ -40,17 +41,29 @@ public class Hood extends SubsystemBase {
 
 	public final LoggedTunableNumber tunableHoodAngle = new LoggedTunableNumber("Hood/Tunable Hood Angle", 0);
 
+	private int logCounter;
+	private final int loopsPerLog;
+
     public Hood(HoodIO io) {
         this.io = io;
         feedforward = new ArmFeedforward(kS, kG, 0);
+		loopsPerLog = RobotContainer.SHOOTER_DEBUG ? 1 : 5;
     }
 
 	public void periodic() {
-		io.updateInputs(inputs);
-		Logger.processInputs("Hood", inputs);
-		// visualization.update();
-		// visualization.log();
-        // updateTunables();
+		logCounter++; 
+
+		if(logCounter % loopsPerLog == 0) {
+			io.updateInputs(inputs);
+			Logger.processInputs("Hood", inputs);
+		}
+
+		if(RobotContainer.SHOOTER_DEBUG) {
+			visualization.update();
+			visualization.log();
+		}
+	
+        updateTunables();
 	}
 
     public Angle getAngle() {

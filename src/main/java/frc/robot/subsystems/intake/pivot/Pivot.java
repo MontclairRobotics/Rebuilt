@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
+import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.Mode;
 
 import java.util.function.Supplier;
 
@@ -18,6 +20,9 @@ public class Pivot extends SubsystemBase {
 	public PivotIO io;
 	private PivotIOInputsAutoLogged inputs = new PivotIOInputsAutoLogged();
 
+	private int logCounter;
+	private final int loopsPerLog;
+
 	private PivotVisualization visualization;
 
 	public Pivot(PivotIO io) {
@@ -25,6 +30,8 @@ public class Pivot extends SubsystemBase {
 		this.visualization = new PivotVisualization();
 		io.setGains(kP, kD, kS, kG);
 		io.setMotionMagic(MOTION_MAGIC_CRUISE_VELOCITY, MOTION_MAGIC_ACCELERATION, MOTION_MAGIC_JERK);
+
+		loopsPerLog = RobotContainer.INTAKE_DEBUG ? 1: 5;
 	}
 
 	public boolean atSetpoint() {
@@ -71,9 +78,16 @@ public class Pivot extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		io.updateInputs(inputs);
-		Logger.processInputs("Pivot", inputs);
-		// visualization.update();
-		// visualization.log();
+		logCounter++; 
+
+		if(logCounter % loopsPerLog == 0) {
+			io.updateInputs(inputs);
+			Logger.processInputs("Pivot", inputs);
+		}
+		
+		if(RobotContainer.INTAKE_DEBUG || Constants.CURRENT_MODE == Mode.SIM) {
+			visualization.update();
+			visualization.log();
+		}
 	}
 }

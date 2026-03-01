@@ -20,8 +20,12 @@ public class Rollers extends SubsystemBase {
 	private final RollersIO io;
 	private final RollersIOInputsAutoLogged inputs = new RollersIOInputsAutoLogged();
 
+	private int logCounter;
+	private final int loopsPerLog;
+
 	public Rollers(RollersIO io) {
 		this.io = io;
+		loopsPerLog = RobotContainer.INTAKE_DEBUG ? 1 : 5;
 	}
 
 	public boolean atSetpoint() {
@@ -30,8 +34,11 @@ public class Rollers extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		io.updateInputs(inputs);
-		Logger.processInputs("Rollers", inputs);
+		logCounter++;
+		if(logCounter % loopsPerLog == 0) {
+			io.updateInputs(inputs);
+			Logger.processInputs("Rollers", inputs);
+		}
 	}
 
 	public void setVelocity(AngularVelocity velocity) {

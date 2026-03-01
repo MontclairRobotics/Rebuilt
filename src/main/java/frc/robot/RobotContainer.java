@@ -69,37 +69,44 @@ public class RobotContainer {
 	public static CommandPS5Controller operatorController = new CommandPS5Controller(1);
 
 	// Subsystems
+	public static Superstructure superstructure;
+	public static Aiming aiming;
 	public static Vision vision;
 	public static CommandSwerveDrivetrain drivetrain;
+	private SwerveDriveSimulation driveSimulation;
 
+	// shooter
 	public static Shooter shooter;
 	public static Turret turret;
 	public static Flywheel flywheel;
 	public static Hood hood;
+
+	public static Spindexer spindexer;
 	public static Serializer serializer;
 	public static Indexer indexer;
-	public static Spindexer spindexer;
-
+	
+	// intake
+	public static Intake intake;
 	public static Pivot pivot;
 	public static Rollers rollers;
-	public static Intake intake;
-
-	public static Superstructure superstructure;
-	public static Aiming aiming;
-
-	public static SimShootingParameters simShootingParameters = new SimShootingParameters(Degrees.zero(), Degrees.zero(), MetersPerSecond.zero());
-
-	private SwerveDriveSimulation driveSimulation;
+	
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
 	public static FuelSim fuelSim = new FuelSim("fuel");
 
-	private boolean withConstantVelocity = false;
-	private boolean whileMoving = true;
+	private boolean useConstantVelocityMap = false;
+	private boolean shootWhileMoving = true;
 
+	// debug, set to true to increase logging, set to false to increase performance and reduce loop overruns
 	public static boolean VISION_DEBUG = false;
+	public static boolean SHOOTER_DEBUG = false;
+	public static boolean INTAKE_DEBUG = false;
+	public static boolean DRIVETRAIN_DEBUG = false;
+	public static boolean SUPERSTRUCTURE_DEBUG = false;
 
 	public RobotContainer() {
+
 		System.out.println("Constants.CURRENT_MODE: " + Constants.CURRENT_MODE);
+
 		switch (Constants.CURRENT_MODE) {
 			case REAL:
 				drivetrain = TunerConstants.createDrivetrain();
@@ -113,7 +120,7 @@ public class RobotContainer {
 				rollers = new Rollers(new RollersIOTalonFX());
 				shooter = new Shooter(
 					hood, flywheel, turret, spindexer,
-					withConstantVelocity, whileMoving
+					useConstantVelocityMap, shootWhileMoving
 				);
 
 				// pivot = new Pivot(new PivotIOTalonFX());
@@ -148,7 +155,7 @@ public class RobotContainer {
 				spindexer = new Spindexer(serializer, indexer);
 				shooter = new Shooter(
 					hood, flywheel, turret, spindexer,
-					withConstantVelocity, whileMoving
+					useConstantVelocityMap, shootWhileMoving
 				);
 				pivot = new Pivot(new PivotIOSim());
 				rollers = new Rollers(new RollersIOSim());

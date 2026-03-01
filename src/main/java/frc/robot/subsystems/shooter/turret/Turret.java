@@ -44,18 +44,30 @@ public class Turret extends SubsystemBase {
 
 	public final LoggedTunableNumber tunableRobotRelativeTurretAngle = new LoggedTunableNumber("Turret/Tunable Robot Relative Angle", 0);
 
+	private int logCounter;
+	private final int loopsPerLog;
+
     public Turret(TurretIO io) {
         this.io = io;
+		loopsPerLog = RobotContainer.SHOOTER_DEBUG ? 1 : 5;
     }
 
 	@Override
 	public void periodic() {
-		io.updateInputs(inputs);
-		Logger.processInputs("Turret", inputs);
-		Logger.recordOutput("Turret/AngleToHub", getAngleToHub());
-		Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
-		// visualization.update();
-		// visualization.log();
+		logCounter++;
+
+		if(logCounter % loopsPerLog == 0) {
+			io.updateInputs(inputs);
+			Logger.processInputs("Turret", inputs);
+			Logger.recordOutput("Turret/AngleToHub", getAngleToHub());
+			Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
+		}
+		
+		if(RobotContainer.SHOOTER_DEBUG) {
+			visualization.update();
+			visualization.log();
+		}
+		
 		updateTunables();
 	}
 

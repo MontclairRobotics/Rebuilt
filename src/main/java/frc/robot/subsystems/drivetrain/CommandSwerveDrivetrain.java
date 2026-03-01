@@ -164,6 +164,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 	public RobotConfig config;
 
+	private int logCounter = 0;
+	private final int loopsPerLog;
+
 	/**
 	 * Constructs a CTRE SwerveDrivetrain using the specified constants.
 	 *
@@ -209,7 +212,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 		tagLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
 		fieldRelative = true;
-		// configureAutoBuilder();
+		configureAutoBuilder();
+
+		loopsPerLog = RobotContainer.DRIVETRAIN_DEBUG ? 1 : 5;
 
 	}
 
@@ -480,16 +485,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 	@Override
 	public void periodic() {
+		logCounter++;
 
 		odometryHeading = this.getState().Pose.getRotation();
 		fieldRelative = !RobotContainer.driverController.L2().getAsBoolean();
-		Logger.recordOutput("Drive/FieldRelative", fieldRelative);
-		Logger.recordOutput("Drive/odometryHeading", odometryHeading);
-		Logger.recordOutput("Drive/odometryPose", getRobotPose());
-		Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
-		Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
 		isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
+		if(logCounter % loopsPerLog == 0) {
+			Logger.recordOutput("Drive/FieldRelative", fieldRelative);
+			Logger.recordOutput("Drive/odometryHeading", odometryHeading);
+			Logger.recordOutput("Drive/odometryPose", getRobotPose());
+			Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
+			Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
+		}
 		/*
 		* Periodically try to apply the operator perspective.
 		* If we haven't applied the operator perspective before, then we should apply it regardless of DS state.

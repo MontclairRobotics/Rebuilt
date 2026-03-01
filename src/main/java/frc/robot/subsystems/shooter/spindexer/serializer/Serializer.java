@@ -20,8 +20,12 @@ public class Serializer extends SubsystemBase {
 	private SerializerIO io;
 	private SerializerIOInputsAutoLogged inputs = new SerializerIOInputsAutoLogged();
 
+	private int logCounter;
+	private final int loopsPerLog;
+
 	public Serializer(SerializerIO io) {
 		this.io = io;
+		loopsPerLog = RobotContainer.SHOOTER_DEBUG ? 1 : 5;
 	}
 
 	public boolean atSetpoint() {
@@ -30,8 +34,12 @@ public class Serializer extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		io.updateInputs(inputs);
-		Logger.processInputs("Serializer", inputs);
+		logCounter++;
+
+		if(logCounter % loopsPerLog == 0) {
+			io.updateInputs(inputs);
+			Logger.processInputs("Serializer", inputs);
+		}
 	}
 
 	public void setVelocity(AngularVelocity velocity) {

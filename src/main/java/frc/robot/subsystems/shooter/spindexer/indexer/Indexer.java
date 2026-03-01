@@ -20,8 +20,12 @@ public class Indexer extends SubsystemBase {
 	private IndexerIO io;
 	private IndexerIOInputsAutoLogged inputs = new IndexerIOInputsAutoLogged();
 
+	private int logCounter;
+	private final int loopsPerLog;
+
 	public Indexer(IndexerIO io) {
 		this.io = io;
+		loopsPerLog = RobotContainer.SHOOTER_DEBUG ? 1 : 5;
 	}
 
 	public boolean atSetpoint() {
@@ -30,8 +34,12 @@ public class Indexer extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		io.updateInputs(inputs);
-		Logger.processInputs("Indexer", inputs);
+		logCounter++;
+
+		if(logCounter % loopsPerLog == 0) {
+			io.updateInputs(inputs);
+			Logger.processInputs("Indexer", inputs);
+		}
 	}
 
 	public void setVelocity(AngularVelocity velocity) {

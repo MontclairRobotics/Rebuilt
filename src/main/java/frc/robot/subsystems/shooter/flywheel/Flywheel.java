@@ -27,8 +27,12 @@ public class Flywheel extends SubsystemBase {
 
     public final LoggedTunableNumber tuningFlywheelSpeed = new LoggedTunableNumber("Flywheel/TuningFlywheelRPS", 0);
 
+    private int logCounter;
+    private final int loopsPerLog;
+
     public Flywheel(FlywheelIO io) {
         this.io = io;
+        loopsPerLog = RobotContainer.SHOOTER_DEBUG ? 1 : 5;
     }
 
     public boolean atGoal() {
@@ -45,8 +49,13 @@ public class Flywheel extends SubsystemBase {
     }
 
     public void periodic() {
-        io.updateInputs(inputs);
-        Logger.processInputs("Flywheel", inputs);
+        logCounter++;
+
+        if(logCounter % loopsPerLog == 0) {
+            io.updateInputs(inputs);
+            Logger.processInputs("Flywheel", inputs);
+        }
+       
         updateTunables();
     }
 
