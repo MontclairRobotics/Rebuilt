@@ -82,15 +82,15 @@ public class FlywheelIOTalonFX implements FlywheelIO{
     @Override
     public void updateInputs(FlywheelIOInputs inputs) {
 
-        BaseStatusSignal.refreshAll(
-            velocitySignal,
-            accelerationSignal,
-            setpointVelocitySignal,
-            setpointAccelerationSignal,
-            appliedVoltageSignal,
-            currentDrawAmpsSignal,
-            tempCelciusSignal
-        );
+        // BaseStatusSignal.refreshAll(
+        //     velocitySignal,
+        //     accelerationSignal,
+        //     setpointVelocitySignal,
+        //     setpointAccelerationSignal,
+        //     appliedVoltageSignal,
+        //     currentDrawAmpsSignal,
+        //     tempCelciusSignal
+        // );
 
         inputs.leftMotorConnected = BaseStatusSignal.isAllGood(
             velocitySignal,

@@ -28,6 +28,7 @@ import frc.robot.constants.Constants;
 import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
+import frc.robot.util.PhoenixUtil;
 import frc.robot.util.PoseUtils;
 
 /**
@@ -116,6 +117,7 @@ public class Robot extends LoggedRobot {
 			TargetLocation.FERRY_RIGHT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT));
 		}
 
+		PhoenixUtil.refreshAll();
 		CommandScheduler.getInstance().run();
 	}
 
@@ -159,7 +161,7 @@ public class Robot extends LoggedRobot {
 		RobotContainer.pivot.setNeutralMode(NeutralModeValue.Brake);
 		RobotContainer.turret.setNeutralMode(NeutralModeValue.Brake);
 		RobotContainer.hood.setNeutralMode(NeutralModeValue.Brake);
-		
+
 		if (autonomousCommand != null) {
 			autonomousCommand.cancel();
 		}

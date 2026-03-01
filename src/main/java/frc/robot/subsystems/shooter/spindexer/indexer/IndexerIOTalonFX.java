@@ -60,13 +60,13 @@ public class IndexerIOTalonFX implements IndexerIO {
 	@Override
 	public void updateInputs(IndexerIOInputs inputs) {
 
-		BaseStatusSignal.refreshAll(
-            velocitySignal,
-			setpointVelocitySignal,
-			appliedVoltageSignal,
-			currentDrawAmpsSignal,
-			tempCelciuSignal
-        );
+		// BaseStatusSignal.refreshAll(
+        //     velocitySignal,
+		// 	setpointVelocitySignal,
+		// 	appliedVoltageSignal,
+		// 	currentDrawAmpsSignal,
+		// 	tempCelciuSignal
+        // );
 
 		inputs.motorConnected = BaseStatusSignal.isAllGood(
 			velocitySignal,

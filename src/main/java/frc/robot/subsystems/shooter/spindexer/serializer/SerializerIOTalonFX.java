@@ -60,13 +60,13 @@ public class SerializerIOTalonFX implements SerializerIO {
 	@Override
 	public void updateInputs(SerializerIOInputs inputs) {
 
-		BaseStatusSignal.refreshAll(
-            velocitySignal,
-			setpointVelocitySignal,
-			appliedVoltageSignal,
-			currentDrawAmpsSignal,
-			tempCelciuSignal
-        );
+		// BaseStatusSignal.refreshAll(
+        //     velocitySignal,
+		// 	setpointVelocitySignal,
+		// 	appliedVoltageSignal,
+		// 	currentDrawAmpsSignal,
+		// 	tempCelciuSignal
+        // );
 
 		inputs.motorConnected = BaseStatusSignal.isAllGood(
 			velocitySignal,

@@ -62,13 +62,13 @@ public class RollersIOTalonFX implements RollersIO {
 	@Override
 	public void updateInputs(RollersIOInputs inputs) {
 
-		BaseStatusSignal.refreshAll(
-            velocitySignal,
-			setpointVelocitySignal,
-			appliedVoltageSignal,
-			currentDrawAmpsSignal,
-			tempCelciuSignal
-        );
+		// BaseStatusSignal.refreshAll(
+        //     velocitySignal,
+		// 	setpointVelocitySignal,
+		// 	appliedVoltageSignal,
+		// 	currentDrawAmpsSignal,
+		// 	tempCelciuSignal
+        // );
 
 		inputs.motorConnected = BaseStatusSignal.isAllGood(
 			velocitySignal,

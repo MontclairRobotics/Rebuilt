@@ -50,7 +50,6 @@ public class FlywheelIOBangBang implements FlywheelIO {
     public static enum Phase {
         STARTUP,
         IDLE,
-        BALL,
         RECOVERY
     }
 
@@ -101,15 +100,16 @@ public class FlywheelIOBangBang implements FlywheelIO {
 
     @Override
     public void updateInputs(FlywheelIOInputs inputs) {
-        BaseStatusSignal.refreshAll(
-            velocitySignal,
-            accelerationSignal,
-            setpointVelocitySignal,
-            setpointAccelerationSignal,
-            appliedVoltageSignal,
-            currentDrawAmpsSignal,
-            tempCelciusSignal
-        );
+        
+        // BaseStatusSignal.refreshAll(
+        //     velocitySignal,
+        //     accelerationSignal,
+        //     setpointVelocitySignal,
+        //     setpointAccelerationSignal,
+        //     appliedVoltageSignal,
+        //     currentDrawAmpsSignal,
+        //     tempCelciusSignal
+        // );
 
         inputs.leftMotorConnected = BaseStatusSignal.isAllGood(
             velocitySignal,
@@ -157,16 +157,6 @@ public class FlywheelIOBangBang implements FlywheelIO {
                 leftMotor.setControl(torqueRequest.withVelocity(targetVelocity));
 
                 // detect when a shot happens
-                if (error > SHOT_VELOCITY_DROP.in(RotationsPerSecond)) {
-                    phase = Phase.BALL; // we enter ball mode
-                }
-
-                break;
-
-            case BALL:
-                leftMotor.setControl(torqueRequest.withVelocity(targetVelocity));
-
-                // upon shooting the ball (greatest velocity drop)
                 if (error > SHOT_VELOCITY_DROP.in(RotationsPerSecond)) {
                     phase = Phase.RECOVERY; // we enter recovery mode
                 }

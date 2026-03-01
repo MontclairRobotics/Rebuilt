@@ -81,14 +81,14 @@ public class HoodIOTalonFX implements HoodIO {
     @Override
     public void updateInputs(HoodIOInputs inputs) {
 
-        BaseStatusSignal.refreshAll(
-            positionSignal,
-            setpointPositionSignal,
-            velocitySignal,
-            appliedVoltageSignal,
-            currentDrawAmpsSignal,
-            tempCelsiusSignal
-        );
+        // BaseStatusSignal.refreshAll(
+        //     positionSignal,
+        //     setpointPositionSignal,
+        //     velocitySignal,
+        //     appliedVoltageSignal,
+        //     currentDrawAmpsSignal,
+        //     tempCelsiusSignal
+        // );
 
         inputs.motorConnected = BaseStatusSignal.isAllGood(
             positionSignal,
