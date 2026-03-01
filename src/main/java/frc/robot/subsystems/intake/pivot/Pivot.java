@@ -15,6 +15,8 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 public class Pivot extends SubsystemBase {
 
 	public PivotIO io;
@@ -31,7 +33,7 @@ public class Pivot extends SubsystemBase {
 		io.setGains(kP, kD, kS, kG);
 		io.setMotionMagic(MOTION_MAGIC_CRUISE_VELOCITY, MOTION_MAGIC_ACCELERATION, MOTION_MAGIC_JERK);
 
-		loopsPerLog = RobotContainer.INTAKE_DEBUG ? 1: 5;
+		loopsPerLog = RobotContainer.INTAKE_DEBUG ? 1 : 5;
 	}
 
 	public boolean atSetpoint() {
@@ -51,6 +53,10 @@ public class Pivot extends SubsystemBase {
 		// Logger.recordOutput("Pivot/JoystickVoltage", voltage);
 		// Logger.recordOutput("Pivot/RawAxis", RobotContainer.driverController.getRightY());
 		io.setVoltage(voltage);
+	}
+
+	public void setNeutralMode(NeutralModeValue value) {
+		io.setNeutralMode(value);
 	}
 
 	public Command stopCommand() {
@@ -84,7 +90,7 @@ public class Pivot extends SubsystemBase {
 			io.updateInputs(inputs);
 			Logger.processInputs("Pivot", inputs);
 		}
-		
+
 		if(RobotContainer.INTAKE_DEBUG || Constants.CURRENT_MODE == Mode.SIM) {
 			visualization.update();
 			visualization.log();

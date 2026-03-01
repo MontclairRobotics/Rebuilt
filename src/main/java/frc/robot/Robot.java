@@ -62,8 +62,8 @@ public class Robot extends LoggedRobot {
 		// Set up data receivers & replay source
 		switch (Constants.CURRENT_MODE) {
 		case REAL:
-			// Running on a real robot, log to a USB stick ("/U/logs")
-			// Logger.addDataReceiver(new WPILOGWriter());
+			// Running on a real robot, log to roboRio
+			Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs"));
 			Logger.addDataReceiver(new NT4Publisher());
 			break;
 
@@ -81,9 +81,8 @@ public class Robot extends LoggedRobot {
 			break;
 		}
 
-		// Start AdvantageKit logger
-
 		robotContainer = new RobotContainer();
+		// Start AdvantageKit logger
 		Logger.start();
 	}
 
@@ -106,9 +105,11 @@ public class Robot extends LoggedRobot {
 	/** This function is called periodically during all modes. */
 	@Override
 	public void robotPeriodic() {
-		AllianceManager.update();
+		// this should only run once
+		if(!AllianceManager.allianceKnown) AllianceManager.update();
 
-		if(!hasAppliedTargetLocation && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+		// this should only run once
+		if(!hasAppliedTargetLocation && AllianceManager.allianceKnown && AllianceManager.isRed()) {
 			hasAppliedTargetLocation = true;
 			TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
 			TargetLocation.FERRY_LEFT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT));
@@ -121,11 +122,13 @@ public class Robot extends LoggedRobot {
 	/** This function is called once when the robot is disabled. */
 	@Override
 	public void disabledInit() {
+		// coast mode
 		RobotContainer.turret.setNeutralMode(NeutralModeValue.Coast);
 		RobotContainer.hood.setNeutralMode(NeutralModeValue.Coast);
+		RobotContainer.pivot.setNeutralMode(NeutralModeValue.Coast);
 
 		if (!RobotBase.isReal()) {
-			// robotContainer.resetSdimulation();
+			// robotContainer.resetSimulation();
 		}
 	}
 
@@ -151,9 +154,12 @@ public class Robot extends LoggedRobot {
 	/** This function is called once when teleop is enabled. */
 	@Override
 	public void teleopInit() {
-		RobotContainer.pivot.io.resetEncoderPosition();
+
+		// brake mode
+		RobotContainer.pivot.setNeutralMode(NeutralModeValue.Brake);
 		RobotContainer.turret.setNeutralMode(NeutralModeValue.Brake);
 		RobotContainer.hood.setNeutralMode(NeutralModeValue.Brake);
+		
 		if (autonomousCommand != null) {
 			autonomousCommand.cancel();
 		}

@@ -190,6 +190,7 @@ public class Superstructure extends SubsystemBase {
 		// if(!AllianceManager.isAllianceKnown() || (HubTracker.getCurrentShift().isEmpty())) return false;
 
 		if(!AllianceManager.isAllianceKnown()) return false;
+		
 		return
 			!shouldStowHood()
 			&& isInScoringZone();

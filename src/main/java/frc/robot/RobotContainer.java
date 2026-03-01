@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.Constants.Mode;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.pivot.Pivot;
@@ -110,61 +111,61 @@ public class RobotContainer {
 		switch (Constants.CURRENT_MODE) {
 			case REAL:
 				drivetrain = TunerConstants.createDrivetrain();
+				superstructure = new Superstructure(shooter);
+				aiming = new Aiming(turret);
+	
+				hood = new Hood(new HoodIOTalonFX());
 				flywheel = new Flywheel(new FlywheelIOTalonFX());
 				turret = new Turret(new TurretIOTalonFX());
-				hood = new Hood(new HoodIOTalonFX());
+
+				spindexer = new Spindexer(serializer, indexer);
 				serializer = new Serializer(new SerializerIOTalonFX());
 				indexer = new Indexer(new IndexerIOTalonFX());
-				spindexer = new Spindexer(serializer, indexer);
-				pivot = new Pivot(new PivotIOTalonFX());
-				rollers = new Rollers(new RollersIOTalonFX());
+				
 				shooter = new Shooter(
 					hood, flywheel, turret, spindexer,
 					useConstantVelocityMap, shootWhileMoving
 				);
 
-				// pivot = new Pivot(new PivotIOTalonFX());
-				// rollers = new Rollers(new RollersIOTalonFX());
-				// intake = new Intake(pivot, rollers);
-				superstructure = new Superstructure(shooter);
-				aiming = new Aiming(turret);
-				// vision =
-				// 	new Vision(
-				// 		drivetrain::addVisionMeasurement,
-				// 		// new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
-				// 		new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
-				// 		new VisionIOLiion =
-					new Vision(
-						drivetrain::addVisionMeasurement,
-						// new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
-						new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
-						new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading));
-
-
+				pivot = new Pivot(new PivotIOTalonFX());
+				rollers = new Rollers(new RollersIOTalonFX());
+				intake = new Intake(pivot, rollers);
+				
+				vision = new Vision(
+					drivetrain::addVisionMeasurement,
+					// new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
+					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
+					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
+				);
 
 				break;
 
 			case SIM:
 				drivetrain = TunerConstants.createDrivetrain();
 				driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
+				superstructure = new Superstructure(shooter);
+				aiming = new Aiming(turret);
+
+				hood = new Hood(new HoodIOSim());
 				flywheel = new Flywheel(new FlywheelIOSim());
 				turret = new Turret(new TurretIOSim());
-				hood = new Hood(new HoodIOSim());
+				
+				spindexer = new Spindexer(serializer, indexer);
 				serializer = new Serializer(new SerializerIOSim());
 				indexer = new Indexer(new IndexerIOSim());
-				spindexer = new Spindexer(serializer, indexer);
+				
 				shooter = new Shooter(
 					hood, flywheel, turret, spindexer,
 					useConstantVelocityMap, shootWhileMoving
 				);
+
 				pivot = new Pivot(new PivotIOSim());
 				rollers = new Rollers(new RollersIOSim());
 				intake = new Intake(pivot, rollers);
-				superstructure = new Superstructure(shooter);
+				
 				fuelSim.enableAirResistance();
 				fuelSim.start();
-				aiming = new Aiming(turret);
-
+				
 				fuelSim.registerRobot(
 					Constants.BUMPER_WIDTH,
 					Constants.BUMPER_WIDTH,
@@ -172,6 +173,7 @@ public class RobotContainer {
 					() -> drivetrain.getRobotPose(),
 					() -> drivetrain.getFieldRelativeSpeeds()
 				);
+
 				fuelSim.registerIntake(
 					Inches.of(15),
 					Inches.of(22),
@@ -180,6 +182,7 @@ public class RobotContainer {
 					shooter::shouldIntake,
 					shooter::addBall
 				);
+
 				fuelSim.spawnStartingFuel();
 
 				// vision =
@@ -206,9 +209,14 @@ public class RobotContainer {
 	}
 
 	private void configureBindings() {
+
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
+		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
+
 		driverController.triangle().whileTrue(spindexer.setVoltageCommand(5)).onFalse(spindexer.setVoltageCommand(0));
+
 		driverController.R1().whileTrue(rollers.setVoltageCommand(12)).onFalse(rollers.setVoltageCommand(0));
+		
 		// driverController.circle().whileTrue(rollers.spinUpCommand()).onFalse(rollers.spinDownCommand());
 		// hood.setDefaultCommand(hood.joystickControlCommand());
 		// turret.setDefaultCommand(turret.joystickControlCommand());
@@ -241,9 +249,9 @@ public class RobotContainer {
 		// driverController.circle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
-		driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
-		// zeros gyro
-		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
+		
+		if(Constants.CURRENT_MODE == Mode.SIM) driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
+	
 	}
 
 	public Command getAutonomousCommand() {

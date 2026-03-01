@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.PivotConstants.*;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -92,4 +94,9 @@ public class PivotIOSim implements PivotIO {
     public void resetEncoderPosition() {
 		// does nothing, not necessary
     }
+
+	@Override 
+	public void setNeutralMode(NeutralModeValue value) {
+		// does nothing, not necessary
+	}
 }

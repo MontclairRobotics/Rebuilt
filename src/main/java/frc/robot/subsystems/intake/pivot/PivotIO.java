@@ -6,6 +6,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 public interface PivotIO {
 
 	@AutoLog
@@ -38,4 +40,6 @@ public interface PivotIO {
 	public void setGains(double kP, double kD, double kS, double kG);
 
 	public void setMotionMagic(AngularVelocity velocity, AngularAcceleration acceleration, double jerk);
+
+	public void setNeutralMode(NeutralModeValue value);
 }
