@@ -54,8 +54,9 @@ public class Flywheel extends SubsystemBase {
         if(logCounter % loopsPerLog == 0) {
             io.updateInputs(inputs);
             Logger.processInputs("Flywheel", inputs);
+            Logger.recordOutput("Flywheel/Mode", FlywheelIOBangBang.phase);
         }
-       
+
         updateTunables();
     }
 

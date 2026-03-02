@@ -13,6 +13,7 @@ import frc.robot.RobotContainer;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.RollersConstants.*;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class Rollers extends SubsystemBase {
@@ -71,8 +72,8 @@ public class Rollers extends SubsystemBase {
 		return Commands.run(() -> setVelocity(SPIN_VELOCITY), this);
 	}
 
-	public Command setVoltageCommand(double voltage) {
-		return Commands.run(() -> io.setVoltage(voltage), this);
+	public Command setVoltageCommand(DoubleSupplier voltage) {
+		return Commands.run(() -> io.setVoltage(voltage.getAsDouble()), this);
 	}
 
     public Command joystickControlCommand() {

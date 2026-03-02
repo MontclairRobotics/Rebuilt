@@ -110,7 +110,7 @@ public class PivotIOTalonFX implements PivotIO {
             && Math.abs(motor.getVelocity().getValueAsDouble()) < MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond);
 	}
 
-    @Override 
+    @Override
 	public void setNeutralMode(NeutralModeValue value) {
 		motor.setNeutralMode(value);
 	}

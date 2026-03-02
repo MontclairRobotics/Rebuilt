@@ -21,8 +21,9 @@ import frc.robot.util.PhoenixUtil;
 
 import static frc.robot.constants.FlywheelConstants.*;
 
+
 public class FlywheelIOBangBang implements FlywheelIO {
-    
+
     private TalonFX leftMotor;
     private TalonFX rightMotor;
 
@@ -41,36 +42,33 @@ public class FlywheelIOBangBang implements FlywheelIO {
     private VelocityTorqueCurrentFOC torqueRequest = new VelocityTorqueCurrentFOC(0);
     private NeutralOut neutralOut = new NeutralOut();
 
+    // private BangBangController bangBangController = new BangBangController();
+
     // when the velocity drops this much in the idle phase, we say that a ball has been shot
-    private static final AngularVelocity SHOT_VELOCITY_DROP = RotationsPerSecond.of(7);
-    
+    private static final AngularVelocity SHOT_VELOCITY_DROP = RotationsPerSecond.of(3);
+
     // the velocity tolerance around the setpoint needed in order to exit the recovery phase
     private static final AngularVelocity RECOVERY_VELOCITY_TOLERANCE = VELOCITY_TOLERANCE; // may want to change these? prob keep the same
 
     public static enum Phase {
-        STARTUP,
+        SPINUP,
         IDLE,
-        RECOVERY
     }
 
-    private Phase phase = Phase.STARTUP;
+    static Phase phase = Phase.SPINUP;
+
     public FlywheelIOBangBang() {
         leftMotor = new TalonFX(LEFT_CAN_ID);
         rightMotor = new TalonFX(RIGHT_CAN_ID);
         rightMotor.setControl(new Follower(LEFT_CAN_ID, MotorAlignmentValue.Opposed));
 
         leftMotorConfig = new TalonFXConfiguration()
+            .withSlot0(SLOT0_CONFIGS)
             .withMotorOutput(LEFT_MOTOR_OUTPUT_CONFIGS)
+            .withTorqueCurrent(TORQUE_CURRENT_CONFIGS)
             .withFeedback(FEEDBACK_CONFIGS);
-        
-        leftMotorConfig.Slot0.kP = 999999.0;
-        leftMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
-        leftMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
-        leftMotorConfig.MotorOutput.PeakForwardDutyCycle = 1.0;
-        leftMotorConfig.MotorOutput.PeakReverseDutyCycle = 0.0;
 
-        rightMotorConfig = new TalonFXConfiguration()
-            .withMotorOutput(RIGHT_MOTOR_OUTPUT_CONFIGS);
+        rightMotorConfig = new TalonFXConfiguration();
 
         leftMotor.getConfigurator().apply(leftMotorConfig);
         rightMotor.getConfigurator().apply(rightMotorConfig);
@@ -100,16 +98,16 @@ public class FlywheelIOBangBang implements FlywheelIO {
 
     @Override
     public void updateInputs(FlywheelIOInputs inputs) {
-        
-        // BaseStatusSignal.refreshAll(
-        //     velocitySignal,
-        //     accelerationSignal,
-        //     setpointVelocitySignal,
-        //     setpointAccelerationSignal,
-        //     appliedVoltageSignal,
-        //     currentDrawAmpsSignal,
-        //     tempCelciusSignal
-        // );
+
+        BaseStatusSignal.refreshAll(
+            velocitySignal,
+            accelerationSignal,
+            setpointVelocitySignal,
+            setpointAccelerationSignal,
+            appliedVoltageSignal,
+            currentDrawAmpsSignal,
+            tempCelciusSignal
+        );
 
         inputs.leftMotorConnected = BaseStatusSignal.isAllGood(
             velocitySignal,
@@ -141,35 +139,34 @@ public class FlywheelIOBangBang implements FlywheelIO {
         double targetRPS = targetVelocity.in(RotationsPerSecond);
         double error = targetRPS - currentRPS;
 
+        // double output = bangBangController.calculate(currentRPS, targetRPS);
+        // Logger.recordOutput("Flywheel/BangBang", output);
+
         switch (phase) {
 
-            case STARTUP:
-                leftMotor.setControl(dutyCycleRequest.withVelocity(targetVelocity));
+            case SPINUP:
 
                 // when we're within tolerance, switch to idle mode
                 if (Math.abs(error) < RECOVERY_VELOCITY_TOLERANCE.in(RotationsPerSecond)) {
                     phase = Phase.IDLE;
+                    break;
                 }
+
+                leftMotor.setControl(dutyCycleRequest.withVelocity(targetVelocity));
+                // leftMotor.set(output);
 
                 break;
 
             case IDLE:
+                if (error > SHOT_VELOCITY_DROP.in(RotationsPerSecond)) {
+                    phase = Phase.SPINUP; // we enter recovery mode
+                    break;
+                }
                 leftMotor.setControl(torqueRequest.withVelocity(targetVelocity));
+                // leftMotor.setControl(torqueRequest.withOutput(output * 70));
 
                 // detect when a shot happens
-                if (error > SHOT_VELOCITY_DROP.in(RotationsPerSecond)) {
-                    phase = Phase.RECOVERY; // we enter recovery mode
-                }
 
-                break;
-
-            case RECOVERY:
-                leftMotor.setControl(dutyCycleRequest.withVelocity(targetVelocity));
-
-                // when we're in tolerance again, switch back to idle mode
-                if (Math.abs(error) < RECOVERY_VELOCITY_TOLERANCE.in(RotationsPerSecond)) {
-                    phase = Phase.IDLE;
-                }
 
                 break;
         }
@@ -183,7 +180,7 @@ public class FlywheelIOBangBang implements FlywheelIO {
     @Override
     public void stop() {
         leftMotor.setControl(neutralOut);
-        phase = Phase.STARTUP; // enter startup mode after we stop the flywheel
+        phase = Phase.SPINUP; // enter startup mode after we stop the flywheel
     }
 
     @Override

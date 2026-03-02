@@ -39,8 +39,8 @@ public class TurretConstants {
 	public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the canivore
 
 	// constraints
-	public static final Angle MIN_ANGLE = Rotations.of(-0.5);
-	public static final Angle MAX_ANGLE = Rotations.of(0.5);
+	public static final Angle MIN_ANGLE = Rotations.of(-0.475);
+	public static final Angle MAX_ANGLE = Rotations.of(0.475);
 	public static final Angle ANGLE_TOLERANCE = Degrees.of(3);
 
 	// physical properties
@@ -52,16 +52,16 @@ public class TurretConstants {
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
 	public static final Angle ANGLE_OFFSET = Rotations.of(0.375);
-	public static final Angle ENCODER_OFFSET = Rotations.of(-0.276822265625);
+	public static final Angle ENCODER_OFFSET = Rotations.of(0.085);
 
 	// pid + ff gains
-	public static final double kP = 130.0555;
+	public static final double kP = 110.0555;
 	public static final double kD = 0;
-	public static final double kS = 2;
+	public static final double kS = 0.35;
 
-	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(3);
-	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(6);
-	public static final double MOTION_MAGIC_JERK = 50; // Rotations Per Second Per Second Per Second
+	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(6);
+	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(60);
+	public static final double MOTION_MAGIC_JERK = 100; // Rotations Per Second Per Second Per Second
 	public static AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(0.1);
 
 	public static final double STATOR_CURRENT_LIMIT = 60; // Amps

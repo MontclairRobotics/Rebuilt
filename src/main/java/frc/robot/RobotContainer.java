@@ -32,10 +32,9 @@ import frc.robot.subsystems.intake.rollers.RollersIOSim;
 import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.Aiming;
-import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOBangBang;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.Indexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.IndexerIOSim;
@@ -48,13 +47,13 @@ import frc.robot.subsystems.shooter.turret.TurretIOSim;
 import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
-import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.sim.FuelSim;
+import frc.robot.util.tunables.Tunable;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
@@ -85,17 +84,17 @@ public class RobotContainer {
 	public static Spindexer spindexer;
 	public static Serializer serializer;
 	public static Indexer indexer;
-	
+
 	// intake
 	public static Intake intake;
 	public static Pivot pivot;
 	public static Rollers rollers;
-	
+
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
 	public static FuelSim fuelSim = new FuelSim("fuel");
 
 	private boolean useConstantVelocityMap = false;
-	private boolean shootWhileMoving = true;
+	private boolean shootWhileMoving = false;
 
 	// debug, set to true to increase logging, set to false to increase performance and reduce loop overruns
 	public static boolean VISION_DEBUG = false;
@@ -104,6 +103,9 @@ public class RobotContainer {
 	public static boolean DRIVETRAIN_DEBUG = false;
 	public static boolean SUPERSTRUCTURE_DEBUG = false;
 
+	public double intakeVoltage = 12;
+	Tunable intakeSpeed = new Tunable("Intake VOltage", intakeVoltage, (value) -> intakeVoltage = value);
+
 	public RobotContainer() {
 
 		System.out.println("Constants.CURRENT_MODE: " + Constants.CURRENT_MODE);
@@ -111,29 +113,31 @@ public class RobotContainer {
 		switch (Constants.CURRENT_MODE) {
 			case REAL:
 				drivetrain = TunerConstants.createDrivetrain();
-				superstructure = new Superstructure(shooter);
-				aiming = new Aiming(turret);
-	
-				hood = new Hood(new HoodIOTalonFX());
-				flywheel = new Flywheel(new FlywheelIOTalonFX());
+
+				hood = new Hood(new HoodIOSim());
+				flywheel = new Flywheel(new FlywheelIOBangBang());
 				turret = new Turret(new TurretIOTalonFX());
 
-				spindexer = new Spindexer(serializer, indexer);
+
 				serializer = new Serializer(new SerializerIOTalonFX());
 				indexer = new Indexer(new IndexerIOTalonFX());
-				
+				spindexer = new Spindexer(serializer, indexer);
+
 				shooter = new Shooter(
 					hood, flywheel, turret, spindexer,
 					useConstantVelocityMap, shootWhileMoving
 				);
 
+				superstructure = new Superstructure(shooter);
+				aiming = new Aiming(turret);
+
 				pivot = new Pivot(new PivotIOTalonFX());
 				rollers = new Rollers(new RollersIOTalonFX());
 				intake = new Intake(pivot, rollers);
-				
+
 				vision = new Vision(
 					drivetrain::addVisionMeasurement,
-					// new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
+					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
 					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
 					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
 				);
@@ -149,11 +153,11 @@ public class RobotContainer {
 				hood = new Hood(new HoodIOSim());
 				flywheel = new Flywheel(new FlywheelIOSim());
 				turret = new Turret(new TurretIOSim());
-				
+
 				spindexer = new Spindexer(serializer, indexer);
 				serializer = new Serializer(new SerializerIOSim());
 				indexer = new Indexer(new IndexerIOSim());
-				
+
 				shooter = new Shooter(
 					hood, flywheel, turret, spindexer,
 					useConstantVelocityMap, shootWhileMoving
@@ -162,10 +166,10 @@ public class RobotContainer {
 				pivot = new Pivot(new PivotIOSim());
 				rollers = new Rollers(new RollersIOSim());
 				intake = new Intake(pivot, rollers);
-				
+
 				fuelSim.enableAirResistance();
 				fuelSim.start();
-				
+
 				fuelSim.registerRobot(
 					Constants.BUMPER_WIDTH,
 					Constants.BUMPER_WIDTH,
@@ -213,10 +217,10 @@ public class RobotContainer {
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 
-		driverController.triangle().whileTrue(spindexer.setVoltageCommand(5)).onFalse(spindexer.setVoltageCommand(0));
+		driverController.triangle().whileTrue(spindexer.setVoltageCommand(12)).onFalse(spindexer.setVoltageCommand(0));
 
-		driverController.R1().whileTrue(rollers.setVoltageCommand(12)).onFalse(rollers.setVoltageCommand(0));
-		
+		driverController.R1().whileTrue(rollers.setVoltageCommand(() -> intakeVoltage)).onFalse(rollers.setVoltageCommand(() -> 0));
+
 		// driverController.circle().whileTrue(rollers.spinUpCommand()).onFalse(rollers.spinDownCommand());
 		// hood.setDefaultCommand(hood.joystickControlCommand());
 		// turret.setDefaultCommand(turret.joystickControlCommand());
@@ -249,9 +253,9 @@ public class RobotContainer {
 		// driverController.circle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
-		
+
 		if(Constants.CURRENT_MODE == Mode.SIM) driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
-	
+
 	}
 
 	public Command getAutonomousCommand() {

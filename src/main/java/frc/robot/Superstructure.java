@@ -90,7 +90,7 @@ public class Superstructure extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		logCounter++; 
+		logCounter++;
 
 		if(movingIntoObstacle()) {
 			updateTrenchZonesVeloBased();
@@ -107,7 +107,7 @@ public class Superstructure extends SubsystemBase {
 			Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowHood());
 			Logger.recordOutput("Trench/Trench Danger Zones", FieldConstants.Zones.TRENCH_DANGER_ZONES);
 		}
-		
+
 	};
 
 	public void resetTrenchZones() {
@@ -190,7 +190,7 @@ public class Superstructure extends SubsystemBase {
 		// if(!AllianceManager.isAllianceKnown() || (HubTracker.getCurrentShift().isEmpty())) return false;
 
 		if(!AllianceManager.isAllianceKnown()) return false;
-		
+
 		return
 			!shouldStowHood()
 			&& isInScoringZone();

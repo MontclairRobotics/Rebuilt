@@ -95,7 +95,7 @@ public class PivotIOSim implements PivotIO {
 		// does nothing, not necessary
     }
 
-	@Override 
+	@Override
 	public void setNeutralMode(NeutralModeValue value) {
 		// does nothing, not necessary
 	}

@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -20,10 +21,10 @@ public class FlywheelConstants {
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(1);
 
-	public static final double kP = 30;
+	public static final double kP = 999999.0;
 	public static final double kD = 0;
-	public static final double kS = 20.5; // tuned 2/22
-	public static final double kV = 0.8;
+	public static final double kS = 0; // tuned 2/22
+	public static final double kV = 0;
 
 	public static final double STATOR_CURRENT_LIMIT = 100; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 60; // Amps
@@ -43,10 +44,18 @@ public class FlywheelConstants {
 
 	public static final MotorOutputConfigs LEFT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
 		.withInverted(InvertedValue.Clockwise_Positive)
-		.withNeutralMode(NeutralModeValue.Coast);
+		.withNeutralMode(NeutralModeValue.Coast)
+		.withPeakForwardDutyCycle(1)
+		.withPeakReverseDutyCycle(0);
 
 	public static final MotorOutputConfigs RIGHT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
-		.withNeutralMode(NeutralModeValue.Coast);
+		.withNeutralMode(NeutralModeValue.Coast)
+		.withPeakForwardDutyCycle(1)
+		.withPeakReverseDutyCycle(0);
+
+	public static final TorqueCurrentConfigs TORQUE_CURRENT_CONFIGS = new TorqueCurrentConfigs()
+		.withPeakForwardTorqueCurrent(90)
+		.withPeakReverseTorqueCurrent(0);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()
 		.withVelocityFilterTimeConstant(Seconds.of(0.01))

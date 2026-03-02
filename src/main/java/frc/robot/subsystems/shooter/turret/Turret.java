@@ -62,12 +62,12 @@ public class Turret extends SubsystemBase {
 			Logger.recordOutput("Turret/AngleToHub", getAngleToHub());
 			Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
 		}
-		
+
 		if(RobotContainer.SHOOTER_DEBUG) {
 			visualization.update();
 			visualization.log();
 		}
-		
+
 		updateTunables();
 	}
 

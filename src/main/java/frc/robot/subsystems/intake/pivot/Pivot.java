@@ -84,7 +84,7 @@ public class Pivot extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		logCounter++; 
+		logCounter++;
 
 		if(logCounter % loopsPerLog == 0) {
 			io.updateInputs(inputs);

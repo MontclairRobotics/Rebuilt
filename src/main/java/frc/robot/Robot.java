@@ -21,14 +21,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
-import frc.robot.util.PhoenixUtil;
 import frc.robot.util.PoseUtils;
 
 /**
@@ -117,7 +115,7 @@ public class Robot extends LoggedRobot {
 			TargetLocation.FERRY_RIGHT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT));
 		}
 
-		PhoenixUtil.refreshAll();
+		// PhoenixUtil.refreshAll();
 		CommandScheduler.getInstance().run();
 	}
 
