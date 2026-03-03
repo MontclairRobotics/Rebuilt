@@ -37,10 +37,10 @@ public class FlywheelConstants {
 		.withKS(kS).withKV(kV);
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
-		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)
-		.withStatorCurrentLimitEnable(true)
-		.withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
-		.withSupplyCurrentLimitEnable(true);
+		// .withStatorCurrentLimit(STATOR_CURRENT_LIMIT)
+		.withStatorCurrentLimitEnable(false)
+		// .withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
+		.withSupplyCurrentLimitEnable(false);
 
 	public static final MotorOutputConfigs LEFT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
 		.withInverted(InvertedValue.Clockwise_Positive)

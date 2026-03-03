@@ -226,7 +226,7 @@ public class Auto extends SubsystemBase {
       ),
       Commands.parallel(
         followPathCommands,
-        RobotContainer.rollers.intakeCommand()
+        RobotContainer.rollers.spinUpCommand()
       )
       );
     } else {
@@ -246,7 +246,7 @@ public class Auto extends SubsystemBase {
         Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
         Commands.parallel(
           followPathCommands,
-          RobotContainer.rollers.intakeCommand()
+          RobotContainer.rollers.spinUpCommand()
         )
       );
     }

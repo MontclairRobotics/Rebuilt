@@ -65,15 +65,19 @@ public class Rollers extends SubsystemBase {
     }
 
     public Command spinDownCommand() {
-        return Commands.run(() -> io.setVelocity(RotationsPerSecond.zero()), this);
+        return setVoltageCommand(0);
     }
 
     public Command spinUpCommand() {
-		return Commands.run(() -> setVelocity(SPIN_VELOCITY), this);
+		return setVoltageCommand(SPIN_VOLTAGE);
 	}
 
 	public Command setVoltageCommand(DoubleSupplier voltage) {
 		return Commands.run(() -> io.setVoltage(voltage.getAsDouble()), this);
+	}
+
+	public Command setVoltageCommand(double voltage) {
+		return Commands.run(() -> io.setVoltage(voltage), this);
 	}
 
     public Command joystickControlCommand() {

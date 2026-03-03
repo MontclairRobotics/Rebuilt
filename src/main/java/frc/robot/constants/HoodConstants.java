@@ -62,9 +62,9 @@ public class HoodConstants {
 	public static final double STATOR_CURRENT_LIMIT = 80; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 40; // Amps
 
-	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(1);
-	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(2);
-	public static final double MOTION_MAGIC_JERK = 40; // Rotations Per Second Per Second Per Second
+	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(3);
+	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(30);
+	public static final double MOTION_MAGIC_JERK = 100; // Rotations Per Second Per Second Per Second
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.05);
 
 	// Configs

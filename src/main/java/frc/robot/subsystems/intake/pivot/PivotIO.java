@@ -4,6 +4,9 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import org.littletonrobotics.junction.AutoLog;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -12,12 +15,17 @@ public interface PivotIO {
 
 	@AutoLog
 	public static class PivotIOInputs {
-		public double appliedVoltage;
-		public double current;
-		public double tempCelsius;
-		public double angle;
-		public boolean encoderConnected;
-		public boolean isAtSetpoint;
+		public boolean motorConnected = false;
+
+        public double appliedVoltage = 0.0;
+        public double currentDrawAmps = 0.0;
+        public double tempCelcius = 0.0;
+
+        public Angle angle = Rotations.zero();
+        public Angle angleSetpoint = Rotations.zero();
+        public AngularVelocity velocity = RotationsPerSecond.zero();
+
+        public boolean isAtSetpoint = false;
 	}
 
 	public void updateInputs(PivotIOInputs inputs);

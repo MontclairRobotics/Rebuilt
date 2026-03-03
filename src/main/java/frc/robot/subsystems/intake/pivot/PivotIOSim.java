@@ -45,10 +45,10 @@ public class PivotIOSim implements PivotIO {
 		sim.update(0.02);
 
 		inputs.appliedVoltage = appliedVoltage;
-		inputs.current = sim.getCurrentDrawAmps();
-		inputs.angle = getAngle().in(Rotations);
-		inputs.tempCelsius = 0;
-		inputs.encoderConnected = false;
+		inputs.currentDrawAmps = sim.getCurrentDrawAmps();
+		inputs.angle = getAngle();
+		inputs.tempCelcius = 0;
+		
 		inputs.isAtSetpoint = isAtSetpoint();
 	}
 

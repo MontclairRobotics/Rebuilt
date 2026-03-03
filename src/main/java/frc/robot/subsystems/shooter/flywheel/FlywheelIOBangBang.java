@@ -139,35 +139,23 @@ public class FlywheelIOBangBang implements FlywheelIO {
         double targetRPS = targetVelocity.in(RotationsPerSecond);
         double error = targetRPS - currentRPS;
 
-        // double output = bangBangController.calculate(currentRPS, targetRPS);
-        // Logger.recordOutput("Flywheel/BangBang", output);
-
         switch (phase) {
 
             case SPINUP:
-
                 // when we're within tolerance, switch to idle mode
                 if (Math.abs(error) < RECOVERY_VELOCITY_TOLERANCE.in(RotationsPerSecond)) {
                     phase = Phase.IDLE;
                     break;
                 }
-
                 leftMotor.setControl(dutyCycleRequest.withVelocity(targetVelocity));
-                // leftMotor.set(output);
-
                 break;
 
             case IDLE:
                 if (error > SHOT_VELOCITY_DROP.in(RotationsPerSecond)) {
-                    phase = Phase.SPINUP; // we enter recovery mode
+                    phase = Phase.SPINUP; // we have shot a ball and need to spin up again
                     break;
                 }
                 leftMotor.setControl(torqueRequest.withVelocity(targetVelocity));
-                // leftMotor.setControl(torqueRequest.withOutput(output * 70));
-
-                // detect when a shot happens
-
-
                 break;
         }
     }

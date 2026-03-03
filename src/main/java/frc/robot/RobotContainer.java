@@ -75,8 +75,6 @@ import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
-import frc.robot.subsystems.shooter.spindexer.SpindexerIOSim;
-import frc.robot.subsystems.shooter.spindexer.SpindexerIOTalonFX;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
 import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
@@ -92,11 +90,8 @@ public class RobotContainer {
 	public static CommandPS5Controller operatorController = new CommandPS5Controller(1);
 
 	// Subsystems
-	public static Superstructure superstructure;
-	public static Aiming aiming;
 	public static Vision vision;
 	public static CommandSwerveDrivetrain drivetrain;
-	private SwerveDriveSimulation driveSimulation;
 
 	// shooter
 	public static Shooter shooter;
@@ -109,7 +104,6 @@ public class RobotContainer {
 	public static Indexer indexer;
 
 	// intake
-	public static Intake intake;
 	public static Pivot pivot;
 	public static Rollers rollers;
 	public static Intake intake;
@@ -181,15 +175,11 @@ public class RobotContainer {
 
 			case SIM:
 				drivetrain = TunerConstants.createDrivetrain();
-				drivetrain.resetPose(new Pose2d(new Translation2d(4.430,7.440), new Rotation2d(0.0)));
-			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
-
-
+				driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 
 				hood = new Hood(new HoodIOSim());
 				flywheel = new Flywheel(new FlywheelIOSim());
 				turret = new Turret(new TurretIOSim());
-
 
 				serializer = new Serializer(new SerializerIOSim());
 				indexer = new Indexer(new IndexerIOSim());
@@ -252,8 +242,6 @@ public class RobotContainer {
 			String autoName = autoChooser.getSelected().getName();
 			Auto.drawAuto(autoName);
 		}
-
-		drivetrain.resetPose(new Pose2d(startingX, startingY, new Rotation2d()));
 
 		configureBindings();
 

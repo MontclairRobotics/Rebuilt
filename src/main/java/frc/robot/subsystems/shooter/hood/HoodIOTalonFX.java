@@ -99,8 +99,6 @@ public class HoodIOTalonFX implements HoodIO {
             tempCelsiusSignal
         );
 
-        // inputs.hoodAngle = motor.getPosition().getValue();
-
         inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
         inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
         inputs.tempCelcius = tempCelsiusSignal.getValueAsDouble();

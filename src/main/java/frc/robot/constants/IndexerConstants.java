@@ -18,16 +18,17 @@ public class IndexerConstants {
 
     public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.5);
 	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(30);
+	public static final double SPIN_VOLTAGE = 12;
 
     public static final double kP = 2;
 	public static final double kD = 0;
 	public static final double kS = 7;
 	public static final double kV = 0.5;
 
-    public static final double STATOR_CURRENT_LIMIT = 60;
-    public static final double SUPPLY_CURRENT_LIMIT = 40;
+    public static final double STATOR_CURRENT_LIMIT = 80;
+    public static final double SUPPLY_CURRENT_LIMIT = 60;
 
-    public static final double GEARING = 3; // Allegedly, but doesn't really matter
+    public static final double GEARING = 1;
     public static final double MOMENT_OF_INERTIA = 0.02; //TODO: get
 
     public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()

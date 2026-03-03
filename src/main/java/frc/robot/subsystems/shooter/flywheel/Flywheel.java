@@ -51,8 +51,9 @@ public class Flywheel extends SubsystemBase {
     public void periodic() {
         logCounter++;
 
+        io.updateInputs(inputs); // need to update inputs every frame
+
         if(logCounter % loopsPerLog == 0) {
-            io.updateInputs(inputs);
             Logger.processInputs("Flywheel", inputs);
             Logger.recordOutput("Flywheel/Mode", FlywheelIOBangBang.phase);
         }
