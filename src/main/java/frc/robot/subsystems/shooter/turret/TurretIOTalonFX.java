@@ -130,7 +130,8 @@ public class TurretIOTalonFX implements TurretIO {
     public boolean isAtSetpoint() {
         double error = motor.getClosedLoopError().getValueAsDouble();
         return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations)
-            && Math.abs(velocitySignal.getValueAsDouble()) < MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond);
+            // && Math.abs(velocitySignal.getValueAsDouble()) < MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond)
+        ;
     }
 
     @Override

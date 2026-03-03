@@ -55,11 +55,11 @@ public class Serializer extends SubsystemBase {
 	}
 
 	public void spinUp() {
-		setVelocity(SPIN_VELOCITY);
+		setVoltage(SPIN_VOLTAGE);
 	}
 
 	public void spinDown() {
-		setVelocity(RotationsPerSecond.zero());
+		setVoltage(0);
 	}
 
 	public void applyJoystickInput() {
@@ -69,11 +69,11 @@ public class Serializer extends SubsystemBase {
     }
 
     public Command spinDownCommand() {
-        return Commands.run(() -> io.setVelocity(RotationsPerSecond.zero()), this);
+        return Commands.run(() -> spinDown(), this);
     }
 
     public Command spinUpCommand() {
-		return Commands.run(() -> setVelocity(SPIN_VELOCITY), this);
+		return Commands.run(() -> spinUp(), this);
 	}
 
     public Command joystickControlCommand() {

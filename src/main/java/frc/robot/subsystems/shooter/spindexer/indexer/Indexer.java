@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.shooter.spindexer.Spindexer;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -55,11 +56,11 @@ public class Indexer extends SubsystemBase {
 	}
 
 	public void spinUp() {
-		setVelocity(SPIN_VELOCITY);
+		setVoltage(SPIN_VOLTAGE);
 	}
 
 	public void spinDown() {
-		setVelocity(RotationsPerSecond.zero());
+		setVoltage(0);
 	}
 
 	public void applyJoystickInput() {
@@ -69,11 +70,11 @@ public class Indexer extends SubsystemBase {
     }
 
     public Command spinDownCommand() {
-        return Commands.run(() -> io.setVelocity(RotationsPerSecond.zero()), this);
+        return Commands.run(() -> spinDown(), this);
     }
 
     public Command spinUpCommand() {
-		return Commands.run(() -> setVelocity(SPIN_VELOCITY), this);
+		return Commands.run(() -> spinUp(), this);
 	}
 
     public Command joystickControlCommand() {

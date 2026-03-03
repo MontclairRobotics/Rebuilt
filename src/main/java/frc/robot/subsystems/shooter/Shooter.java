@@ -110,7 +110,7 @@ public class Shooter extends SubsystemBase {
 	}
 
     public boolean atSetpoint() {
-        return turret.atSetpoint() && hood.atSetpoint();
+        return turret.atSetpoint() && hood.atSetpoint() && flywheel.atGoal();
     }
 
     public Command setParameters(Supplier<ShootingParameters> paramsSupplier) {

@@ -143,7 +143,7 @@ public class RobotContainer {
 			case REAL:
 				drivetrain = TunerConstants.createDrivetrain();
 
-				hood = new Hood(new HoodIOSim());
+				hood = new Hood(new HoodIOTalonFX());
 				flywheel = new Flywheel(new FlywheelIOBangBang());
 				turret = new Turret(new TurretIOTalonFX());
 
