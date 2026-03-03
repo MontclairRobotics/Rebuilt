@@ -147,21 +147,25 @@ public class RobotContainer {
 			case SIM:
 				drivetrain = TunerConstants.createDrivetrain();
 				driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
-				superstructure = new Superstructure(shooter);
-				aiming = new Aiming(turret);
+
+
 
 				hood = new Hood(new HoodIOSim());
 				flywheel = new Flywheel(new FlywheelIOSim());
 				turret = new Turret(new TurretIOSim());
 
-				spindexer = new Spindexer(serializer, indexer);
+
 				serializer = new Serializer(new SerializerIOSim());
 				indexer = new Indexer(new IndexerIOSim());
+				spindexer = new Spindexer(serializer, indexer);
 
 				shooter = new Shooter(
 					hood, flywheel, turret, spindexer,
 					useConstantVelocityMap, shootWhileMoving
 				);
+
+				superstructure = new Superstructure(shooter);
+				aiming = new Aiming(turret);
 
 				pivot = new Pivot(new PivotIOSim());
 				rollers = new Rollers(new RollersIOSim());
