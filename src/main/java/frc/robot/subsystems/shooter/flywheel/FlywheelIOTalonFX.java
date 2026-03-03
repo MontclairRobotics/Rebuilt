@@ -116,7 +116,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
     }
 
     @Override
-    public void setVelocity(AngularVelocity targetVelocity) {
+    public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {
         leftMotor.setControl(request.withVelocity(targetVelocity));
     }
 

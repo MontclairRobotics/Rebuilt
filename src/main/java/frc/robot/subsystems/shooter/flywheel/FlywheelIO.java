@@ -28,7 +28,7 @@ public interface FlywheelIO {
 
     public void updateInputs(FlywheelIOInputs inputs);
 
-    public void setVelocity(AngularVelocity targetVelocity);
+    public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint);
 
     public void setVoltage(double voltage);
 

@@ -133,11 +133,13 @@ public class FlywheelIOBangBang implements FlywheelIO {
     }
 
     @Override
-    public void setVelocity(AngularVelocity targetVelocity) {
+    public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {
 
         double currentRPS = velocitySignal.getValue().in(RotationsPerSecond);
         double targetRPS = targetVelocity.in(RotationsPerSecond);
         double error = targetRPS - currentRPS;
+
+        Flywheel.recordSetpoint(targetVelocity, timeSecondsForSetpoint);
 
         switch (phase) {
 

@@ -63,7 +63,7 @@ public class FlywheelIOSim implements FlywheelIO {
     }
 
     @Override
-    public void setVelocity(AngularVelocity targetVelocity) {
+    public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {
         double pidOutput = pidController.calculate(
             RadiansPerSecond.of(sim.getAngularVelocityRadPerSec()).in(RotationsPerSecond),
             targetVelocity.in(RotationsPerSecond)
