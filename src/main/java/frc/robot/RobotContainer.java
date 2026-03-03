@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -61,8 +63,29 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.aiming.Aiming;
+import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
+import frc.robot.subsystems.shooter.flywheel.Flywheel;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
+import frc.robot.subsystems.shooter.hood.Hood;
+import frc.robot.subsystems.shooter.hood.HoodIOSim;
+import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
+import frc.robot.subsystems.shooter.spindexer.Spindexer;
+import frc.robot.subsystems.shooter.spindexer.SpindexerIOSim;
+import frc.robot.subsystems.shooter.spindexer.SpindexerIOTalonFX;
+import frc.robot.subsystems.shooter.turret.Turret;
+import frc.robot.subsystems.shooter.turret.TurretIOSim;
+import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 
 public class RobotContainer {
+
+	private final SendableChooser<Command> autoChooser;
 
 	// Controllers
 	public static CommandPS5Controller driverController = new CommandPS5Controller(0);
@@ -89,7 +112,19 @@ public class RobotContainer {
 	public static Intake intake;
 	public static Pivot pivot;
 	public static Rollers rollers;
+	public static Intake intake;
 
+	public static Superstructure superstructure;
+	public static Aiming aiming;
+
+	public static Auto auto;
+
+	public static double startingX = 4.430;
+	public static double startingY = 7.440;
+
+	public static SimShootingParameters simShootingParameters = new SimShootingParameters(Degrees.zero(), Degrees.zero(), MetersPerSecond.zero());
+
+	private SwerveDriveSimulation driveSimulation;
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
 	public static FuelSim fuelSim = new FuelSim("fuel");
 
@@ -146,7 +181,8 @@ public class RobotContainer {
 
 			case SIM:
 				drivetrain = TunerConstants.createDrivetrain();
-				driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
+				drivetrain.resetPose(new Pose2d(new Translation2d(4.430,7.440), new Rotation2d(0.0)));
+			driveSimulation = drivetrain.mapleSimSwerveDrivetrain.mapleSimDrive;
 
 
 
@@ -193,7 +229,8 @@ public class RobotContainer {
 
 				fuelSim.spawnStartingFuel();
 
-				// vision =
+				auto = new Auto();
+			// vision =
 				// 	new Vision(
 				// 		drivetrain::addVisionMeasurement,
 				// 		new VisionIOPhotonVisionSim(
@@ -209,7 +246,14 @@ public class RobotContainer {
 					vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 		}
 
-		drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
+		autoChooser = AutoBuilder.buildAutoChooser();
+		SmartDashboard.putData("Auto Chooser", autoChooser);
+		if(autoChooser.getSelected() != null) {
+			String autoName = autoChooser.getSelected().getName();
+			Auto.drawAuto(autoName);
+		}
+
+		drivetrain.resetPose(new Pose2d(startingX, startingY, new Rotation2d()));
 
 		configureBindings();
 
@@ -263,7 +307,7 @@ public class RobotContainer {
 	}
 
 	public Command getAutonomousCommand() {
-		return Commands.print("No autonomous command configured");
+		return autoChooser.getSelected();
 	}
 
 	/**
@@ -274,7 +318,7 @@ public class RobotContainer {
 	 */
 	public void resetSimulation() {
 		if (Constants.CURRENT_MODE != Constants.Mode.SIM) return;
-		drivetrain.resetPose(new Pose2d(3, 3, new Rotation2d()));
+		drivetrain.resetPose(new Pose2d(startingX, startingY, new Rotation2d()));
 		SimulatedArena.getInstance().resetFieldForAuto();
 	}
 

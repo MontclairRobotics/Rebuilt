@@ -49,7 +49,7 @@ public class HoodConstants {
 	public static final double MOMENT_OF_INERTIA = 0.03038161694; // from CAD on 3/3/2026
 	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.2956328125); // absolute encoder
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
-	public static final double HOOD_LOWER_TIME = 0.6;
+	public static final double HOOD_LOWER_TIME = 1;
 
 	// Gains (Tuned 2/22)
 	public static final double kP = 600;

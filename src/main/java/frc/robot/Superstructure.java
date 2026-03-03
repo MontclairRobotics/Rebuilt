@@ -2,6 +2,7 @@ package frc.robot;
 
 import org.littletonrobotics.junction.Logger;
 
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
@@ -19,12 +20,14 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Mode;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.constants.HoodConstants;
+import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LeftTrench;
 import frc.robot.util.FieldConstants.LinesVertical;
 import frc.robot.util.HubTracker;
 import frc.robot.util.PoseUtils;
+
 
 public class Superstructure extends SubsystemBase {
 
@@ -62,22 +65,21 @@ public class Superstructure extends SubsystemBase {
 				shooter.stowCommand());
 			scoringModeTrigger.whileTrue(
 				shooter.setParameters(
-					() -> RobotContainer.aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryLeftTrigger.whileTrue(
 				shooter.setParameters(
-					() -> RobotContainer.aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryRightTrigger.whileTrue(
 				shooter.setParameters(
-					() -> RobotContainer.aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 		}
-
 	}
 
 	public final Trigger scoringModeTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldBeScoring());
+			new Trigger(() -> DriverStation.isEnabled() && shouldBeScoring());
 
 	public final Trigger ferryLeftTrigger =
 			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryLeft());
@@ -86,7 +88,7 @@ public class Superstructure extends SubsystemBase {
 			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryRight());
 
 	public final Trigger shouldStowHoodTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldStowHood());
+			new Trigger(() -> DriverStation.isEnabled() && shouldStowHood());
 
 	@Override
 	public void periodic() {
@@ -172,7 +174,7 @@ public class Superstructure extends SubsystemBase {
 		return AllianceManager.isRed();
     }
 
-    public boolean isInScoringZone() {
+    public static boolean isInScoringZone() {
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
 
         return
@@ -200,6 +202,7 @@ public class Superstructure extends SubsystemBase {
         // 	&& isInScoringZone()
         // 	&& HubTracker.isActive(DriverStation.getAlliance().get(), HubTracker.getCurrentShift().get());
 	}
+
 
     public boolean shouldFerryLeft() {
 		if(!AllianceManager.isAllianceKnown()) return false;
@@ -240,7 +243,7 @@ public class Superstructure extends SubsystemBase {
         	);
     }
 
-    public boolean shouldStowHood() {
+    public static boolean shouldStowHood() {
 		if(!AllianceManager.isAllianceKnown()) return false;
         return inTrenchDangerZone();
     }
