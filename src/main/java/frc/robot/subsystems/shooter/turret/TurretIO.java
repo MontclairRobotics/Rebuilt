@@ -30,7 +30,7 @@ public interface TurretIO {
 
     public void updateInputs(TurretIOInputs inputs);
 
-    public void setRobotRelativeAngle(Angle angle);
+    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity);
 
     public void setVoltage(double voltage);
 

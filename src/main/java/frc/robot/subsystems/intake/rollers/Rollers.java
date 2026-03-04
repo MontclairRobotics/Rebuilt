@@ -26,7 +26,7 @@ public class Rollers extends SubsystemBase {
 
 	public Rollers(RollersIO io) {
 		this.io = io;
-		loopsPerLog = RobotContainer.INTAKE_DEBUG ? 1 : 5;
+		loopsPerLog = RobotContainer.ROLLERS_DEBUG ? 1 : 5;
 	}
 
 	public boolean atSetpoint() {

@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter.flywheel;
 
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.FlywheelConstants.*;
 
@@ -8,7 +7,6 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.Timestamp.TimestampSource;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
@@ -28,19 +26,26 @@ public class Flywheel extends SubsystemBase {
 
     private static final TimeInterpolatableBuffer<AngularVelocity> setpointBuffer = TimeInterpolatableBuffer.createBuffer(Flywheel::interpolate, AimingConstants.LATENCY * 2);
 
-    private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Flywheel/kP", SLOT0_CONFIGS.kP);
-    private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Flywheel/kD", SLOT0_CONFIGS.kD);
-    private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Flywheel/kS", SLOT0_CONFIGS.kS);
-    private final LoggedTunableNumber tunableKV = new LoggedTunableNumber("Flywheel/kV", SLOT0_CONFIGS.kV);
+    private LoggedTunableNumber tunableKP;
+    private LoggedTunableNumber tunableKS;
+    private LoggedTunableNumber tunableKV;
 
-    public final LoggedTunableNumber tuningFlywheelSpeed = new LoggedTunableNumber("Flywheel/TuningFlywheelRPS", 0);
+    public LoggedTunableNumber tuningFlywheelSpeed;
 
     private int logCounter;
     private final int loopsPerLog;
 
     public Flywheel(FlywheelIO io) {
         this.io = io;
-        loopsPerLog = RobotContainer.SHOOTER_DEBUG ? 1 : 5;
+        loopsPerLog = RobotContainer.FLYWHEEL_DEBUG ? 1 : 5;
+
+        if(RobotContainer.FLYWHEEL_DEBUG) {
+            tunableKP = new LoggedTunableNumber("Flywheel/kP", SLOT0_CONFIGS.kP);
+            tunableKS = new LoggedTunableNumber("Flywheel/kS", SLOT0_CONFIGS.kS);
+            tunableKV = new LoggedTunableNumber("Flywheel/kV", SLOT0_CONFIGS.kV);
+
+            tuningFlywheelSpeed = new LoggedTunableNumber("Flywheel/TuningFlywheelRPS", 0);
+        }
     }
 
     public static AngularVelocity interpolate(AngularVelocity startValue, AngularVelocity endValue, double t) {
@@ -63,10 +68,9 @@ public class Flywheel extends SubsystemBase {
 
     private void updateTunables() {
         if(tunableKP.hasChanged(hashCode())
-                || tunableKD.hasChanged(hashCode())
                 || tunableKS.hasChanged(hashCode())
                 || tunableKV.hasChanged(hashCode())) {
-            io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get(), tunableKV.get());
+            io.setGains(tunableKP.get(), 0, tunableKS.get(), tunableKV.get());
         }
     }
 
@@ -80,7 +84,7 @@ public class Flywheel extends SubsystemBase {
             Logger.recordOutput("Flywheel/Mode", FlywheelIOBangBang.phase);
         }
 
-        updateTunables();
+        if(RobotContainer.FLYWHEEL_DEBUG) updateTunables();
     }
 
     public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {

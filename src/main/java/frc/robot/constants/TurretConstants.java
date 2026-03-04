@@ -41,7 +41,10 @@ public class TurretConstants {
 	// constraints
 	public static final Angle MIN_ANGLE = Rotations.of(-0.475);
 	public static final Angle MAX_ANGLE = Rotations.of(0.475);
+	public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(4);
+	public static final AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(60);
 	public static final Angle ANGLE_TOLERANCE = Degrees.of(3);
+	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.25); // TODO: tune
 
 	// physical properties
 	public static final double MOMENT_OF_INERTIA = 0.154244993; //From CAD on 2026.02.12
@@ -56,13 +59,12 @@ public class TurretConstants {
 
 	// pid + ff gains
 	public static final double kP = 110.0555;
-	public static final double kD = 0;
+	public static final double kD = 5.00555;
 	public static final double kS = 0.35;
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(6);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(60);
 	public static final double MOTION_MAGIC_JERK = 100; // Rotations Per Second Per Second Per Second
-	public static AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(0.1);
 
 	public static final double STATOR_CURRENT_LIMIT = 60; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 40; // Amps

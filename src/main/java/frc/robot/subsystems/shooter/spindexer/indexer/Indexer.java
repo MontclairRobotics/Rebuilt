@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.shooter.spindexer.Spindexer;
+import frc.robot.util.tunables.LoggedTunableNumber;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -24,9 +24,11 @@ public class Indexer extends SubsystemBase {
 	private int logCounter;
 	private final int loopsPerLog;
 
+	public LoggedTunableNumber indexerSpeedTunable = new LoggedTunableNumber("Spindexer/Indexer Speed RPS", 0);
+
 	public Indexer(IndexerIO io) {
 		this.io = io;
-		loopsPerLog = RobotContainer.SHOOTER_DEBUG ? 1 : 5;
+		loopsPerLog = RobotContainer.INDEXER_DEBUG ? 1 : 5;
 	}
 
 	public boolean atSetpoint() {
@@ -37,8 +39,9 @@ public class Indexer extends SubsystemBase {
 	public void periodic() {
 		logCounter++;
 
+		io.updateInputs(inputs);
+
 		if(logCounter % loopsPerLog == 0) {
-			io.updateInputs(inputs);
 			Logger.processInputs("Indexer", inputs);
 		}
 	}
@@ -56,11 +59,11 @@ public class Indexer extends SubsystemBase {
 	}
 
 	public void spinUp() {
-		setVoltage(SPIN_VOLTAGE);
+		setVelocity(SPIN_VELOCITY);
 	}
 
 	public void spinDown() {
-		setVoltage(0);
+		setVelocity(RotationsPerSecond.zero());
 	}
 
 	public void applyJoystickInput() {

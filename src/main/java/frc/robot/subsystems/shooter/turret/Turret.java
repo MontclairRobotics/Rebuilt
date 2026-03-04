@@ -1,8 +1,8 @@
 package frc.robot.subsystems.shooter.turret;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
 import java.util.function.Supplier;
@@ -17,12 +17,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.tunables.LoggedTunableNumber;
@@ -33,14 +35,13 @@ public class Turret extends SubsystemBase {
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 	private final TurretVisualization visualization = new TurretVisualization();
 
-	private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Turret/kP", SLOT0_CONFIGS.kP);
-    private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Turret/kD", SLOT0_CONFIGS.kD);
-    private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Turret/kS", SLOT0_CONFIGS.kS);
+	// private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Turret/kP", SLOT0_CONFIGS.kP);
+    // private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Turret/kD", SLOT0_CONFIGS.kD);
+    // private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Turret/kS", SLOT0_CONFIGS.kS);
 
-	private final LoggedTunableNumber tunableMotionMagicCruiseVelocity = new LoggedTunableNumber("Turret/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity);
-	private final LoggedTunableNumber tunableMotionMagicAcceleration = new LoggedTunableNumber("Turret/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration);
-	private final LoggedTunableNumber tunableMotionMagicJerk = new LoggedTunableNumber("Turret/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk);
-	private final LoggedTunableNumber tunableMaxVelocityAtSetpoint = new LoggedTunableNumber("Turret/Max Velocity At Setpoint", MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond));
+	// private final LoggedTunableNumber tunableMotionMagicCruiseVelocity = new LoggedTunableNumber("Turret/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity);
+	// private final LoggedTunableNumber tunableMotionMagicAcceleration = new LoggedTunableNumber("Turret/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration);
+	// private final LoggedTunableNumber tunableMotionMagicJerk = new LoggedTunableNumber("Turret/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk);
 
 	public final LoggedTunableNumber tunableRobotRelativeTurretAngle = new LoggedTunableNumber("Turret/Tunable Robot Relative Angle", 0);
 
@@ -49,7 +50,7 @@ public class Turret extends SubsystemBase {
 
     public Turret(TurretIO io) {
         this.io = io;
-		loopsPerLog = RobotContainer.SHOOTER_DEBUG ? 1 : 5;
+		loopsPerLog = RobotContainer.TURRET_DEBUG ? 1 : 5;
     }
 
 	@Override
@@ -63,12 +64,11 @@ public class Turret extends SubsystemBase {
 			Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
 		}
 
-		if(RobotContainer.SHOOTER_DEBUG) {
+		if(RobotContainer.TURRET_DEBUG) {
 			visualization.update();
 			visualization.log();
+			updateTunables();
 		}
-
-		updateTunables();
 	}
 
     /**
@@ -111,23 +111,21 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void updateTunables() {
-		if(tunableKP.hasChanged(hashCode())
-                || tunableKD.hasChanged(hashCode())
-                || tunableKS.hasChanged(hashCode())) {
-            io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get());
-        }
+		// if(tunableKP.hasChanged(hashCode())
+        //         || tunableKD.hasChanged(hashCode())
+        //         || tunableKS.hasChanged(hashCode())) {
+        //     io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get());
+        // }
 
-		if(tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
-				|| tunableMotionMagicAcceleration.hasChanged(hashCode())
-				|| tunableMotionMagicJerk.hasChanged(hashCode())) {
-			io.setMotionMagic(
-				tunableMotionMagicCruiseVelocity.get(),
-				tunableMotionMagicAcceleration.get(),
-				tunableMotionMagicJerk.get()
-			);
-		}
-
-		if(tunableMaxVelocityAtSetpoint.hasChanged(hashCode())) MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(tunableMaxVelocityAtSetpoint.get());
+		// if(tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
+		// 		|| tunableMotionMagicAcceleration.hasChanged(hashCode())
+		// 		|| tunableMotionMagicJerk.hasChanged(hashCode())) {
+		// 	io.setMotionMagic(
+		// 		tunableMotionMagicCruiseVelocity.get(),
+		// 		tunableMotionMagicAcceleration.get(),
+		// 		tunableMotionMagicJerk.get()
+		// 	);
+		// }
 	}
 
 	public void applyJoystickInput() {
@@ -194,16 +192,27 @@ public class Turret extends SubsystemBase {
 		return robotToPoint.getAngle().getMeasure();
 	}
 
+	public AngularVelocity calculateTargetVelocity(TargetLocation target) {
+		Translation2d location = target.getLocation();
+		Translation2d fieldRelativeVelocity = this.getFieldRelativeVelocity();
+		Translation2d fieldRelativePosition = this.getFieldRelativePosition();
+		Translation2d r = location.minus(fieldRelativePosition);
+		double distance = r.getNorm();
+		Rotation2d r_angle = r.getAngle();
+		Translation2d radialVelocity = fieldRelativeVelocity.rotateBy(r_angle.unaryMinus());
+		return RadiansPerSecond.of(radialVelocity.getY() / distance);
+	}
+
 	public boolean atSetpoint() {
 		return io.isAtSetpoint();
 	}
 
-	public void setRobotRelativeAngle(Angle angle) {
-		io.setRobotRelativeAngle(angle);
+	public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity) {
+		io.setRobotRelativeAngle(angle, velocity);
 	}
 
-	public void setRobotRelativeAngle(Supplier<Angle> angleSupplier) {
-		io.setRobotRelativeAngle(angleSupplier.get());
+	public void setRobotRelativeAngle(Supplier<Angle> angleSupplier, Supplier<AngularVelocity> velocitySupplier) {
+		io.setRobotRelativeAngle(angleSupplier.get(), velocitySupplier.get());
 	}
 
 	public Command joystickControlCommand() {
@@ -218,7 +227,7 @@ public class Turret extends SubsystemBase {
 		return Commands.runOnce(() -> io.setVoltage(voltage));
 	}
 
-	public Command setRobotRelativeAngleCommand(Supplier<Angle> angleSupplier) {
-		return Commands.run(() -> setRobotRelativeAngle(angleSupplier.get()));
+	public Command setRobotRelativeAngleCommand(Supplier<Angle> angleSupplier, Supplier<AngularVelocity> velocitySupplier) {
+		return Commands.run(() -> setRobotRelativeAngle(angleSupplier.get(), velocitySupplier.get()));
 	}
 }

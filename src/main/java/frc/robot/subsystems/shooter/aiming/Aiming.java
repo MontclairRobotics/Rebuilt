@@ -14,6 +14,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.ShotSettings;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
@@ -33,6 +34,7 @@ public class Aiming {
 
 	public static ShootingParameters calculateShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
 
+		Shooter.targetLocation = target;
 		Translation2d targetLocation = target.getLocation();
 		InterpolatingTreeMap<Double, ShotSettings> map;
 
@@ -101,6 +103,7 @@ public class Aiming {
 
 	public SimShootingParameters calculateSimShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
 
+		Shooter.targetLocation = target;
 		Translation2d targetLocation = target.getLocation();
 		InterpolatingTreeMap<Double, SimShotSettings> map;
 

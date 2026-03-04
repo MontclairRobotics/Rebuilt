@@ -15,11 +15,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
@@ -35,7 +35,6 @@ import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIOBangBang;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.Indexer;
@@ -127,14 +126,20 @@ public class RobotContainer {
 
 	// debug, set to true to increase logging, set to false to increase performance and reduce loop overruns
 	public static boolean VISION_DEBUG = false;
-	public static boolean SHOOTER_DEBUG = false;
-	public static boolean INTAKE_DEBUG = false;
-	public static boolean DRIVETRAIN_DEBUG = false;
-	public static boolean SUPERSTRUCTURE_DEBUG = false;
+	public static boolean TURRET_DEBUG = true;
+	public static boolean FLYWHEEL_DEBUG = true;
+	public static boolean HOOD_DEBUG  = true;
+	public static boolean INDEXER_DEBUG = false;
+	public static boolean SERIALIZER_DEBUG = false;
+	public static boolean ROLLERS_DEBUG = false;
+	public static boolean PIVOT_DEBUG = true;
+	public static boolean DRIVETRAIN_DEBUG = true;
+	public static boolean SUPERSTRUCTURE_DEBUG = true;
 
 	public double intakeVoltage = 12;
-	Tunable intakeSpeed = new Tunable("Intake VOltage", intakeVoltage, (value) -> intakeVoltage = value);
+	Tunable intakeSpeed = new Tunable("Intake Voltage", intakeVoltage, (value) -> intakeVoltage = value);
 
+	public static final Trigger shootTrigger = driverController.circle();
 	public RobotContainer() {
 
 		System.out.println("Constants.CURRENT_MODE: " + Constants.CURRENT_MODE);
@@ -144,9 +149,8 @@ public class RobotContainer {
 				drivetrain = TunerConstants.createDrivetrain();
 
 				hood = new Hood(new HoodIOTalonFX());
-				flywheel = new Flywheel(new FlywheelIOBangBang());
+				flywheel = new Flywheel(new FlywheelIOTalonFX());
 				turret = new Turret(new TurretIOTalonFX());
-
 
 				serializer = new Serializer(new SerializerIOTalonFX());
 				indexer = new Indexer(new IndexerIOTalonFX());
@@ -220,15 +224,6 @@ public class RobotContainer {
 				fuelSim.spawnStartingFuel();
 
 				auto = new Auto();
-			// vision =
-				// 	new Vision(
-				// 		drivetrain::addVisionMeasurement,
-				// 		new VisionIOPhotonVisionSim(
-				// 			"camera0Name", robotToCamera0, drivetrain::getRobotPose),
-				// 		new VisionIOPhotonVisionSim(
-				// 			"camera1Name", robotToCamera1, drivetrain::getRobotPose));
-
-					//TODO: Fix vision simulation! (It is causing loop overruns and memory issues with advantage kit logging)
 
 				break;
 
@@ -250,18 +245,14 @@ public class RobotContainer {
 
 	private void configureBindings() {
 
+		// driver
+
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 
 		driverController.triangle().whileTrue(spindexer.setVoltageCommand(12)).onFalse(spindexer.setVoltageCommand(0));
 
 		driverController.R1().whileTrue(rollers.setVoltageCommand(() -> intakeVoltage)).onFalse(rollers.setVoltageCommand(() -> 0));
-
-		// driverController.circle().whileTrue(rollers.spinUpCommand()).onFalse(rollers.spinDownCommand());
-		// hood.setDefaultCommand(hood.joystickControlCommand());
-		// turret.setDefaultCommand(turret.joystickControlCommand());
-		// flywheel.setDefaultCommand(flywheel.joystickControlCommand());
-		// driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
 		driverController.square()
 			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
@@ -271,9 +262,9 @@ public class RobotContainer {
 		// 	.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
 		// 	.onFalse(turret.stopCommand());
 
-		driverController.circle()
-			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get())))
-			.onFalse(flywheel.stopCommand());
+		// driverController.circle()
+		// 	.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), Timer.getFPGATimestamp()))
+		// 	.onFalse(flywheel.stopCommand());
 
 		// driverController.triangle()
 		// 	.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.ze))
