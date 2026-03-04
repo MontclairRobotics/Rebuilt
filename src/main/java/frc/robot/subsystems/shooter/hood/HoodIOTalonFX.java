@@ -2,7 +2,6 @@ package frc.robot.subsystems.shooter.hood;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.HoodConstants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;

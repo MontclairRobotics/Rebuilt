@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter.spindexer.serializer;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.SerializerConstants.*;
 
 import java.util.function.Supplier;

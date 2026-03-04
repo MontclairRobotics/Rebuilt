@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter.spindexer.indexer;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.IndexerConstants.*;
 
 import java.util.function.Supplier;
@@ -12,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.shooter.spindexer.Spindexer;
 
 import org.littletonrobotics.junction.Logger;
 
