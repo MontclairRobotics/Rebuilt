@@ -17,13 +17,14 @@ public class IndexerConstants {
     public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the canivore
 
     public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.5);
-	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(30);
+	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(85);
 	public static final double SPIN_VOLTAGE = 12;
 
-    public static final double kP = 2;
+	// tuned 3/4
+    public static final double kP = 10;
 	public static final double kD = 0;
 	public static final double kS = 7;
-	public static final double kV = 0.5;
+	public static final double kV = 0.35;
 
     public static final double STATOR_CURRENT_LIMIT = 80;
     public static final double SUPPLY_CURRENT_LIMIT = 60;
@@ -37,9 +38,9 @@ public class IndexerConstants {
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
 		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)
-		.withStatorCurrentLimitEnable(true)
+		.withStatorCurrentLimitEnable(false)
 		.withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
-		.withSupplyCurrentLimitEnable(true);
+		.withSupplyCurrentLimitEnable(false);
 
 	public static final MotorOutputConfigs MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
 		.withInverted(InvertedValue.Clockwise_Positive)

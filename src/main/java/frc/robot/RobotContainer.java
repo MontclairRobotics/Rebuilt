@@ -11,11 +11,12 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -38,6 +39,7 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.Indexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.IndexerIOSim;
@@ -52,7 +54,6 @@ import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.sim.FuelSim;
@@ -65,26 +66,13 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
-import frc.robot.subsystems.shooter.flywheel.Flywheel;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
-import frc.robot.subsystems.shooter.hood.Hood;
-import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
-import frc.robot.subsystems.shooter.spindexer.Spindexer;
-import frc.robot.subsystems.shooter.turret.Turret;
-import frc.robot.subsystems.shooter.turret.TurretIOSim;
-import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
-import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
-import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 
 public class RobotContainer {
 
-	private final SendableChooser<Command> autoChooser;
+	// private final SendableChooser<Command> autoChooser;
 
 	// Controllers
 	public static CommandPS5Controller driverController = new CommandPS5Controller(0);
@@ -128,21 +116,21 @@ public class RobotContainer {
 
 	// debug, set to true to increase logging, set to false to increase performance and reduce loop overruns
 	public static boolean VISION_DEBUG = false;
-	public static boolean TURRET_DEBUG = true;
-	public static boolean FLYWHEEL_DEBUG = true;
-	public static boolean HOOD_DEBUG  = true;
+	public static boolean TURRET_DEBUG = false;
+	public static boolean FLYWHEEL_DEBUG = false;
+	public static boolean HOOD_DEBUG  = false;
 	public static boolean INDEXER_DEBUG = false;
 	public static boolean SERIALIZER_DEBUG = false;
 	public static boolean ROLLERS_DEBUG = false;
-	public static boolean PIVOT_DEBUG = true;
-	public static boolean DRIVETRAIN_DEBUG = true;
-	public static boolean SUPERSTRUCTURE_DEBUG = true;
+	public static boolean PIVOT_DEBUG = false;
+	public static boolean DRIVETRAIN_DEBUG = false;
+	public static boolean SUPERSTRUCTURE_DEBUG = false;
 
 	public double intakeVoltage = 10;
 	Tunable intakeSpeed = new Tunable("Intake Voltage", intakeVoltage, (value) -> intakeVoltage = value);
 
 	public static final Trigger shootTrigger = driverController.circle().or(() -> DriverStation.isAutonomous());
-	
+
 	public LoggedTunableNumber indexerCurrent = new LoggedTunableNumber("Spindexer/Index Current", 0);
 	public LoggedTunableNumber serializerCurrent = new LoggedTunableNumber("Spindexer/Serializer Current", 0);
 
@@ -174,12 +162,12 @@ public class RobotContainer {
 				rollers = new Rollers(new RollersIOTalonFX());
 				intake = new Intake(pivot, rollers);
 
-				vision = new Vision(
-					drivetrain::addVisionMeasurement,
-					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
-					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
-					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
-				);
+				// vision = new Vision(
+				// 	drivetrain::addVisionMeasurement,
+				// 	new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
+				// 	new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
+				// 	new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
+				// );
 
 				break;
 
@@ -237,12 +225,12 @@ public class RobotContainer {
 					vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 		}
 
-		autoChooser = AutoBuilder.buildAutoChooser();
-		SmartDashboard.putData("Auto Chooser", autoChooser);
-		if(autoChooser.getSelected() != null) {
-			String autoName = autoChooser.getSelected().getName();
-			Auto.drawAuto(autoName);
-		}
+		// autoChooser = AutoBuilder.buildAutoChooser();
+		// SmartDashboard.putData("Auto Chooser", autoChooser);
+		// if(autoChooser.getSelected() != null) {
+		// 	String autoName = autoChooser.getSelected().getName();
+		// 	Auto.drawAuto(autoName);
+		// }
 
 		configureBindings();
 
@@ -264,7 +252,7 @@ public class RobotContainer {
 			.alongWith(serializer.setCurrentCommand(() -> 0)
 		));
 
-		driverController.R1().whileTrue(rollers.setVoltageCommand(() -> intakeVoltage)).onFalse(rollers.setVoltageCommand(() -> 0));
+		// driverController.R1().whileTrue(rollers.setVoltageCommand(() -> intakeVoltage)).onFalse(rollers.setVoltageCommand(() -> 0));
 
 		// operatorController.L2()
 		// 	.whileTrue(rollers.setVoltageCommand(intakeVoltage))
@@ -279,7 +267,7 @@ public class RobotContainer {
 		// hood.setDefaultCommand(hood.joystickControlCommand());
 		// turret.setDefaultCommand(turret.joystickControlCommand());
 		// flywheel.setDefaultCommand(flywheel.joystickControlCommand());
-		// driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
+		driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
 		driverController.square()
 			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
@@ -289,9 +277,9 @@ public class RobotContainer {
 		// 	.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
 		// 	.onFalse(turret.stopCommand());
 
-		// driverController.circle()
-		// 	.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), Timer.getFPGATimestamp()))
-		// 	.onFalse(flywheel.stopCommand());
+		driverController.circle()
+			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), Timer.getFPGATimestamp()))
+			.onFalse(flywheel.stopCommand());
 
 		// driverController.triangle()
 		// 	.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.ze))

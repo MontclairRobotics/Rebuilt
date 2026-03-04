@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.tunables.LoggedTunableNumber;
 
-import org.littletonrobotics.junction.Logger;
 
 public class Indexer extends SubsystemBase {
 
@@ -38,13 +37,13 @@ public class Indexer extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		logCounter++;
+		// logCounter++;
 
-		io.updateInputs(inputs);
+		// io.updateInputs(inputs);
 
-		if(logCounter % loopsPerLog == 0) {
-			Logger.processInputs("Indexer", inputs);
-		}
+		// if(logCounter % loopsPerLog == 0) {
+		// 	Logger.processInputs("Indexer", inputs);
+		// }
 	}
 
 	public void setVelocity(AngularVelocity velocity) {

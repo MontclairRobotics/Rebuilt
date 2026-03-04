@@ -21,10 +21,11 @@ public class FlywheelConstants {
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(1);
 
-	public static final double kP = 999999.0;
+	// tuned 3/4
+	public static final double kP = 30;
 	public static final double kD = 0;
-	public static final double kS = 0; // tuned 2/22
-	public static final double kV = 0;
+	public static final double kS = 21.5;
+	public static final double kV = 0.46;
 
 	public static final double STATOR_CURRENT_LIMIT = 100; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 60; // Amps

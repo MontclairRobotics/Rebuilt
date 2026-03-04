@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter.spindexer.serializer;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.SerializerConstants.*;
 
 import java.util.function.DoubleSupplier;
@@ -14,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.tunables.LoggedTunableNumber;
 
-import org.littletonrobotics.junction.Logger;
 
 public class Serializer extends SubsystemBase {
 
@@ -37,13 +37,13 @@ public class Serializer extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		logCounter++;
+		// logCounter++;
 
-		io.updateInputs(inputs);
+		// io.updateInputs(inputs);
 
-		if(logCounter % loopsPerLog == 0) {
-			Logger.processInputs("Serializer", inputs);
-		}
+		// if(logCounter % loopsPerLog == 0) {
+		// 	Logger.processInputs("Serializer", inputs);
+		// }
 	}
 
 	public void setVelocity(AngularVelocity velocity) {

@@ -44,8 +44,8 @@ public class Flywheel extends SubsystemBase {
             tunableKS = new LoggedTunableNumber("Flywheel/kS", SLOT0_CONFIGS.kS);
             tunableKV = new LoggedTunableNumber("Flywheel/kV", SLOT0_CONFIGS.kV);
 
-            tuningFlywheelSpeed = new LoggedTunableNumber("Flywheel/TuningFlywheelRPS", 0);
         }
+        tuningFlywheelSpeed = new LoggedTunableNumber("Flywheel/TuningFlywheelRPS", 0);
     }
 
     public static AngularVelocity interpolate(AngularVelocity startValue, AngularVelocity endValue, double t) {
