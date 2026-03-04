@@ -27,6 +27,8 @@ public interface SerializerIO {
 
 	public void setVoltage(double voltage);
 
+	public void setCurrent(double currentDrawAmps);
+
 	public void stop();
 
 	public boolean isAtSetpoint();

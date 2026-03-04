@@ -9,6 +9,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -26,6 +27,7 @@ public class SerializerIOTalonFX implements SerializerIO {
     private final StatusSignal<Temperature> tempCelciuSignal;
 
 	private VelocityTorqueCurrentFOC request = new VelocityTorqueCurrentFOC(0);
+	private TorqueCurrentFOC torqueRequest = new TorqueCurrentFOC(0);
 	private final NeutralOut neutralOut = new NeutralOut();
 
 	public SerializerIOTalonFX() {
@@ -104,6 +106,11 @@ public class SerializerIOTalonFX implements SerializerIO {
 	public boolean isAtSetpoint() {
 		double error = motor.getClosedLoopError().getValueAsDouble();
         return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
+	}
+
+	@Override
+	public void setCurrent(double currentDrawAmps) {
+		motor.setControl(torqueRequest.withOutput(currentDrawAmps));
 	}
 
 }

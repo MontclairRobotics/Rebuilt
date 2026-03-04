@@ -81,4 +81,10 @@ public class SerializerIOSim implements SerializerIO {
 	public boolean isAtSetpoint() {
 		return pidController.atSetpoint();
 	}
+
+	@Override
+	public void setCurrent(double currentDrawAmps) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setCurrent'");
+	}
 }

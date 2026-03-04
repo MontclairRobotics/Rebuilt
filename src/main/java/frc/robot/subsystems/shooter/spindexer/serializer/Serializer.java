@@ -1,8 +1,8 @@
 package frc.robot.subsystems.shooter.spindexer.serializer;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.SerializerConstants.*;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -46,6 +46,10 @@ public class Serializer extends SubsystemBase {
 		io.setVelocity(velocity);
 	}
 
+	public void setCurrent(double currentDrawAmps) {
+		io.setCurrent(currentDrawAmps);
+	}
+
 	public void setVelocity(Supplier<AngularVelocity> targetVelocitySupplier) {
 		io.setVelocity(targetVelocitySupplier.get());
 	}
@@ -74,6 +78,10 @@ public class Serializer extends SubsystemBase {
 
     public Command spinUpCommand() {
 		return Commands.run(() -> spinUp(), this);
+	}
+
+	public Command setCurrentCommand(DoubleSupplier currentSupplier) {
+		return Commands.run(() -> setCurrent(currentSupplier.getAsDouble()), this);
 	}
 
     public Command joystickControlCommand() {

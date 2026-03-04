@@ -2,7 +2,6 @@ package frc.robot.subsystems.intake.pivot;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.PivotConstants.*;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -48,7 +47,7 @@ public class PivotIOSim implements PivotIO {
 		inputs.currentDrawAmps = sim.getCurrentDrawAmps();
 		inputs.angle = getAngle();
 		inputs.tempCelcius = 0;
-		
+
 		inputs.isAtSetpoint = isAtSetpoint();
 	}
 

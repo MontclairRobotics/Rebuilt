@@ -1,8 +1,8 @@
 package frc.robot.subsystems.shooter.spindexer.indexer;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.IndexerConstants.*;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.shooter.spindexer.Spindexer;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -47,6 +46,10 @@ public class Indexer extends SubsystemBase {
 		io.setVelocity(velocity);
 	}
 
+	public void setCurrent(double currentDrawAmps) {
+		io.setCurrent(currentDrawAmps);
+	}
+
 	public void setVoltage(double voltage) {
 		io.setVoltage(voltage);
 	}
@@ -75,6 +78,10 @@ public class Indexer extends SubsystemBase {
 
     public Command spinUpCommand() {
 		return Commands.run(() -> spinUp(), this);
+	}
+
+	public Command setCurrentCommand(DoubleSupplier currentSupplier) {
+		return Commands.run(() -> setCurrent(currentSupplier.getAsDouble()), this);
 	}
 
     public Command joystickControlCommand() {

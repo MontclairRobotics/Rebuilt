@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.PivotConstants;
 import frc.robot.constants.Constants.Mode;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
@@ -55,6 +56,7 @@ import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.sim.FuelSim;
+import frc.robot.util.tunables.LoggedTunableNumber;
 import frc.robot.util.tunables.Tunable;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
@@ -70,7 +72,6 @@ import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
@@ -132,8 +133,11 @@ public class RobotContainer {
 	public static boolean DRIVETRAIN_DEBUG = false;
 	public static boolean SUPERSTRUCTURE_DEBUG = false;
 
-	public double intakeVoltage = 12;
+	public double intakeVoltage = 10;
 	Tunable intakeSpeed = new Tunable("Intake VOltage", intakeVoltage, (value) -> intakeVoltage = value);
+
+	public LoggedTunableNumber indexerCurrent = new LoggedTunableNumber("Spindexer/Index Current", 0);
+	public LoggedTunableNumber serializerCurrent = new LoggedTunableNumber("Spindexer/Serializer Current", 0);
 
 	public RobotContainer() {
 
@@ -157,8 +161,8 @@ public class RobotContainer {
 					useConstantVelocityMap, shootWhileMoving
 				);
 
-				superstructure = new Superstructure(shooter);
-				aiming = new Aiming(turret);
+				// superstructure = new Superstructure(shooter);
+				// aiming = new Aiming(turret);
 
 				pivot = new Pivot(new PivotIOTalonFX());
 				rollers = new Rollers(new RollersIOTalonFX());
@@ -250,12 +254,28 @@ public class RobotContainer {
 
 	private void configureBindings() {
 
+		// turret.setDefaultCommand(turret.setRobotRelativeAngleCommand(() -> Turret.toRobotRelativeAngle(turret.getAngleToHub())));
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 
-		driverController.triangle().whileTrue(spindexer.setVoltageCommand(12)).onFalse(spindexer.setVoltageCommand(0));
+		driverController.triangle().whileTrue(
+			indexer.setCurrentCommand(() -> indexerCurrent.getAsDouble())
+			.alongWith(serializer.setCurrentCommand(() -> serializerCurrent.getAsDouble()))
+		).onFalse(
+			indexer.setCurrentCommand(() -> 0)
+			.alongWith(serializer.setCurrentCommand(() -> 0)
+		));
 
 		driverController.R1().whileTrue(rollers.setVoltageCommand(() -> intakeVoltage)).onFalse(rollers.setVoltageCommand(() -> 0));
+
+		// operatorController.L2()
+		// 	.whileTrue(rollers.setVoltageCommand(intakeVoltage))
+		// 	.onFalse(rollers.setVoltageCommand(() -> 0));
+
+		operatorController.R2().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
+		operatorController.L2().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(intakeVoltage))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
+		operatorController.square().whileTrue(pivot.goToAngleCommand(PivotConstants.MAX_ANGLE.div(2))).onFalse(pivot.stopCommand());
+
 
 		// driverController.circle().whileTrue(rollers.spinUpCommand()).onFalse(rollers.spinDownCommand());
 		// hood.setDefaultCommand(hood.joystickControlCommand());

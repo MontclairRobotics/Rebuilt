@@ -3,8 +3,8 @@ package frc.robot.subsystems.shooter.turret;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -19,7 +19,6 @@ import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
 public class TurretIOTalonFX implements TurretIO {
@@ -36,7 +35,7 @@ public class TurretIOTalonFX implements TurretIO {
     private final StatusSignal<Current> currentDrawAmpsSignal;
     private final StatusSignal<Temperature> tempCelsiusSignal;
 
-    private final MotionMagicVoltage request = new MotionMagicVoltage(0);
+    private final PositionVoltage request = new PositionVoltage(0);
     private final NeutralOut neutralOut = new NeutralOut();
 
     public TurretIOTalonFX() {

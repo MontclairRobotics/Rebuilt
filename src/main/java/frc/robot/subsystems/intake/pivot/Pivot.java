@@ -64,11 +64,16 @@ public class Pivot extends SubsystemBase {
 	}
 
 	public Command goToAngleCommand(Angle angle) {
-		return Commands.run(() -> setPivotAngle(angle), this)
-			.until(this::atSetpoint)
-			.finallyDo(() -> {
-				io.stop();
-			});
+		return Commands.run(() -> setPivotAngle(angle), RobotContainer.pivot)
+			.until(this::atSetpoint);
+	}
+
+	public Command deployCommand() {
+		return Commands.run(() -> setPivotAngle(MIN_ANGLE), this);
+	}
+
+	public Command stowCommand() {
+		return Commands.run(() -> setPivotAngle(MAX_ANGLE), this);
 	}
 
 	public Command goToAngleCommand(Supplier<Angle> angle) {
@@ -77,6 +82,13 @@ public class Pivot extends SubsystemBase {
 				io.stop();
 			});
 	}
+
+	public Command jostleCommand() {
+        return Commands.repeatingSequence(
+            goToAngleCommand(MAX_ANGLE.div(2)),
+            goToAngleCommand(MIN_ANGLE)
+        );
+    }
 
 	public Command joystickControlCommand() {
 		return Commands.run(this::joystickControl, this);

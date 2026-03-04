@@ -219,6 +219,6 @@ public class Turret extends SubsystemBase {
 	}
 
 	public Command setRobotRelativeAngleCommand(Supplier<Angle> angleSupplier) {
-		return Commands.run(() -> setRobotRelativeAngle(angleSupplier.get()));
+		return Commands.run(() -> setRobotRelativeAngle(angleSupplier.get()), this);
 	}
 }
