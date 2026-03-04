@@ -12,7 +12,6 @@ import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -22,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.PivotConstants;
+import frc.robot.util.AllianceManager;
 
 public class Auto extends SubsystemBase {
   private char currentPos;
@@ -58,7 +58,7 @@ public class Auto extends SubsystemBase {
     }
     maxObjs = 0;
 
-    if(DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+    if(AllianceManager.isRed()) {
       try {
         for(int i = 0; i < PathPlannerAuto.getPathGroupFromAutoFile(auto).size(); i++) {
           field.getObject("obj" + i).setPoses(PathPlannerAuto.getPathGroupFromAutoFile(auto).get(i).getPathPoses());
@@ -72,7 +72,7 @@ public class Auto extends SubsystemBase {
       }
     }
 
-    if(DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+    if(AllianceManager.isRed()) {
       try {
         for(int i = 0; i < PathPlannerAuto.getPathGroupFromAutoFile(auto).size(); i++) {
           field.getObject("obj" + i).setPoses(PathPlannerAuto.getPathGroupFromAutoFile(auto).get(i).flipPath().getPathPoses());
@@ -96,7 +96,7 @@ public class Auto extends SubsystemBase {
       maxObjs = 0;
     }
 
-    if(DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+    if(!AllianceManager.isRed()) {
       for(int i = 0; i < allPaths.size(); i++) {
         field.getObject("obj" + i).setPoses(allPaths.get(i).getPathPoses().toArray(new Pose2d[0]));
         if(i > maxObjs) {
@@ -105,7 +105,7 @@ public class Auto extends SubsystemBase {
       }
     }
 
-    if(DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+    if(AllianceManager.isRed()) {
       for(int i = 0; i < allPaths.size(); i++) {
         field.getObject("obj" + i).setPoses(allPaths.get(i).flipPath().getPathPoses().toArray(new Pose2d[0]));
         if(i > maxObjs) {
@@ -159,7 +159,7 @@ public class Auto extends SubsystemBase {
   }
 
   public Command buildAuto(String autoString) {
-    allPaths = new ArrayList();
+    allPaths = new ArrayList<PathPlannerPath>();
     SequentialCommandGroup autoCommand = new SequentialCommandGroup();
 
     if (!isAutoValid(autoString)) {
@@ -212,7 +212,7 @@ public class Auto extends SubsystemBase {
       currentPos = autoString.charAt(i);
     }
 
-    if(DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+    if(!AllianceManager.isRed()) {
       autoCommand.addCommands(
       Commands.runOnce(
         () -> {try {
@@ -263,11 +263,8 @@ public class Auto extends SubsystemBase {
     return autoCommand;
   }
 
-
-
-
   public void periodic() {
-    alliance.setString(DriverStation.getAlliance().get().toString());
+    alliance.setString(AllianceManager.getAlliance().toString());
     createAuto(autoString.getString(""));
   }
 }
