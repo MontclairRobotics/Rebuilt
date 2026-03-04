@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -139,7 +140,8 @@ public class RobotContainer {
 	public double intakeVoltage = 12;
 	Tunable intakeSpeed = new Tunable("Intake Voltage", intakeVoltage, (value) -> intakeVoltage = value);
 
-	public static final Trigger shootTrigger = driverController.circle();
+	public static final Trigger shootTrigger = driverController.circle().or(() -> DriverStation.isAutonomous());
+	
 	public RobotContainer() {
 
 		System.out.println("Constants.CURRENT_MODE: " + Constants.CURRENT_MODE);
@@ -286,7 +288,7 @@ public class RobotContainer {
 	}
 
 	public Command getAutonomousCommand() {
-		return autoChooser.getSelected();
+		return auto.getAutoCommand();
 	}
 
 	/**
