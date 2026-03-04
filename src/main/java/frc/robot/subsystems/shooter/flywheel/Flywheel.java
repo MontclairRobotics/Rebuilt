@@ -79,10 +79,10 @@ public class Flywheel extends SubsystemBase {
 
         io.updateInputs(inputs); // need to update inputs every frame
 
-        if(logCounter % loopsPerLog == 0) {
+        // if(logCounter % loopsPerLog == 0) {
             Logger.processInputs("Flywheel", inputs);
-            Logger.recordOutput("Flywheel/Mode", FlywheelIOBangBang.phase);
-        }
+            // Logger.recordOutput("Flywheel/Mode", FlywheelIOBangBang.phase);
+        // }
 
         if(RobotContainer.FLYWHEEL_DEBUG) updateTunables();
     }

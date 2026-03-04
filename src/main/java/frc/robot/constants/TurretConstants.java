@@ -55,7 +55,7 @@ public class TurretConstants {
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
 	public static final Angle ANGLE_OFFSET = Rotations.of(0.375);
-	public static final Angle ENCODER_OFFSET = Rotations.of(0.085);
+	public static final Angle ENCODER_OFFSET = Rotations.of(0.7578125);
 
 	// pid + ff gains
 	public static final double kP = 110.0555;
@@ -66,8 +66,8 @@ public class TurretConstants {
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(60);
 	public static final double MOTION_MAGIC_JERK = 100; // Rotations Per Second Per Second Per Second
 
-	public static final double STATOR_CURRENT_LIMIT = 60; // Amps
-	public static final double SUPPLY_CURRENT_LIMIT = 40; // Amps
+	public static final double STATOR_CURRENT_LIMIT = 80; // Amps
+	public static final double SUPPLY_CURRENT_LIMIT = 60; // Amps
 
 	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
 		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)

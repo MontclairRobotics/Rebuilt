@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
@@ -34,11 +35,11 @@ public class PivotConstants {
 
 	public static final double ROTOR_TO_SENSOR_RATIO = 64;
 	public static final double SENSOR_TO_MECHANISM_RATIO = 1; // CANcoder is on the mechanism
-	public static final double ENCODER_OFFSET = -0.607689453125;
+	public static final double ENCODER_OFFSET = -0.77836915625;
 
 	// constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);
-	public static final Angle MAX_ANGLE = Degrees.of(120);
+	public static final Angle MAX_ANGLE = Rotations.of(0.3);
 
 	// physical properties
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // rotations of the motor shaft per rotations of the intake pivot
@@ -46,13 +47,13 @@ public class PivotConstants {
 	public static final double MOMENT_OF_INERTIA = 1; // TODO: set
 
 	// pid gains
-	public static final double kP = 0;
+	public static final double kP = 100;
 	public static final double kI = 0;
 	public static final double kD = 0;
 
 	// ff gains
 	public static final double kS = 0;
-	public static final double kG = 0;
+	public static final double kG = 0.35;
 	public static final double kV = 0;
 
 	public static final Angle TOLERANCE = Degrees.of(1);

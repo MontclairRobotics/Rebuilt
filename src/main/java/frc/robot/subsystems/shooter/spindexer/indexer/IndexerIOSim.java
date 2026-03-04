@@ -82,4 +82,10 @@ public class IndexerIOSim implements IndexerIO {
 		return pidController.atSetpoint();
 	}
 
+	@Override
+	public void setCurrent(double currentDrawAmps) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setCurrent'");
+	}
+
 }
