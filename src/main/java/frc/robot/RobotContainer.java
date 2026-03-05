@@ -5,16 +5,18 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
-
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -23,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.PivotConstants;
 import frc.robot.constants.Constants.Mode;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
@@ -131,6 +134,9 @@ public class RobotContainer {
 
 	public LoggedTunableNumber indexerCurrent = new LoggedTunableNumber("Spindexer/Index Current", 0);
 	public LoggedTunableNumber serializerCurrent = new LoggedTunableNumber("Spindexer/Serializer Current", 0);
+
+	public LoggedTunableNumber indexerVelocity = new LoggedTunableNumber("Spindexer/Index Velocity", 0);
+	public LoggedTunableNumber serializerVelocity = new LoggedTunableNumber("Spindexer/Serializer Velocity", 0);
 
 	public RobotContainer() {
 
@@ -242,16 +248,27 @@ public class RobotContainer {
 		// driver
 
 		operatorController.circle().onFalse(shooter.stowCommand());
-		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
+		operatorController.povUp().onTrue(turret.increaseFudgeFactorCommand());
+		operatorController.povDown().onTrue(turret.decreaseFudgeFactorCommand());
+		drivetrain.setDefaultCommand(new JoystickDriveCommand(true));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 
-		// driverController.triangle().whileTrue(
-		// 	indexer.setCurrentCommand(() -> indexerCurrent.getAsDouble())
-		// 	.alongWith(serializer.setCurrentCommand(() -> serializerCurrent.getAsDouble()))
-		// ).onFalse(
-		// 	indexer.setCurrentCommand(() -> 0)
-		// 	.alongWith(serializer.setCurrentCommand(() -> 0)
-		// ));
+		driverController.triangle().whileTrue(
+			indexer.setCurrentCommand(() -> indexerCurrent.getAsDouble())
+			.alongWith(serializer.setCurrentCommand(() -> serializerCurrent.getAsDouble()))
+		).onFalse(
+			indexer.setCurrentCommand(() -> 0)
+			.alongWith(serializer.setCurrentCommand(() -> 0)
+		));
+
+		driverController.cross().whileTrue(
+			indexer.setVelocityCommand(() -> RotationsPerSecond.of(indexerVelocity.get()))
+			.alongWith(serializer.setVelocityCommand(() -> RotationsPerSecond.of(serializerVelocity.get())))
+		)
+		.onFalse(
+			indexer.spinDownCommand()
+			.alongWith(serializer.spinDownCommand())
+		);
 
 		// driverController.R1().whileTrue(rollers.setVoltageCommand(() -> intakeVoltage)).onFalse(rollers.setVoltageCommand(() -> 0));
 
@@ -261,26 +278,27 @@ public class RobotContainer {
 
 		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
 		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(intakeVoltage))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
-		// operatorController.square().whileTrue(pivot.goToAngleCommand(PivotConstants.MAX_ANGLE.div(2))).onFalse(pivot.stopCommand());
+		operatorController.square().whileTrue(pivot.goToAngleCommand(PivotConstants.MAX_ANGLE.div(2))).onFalse(pivot.stopCommand());
 
 
 		// driverController.circle().whileTrue(rollers.spinUpCommand()).onFalse(rollers.spinDownCommand());
 		// hood.setDefaultCommand(hood.joystickControlCommand());
 		// turret.setDefaultCommand(turret.joystickControlCommand());
 		// flywheel.setDefaultCommand(flywheel.joystickControlCommand());
-		// driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
-		// driverController.square()
-		// 	.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
-		// 	.onFalse(hood.stopCommand());
+		driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
+
+		driverController.square()
+			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
+			.onFalse(hood.stopCommand());
 
 		// driverController.square()
 		// 	.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
 		// 	.onFalse(turret.stopCommand());
 
-		// driverController.circle()
-		// 	.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), Timer.getFPGATimestamp()))
-		// 	.onFalse(flywheel.stopCommand());
+		driverController.circle()
+			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), Timer.getFPGATimestamp()))
+			.onFalse(flywheel.stopCommand());
 
 		// driverController.triangle()
 		// 	.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.ze))

@@ -236,6 +236,8 @@ public class Auto extends SubsystemBase {
 
 		if(AllianceManager.getAlliance() == DriverStation.Alliance.Blue) {
 			autoCommand.addCommands(
+				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
 				Commands.parallel(
 					followPathCommands,
 					RobotContainer.rollers.spinUpCommand()

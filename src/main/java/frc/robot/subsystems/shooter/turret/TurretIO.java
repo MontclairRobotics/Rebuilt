@@ -36,6 +36,8 @@ public interface TurretIO {
 
     public void stop();
 
+    public void applyFudgeFactor(Angle angle);
+
     public boolean isAtSetpoint();
 
     public void setGains(double kP, double kD, double kS);

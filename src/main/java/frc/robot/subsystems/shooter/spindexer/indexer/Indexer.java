@@ -90,6 +90,10 @@ public class Indexer extends SubsystemBase {
 		return Commands.run(() -> setCurrent(currentSupplier.getAsDouble()), this);
 	}
 
+	public Command setVelocityCommand(Supplier<AngularVelocity> velocitySupplier) {
+		return Commands.run(() -> setVelocity(velocitySupplier), this);
+	}
+
     public Command joystickControlCommand() {
         return Commands.run(() -> applyJoystickInput(), this);
     }

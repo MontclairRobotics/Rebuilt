@@ -88,6 +88,10 @@ public class Serializer extends SubsystemBase {
 		return Commands.run(() -> setCurrent(currentSupplier.getAsDouble()), this);
 	}
 
+	public Command setVelocityCommand(Supplier<AngularVelocity> velocitySupplier) {
+		return Commands.run(() -> setVelocity(velocitySupplier));
+	}
+
     public Command joystickControlCommand() {
         return Commands.run(() -> applyJoystickInput(), this);
     }

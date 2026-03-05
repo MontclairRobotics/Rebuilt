@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 public class PivotIOSim implements PivotIO {
 
 	private SingleJointedArmSim sim;
-	private PIDController pidController = new  PIDController(0, 0, 0);
+	private PIDController pidController = new  PIDController(10, 0, 0);
 	private ArmFeedforward feedforward = new ArmFeedforward(0, 0, 0);
 
 	private double appliedVoltage;

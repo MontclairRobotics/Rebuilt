@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter.turret;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
@@ -19,6 +20,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -45,6 +47,9 @@ public class Turret extends SubsystemBase {
 
 	public final LoggedTunableNumber tunableRobotRelativeTurretAngle = new LoggedTunableNumber("Turret/Tunable Robot Relative Angle", 0);
 
+	private Angle fudgeFactor = Degrees.of(0);
+	private final Angle step = Degrees.of(3);
+
 	private int logCounter;
 	private final int loopsPerLog;
 
@@ -64,11 +69,29 @@ public class Turret extends SubsystemBase {
 			Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
 		}
 
-		if(RobotContainer.TURRET_DEBUG) {
+		if(RobotContainer.TURRET_DEBUG || RobotBase.isSimulation()) {
 			visualization.update();
 			visualization.log();
 			updateTunables();
 		}
+	}
+
+	public void increaseFudgeFactor() {
+		fudgeFactor.plus(step);
+		io.applyFudgeFactor(fudgeFactor);
+	}
+
+	public void decreaseFudgeFactor() {
+		fudgeFactor.minus(step);
+		io.applyFudgeFactor(fudgeFactor);
+	}
+
+	public Command increaseFudgeFactorCommand() {
+		return Commands.runOnce(() -> increaseFudgeFactor());
+	}
+
+	public Command decreaseFudgeFactorCommand() {
+		return Commands.runOnce(() -> decreaseFudgeFactor());
 	}
 
     /**
@@ -212,7 +235,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void setRobotRelativeAngle(Supplier<Angle> angleSupplier, Supplier<AngularVelocity> velocitySupplier) {
-		io.setRobotRelativeAngle(angleSupplier.get(), velocitySupplier.get());
+		setRobotRelativeAngle(angleSupplier.get(), velocitySupplier.get());
 	}
 
 	public Command joystickControlCommand() {

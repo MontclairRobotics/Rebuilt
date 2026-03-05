@@ -157,4 +157,9 @@ public class TurretIOTalonFX implements TurretIO {
         motor.setNeutralMode(value);
     }
 
+    @Override
+    public void applyFudgeFactor(Angle angle) {
+       motor.setPosition(positionSignal.getValue().plus(angle));
+    }
+
 }

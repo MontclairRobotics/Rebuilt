@@ -113,4 +113,9 @@ public class TurretIOSim implements TurretIO {
        // does nothing
     }
 
+    @Override
+    public void applyFudgeFactor(Angle angle) {
+       sim.setState(sim.getAngleRads() + angle.in(Radians), 0.0);
+    }
+
 }

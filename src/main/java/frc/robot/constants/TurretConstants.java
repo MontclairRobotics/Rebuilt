@@ -58,9 +58,9 @@ public class TurretConstants {
 	public static final Angle ENCODER_OFFSET = Rotations.of(0.931923828125);
 
 	// pid + ff gains
-	public static final double kP = 70.0555;
-	public static final double kD = 3.00555;
-	public static final double kS = 0.35;
+	public static final double kP = 50.0555;
+	public static final double kD = 2.00555;
+	public static final double kS = 0.350000555;
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(6);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(60);
