@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringEntry;
@@ -19,29 +20,28 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.PivotConstants;
 import frc.robot.util.AllianceManager;
+import frc.robot.util.Elastic;
+import frc.robot.util.Elastic.Notification;
+import frc.robot.util.Elastic.Notification.NotificationLevel;
 import frc.robot.util.PoseUtils;
 
 public class Auto extends SubsystemBase {
 	private char currentPos;
 	private double timeToEmptyFuel = 6.0; //TODO: get the actual value
-	private ShuffleboardTab autoTab;
-	private GenericEntry autoString;
-	private GenericEntry error;
-	private GenericEntry alliance;
-	private GenericEntry currPos;
 	private Field2d field = new Field2d();
+
 	private ArrayList<PathPlannerPath> allPaths = new  ArrayList<PathPlannerPath>();
 	private ArrayList<PathPlannerPath> prevPaths = new ArrayList<PathPlannerPath>();
+
 	private Command autoCommand;
 	private int maxObjs;
 
@@ -54,13 +54,21 @@ public class Auto extends SubsystemBase {
 	StringTopic feedbackTopic = auto.getStringTopic("Auto Feedback");
 	StringPublisher feedbackPub = feedbackTopic.publish();
 	StringSubscriber stringSub = autoTopic.subscribe("");
+	Alliance prevAlliance = Alliance.Blue;
+
+	private String prevAutoString = "";
+
+	public void setFeedback(String s, NotificationLevel level) {
+		feedbackPub.set(s);
+		Notification not = new Notification(level, "Auto Feedback", s, 3000);
+		Elastic.sendNotification(not);
+	}
 
 	public Auto() {
-		autoTab = Shuffleboard.getTab("Auto");
-		autoString = autoTab.add("Auto string", "").withSize(2,1).getEntry();
-		error = autoTab.add("Error", "No errors").withSize(2,1).withPosition(0,1).getEntry();
-		alliance = autoTab.add("Alliance", "Unkown alliance").withSize(2,1).withPosition(0,2).getEntry();
-		currPos = autoTab.add("current position", "").getEntry();
+		autoTopic.setRetained(true);
+		stringEnt.set("");
+		feedbackTopic.setRetained(true);
+		feedbackPub.set("Enter auto string");
 		SmartDashboard.putData("Field", field);
 	}
 
@@ -133,18 +141,13 @@ public class Auto extends SubsystemBase {
 
 	public boolean isAutoValid(String autoString) {
 
-		if(this.autoString.getString("").equals("")) {
-			error.setString("Enter a string into Auto string");
-			return false;
-		}
-
 		if(autoString.length() < 3) {
-			error.setString("Auto length is too short");
+			setFeedback("Auto string is too short!", NotificationLevel.ERROR);
 			return false;
 		}
 
 		if(autoString.length() % 2 == 0) {
-			error.setString("One of the paths has an invalid length");
+			setFeedback("One of the paths has an invalid length", NotificationLevel.ERROR);;
 			return false;
 		}
 
@@ -154,7 +157,7 @@ public class Auto extends SubsystemBase {
 		try {
 			AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentAutoString));
 		} catch(Exception e) {
-			error.setString("Path " + currentAutoString + " doesn\'t exist");
+			setFeedback("Path " + currentAutoString + " doesn\'t exist", NotificationLevel.ERROR);;
 			return false;
 		}
 
@@ -163,13 +166,13 @@ public class Auto extends SubsystemBase {
 			try {
 				AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentAutoString));
 			} catch(Exception e) {
-				error.setString("Path " + currentAutoString + " doesn\'t exist");
+				setFeedback("Path " + currentAutoString + " doesn\'t exist", NotificationLevel.ERROR);
 				return false;
 			}
 			currentPos = autoString.substring(i, i + 1);
 		}
 
-		error.setString("No errors");
+		setFeedback("Auto String Valid!", NotificationLevel.INFO);
 		return true;
 	}
 
@@ -180,7 +183,7 @@ public class Auto extends SubsystemBase {
 
 		if (!isAutoValid(autoString)) {
 			try {
-				AutoBuilder.followPath(PathPlannerPath.fromPathFile("LL0"));
+				// AutoBuilder.followPath(PathPlannerPath.fromPathFile("LL0"));
 				return autoCommand;
 			} catch(Exception e) {
 
@@ -190,7 +193,7 @@ public class Auto extends SubsystemBase {
 		SequentialCommandGroup followPathCommands = new SequentialCommandGroup();
 
 		currentPos = autoString.charAt(1);
-		currPos.setString("" + currentPos);
+
 		try {
 			String pathString = autoString.substring(0, 3);
 			PathPlannerPath firstPath = PathPlannerPath.fromPathFile(pathString);
@@ -205,13 +208,16 @@ public class Auto extends SubsystemBase {
 			try {
 				allPaths.add(PathPlannerPath.fromPathFile(autoString.substring(0, 3)));
 			} catch(Exception e) {
-				error.setString("Adding first path to allPaths issue");
+				setFeedback("Issue with adding the first path", NotificationLevel.ERROR);
 			}
 		} catch(Exception e) {
-			error.setString("First path issue");
+			setFeedback("Unknown error with the first path", NotificationLevel.ERROR);
 		}
 
 		for (int i = 3; i < autoString.length(); i += 2) {
+
+			String pathString = currentPos + autoString.substring(i, i + 2);
+
 			if(
 				(currentPos == 'L' || currentPos == 'R')
 				&& currentPos == autoString.charAt(i)
@@ -219,16 +225,15 @@ public class Auto extends SubsystemBase {
 				followPathCommands.addCommands(Commands.waitSeconds(timeToEmptyFuel));
 			}
 			try {
+				PathPlannerPath path = PathPlannerPath.fromPathFile(pathString);
 				followPathCommands.addCommands(
-					AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentPos + autoString.substring(i, i + 2)))
+					AutoBuilder.followPath(path)
 				);
-				try {
-					allPaths.add(PathPlannerPath.fromPathFile(currentPos + autoString.substring(i, i + 2)));
-				} catch(Exception e) {
-					error.setString("Adding to all paths issue");
-				}
+				allPaths.add(path);
 			} catch(Exception e) {
-				error.setString("Later path issue");
+				setFeedback("Path " + pathString + " not found!", NotificationLevel.ERROR);
+				allPaths.clear();
+				return Commands.none();
 			}
 
 			currentPos = autoString.charAt(i);
@@ -236,8 +241,8 @@ public class Auto extends SubsystemBase {
 
 		if(AllianceManager.getAlliance() == DriverStation.Alliance.Blue) {
 			autoCommand.addCommands(
-				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
+				// RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+				// Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
 				Commands.parallel(
 					followPathCommands,
 					RobotContainer.rollers.spinUpCommand()
@@ -245,8 +250,8 @@ public class Auto extends SubsystemBase {
 			);
 		} else {
 			autoCommand.addCommands(
-				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
+				// RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+				// Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
 				Commands.parallel(
 					followPathCommands,
 					RobotContainer.rollers.spinUpCommand()
@@ -266,8 +271,47 @@ public class Auto extends SubsystemBase {
 		return autoCommand;
 	}
 
+	public void validateAndCreatePaths(String str) {
+		clearField();
+		if (isAutoValid(str)) {
+			autoCommand = buildAuto(str);
+			drawPaths();
+		}
+	}
+
+	public void clearField() {
+        allPaths.clear();
+        for (int i = 0; i < 100; i++) {
+            FieldObject2d obj = field.getObject("obj" + i);
+            obj.setTrajectory(new Trajectory());
+        }
+    }
+
 	public void periodic() {
-		alliance.setString(AllianceManager.getAlliance().toString());
-		createAuto(autoString.getString(""));
+		if(DriverStation.isDisabled()) {
+			String str = stringEnt.get();
+			SmartDashboard.putData(field);
+
+			String autoString = "";
+			Optional<Alliance> alliance = DriverStation.getAlliance();
+
+			for (char a : str.toCharArray()) {
+                if (a != ' ' && a != ',') {
+                    autoString += a;
+                }
+            }
+
+			if(!autoString.equals(prevAutoString)) {
+				prevAutoString = autoString;
+				validateAndCreatePaths(autoString);
+				Logger.recordOutput("Auto/Auto String", autoString);
+				System.out.print("RUNNING AUTO BUILDER");
+			} else if (alliance.isPresent() && alliance.get() != prevAlliance) {
+				prevAlliance = alliance.get();
+				validateAndCreatePaths(autoString);
+				Logger.recordOutput("Auto/Auto String", autoString);
+				System.out.print("RUNNING AUTO BUILDER");
+			}
+		}
 	}
 }
