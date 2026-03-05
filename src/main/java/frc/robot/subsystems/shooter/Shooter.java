@@ -118,9 +118,9 @@ public class Shooter extends SubsystemBase {
 
     public Command setParameters(Supplier<ShootingParameters> paramsSupplier) {
         return Commands.parallel(
-            turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation))
-            // hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
-            // indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
+            turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation)),
+            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
+            indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
         );
     }
 
@@ -170,9 +170,9 @@ public class Shooter extends SubsystemBase {
 
     public Command indexAndShootCommand(Supplier<AngularVelocity> flywheelVelocitySupplier) {
         return Commands.run(() -> {
+            flywheel.setVelocity(flywheelVelocitySupplier, Timer.getFPGATimestamp());
             if (RobotContainer.shootTrigger.getAsBoolean() && this.atSetpoint()) {
                 spindexer.spinUp();
-                flywheel.setVelocity(flywheelVelocitySupplier, Timer.getFPGATimestamp());
             }
         });
     }
@@ -180,7 +180,9 @@ public class Shooter extends SubsystemBase {
     public Command stowCommand(){
         return Commands.parallel (
 			hood.setAngleCommand(() -> HoodConstants.MIN_ANGLE),
-			turret.stopCommand()
+			turret.stopCommand(),
+            flywheel.stopCommand(),
+            spindexer.spinDownCommand()
 		);
     }
 }

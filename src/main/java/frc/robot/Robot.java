@@ -62,7 +62,7 @@ public class Robot extends LoggedRobot {
 		switch (Constants.CURRENT_MODE) {
 		case REAL:
 			// Running on a real robot, log to roboRio
-			Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs"));
+			Logger.addDataReceiver(new WPILOGWriter("U/logs"));
 			Logger.addDataReceiver(new NT4Publisher());
 			break;
 

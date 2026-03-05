@@ -55,11 +55,11 @@ public class TurretConstants {
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
 	public static final Angle ANGLE_OFFSET = Rotations.of(0.375);
-	public static final Angle ENCODER_OFFSET = Rotations.of(0.4412890625);
+	public static final Angle ENCODER_OFFSET = Rotations.of(0.931923828125);
 
 	// pid + ff gains
-	public static final double kP = 110.0555;
-	public static final double kD = 5.00555;
+	public static final double kP = 70.0555;
+	public static final double kD = 3.00555;
 	public static final double kS = 0.35;
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(6);
@@ -96,7 +96,7 @@ public class TurretConstants {
 	public static final CANcoderConfiguration ENCODER_CONFIGS = new CANcoderConfiguration()
 		.withMagnetSensor(
 			new MagnetSensorConfigs()
-				.withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+				.withSensorDirection(SensorDirectionValue.Clockwise_Positive)
 				.withMagnetOffset(ENCODER_OFFSET)
 		);
 }

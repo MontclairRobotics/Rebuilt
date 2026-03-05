@@ -6,6 +6,8 @@ import static frc.robot.constants.IndexerConstants.*;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
@@ -37,13 +39,13 @@ public class Indexer extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// logCounter++;
+		logCounter++;
 
-		// io.updateInputs(inputs);
+		io.updateInputs(inputs);
 
-		// if(logCounter % loopsPerLog == 0) {
-		// 	Logger.processInputs("Indexer", inputs);
-		// }
+		if(logCounter % loopsPerLog == 0) {
+			Logger.processInputs("Indexer", inputs);
+		}
 	}
 
 	public void setVelocity(AngularVelocity velocity) {

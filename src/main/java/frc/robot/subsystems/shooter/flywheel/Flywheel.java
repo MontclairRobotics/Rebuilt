@@ -5,7 +5,6 @@ import static frc.robot.constants.FlywheelConstants.*;
 
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
 
 
 import edu.wpi.first.math.MathUtil;
@@ -75,16 +74,16 @@ public class Flywheel extends SubsystemBase {
     }
 
     public void periodic() {
-        logCounter++;
+        // logCounter++;
 
-        io.updateInputs(inputs); // need to update inputs every frame
+        // io.updateInputs(inputs); // need to update inputs every frame
 
         // if(logCounter % loopsPerLog == 0) {
-            Logger.processInputs("Flywheel", inputs);
-            // Logger.recordOutput("Flywheel/Mode", FlywheelIOBangBang.phase);
+        //     Logger.processInputs("Flywheel", inputs);
+        //     // Logger.recordOutput("Flywheel/Mode", FlywheelIOBangBang.phase);
         // }
 
-        if(RobotContainer.FLYWHEEL_DEBUG) updateTunables();
+        // if(RobotContainer.FLYWHEEL_DEBUG) updateTunables();
     }
 
     public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {

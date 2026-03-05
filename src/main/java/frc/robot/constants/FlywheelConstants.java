@@ -19,7 +19,7 @@ public class FlywheelConstants {
 
 	public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
-	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(1);
+	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.5);
 
 	// tuned 3/4
 	public static final double kP = 30;

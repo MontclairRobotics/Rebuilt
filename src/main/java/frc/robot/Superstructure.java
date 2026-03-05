@@ -103,10 +103,10 @@ public class Superstructure extends SubsystemBase {
 		if(logCounter % loopsPerLog == 0) {
 			Logger.recordOutput("Superstructure/isallianceknown", AllianceManager.isAllianceKnown());
 			Logger.recordOutput("Superstructure/currentshiftempty", HubTracker.getCurrentShift().isEmpty());
-			Logger.recordOutput("Superstructure/shouldBeScoring", shouldBeScoring());
+			Logger.recordOutput("Superstructure/shouldBeScoring", scoringModeTrigger.getAsBoolean());
 			Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
 			Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
-			Logger.recordOutput("Superstructure/inTrenchDangerZone", inTrenchDangerZone());
+			Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowTrigger.getAsBoolean());
 			Logger.recordOutput("Trench/Trench Danger Zones", FieldConstants.Zones.TRENCH_DANGER_ZONES);
 		}
 

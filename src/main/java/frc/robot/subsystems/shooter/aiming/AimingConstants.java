@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.Time;
 
 public class AimingConstants {
 
-	public static double LATENCY = 0.02; // seconds it takes to reach desired state once state is set
+	public static double LATENCY = 0.1; // seconds it takes to reach desired state once state is set
 
 	public record ShotSettings(Angle angle, AngularVelocity flywheelVelocity, Time timeOfFlight, boolean withConstantVelocity) implements Interpolatable<ShotSettings> {
 		public ShotSettings(Angle angle, AngularVelocity flywheelVelocity, Time timeOfFlight, boolean withConstantVelocity) {
@@ -85,6 +85,9 @@ public class AimingConstants {
 
 		REAL_MAP.put(0.0, new ShotSettings(Rotations.zero(), RotationsPerSecond.of(1), Seconds.of(0), false));
 		REAL_MAP.put(5.0, new ShotSettings(Rotations.zero(), RotationsPerSecond.of(1), Seconds.of(0), false));
+		REAL_MAP.put(2.24, new ShotSettings(Degrees.of(17), RotationsPerSecond.of(23.5), Seconds.of(1), false));
+		REAL_MAP.put(3.45, new ShotSettings(Degrees.of(20), RotationsPerSecond.of(26), Seconds.of(1.125), false));
+		REAL_MAP.put(4.30, new ShotSettings(Degrees.of(24), RotationsPerSecond.of(27.75), Seconds.of(1.25), false));
 
 		SIM_CONSTANT_VELOCITY_MAP.put(0.8516690912634933, new SimShotSettings(Degrees.of(3), MetersPerSecond.of(9), Seconds.of(1.52), true));
 		SIM_CONSTANT_VELOCITY_MAP.put(2.0927103773901443, new SimShotSettings(Degrees.of(10), MetersPerSecond.of(9), Seconds.of(1.504), true));
