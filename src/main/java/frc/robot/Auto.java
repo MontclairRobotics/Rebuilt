@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.PivotConstants;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.Elastic;
 import frc.robot.util.Elastic.Notification;
@@ -241,8 +242,8 @@ public class Auto extends SubsystemBase {
 
 		if(AllianceManager.getAlliance() == DriverStation.Alliance.Blue) {
 			autoCommand.addCommands(
-				// RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-				// Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
+				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
 				Commands.parallel(
 					followPathCommands,
 					RobotContainer.rollers.spinUpCommand()
@@ -250,8 +251,8 @@ public class Auto extends SubsystemBase {
 			);
 		} else {
 			autoCommand.addCommands(
-				// RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-				// Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
+				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
 				Commands.parallel(
 					followPathCommands,
 					RobotContainer.rollers.spinUpCommand()

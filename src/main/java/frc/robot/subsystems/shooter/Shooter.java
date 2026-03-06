@@ -74,6 +74,7 @@ public class Shooter extends SubsystemBase {
         return hopperCount;
     }
 
+
     public void addBall() {
         if (hopperCount < HOPPER_CAPACITY) {
             hopperCount++;
