@@ -97,6 +97,11 @@ public class TurretIOSim implements TurretIO {
     }
 
     @Override
+    public boolean isAtTimeAdjustedSetpoint() {
+        return false;
+    }
+
+    @Override
     public void setGains(double kP, double kD, double kS) {
         // pidController.setP(kP);
         // pidController.setD(kD);

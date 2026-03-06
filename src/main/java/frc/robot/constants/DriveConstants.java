@@ -34,7 +34,7 @@ public class DriveConstants {
 		MAX_ANGULAR_ACCELERATION
 	);
 
-	public static final double ROTATION_kP = 16;
+	public static final double ROTATION_kP = 5;
 	public static final double ROTATION_kI = 0;
 	public static final double ROTATION_kD = 0.1;
 	public static final Angle ROTATION_TOLERANCE = Degrees.of(1);

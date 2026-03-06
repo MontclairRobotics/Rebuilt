@@ -16,6 +16,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -26,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.shooter.aiming.AimingConstants;
 import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
@@ -36,6 +38,8 @@ public class Turret extends SubsystemBase {
     private final TurretIO io;
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 	private final TurretVisualization visualization = new TurretVisualization();
+
+	private static final TimeInterpolatableBuffer<Angle> setpointBuffer = TimeInterpolatableBuffer.createBuffer(Turret::interpolate, AimingConstants.LATENCY * 2);
 
 	// private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Turret/kP", SLOT0_CONFIGS.kP);
     // private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Turret/kD", SLOT0_CONFIGS.kD);
@@ -69,9 +73,10 @@ public class Turret extends SubsystemBase {
 			Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
 		}
 
+		visualization.update();
+		visualization.log();
+
 		if(RobotContainer.TURRET_DEBUG || RobotBase.isSimulation()) {
-			visualization.update();
-			visualization.log();
 			updateTunables();
 		}
 	}
@@ -93,6 +98,24 @@ public class Turret extends SubsystemBase {
 	public Command decreaseFudgeFactorCommand() {
 		return Commands.runOnce(() -> decreaseFudgeFactor());
 	}
+
+	public static Angle interpolate(Angle startValue, Angle endValue, double t) {
+        return Rotations.of(
+            MathUtil.interpolate(startValue.in(Rotations), endValue.in(Rotations), t)
+        );
+    }
+
+	public boolean atTimeAdjustedSetpoint() {
+        return io.isAtTimeAdjustedSetpoint();
+    }
+
+    public static void recordSetpoint(Angle setpoint, double timeSecondsForSetpoint) {
+        setpointBuffer.addSample(timeSecondsForSetpoint, setpoint);
+    }
+
+    public static Angle getSetpointForTime(double timeSeconds) {
+        return setpointBuffer.getSample(timeSeconds).orElseGet(() -> Rotations.zero());
+    }
 
     /**
 	 * Handles turret wrapping through the max and min angles

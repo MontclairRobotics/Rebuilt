@@ -5,27 +5,25 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.JoystickDriveCommand;
+import frc.robot.commands.WheelRadiusCharacterization;
+import frc.robot.commands.WheelRadiusCharacterization.Direction;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
-import frc.robot.constants.PivotConstants;
 import frc.robot.constants.Constants.Mode;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
@@ -55,6 +53,7 @@ import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.util.PoseUtils;
 import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.sim.FuelSim;
@@ -171,8 +170,8 @@ public class RobotContainer {
 				vision = new Vision(
 					drivetrain::addVisionMeasurement,
 					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
-					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading)
-					// new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
+					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
+					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
 				);
 
 				break;
@@ -247,28 +246,31 @@ public class RobotContainer {
 
 		// driver
 
+		driverController.povRight().whileTrue(new WheelRadiusCharacterization(Direction.CLOCKWISE, drivetrain));
+		driverController.povLeft().whileTrue(new WheelRadiusCharacterization(Direction.COUNTER_CLOCKWISE, drivetrain));
+
 		operatorController.circle().onFalse(shooter.stowCommand());
 		operatorController.povUp().onTrue(turret.increaseFudgeFactorCommand());
 		operatorController.povDown().onTrue(turret.decreaseFudgeFactorCommand());
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(true));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 
-		driverController.triangle().whileTrue(
-			indexer.setCurrentCommand(() -> indexerCurrent.getAsDouble())
-			.alongWith(serializer.setCurrentCommand(() -> serializerCurrent.getAsDouble()))
-		).onFalse(
-			indexer.setCurrentCommand(() -> 0)
-			.alongWith(serializer.setCurrentCommand(() -> 0)
-		));
+		// driverController.triangle().whileTrue(
+		// 	indexer.setCurrentCommand(() -> indexerCurrent.getAsDouble())
+		// 	.alongWith(serializer.setCurrentCommand(() -> serializerCurrent.getAsDouble()))
+		// ).onFalse(
+		// 	indexer.setCurrentCommand(() -> 0)
+		// 	.alongWith(serializer.setCurrentCommand(() -> 0)
+		// ));
 
-		driverController.cross().whileTrue(
-			indexer.setVelocityCommand(() -> RotationsPerSecond.of(indexerVelocity.get()))
-			.alongWith(serializer.setVelocityCommand(() -> RotationsPerSecond.of(serializerVelocity.get())))
-		)
-		.onFalse(
-			indexer.spinDownCommand()
-			.alongWith(serializer.spinDownCommand())
-		);
+		// driverController.cross().whileTrue(
+		// 	indexer.setVelocityCommand(() -> RotationsPerSecond.of(indexerVelocity.get()))
+		// 	.alongWith(serializer.setVelocityCommand(() -> RotationsPerSecond.of(serializerVelocity.get())))
+		// )
+		// .onFalse(
+		// 	indexer.spinDownCommand()
+		// 	.alongWith(serializer.spinDownCommand())
+		// );
 
 		// driverController.R1().whileTrue(rollers.setVoltageCommand(() -> intakeVoltage)).onFalse(rollers.setVoltageCommand(() -> 0));
 
@@ -278,7 +280,7 @@ public class RobotContainer {
 
 		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
 		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(intakeVoltage))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
-		operatorController.square().whileTrue(pivot.goToAngleCommand(PivotConstants.MAX_ANGLE.div(2))).onFalse(pivot.stopCommand());
+		// operatorController.square().whileTrue(pivot.goToAngleCommand(PivotConstants.MAX_ANGLE.div(2))).onFalse(pivot.stopCommand());
 
 
 		// driverController.circle().whileTrue(rollers.spinUpCommand()).onFalse(rollers.spinDownCommand());
@@ -288,31 +290,31 @@ public class RobotContainer {
 
 		driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
-		driverController.square()
-			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
-			.onFalse(hood.stopCommand());
+		// driverController.square()
+		// 	.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
+		// 	.onFalse(hood.stopCommand());
 
 		// driverController.square()
 		// 	.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
 		// 	.onFalse(turret.stopCommand());
 
-		driverController.circle()
-			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), Timer.getFPGATimestamp()))
-			.onFalse(flywheel.stopCommand());
+		// driverController.circle()
+		// 	.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), Timer.getFPGATimestamp()))
+		// 	.onFalse(flywheel.stopCommand());
 
 		// driverController.triangle()
 		// 	.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.ze))
 		// 	.onFalse(flywheel.stopCommand());
 		//.times(1).minus(Rotations.of(drivetrain.getWrappedHeading().getRotations()))
 		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed),Degrees.of(90-hoodAngle),turret.getAngleToHub(),TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
-		// driverController.triangle()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
-		// driverController.square()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
-		// driverController.cross()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
-		// driverController.circle()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
+		driverController.triangle()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
+		driverController.square()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
+		driverController.cross()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
+		driverController.circle()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
 
 		if(Constants.CURRENT_MODE == Mode.SIM) driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));

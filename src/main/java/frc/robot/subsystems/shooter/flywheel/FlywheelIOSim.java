@@ -96,4 +96,9 @@ public class FlywheelIOSim implements FlywheelIO {
         feedforward.setKv(kV);
     }
 
+    @Override
+    public boolean isAtTimeAdjustedSetpoint() {
+        return false;
+    }
+
 }

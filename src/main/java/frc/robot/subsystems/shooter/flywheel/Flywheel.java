@@ -5,12 +5,13 @@ import static frc.robot.constants.FlywheelConstants.*;
 
 import java.util.function.Supplier;
 
-
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -53,8 +54,12 @@ public class Flywheel extends SubsystemBase {
         );
     }
 
-    public boolean atGoal() {
+    public boolean atSetpoint() {
         return io.isAtSetpoint();
+    }
+
+    public boolean atTimeAdjustedSetpoint() {
+        return io.isAtTimeAdjustedSetpoint();
     }
 
     public static void recordSetpoint(AngularVelocity setpointVelocity, double timeSecondsForSetpoint) {
@@ -74,16 +79,18 @@ public class Flywheel extends SubsystemBase {
     }
 
     public void periodic() {
-        // logCounter++;
+        logCounter++;
 
-        // io.updateInputs(inputs); // need to update inputs every frame
+        io.updateInputs(inputs); // need to update inputs every frame
 
-        // if(logCounter % loopsPerLog == 0) {
-        //     Logger.processInputs("Flywheel", inputs);
-        //     // Logger.recordOutput("Flywheel/Mode", FlywheelIOBangBang.phase);
-        // }
+        if(logCounter % loopsPerLog == 0) {
+            Logger.processInputs("Flywheel", inputs);
+            // Logger.recordOutput("Flywheel/Mode", FlywheelIOBangBang.phase);
+            Logger.recordOutput("Flywheel/Time Adjusted Setpoint", getSetpointForTime(Timer.getFPGATimestamp()));
+            Logger.recordOutput("Flywheel/Is At Time Adjusted Setpoint", atTimeAdjustedSetpoint());
+        }
 
-        // if(RobotContainer.FLYWHEEL_DEBUG) updateTunables();
+        if(RobotContainer.FLYWHEEL_DEBUG) updateTunables();
     }
 
     public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {

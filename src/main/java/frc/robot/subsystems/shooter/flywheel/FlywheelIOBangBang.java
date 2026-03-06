@@ -188,4 +188,9 @@ public class FlywheelIOBangBang implements FlywheelIO {
 
         leftMotor.getConfigurator().apply(leftMotorConfig.Slot0);
     }
+
+    @Override
+    public boolean isAtTimeAdjustedSetpoint() {
+        return false;
+    }
 }

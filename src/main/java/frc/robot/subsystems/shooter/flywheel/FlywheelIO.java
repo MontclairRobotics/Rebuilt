@@ -36,6 +36,8 @@ public interface FlywheelIO {
 
     public boolean isAtSetpoint();
 
+    public boolean isAtTimeAdjustedSetpoint();
+
     public void setGains(double kP, double kD, double kS, double kV);
 
 }
