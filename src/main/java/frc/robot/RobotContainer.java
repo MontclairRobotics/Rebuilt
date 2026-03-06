@@ -5,12 +5,14 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.internal.DriverStationModeThread;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -24,6 +26,7 @@ import frc.robot.commands.WheelRadiusCharacterization;
 import frc.robot.commands.WheelRadiusCharacterization.Direction;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.PivotConstants;
 import frc.robot.constants.Constants.Mode;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
@@ -129,8 +132,7 @@ public class RobotContainer {
 	public double intakeVoltage = 10;
 	Tunable intakeSpeed = new Tunable("Intake Voltage", intakeVoltage, (value) -> intakeVoltage = value);
 
-	public static final Trigger shootTrigger = operatorController.circle().or(() -> DriverStation.isAutonomous());
-
+	public static Trigger shootTrigger;
 	public LoggedTunableNumber indexerCurrent = new LoggedTunableNumber("Spindexer/Index Current", 0);
 	public LoggedTunableNumber serializerCurrent = new LoggedTunableNumber("Spindexer/Serializer Current", 0);
 
@@ -237,9 +239,43 @@ public class RobotContainer {
 		// 	Auto.drawAuto(autoName);
 		// }
 
-		configureBindings();
+		// configureBindings();
+		configureCompetitionBindings();
 
     	drivetrain.registerTelemetry(logger::telemeterize);
+	}
+
+	private void configureCompetitionBindings() {
+
+		shootTrigger = operatorController.circle().or(() -> DriverStation.isAutonomous());
+
+		// driver
+		drivetrain.setDefaultCommand(new JoystickDriveCommand(true));
+		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
+		driverController.R2()
+			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(2), RotationsPerSecond.of(1)))
+			.onFalse(drivetrain.setMaxSpeedsCommand(TunerConstants.kSpeedAt12Volts, RotationsPerSecond.of(1.624)));
+
+		driverController.triangle()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
+		driverController.square()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
+		driverController.cross()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
+		driverController.circle()
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
+
+		// operator
+		operatorController.circle().onFalse(shooter.stowCommand());
+		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
+		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
+
+		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(intakeVoltage))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
+		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
+		operatorController.R2()
+			.whileTrue(pivot.goToAngleCommand(PivotConstants.MAX_ANGLE.div(2)))
+			.onFalse(pivot.deployCommand());
+
 	}
 
 	private void configureBindings() {

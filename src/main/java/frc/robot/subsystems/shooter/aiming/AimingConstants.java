@@ -83,14 +83,28 @@ public class AimingConstants {
 
 	static {
 
-		REAL_MAP.put(0.0, new ShotSettings(Rotations.zero(), RotationsPerSecond.of(1), Seconds.of(0), false));
-		REAL_MAP.put(5.0, new ShotSettings(Rotations.zero(), RotationsPerSecond.of(1), Seconds.of(0), false));
-		REAL_MAP.put(2.24, new ShotSettings(Degrees.of(17), RotationsPerSecond.of(23.5), Seconds.of(1), false));
-		REAL_MAP.put(3.45, new ShotSettings(Degrees.of(20), RotationsPerSecond.of(26), Seconds.of(1.125), false));
-		REAL_MAP.put(4.30, new ShotSettings(Degrees.of(24), RotationsPerSecond.of(27.75), Seconds.of(1.25), false));
+		// REAL_MAP.put(0.0, new ShotSettings(Rotations.zero(), RotationsPerSecond.of(1), Seconds.of(0), false));
+		// REAL_MAP.put(5.0, new ShotSettings(Rotations.zero(), RotationsPerSecond.of(1), Seconds.of(0), false));
+		// REAL_MAP.put(2.24, new ShotSettings(Degrees.of(17), RotationsPerSecond.of(23.5), Seconds.of(1), false));
+		// REAL_MAP.put(3.45, new ShotSettings(Degrees.of(20), RotationsPerSecond.of(26), Seconds.of(1.125), false));
+		// REAL_MAP.put(4.30, new ShotSettings(Degrees.of(24), RotationsPerSecond.of(27.75), Seconds.of(1.25), false));
+		
+		REAL_MAP.put(0.00, new ShotSettings(Degrees.of(0.0), RotationsPerSecond.of(20), Seconds.of(1), false));
+		REAL_MAP.put(1.21, new ShotSettings(Degrees.of(5.5), RotationsPerSecond.of(23), Seconds.of(0.968), false));
+		REAL_MAP.put(2.56, new ShotSettings(Degrees.of(19), RotationsPerSecond.of(24.5), Seconds.of(0.9), false));
+		REAL_MAP.put(3.78, new ShotSettings(Degrees.of(27), RotationsPerSecond.of(26.5), Seconds.of(0.9), false));
+		REAL_MAP.put(5.48, new ShotSettings(Degrees.of(32), RotationsPerSecond.of(28), Seconds.of(1.027), false));
+		REAL_MAP.put(7.00, new ShotSettings(Degrees.of(32), RotationsPerSecond.of(33), Seconds.of(1.05), false));
+		
+		REAL_FERRY_MAP.put(20.0, new ShotSettings(Degrees.of(30), RotationsPerSecond.of(50), Seconds.of(3), false));
+		REAL_FERRY_MAP.put(9.59, new ShotSettings(Degrees.of(30), RotationsPerSecond.of(40), Seconds.of(1.8), false));
+		REAL_FERRY_MAP.put(8.67, new ShotSettings(Degrees.of(30), RotationsPerSecond.of(37.4), Seconds.of(1.78), false));
+		REAL_FERRY_MAP.put(6.63, new ShotSettings(Degrees.of(30), RotationsPerSecond.of(28.9), Seconds.of(1.38), false));
+		REAL_FERRY_MAP.put(5.15, new ShotSettings(Degrees.of(30), RotationsPerSecond.of(25.5), Seconds.of(1.22), false));
+		REAL_FERRY_MAP.put(3.67, new ShotSettings(Degrees.of(30), RotationsPerSecond.of(22.44), Seconds.of(1.06), false));
+		REAL_FERRY_MAP.put(0.0, new ShotSettings(Degrees.of(30), RotationsPerSecond.of(15), Seconds.of(1), false));
 
-		SIM_CONSTANT_VELOCITY_MAP.put(0.8516690912634933, new SimShotSettings(Degrees.of(3), MetersPerSecond.of(9), Seconds.of(1.52), true));
-		SIM_CONSTANT_VELOCITY_MAP.put(2.0927103773901443, new SimShotSettings(Degrees.of(10), MetersPerSecond.of(9), Seconds.of(1.504), true));
+		SIM_CONSTANT_VELOCITY_MAP.put(0.8516690912634933, new SimShotSettings(Degrees.of(3), MetersPerSecond.of(9), Seconds.of(1.52), true));		SIM_CONSTANT_VELOCITY_MAP.put(2.0927103773901443, new SimShotSettings(Degrees.of(10), MetersPerSecond.of(9), Seconds.of(1.504), true));
 		SIM_CONSTANT_VELOCITY_MAP.put(3.3339369176475455, new SimShotSettings(Degrees.of(15), MetersPerSecond.of(9), Seconds.of(1.512), true));
 		SIM_CONSTANT_VELOCITY_MAP.put(4.5789466791916436, new SimShotSettings(Degrees.of(25), MetersPerSecond.of(9), Seconds.of(1.34), true));
 		SIM_CONSTANT_VELOCITY_MAP.put(5.8242079384087, new SimShotSettings(Degrees.of(40), MetersPerSecond.of(9), Seconds.of(1.04), true));
@@ -101,6 +115,7 @@ public class AimingConstants {
 		SIM_MAP.put(3.993633, new SimShotSettings(Degrees.of(26), MetersPerSecond.of(8.2), Seconds.of(1.16), false));
 		SIM_MAP.put(4.998351, new SimShotSettings(Degrees.of(33), MetersPerSecond.of(8.6), Seconds.of(1.1), false));
 		SIM_MAP.put(5.714192, new SimShotSettings(Degrees.of(37), MetersPerSecond.of(9), Seconds.of(1.14), false));
+		
 		SIM_FERRY_MAP.put(9.59, new SimShotSettings(Degrees.of(40), MetersPerSecond.of(10.75), Seconds.of(1.8), false));
 		SIM_FERRY_MAP.put(3.6669131055202966, new SimShotSettings(Degrees.of(30), MetersPerSecond.of(6.6), Seconds.of(1.06), false));//
 		SIM_FERRY_MAP.put(8.666543502404746, new SimShotSettings(Degrees.of(30), MetersPerSecond.of(11), Seconds.of(1.78), false));//

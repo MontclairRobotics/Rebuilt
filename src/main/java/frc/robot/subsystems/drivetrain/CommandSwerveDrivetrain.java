@@ -431,6 +431,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		resetRotation(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)));
 	}
 
+	public Command setMaxSpeedsCommand(LinearVelocity maxSpeed, AngularVelocity maxRotSpeed) {
+		return Commands.runOnce(() -> {
+			MAX_SPEED = maxSpeed;
+			MAX_ANGULAR_SPEED = maxRotSpeed;
+		});
+	}
+
 	public Command driveJoystickInputCommand() {
 		return Commands.run(() -> driveJoystick(), RobotContainer.drivetrain);
 	}

@@ -17,14 +17,14 @@ import frc.robot.util.TunerConstants;
 
 public class DriveConstants {
 
-	public static final LinearVelocity MAX_SPEED = TunerConstants.kSpeedAt12Volts;
+	public static LinearVelocity MAX_SPEED = TunerConstants.kSpeedAt12Volts;
 	public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(8);
 
 	public static final double JOYSTICK_INPUT_GAIN = 1.5;
 	public static final double JOYSTICK_INPUT_ROT_GAIN = 2;
 	public static final double JOYSTICK_DEADBAND = 0.1;
 
-	public static final AngularVelocity MAX_ANGULAR_SPEED = RotationsPerSecond.of(1.624);
+	public static AngularVelocity MAX_ANGULAR_SPEED = RotationsPerSecond.of(1.624);
 	public static final AngularAcceleration MAX_ANGULAR_ACCELERATION = RotationsPerSecondPerSecond.of(4);
 
 	public static final PathConstraints DEFAULT_CONSTRAINTS = new PathConstraints(
