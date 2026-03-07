@@ -129,7 +129,7 @@ public class Shooter extends SubsystemBase {
     public Command setConstantShotParameters() {
         ShootingParameters params = new ShootingParameters(Rotations.of(0.125), Degrees.of(19), RotationsPerSecond.of(24.5));
         return Commands.parallel(
-            turret.setRobotRelativeAngleCommand(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation)),
+            turret.setRobotRelativeAngleCommand(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(TargetLocation.HUB)),
             hood.setAngleCommand(() -> params.hoodAngle()),
             indexAndShootCommand(() -> params.flywheelVelocity())
         );

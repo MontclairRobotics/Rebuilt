@@ -273,7 +273,12 @@ public class RobotContainer {
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
 
 		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(10))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
-		operatorController.L2().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(12))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
+		operatorController.L2().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
+
+		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
+		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
+		operatorController.povUp().onTrue(Commands.runOnce(() -> flywheel.increaseFudge()));
+		operatorController.povDown().onTrue(Commands.runOnce(() -> flywheel.decreaseFudge()));
 
 		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
 		operatorController.R2()

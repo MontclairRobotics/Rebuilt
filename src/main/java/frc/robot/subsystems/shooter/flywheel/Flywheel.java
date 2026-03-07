@@ -35,6 +35,8 @@ public class Flywheel extends SubsystemBase {
     private int logCounter;
     private final int loopsPerLog;
 
+    private int fudgeFactor = 0;
+
     public Flywheel(FlywheelIO io) {
         this.io = io;
         loopsPerLog = RobotContainer.FLYWHEEL_DEBUG ? 1 : 5;
@@ -56,6 +58,14 @@ public class Flywheel extends SubsystemBase {
 
     public boolean atSetpoint() {
         return io.isAtSetpoint();
+    }
+
+    public void increaseFudge() {
+        fudgeFactor++;
+    }
+
+    public void decreaseFudge() {
+        fudgeFactor++;
     }
 
     public boolean atTimeAdjustedSetpoint() {
@@ -94,11 +104,11 @@ public class Flywheel extends SubsystemBase {
     }
 
     public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {
-        io.setVelocity(targetVelocity, timeSecondsForSetpoint);
+        io.setVelocity(targetVelocity.plus(RotationsPerSecond.of(fudgeFactor)), timeSecondsForSetpoint);
     }
 
     public void setVelocity(Supplier<AngularVelocity> targetVelocitySupplier, double timeSecondsForSetpoint) {
-        io.setVelocity(targetVelocitySupplier.get(), timeSecondsForSetpoint);
+        setVelocity(targetVelocitySupplier.get(), timeSecondsForSetpoint);
     }
 
     public void applyJoystickInput() {
