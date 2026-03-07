@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -296,8 +297,8 @@ public class RobotContainer {
 		driverController.povLeft().whileTrue(new WheelRadiusCharacterization(Direction.COUNTER_CLOCKWISE, drivetrain));
 
 		operatorController.circle().onFalse(shooter.stowCommand());
-		operatorController.povUp().onTrue(turret.increaseFudgeFactorCommand());
-		operatorController.povDown().onTrue(turret.decreaseFudgeFactorCommand());
+		// operatorController.povUp().onTrue(turret.increaseFudgeFactorCommand());
+		// operatorController.povDown().onTrue(turret.decreaseFudgeFactorCommand());
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(true));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 
@@ -336,31 +337,31 @@ public class RobotContainer {
 
 		driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
-		// driverController.square()
-		// 	.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
-		// 	.onFalse(hood.stopCommand());
+		driverController.square()
+			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
+			.onFalse(hood.stopCommand());
 
 		// driverController.square()
 		// 	.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
 		// 	.onFalse(turret.stopCommand());
 
-		// driverController.circle()
-		// 	.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), Timer.getFPGATimestamp()))
-		// 	.onFalse(flywheel.stopCommand());
+		driverController.circle()
+			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), Timer.getFPGATimestamp()))
+			.onFalse(flywheel.stopCommand());
 
 		// driverController.triangle()
 		// 	.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.ze))
 		// 	.onFalse(flywheel.stopCommand());
 		//.times(1).minus(Rotations.of(drivetrain.getWrappedHeading().getRotations()))
 		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed),Degrees.of(90-hoodAngle),turret.getAngleToHub(),TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
-		driverController.triangle()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
-		driverController.square()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
-		driverController.cross()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
-		driverController.circle()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
+		// driverController.triangle()
+		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
+		// driverController.square()
+		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
+		// driverController.cross()
+		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
+		// driverController.circle()
+		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
 		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
 
 		if(Constants.CURRENT_MODE == Mode.SIM) driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
