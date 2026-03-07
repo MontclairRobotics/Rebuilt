@@ -90,10 +90,10 @@ public class AimingConstants {
 		// REAL_MAP.put(4.30, new ShotSettings(Degrees.of(24), RotationsPerSecond.of(27.75), Seconds.of(1.25), false));
 
 		REAL_MAP.put(0.00, new ShotSettings(Degrees.of(0.0), RotationsPerSecond.of(20), Seconds.of(1), false));
-		REAL_MAP.put(1.21, new ShotSettings(Degrees.of(5.5), RotationsPerSecond.of(23), Seconds.of(0.968), false));
-		REAL_MAP.put(2.56, new ShotSettings(Degrees.of(19), RotationsPerSecond.of(24.5), Seconds.of(0.9), false));
-		REAL_MAP.put(3.78, new ShotSettings(Degrees.of(27), RotationsPerSecond.of(26.5), Seconds.of(0.9), false));
-		REAL_MAP.put(5.48, new ShotSettings(Degrees.of(32), RotationsPerSecond.of(28), Seconds.of(1.027), false));
+		REAL_MAP.put(1.21, new ShotSettings(Degrees.of(6), RotationsPerSecond.of(21.2), Seconds.of(0.968), false));
+		REAL_MAP.put(2.56, new ShotSettings(Degrees.of(17), RotationsPerSecond.of(23), Seconds.of(0.9), false));
+		REAL_MAP.put(3.78, new ShotSettings(Degrees.of(24), RotationsPerSecond.of(24), Seconds.of(0.9), false));
+		REAL_MAP.put(5.48, new ShotSettings(Degrees.of(30), RotationsPerSecond.of(27), Seconds.of(1.027), false));
 		REAL_MAP.put(7.00, new ShotSettings(Degrees.of(32), RotationsPerSecond.of(33), Seconds.of(1.05), false));
 
 		REAL_FERRY_MAP.put(20.0, new ShotSettings(Degrees.of(30), RotationsPerSecond.of(50), Seconds.of(3), false));

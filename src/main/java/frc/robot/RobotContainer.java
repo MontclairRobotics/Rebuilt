@@ -5,6 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -27,6 +28,7 @@ import frc.robot.commands.WheelRadiusCharacterization.Direction;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.PivotConstants;
+import frc.robot.constants.TurretConstants;
 import frc.robot.constants.Constants.Mode;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
@@ -130,8 +132,8 @@ public class RobotContainer {
 	public static boolean DRIVETRAIN_DEBUG = false;
 	public static boolean SUPERSTRUCTURE_DEBUG = false;
 
-	public double intakeVoltage = 10;
-	Tunable intakeSpeed = new Tunable("Intake Voltage", intakeVoltage, (value) -> intakeVoltage = value);
+	public double turretFudge = 0;
+
 
 	public static Trigger shootTrigger = operatorController.circle().or(() -> DriverStation.isAutonomous());
 	public LoggedTunableNumber indexerCurrent = new LoggedTunableNumber("Spindexer/Index Current", 0);
@@ -141,6 +143,8 @@ public class RobotContainer {
 	public LoggedTunableNumber serializerVelocity = new LoggedTunableNumber("Spindexer/Serializer Velocity", 0);
 
 	public RobotContainer() {
+
+		Tunable turretFudgeTunable = new Tunable("Turret Fudge", turretFudge, (value) -> TurretConstants.ANGLE_OFFSET = Rotations.of(0.375).plus(Degrees.of(value)));
 
 		System.out.println("Constants.CURRENT_MODE: " + Constants.CURRENT_MODE);
 
@@ -329,7 +333,7 @@ public class RobotContainer {
 		// 	.onFalse(rollers.setVoltageCommand(() -> 0));
 
 		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
-		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(intakeVoltage))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
+		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(turretFudge))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
 		// operatorController.square().whileTrue(pivot.goToAngleCommand(PivotConstants.MAX_ANGLE.div(2))).onFalse(pivot.stopCommand());
 
 

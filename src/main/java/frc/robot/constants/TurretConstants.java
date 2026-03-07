@@ -54,8 +54,8 @@ public class TurretConstants {
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
-	public static final Angle ANGLE_OFFSET = Rotations.of(0.375);
-	public static final Angle ENCODER_OFFSET = Rotations.of(0.931923828125);
+	public static Angle ANGLE_OFFSET = Rotations.of(0.375);
+	public static final Angle ENCODER_OFFSET = Rotations.of(0.251923828125);
 
 	// pid + ff gains
 	public static final double kP = 55.0555;
