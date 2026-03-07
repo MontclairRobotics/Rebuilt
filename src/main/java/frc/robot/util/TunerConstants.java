@@ -62,7 +62,7 @@ public class TunerConstants {
                 .withStatorCurrentLimit((kSlipCurrent))
                 .withStatorCurrentLimitEnable(true)
         );
-        
+
     private static final TalonFXConfiguration steerInitialConfigs = new TalonFXConfiguration()
         .withCurrentLimits(
             new CurrentLimitsConfigs()

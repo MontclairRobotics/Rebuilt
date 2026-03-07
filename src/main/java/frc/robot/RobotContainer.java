@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.internal.DriverStationModeThread;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -132,7 +131,7 @@ public class RobotContainer {
 	public double intakeVoltage = 10;
 	Tunable intakeSpeed = new Tunable("Intake Voltage", intakeVoltage, (value) -> intakeVoltage = value);
 
-	public static Trigger shootTrigger;
+	public static Trigger shootTrigger = operatorController.circle().or(() -> DriverStation.isAutonomous());
 	public LoggedTunableNumber indexerCurrent = new LoggedTunableNumber("Spindexer/Index Current", 0);
 	public LoggedTunableNumber serializerCurrent = new LoggedTunableNumber("Spindexer/Serializer Current", 0);
 
@@ -247,8 +246,6 @@ public class RobotContainer {
 
 	private void configureCompetitionBindings() {
 
-		shootTrigger = operatorController.circle().or(() -> DriverStation.isAutonomous());
-
 		// driver
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(true));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
@@ -281,6 +278,7 @@ public class RobotContainer {
 	private void configureBindings() {
 
 		// driver
+		shootTrigger = operatorController.circle().or(() -> DriverStation.isAutonomous());
 
 		driverController.povRight().whileTrue(new WheelRadiusCharacterization(Direction.CLOCKWISE, drivetrain));
 		driverController.povLeft().whileTrue(new WheelRadiusCharacterization(Direction.COUNTER_CLOCKWISE, drivetrain));
@@ -358,6 +356,7 @@ public class RobotContainer {
 	}
 
 	public Command getAutonomousCommand() {
+		System.out.println(auto.getAutoCommand());
 		return auto.getAutoCommand();
 	}
 
