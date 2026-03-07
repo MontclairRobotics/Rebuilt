@@ -257,21 +257,27 @@ public class RobotContainer {
 		driverController.triangle()
 			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
 		driverController.square()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(90)), false));
 		driverController.cross()
 			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
 		driverController.circle()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(-90)), false));
 
 		// operator
 		operatorController.circle().onFalse(shooter.stowCommand());
+		operatorController.triangle()
+			.whileTrue(shooter.setConstantShotParameters())
+			.onFalse(shooter.stowCommand());
+
 		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
 
-		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(intakeVoltage))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
+		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(10))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
+		operatorController.L2().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(12))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
+
 		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
 		operatorController.R2()
-			.whileTrue(pivot.goToAngleCommand(PivotConstants.MAX_ANGLE.div(2)))
+			.whileTrue(pivot.goToAngleCommand(PivotConstants.MAX_ANGLE.div(2).plus(Degrees.of(10))))
 			.onFalse(pivot.deployCommand());
 
 	}

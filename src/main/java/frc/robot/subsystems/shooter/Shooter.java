@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.function.Supplier;
 
@@ -122,6 +123,15 @@ public class Shooter extends SubsystemBase {
             turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation)),
             hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
             indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
+        );
+    }
+
+    public Command setConstantShotParameters() {
+        ShootingParameters params = new ShootingParameters(Rotations.of(0.125), Degrees.of(19), RotationsPerSecond.of(24.5));
+        return Commands.parallel(
+            turret.setRobotRelativeAngleCommand(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation)),
+            hood.setAngleCommand(() -> params.hoodAngle()),
+            indexAndShootCommand(() -> params.flywheelVelocity())
         );
     }
 
