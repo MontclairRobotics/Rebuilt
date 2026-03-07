@@ -105,7 +105,9 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void robotPeriodic() {
 		// this should only run once
-		if(!AllianceManager.allianceKnown) AllianceManager.update();
+		if(!AllianceManager.allianceKnown) {
+			AllianceManager.update();
+		}
 
 		// this should only run once
 		if(!hasAppliedTargetLocation && AllianceManager.allianceKnown && AllianceManager.isRed()) {
@@ -128,7 +130,7 @@ public class Robot extends LoggedRobot {
 		RobotContainer.pivot.setNeutralMode(NeutralModeValue.Coast);
 
 		if (!RobotBase.isReal()) {
-			// robotContainer.resetSimulation();
+			robotContainer.resetSimulation();
 		}
 	}
 

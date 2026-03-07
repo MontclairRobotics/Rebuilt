@@ -155,8 +155,7 @@ public class JoystickDriveCommand extends Command {
 					xVelocitySupplier.getAsDouble(),
 					yVelocitySupplier.getAsDouble(),
 					omegaVelocitySupplier.getAsDouble(),
-					drivetrain.fieldRelative,
-					true
+					drivetrain.fieldRelative
 				);
 
 				break;
@@ -180,8 +179,7 @@ public class JoystickDriveCommand extends Command {
 					xVelocitySupplier.getAsDouble(),
 					yVelocity,
 					rotVelocityTrenchLock,
-					drivetrain.fieldRelative,
-					true
+					drivetrain.fieldRelative
 				);
 
 				break;
@@ -197,8 +195,7 @@ public class JoystickDriveCommand extends Command {
 					xVelocitySupplier.getAsDouble(),
 					yVelocitySupplier.getAsDouble(),
 					rotVelocityBumpLock,
-					drivetrain.fieldRelative,
-					true
+					drivetrain.fieldRelative
 				);
 
 				break;

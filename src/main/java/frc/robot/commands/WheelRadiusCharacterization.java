@@ -68,7 +68,7 @@ public class WheelRadiusCharacterization extends Command {
                                 0,
                                 0,
                                 omegaLimiter.calculate(
-                                        omegaDirection.value * characterizationSpeed.get())), false, false);
+                                        omegaDirection.value * characterizationSpeed.get())), false);
 
         // Get yaw and wheel positions
 

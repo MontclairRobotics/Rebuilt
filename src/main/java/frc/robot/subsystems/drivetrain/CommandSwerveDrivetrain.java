@@ -314,8 +314,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 			getForwardVelocityFromController(),
 			getStrafeVelocityFromController(),
 			getOmegaVelocityFromController(),
-			fieldRelative,
-			true
+			fieldRelative
 		);
 	}
 
@@ -325,13 +324,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		return new Rotation2d(x, y).plus(Rotation2d.kCW_90deg);
 	}
 
-	public void drive(ChassisSpeeds speeds, boolean fieldRelative, boolean respectOperatorPerspective) {
+	public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
 		drive(
 			speeds.vxMetersPerSecond,
 			speeds.vyMetersPerSecond,
 			speeds.omegaRadiansPerSecond,
-			fieldRelative,
-			respectOperatorPerspective
+			fieldRelative
 		);
 	}
 
@@ -339,17 +337,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		double xSpeed,
 		double ySpeed,
 		double thetaSpeed,
-		boolean fieldRelative,
-		boolean respectOperatorPerspective) {
-
-		if (respectOperatorPerspective) {
-			if (DriverStation.getAlliance().isPresent()
-				&& DriverStation.getAlliance().get() == Alliance.Red
-				&& fieldRelative) {
-				xSpeed *= -1;
-				ySpeed *= -1;
-			}
-		}
+		boolean fieldRelative) {
 
 		ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed);
 
@@ -373,14 +361,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	public void alignToAngleRobotRelative(boolean lockDrive) {
 		double response = thetaController.calculate(getWrappedHeading().getRadians());
 		if (lockDrive) {
-			drive(0, 0, response, false, true); // perspective doesn't matter in robot relative
+			drive(0, 0, response, false); // perspective doesn't matter in robot relative
 		} else {
 			drive(
 				getForwardVelocityFromController(),
 				getStrafeVelocityFromController(),
 				response,
-				false,
-				true
+				false
 			);
 		}
 	}
@@ -393,13 +380,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	public void alignToAngleFieldRelative(boolean lockDrive) {
 		double response = thetaController.calculate(getWrappedHeading().getRadians());
 		if (lockDrive) {
-			drive(0, 0, response, true, true);
+			drive(0, 0, response, true);
 		} else {
 			drive(
 				getForwardVelocityFromController(),
 				getStrafeVelocityFromController(),
 				response,
-				true,
 				true
 			);
 		}
@@ -486,7 +472,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	}
 
 	public Command stopCommand() {
-		return Commands.runOnce(() -> drive(0, 0, 0, false, false));
+		return Commands.runOnce(() -> drive(0, 0, 0, false));
 	}
 
 	@Override
@@ -513,15 +499,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		*/
 
 		if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
-		DriverStation.getAlliance()
-			.ifPresent(
-				allianceColor -> {
-					setOperatorPerspectiveForward(
-						allianceColor == Alliance.Red
-							? kRedAlliancePerspectiveRotation
-							: kBlueAlliancePerspectiveRotation);
-					m_hasAppliedOperatorPerspective = true;
-				});
+			DriverStation.getAlliance()
+				.ifPresent(
+					allianceColor -> {
+						setOperatorPerspectiveForward(
+							allianceColor == Alliance.Red
+								? kRedAlliancePerspectiveRotation
+								: kBlueAlliancePerspectiveRotation);
+						m_hasAppliedOperatorPerspective = true;
+					}
+				);
 		}
 
 		// DogLog.log("BatteryVoltage", RobotController.getBatteryVoltage());
