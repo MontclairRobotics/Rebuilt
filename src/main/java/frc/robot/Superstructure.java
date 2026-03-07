@@ -32,7 +32,7 @@ import frc.robot.util.PoseUtils;
 public class Superstructure extends SubsystemBase {
 
 	private Shooter shooter;
-	private final Distance TRENCH_ZONE_OFFSET = Meters.of(1);
+	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.8);
 
 	private int logCounter;
 	private final int loopsPerLog;

@@ -126,6 +126,13 @@ public class Shooter extends SubsystemBase {
         );
     }
 
+    public Command setParametersNoTurret(Supplier<ShootingParameters> paramsSupplier) {
+        return Commands.parallel(
+            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
+            indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
+        );
+    }
+
     public Command setConstantShotParameters() {
         ShootingParameters params = new ShootingParameters(Rotations.of(0.125), Degrees.of(19), RotationsPerSecond.of(24.5));
         return Commands.parallel(

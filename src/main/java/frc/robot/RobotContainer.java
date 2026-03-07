@@ -269,6 +269,9 @@ public class RobotContainer {
 		operatorController.triangle()
 			.whileTrue(shooter.setConstantShotParameters())
 			.onFalse(shooter.stowCommand());
+		operatorController.square()
+			.whileTrue(shooter.setParametersNoTurret(() -> Aiming.calculateShot(Shooter.targetLocation, useConstantVelocityMap, shootWhileMoving)))
+			.onFalse(shooter.stowCommand());
 
 		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());

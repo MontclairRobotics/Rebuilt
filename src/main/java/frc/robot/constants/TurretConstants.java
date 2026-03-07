@@ -60,7 +60,7 @@ public class TurretConstants {
 	// pid + ff gains
 	public static final double kP = 55.0555;
 	public static final double kD = 0.00555;
-	public static final double kS = 0.350000555;
+	public static final double kS = 1;
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(6);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(60);
