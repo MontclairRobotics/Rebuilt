@@ -32,7 +32,7 @@ import frc.robot.util.PoseUtils;
 public class Superstructure extends SubsystemBase {
 
 	private Shooter shooter;
-	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.2);
+	private final Distance TRENCH_ZONE_OFFSET = Meters.of(1);
 
 	private int logCounter;
 	private final int loopsPerLog;
@@ -257,7 +257,8 @@ public class Superstructure extends SubsystemBase {
 	public static boolean inTrenchDangerZone() {
 		Translation2d turretPose = RobotContainer.turret.getFieldRelativePosition();
         for (Translation2d[] zone : FieldConstants.Zones.TRENCH_DANGER_ZONES) {
-            if (turretPose.getX() >= zone[0].getX()
+            if (
+					turretPose.getX() >= zone[0].getX()
                     && turretPose.getX() <= zone[1].getX()
                     && turretPose.getY() >= zone[0].getY()
                     && turretPose.getY() <= zone[1].getY()) {

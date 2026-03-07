@@ -186,4 +186,16 @@ public class Shooter extends SubsystemBase {
             spindexer.spinDownCommand()
 		);
     }
+
+    public Command startShootingInAuto() {
+        return Commands.runOnce(() -> {
+            RobotContainer.shouldShootInAuto = true;
+        });
+    }
+
+    public Command stopShootingInAuto() {
+        return Commands.runOnce(() -> {
+            RobotContainer.shouldShootInAuto = false;
+        });
+    }
 }

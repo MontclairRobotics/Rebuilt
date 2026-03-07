@@ -115,6 +115,7 @@ public class RobotContainer {
 
 	private boolean useConstantVelocityMap = false;
 	private boolean shootWhileMoving = true;
+	public static boolean shouldShootInAuto = true;
 
 	// debug, set to true to increase logging, set to false to increase performance and reduce loop overruns
 	public static boolean VISION_DEBUG = false;

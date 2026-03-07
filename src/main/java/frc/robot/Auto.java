@@ -28,9 +28,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.PivotConstants;
-import frc.robot.subsystems.shooter.aiming.Aiming;
-import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.Elastic;
 import frc.robot.util.Elastic.Notification;
@@ -225,13 +222,15 @@ public class Auto extends SubsystemBase {
 				(currentPos == 'L' || currentPos == 'R')
 				&& currentPos == autoString.charAt(i)
 				|| ((autoString.charAt(i+1) == '0') && (currentPos == 'D' || currentPos == 'O'))) {
-				followPathCommands.addCommands(
-					Commands.deadline(
-						Commands.waitSeconds(timeToEmptyFuel),
-						RobotContainer.shooter.setParameters(() -> Aiming.calculateShot(TargetLocation.HUB, false, true))
-					),
-					RobotContainer.shooter.stowCommand().withTimeout(1)
-				);
+				// followPathCommands.addCommands(
+				// 	Commands.deadline(
+				// 		Commands.waitSeconds(timeToEmptyFuel),
+				// 		RobotContainer.shooter.setParameters(() -> Aiming.calculateShot(TargetLocation.HUB, false, true))
+				// 	),
+				// 	RobotContainer.shooter.stowCommand().withTimeout(1)
+				// );
+				followPathCommands.addCommands(Commands.waitSeconds(timeToEmptyFuel));
+				// followPathCommands.addCommands(RobotContainer.hood.setAngleCommand(HoodConstants.MIN_ANGLE));
 			}
 			try {
 				PathPlannerPath path = PathPlannerPath.fromPathFile(pathString);
@@ -250,8 +249,8 @@ public class Auto extends SubsystemBase {
 
 		if(AllianceManager.getAlliance() == DriverStation.Alliance.Blue) {
 			autoCommand.addCommands(
-				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
+				// RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+				// Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
 				Commands.parallel(
 					followPathCommands,
 					RobotContainer.rollers.spinUpCommand()
@@ -259,8 +258,8 @@ public class Auto extends SubsystemBase {
 			);
 		} else {
 			autoCommand.addCommands(
-				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
+				// RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+				// Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
 				Commands.parallel(
 					followPathCommands,
 					RobotContainer.rollers.spinUpCommand()

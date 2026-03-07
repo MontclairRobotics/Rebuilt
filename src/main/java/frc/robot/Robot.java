@@ -130,7 +130,7 @@ public class Robot extends LoggedRobot {
 		RobotContainer.pivot.setNeutralMode(NeutralModeValue.Coast);
 
 		if (!RobotBase.isReal()) {
-			robotContainer.resetSimulation();
+			// robotContainer.resetSimulation();
 		}
 	}
 
