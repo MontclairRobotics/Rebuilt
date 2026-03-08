@@ -79,7 +79,7 @@ public class Superstructure extends SubsystemBase {
 	}
 
 	public final Trigger scoringModeTrigger =
-			new Trigger(() -> DriverStation.isEnabled() && shouldBeScoring()).and(() -> (DriverStation.isAutonomous() && RobotContainer.shouldShootAuto) || DriverStation.isTeleopEnabled());
+			new Trigger(() -> DriverStation.isEnabled() && shouldBeScoring()).and(() -> RobotContainer.shootTrigger.getAsBoolean());
 
 	public final Trigger ferryLeftTrigger =
 			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryLeft()).and(RobotContainer.shootTrigger);

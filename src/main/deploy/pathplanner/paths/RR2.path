@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.59,
+        "x": 3.4,
         "y": 0.63
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.7535587188612105,
-        "y": 0.5759193357058121
+        "x": 7.563558718861211,
+        "y": 0.5759193357058123
       },
       "isLocked": false,
       "linkedName": "Right Trench (R)"
@@ -64,12 +64,12 @@
     },
     {
       "anchor": {
-        "x": 3.59,
+        "x": 3.4,
         "y": 0.63
       },
       "prevControl": {
-        "x": 6.563109843081312,
-        "y": 0.6903566333808839
+        "x": 6.373109843081313,
+        "y": 0.6903566333808842
       },
       "nextControl": null,
       "isLocked": false,

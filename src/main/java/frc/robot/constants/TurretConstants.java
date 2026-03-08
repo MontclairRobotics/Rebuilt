@@ -43,14 +43,14 @@ public class TurretConstants {
 	public static final Angle MAX_ANGLE = Rotations.of(0.475);
 	public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(4);
 	public static final AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(60);
-	public static final Angle ANGLE_TOLERANCE = Degrees.of(3);
+	public static final Angle ANGLE_TOLERANCE = Degrees.of(8);
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.25); // TODO: tune
 
 	// physical properties
 	public static final double MOMENT_OF_INERTIA = 0.154244993; //From CAD on 2026.02.12
 	public static final Distance LENGTH = Meters.of(0.3);
 	public static final double ROTOR_TO_SENSOR_RATIO = 3;
-	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 17; //128.0 / 16.0
+	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 18; //128.0 / 16.0
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret

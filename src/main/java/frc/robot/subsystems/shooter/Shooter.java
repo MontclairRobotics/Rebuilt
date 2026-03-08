@@ -115,7 +115,7 @@ public class Shooter extends SubsystemBase {
 	}
 
     public boolean atSetpoint() {
-        return turret.atSetpoint() && hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation());
+        return hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation());
     }
 
     public Command setParameters(Supplier<ShootingParameters> paramsSupplier) {

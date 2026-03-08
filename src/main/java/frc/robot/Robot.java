@@ -158,6 +158,7 @@ public class Robot extends LoggedRobot {
 	public void teleopInit() {
 
 		RobotContainer.shouldShootAuto = false;
+
 		// brake mode
 		RobotContainer.pivot.setNeutralMode(NeutralModeValue.Brake);
 		RobotContainer.turret.setNeutralMode(NeutralModeValue.Brake);

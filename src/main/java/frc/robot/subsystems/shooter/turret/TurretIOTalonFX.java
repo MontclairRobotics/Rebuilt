@@ -136,6 +136,11 @@ public class TurretIOTalonFX implements TurretIO {
     }
 
     @Override
+    public void disable() {
+        motor.disable();
+    }
+
+    @Override
     public boolean isAtTimeAdjustedSetpoint() {
         double error =
             Turret.getSetpointForTime(Timer.getFPGATimestamp()).in(Rotations)

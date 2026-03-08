@@ -40,6 +40,8 @@ public interface TurretIO {
 
     public boolean isAtSetpoint();
 
+    public void disable();
+
     public boolean isAtTimeAdjustedSetpoint();
 
     public void setGains(double kP, double kD, double kS);
