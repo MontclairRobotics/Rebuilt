@@ -39,7 +39,7 @@ public class DriveConstants {
 	public static final double ROTATION_kD = 0.1;
 	public static final Angle ROTATION_TOLERANCE = Degrees.of(1);
 
-	public static final double TRENCH_TRANSLATION_kP = 4;
+	public static final double TRENCH_TRANSLATION_kP = 6;
 	public static final double TRENCH_TRANSLATION_kI = 0;
 	public static final double TRENCH_TRANSLATION_kD = 0;
 

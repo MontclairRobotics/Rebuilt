@@ -20,6 +20,7 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
@@ -248,10 +249,21 @@ public class Auto extends SubsystemBase {
 			currentPos = autoString.charAt(i);
 		}
 
+		SequentialCommandGroup pivotCommandGroup = new SequentialCommandGroup();
+
+		if(RobotBase.isReal()) {
+			pivotCommandGroup.addCommands(
+				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint())
+			);
+		} else {
+			pivotCommandGroup.addCommands(
+				Commands.none()
+			);
+		}
 		if(AllianceManager.getAlliance() == DriverStation.Alliance.Blue) {
 			autoCommand.addCommands(
-				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
+				pivotCommandGroup,
 				Commands.parallel(
 					Commands.waitSeconds(3).andThen(RobotContainer.shooter.startShootingInAuto()),
 					followPathCommands,
@@ -261,8 +273,7 @@ public class Auto extends SubsystemBase {
 
 		} else {
 			autoCommand.addCommands(
-				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
+				pivotCommandGroup,
 				Commands.parallel(
 					RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
 					followPathCommands,

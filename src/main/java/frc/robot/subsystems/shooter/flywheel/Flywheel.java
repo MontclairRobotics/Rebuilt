@@ -65,7 +65,7 @@ public class Flywheel extends SubsystemBase {
     }
 
     public void decreaseFudge() {
-        fudgeFactor++;
+        fudgeFactor--;
     }
 
     public boolean atTimeAdjustedSetpoint() {

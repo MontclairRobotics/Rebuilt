@@ -253,7 +253,7 @@ public class RobotContainer {
 	private void configureCompetitionBindings() {
 
 		// driver
-		drivetrain.setDefaultCommand(new JoystickDriveCommand(true));
+		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 		driverController.R2()
 			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(2), RotationsPerSecond.of(1)))
@@ -306,7 +306,7 @@ public class RobotContainer {
 		operatorController.circle().onFalse(shooter.stowCommand());
 		// operatorController.povUp().onTrue(turret.increaseFudgeFactorCommand());
 		// operatorController.povDown().onTrue(turret.decreaseFudgeFactorCommand());
-		drivetrain.setDefaultCommand(new JoystickDriveCommand(true));
+		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 
 		// driverController.triangle().whileTrue(
