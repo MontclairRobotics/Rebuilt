@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.PivotConstants;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.Elastic;
 import frc.robot.util.Elastic.Notification;
@@ -252,15 +253,18 @@ public class Auto extends SubsystemBase {
 				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
 				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
 				Commands.parallel(
+					Commands.waitSeconds(3).andThen(RobotContainer.shooter.startShootingInAuto()),
 					followPathCommands,
 					RobotContainer.rollers.spinUpCommand()
 				)
 			);
+
 		} else {
 			autoCommand.addCommands(
 				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
 				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint()),
 				Commands.parallel(
+					RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
 					followPathCommands,
 					RobotContainer.rollers.spinUpCommand()
 				)

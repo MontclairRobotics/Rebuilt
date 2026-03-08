@@ -118,7 +118,6 @@ public class RobotContainer {
 
 	private boolean useConstantVelocityMap = false;
 	private boolean shootWhileMoving = true;
-	public static boolean shouldShootInAuto = true;
 
 	// debug, set to true to increase logging, set to false to increase performance and reduce loop overruns
 	public static boolean VISION_DEBUG = false;
@@ -134,8 +133,9 @@ public class RobotContainer {
 
 	public double turretFudge = 0;
 
+	public static boolean shouldShootAuto = false;
 
-	public static Trigger shootTrigger = operatorController.circle().or(() -> DriverStation.isAutonomous());
+	public static Trigger shootTrigger = operatorController.circle().or(() -> shouldShootAuto);
 	public LoggedTunableNumber indexerCurrent = new LoggedTunableNumber("Spindexer/Index Current", 0);
 	public LoggedTunableNumber serializerCurrent = new LoggedTunableNumber("Spindexer/Serializer Current", 0);
 
