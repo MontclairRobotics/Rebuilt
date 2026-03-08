@@ -269,6 +269,7 @@ public class RobotContainer {
 			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(-90)), false));
 
 		// operator
+		operatorController.touchpad().whileTrue(shooter.stowCommand());
 		operatorController.circle().onFalse(shooter.stowCommand());
 		operatorController.triangle()
 			.whileTrue(shooter.setConstantShotParameters())
