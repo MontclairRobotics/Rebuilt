@@ -59,9 +59,10 @@ public class Hood extends SubsystemBase {
 			Logger.processInputs("Hood", inputs);
 		}
 
+		visualization.update();
+		visualization.log();
+
 		if(RobotContainer.HOOD_DEBUG || RobotBase.isSimulation()) {
-			visualization.update();
-			visualization.log();
 			updateTunables();
 		}
 	}

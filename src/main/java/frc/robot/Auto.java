@@ -143,7 +143,7 @@ public class Auto extends SubsystemBase {
 
 	public boolean isAutoValid(String autoString) {
 
-		if(autoString.length() < 3) {
+		if(autoString.length() < 1) {
 			setFeedback("Auto string is too short!", NotificationLevel.ERROR);
 			return false;
 		}
@@ -151,6 +151,10 @@ public class Auto extends SubsystemBase {
 		if(autoString.length() % 2 == 0) {
 			setFeedback("One of the paths has an invalid length", NotificationLevel.ERROR);;
 			return false;
+		}
+
+		if(autoString.length() < 2) {
+			return true;
 		}
 
 		String currentAutoString = autoString.substring(0,3);
@@ -185,9 +189,72 @@ public class Auto extends SubsystemBase {
 
 		if (!isAutoValid(autoString)) {
 			try {
-				AutoBuilder.followPath(PathPlannerPath.fromPathFile("LL0"));
+				// AutoBuilder.followPath(PathPlannerPath.fromPathFile("LL0"));
 				return autoCommand;
 			} catch(Exception e) {
+
+			}
+		}
+
+		if(autoString.length() < 2) {
+			if(autoString.charAt(0) == 'L') {
+				try {
+					PathPlannerPath firstPath = PathPlannerPath.fromPathFile("LL0");
+
+					Optional<Pose2d>  opPose = firstPath.getStartingHolonomicPose();
+					Pose2d pose = opPose.isPresent() ? PoseUtils.flipPoseAlliance(opPose.get()) : new Pose2d();
+
+					autoCommand.addCommands(
+						Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
+						RobotContainer.shooter.startShootingInAuto()
+					);
+
+				} catch(Exception e) {
+					setFeedback("Issue with default auto", NotificationLevel.ERROR);
+					return Commands.none();
+				}
+
+				setFeedback("Auto looks good!", NotificationLevel.INFO);
+				return autoCommand;
+
+			} else if(autoString.charAt(0) == 'R') {
+				try {
+					PathPlannerPath firstPath = PathPlannerPath.fromPathFile("RR0");
+
+					Optional<Pose2d>  opPose = firstPath.getStartingHolonomicPose();
+					Pose2d pose = opPose.isPresent() ? PoseUtils.flipPoseAlliance(opPose.get()) : new Pose2d();
+
+					autoCommand.addCommands(
+						Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
+						RobotContainer.shooter.startShootingInAuto()
+					);
+
+				} catch(Exception e) {
+					setFeedback("Issue with default auto", NotificationLevel.ERROR);
+					return Commands.none();
+				}
+
+				setFeedback("Auto looks good!", NotificationLevel.INFO);
+				return autoCommand;
+
+			} else if(autoString.charAt(0) == 'C') {
+				try {
+					PathPlannerPath firstPath = PathPlannerPath.fromPathFile("CD0");
+
+					Optional<Pose2d>  opPose = firstPath.getStartingHolonomicPose();
+					Pose2d pose = opPose.isPresent() ? PoseUtils.flipPoseAlliance(opPose.get()) : new Pose2d();
+
+					autoCommand.addCommands(
+						Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
+						RobotContainer.shooter.startShootingInAuto()
+					);
+				} catch(Exception e) {
+					setFeedback("Issue with default auto", NotificationLevel.ERROR);
+					return Commands.none();
+				}
+
+				setFeedback("Auto looks good!", NotificationLevel.INFO);
+				return autoCommand;
 
 			}
 		}
