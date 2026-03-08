@@ -275,7 +275,7 @@ public class Auto extends SubsystemBase {
 			autoCommand.addCommands(
 				pivotCommandGroup,
 				Commands.parallel(
-					RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+					Commands.waitSeconds(3).andThen(RobotContainer.shooter.startShootingInAuto()),
 					followPathCommands,
 					RobotContainer.rollers.spinUpCommand()
 				)

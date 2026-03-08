@@ -160,7 +160,7 @@ public class Shooter extends SubsystemBase {
 
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
         Logger.recordOutput("Shooter/At Setpoint", RobotContainer.shooter.atSetpoint());
-        if (RobotContainer.shooter.atSetpoint()) {
+        if (RobotContainer.shooter.atSetpoint() && RobotContainer.shootTrigger.getAsBoolean()) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
 
@@ -188,9 +188,9 @@ public class Shooter extends SubsystemBase {
 
     public Command indexAndShootCommand(Supplier<AngularVelocity> flywheelVelocitySupplier) {
         return Commands.run(() -> {
-            flywheel.setVelocity(flywheelVelocitySupplier, Timer.getFPGATimestamp());
-            if (RobotContainer.shootTrigger.getAsBoolean() && this.atSetpoint()) {
-                spindexer.spinUp();
+            if (RobotContainer.shootTrigger.getAsBoolean()) {
+                flywheel.setVelocity(flywheelVelocitySupplier, Timer.getFPGATimestamp());
+                if(this.atSetpoint()) spindexer.spinUp();
             }
         });
     }

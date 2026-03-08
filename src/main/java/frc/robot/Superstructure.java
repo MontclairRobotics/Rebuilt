@@ -32,7 +32,7 @@ import frc.robot.util.PoseUtils;
 public class Superstructure extends SubsystemBase {
 
 	private Shooter shooter;
-	private final Distance TRENCH_ZONE_OFFSET = Meters.of(1);
+	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.8);
 
 	private int logCounter;
 	private final int loopsPerLog;
@@ -79,7 +79,7 @@ public class Superstructure extends SubsystemBase {
 	}
 
 	public final Trigger scoringModeTrigger =
-			new Trigger(() -> DriverStation.isEnabled() && shouldBeScoring()).and(RobotContainer.shootTrigger);
+			new Trigger(() -> DriverStation.isEnabled() && shouldBeScoring()).and(() -> (DriverStation.isAutonomous() && RobotContainer.shouldShootAuto) || DriverStation.isTeleopEnabled());
 
 	public final Trigger ferryLeftTrigger =
 			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryLeft()).and(RobotContainer.shootTrigger);
