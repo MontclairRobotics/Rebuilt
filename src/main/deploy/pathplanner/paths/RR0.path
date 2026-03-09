@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.4,
+        "x": 3.59,
         "y": 0.63
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.08,
-        "y": 0.4898457888493475
+        "x": 8.27,
+        "y": 0.4898457888493476
       },
       "isLocked": false,
       "linkedName": "Right Trench (R)"
@@ -48,11 +48,11 @@
     },
     {
       "anchor": {
-        "x": 3.4,
+        "x": 3.59,
         "y": 0.63
       },
       "prevControl": {
-        "x": 6.20490727532097,
+        "x": 6.39490727532097,
         "y": 0.6386019971469341
       },
       "nextControl": null,
@@ -122,7 +122,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.5,
+    "maxVelocity": 4.0,
     "maxAcceleration": 8.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 2000.0,
@@ -138,9 +138,6 @@
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
-  },
-  "useDefaultConstraints": true
-}0
   },
   "useDefaultConstraints": true
 }
