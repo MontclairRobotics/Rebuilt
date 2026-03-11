@@ -25,7 +25,7 @@
       },
       "nextControl": {
         "x": 4.675426812976187,
-        "y": 0.5243650577344446
+        "y": 0.5243650577344448
       },
       "isLocked": false,
       "linkedName": "Right Trench (R)"
@@ -101,7 +101,7 @@
       },
       "prevControl": {
         "x": 0.43665637911763017,
-        "y": 0.10976176406625798
+        "y": 0.109761764066258
       },
       "nextControl": null,
       "isLocked": false,
