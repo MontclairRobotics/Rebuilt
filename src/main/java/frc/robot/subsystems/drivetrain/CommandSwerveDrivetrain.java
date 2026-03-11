@@ -483,13 +483,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		fieldRelative = !RobotContainer.driverController.L2().getAsBoolean();
 		isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
-		if(logCounter % loopsPerLog == 0) {
-			Logger.recordOutput("Drive/FieldRelative", fieldRelative);
-			Logger.recordOutput("Drive/odometryHeading", odometryHeading);
-			Logger.recordOutput("Drive/odometryPose", getRobotPose());
-			Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
-			Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
-		}
+		Logger.recordOutput("Drive/FieldRelative", fieldRelative);
+		Logger.recordOutput("Drive/odometryHeading", odometryHeading);
+		Logger.recordOutput("Drive/odometryPose", getRobotPose());
+		Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
+		Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
+
 		/*
 		* Periodically try to apply the operator perspective.
 		* If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
