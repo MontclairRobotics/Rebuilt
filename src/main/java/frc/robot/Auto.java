@@ -154,7 +154,6 @@ public class Auto extends SubsystemBase {
 
 	public boolean isAutoStringValid(String autoString) {
 
-
 		if(autoString.length() == 1) {
 			if(autoString.charAt(0) == 'L' || autoString.charAt(0) == 'C' || autoString.charAt(0) == 'R') {
 				setFeedback("Valid stationary auto!", NotificationLevel.INFO);
@@ -163,7 +162,7 @@ public class Auto extends SubsystemBase {
 				setFeedback("Not a valid location for stationary auto!", NotificationLevel.ERROR);
 				return false;
 			}
-		} 
+		}
 
 		if(autoString.length() < 1) {
 			setFeedback("Auto string is too short!", NotificationLevel.ERROR);
@@ -479,6 +478,17 @@ public class Auto extends SubsystemBase {
 			);
 		}
 		if(AllianceManager.getAlliance() == DriverStation.Alliance.Blue) {
+			if(autoString.charAt(autoString.length() - 1) == 'F'){ //TODO: Make sure path naming scheme matches
+			autoCommand.addCommands(
+				pivotCommandGroup,
+				Commands.parallel(
+					RobotContainer.shooter.startFerryingInAuto(),
+					followPathCommands,
+					RobotContainer.rollers.spinUpCommand()
+				)
+			);
+			}
+			else{
 			autoCommand.addCommands(
 				pivotCommandGroup,
 				Commands.parallel(
@@ -487,8 +497,18 @@ public class Auto extends SubsystemBase {
 					RobotContainer.rollers.spinUpCommand()
 				)
 			);
-
+			};
 		} else {
+			if(autoString.charAt(autoString.length() - 1) == 'F'){
+			autoCommand.addCommands(
+				pivotCommandGroup,
+				Commands.parallel(
+					RobotContainer.shooter.startFerryingInAuto(),
+					followPathCommands,
+					RobotContainer.rollers.spinUpCommand()
+				)
+			);
+			}
 			autoCommand.addCommands(
 				pivotCommandGroup,
 				Commands.parallel(

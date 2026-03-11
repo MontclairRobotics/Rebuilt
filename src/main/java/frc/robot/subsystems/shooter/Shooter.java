@@ -215,4 +215,16 @@ public class Shooter extends SubsystemBase {
             RobotContainer.shouldShootAuto = false;
         });
     }
+
+    public Command startFerryingInAuto() {
+        return Commands.runOnce(() -> {
+            RobotContainer.shouldFerryAuto = true;
+        });
+    }
+
+    public Command stopFerryingInAuto() {
+        return Commands.runOnce(() -> {
+            RobotContainer.shouldFerryAuto = false;
+        });
+    }
 }
