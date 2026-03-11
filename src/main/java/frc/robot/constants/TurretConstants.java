@@ -55,14 +55,14 @@ public class TurretConstants {
 	public static final Angle ENCODER_OFFSET = Rotations.of(0.7578125);
 
 	// pid + ff gains
-	public static final double kP = 75.0555;
+	public static final double kP = 20;
 	public static final double kD = 5;
 	public static final double kS = 0.35;
 
-	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(6);
-	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(60);
-	public static final double MOTION_MAGIC_JERK = 100; // Rotations Per Second Per Second Per Second
-	public static AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(0.1);
+	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(2);
+	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(40);
+	public static final double MOTION_MAGIC_JERK = 10; // Rotations Per Second Per Second Per Second
+	public static AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(1);
 
 	public static final double STATOR_CURRENT_LIMIT = 80; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 60; // Amps

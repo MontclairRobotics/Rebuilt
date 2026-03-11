@@ -37,9 +37,9 @@ public class TurretIOSim implements TurretIO {
 			0
 		);
 
-        pidController = new PIDController(100, 0, 0);
+        pidController = new PIDController(kP, 0, kD);
         pidController.setTolerance(ANGLE_TOLERANCE.in(Rotations));
-        feedforward = new SimpleMotorFeedforward(0, 0);
+        feedforward = new SimpleMotorFeedforward(kS, 0);
 	}
 
     @Override
