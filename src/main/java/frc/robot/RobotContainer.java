@@ -242,9 +242,32 @@ public class RobotContainer {
 		// }
 
 		// configureBindings();
-		configureCompetitionBindings();
+		// configureCompetitionBindings();
+		configureTestingBindingsForMax();
 
     	drivetrain.registerTelemetry(logger::telemeterize);
+	}
+
+	private void configureTestingBindingsForMax() {
+
+		// runs the spindexer + indexer at max speed
+		
+		operatorController.circle()
+			.whileTrue(
+				spindexer.spinUpCommand()
+					.alongWith(
+						flywheel.setVelocityCommand(
+							RotationsPerSecond.of(20), Timer.getFPGATimestamp()
+						)
+					)
+			)
+			.onFalse(
+				spindexer.spinDownCommand()
+					.alongWith(
+						flywheel.stopCommand()
+					)
+			);
+
 	}
 
 	private void configureCompetitionBindings() {
