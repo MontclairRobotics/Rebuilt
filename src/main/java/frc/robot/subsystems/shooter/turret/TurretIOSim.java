@@ -43,7 +43,7 @@ public class TurretIOSim implements TurretIO {
 		);
 
         pidController = new ProfiledPIDController(
-            50, 0, 2,
+            50, 0, 30,
             new Constraints(
                 MAX_VELOCITY.in(RotationsPerSecond),
                 MAX_ACCELERATION.in(RotationsPerSecondPerSecond)
@@ -51,7 +51,7 @@ public class TurretIOSim implements TurretIO {
         );
 
         pidController.setTolerance(ANGLE_TOLERANCE.in(Rotations), VELOCITY_TOLERANCE.in(RotationsPerSecond));
-        feedforward = new SimpleMotorFeedforward(0, 0);
+        feedforward = new SimpleMotorFeedforward(0.5, 0);
 	}
 
     @Override

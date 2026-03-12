@@ -41,8 +41,8 @@ public class TurretConstants {
 	// constraints
 	public static final Angle MIN_ANGLE = Rotations.of(-0.475);
 	public static final Angle MAX_ANGLE = Rotations.of(0.475);
-	public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(4);
-	public static final AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(60);
+	public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(6);
+	public static final AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(80);
 	public static final Angle ANGLE_TOLERANCE = Degrees.of(8);
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.25); // TODO: tune
 

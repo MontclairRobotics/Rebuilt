@@ -405,5 +405,6 @@ public class RobotContainer {
 		Logger.recordOutput("ferry1",new Translation2d(2,7));
 		// Logger.recordOutput("ferry2",new Translation2d(2,1));
 		Logger.recordOutput("ferrydistance", turret.getDistanceToPoint(new Translation2d(2,7)));
+		//Logger.recordOutput("shouldFerryAuto", shouldFerryAuto);
 	}
 }

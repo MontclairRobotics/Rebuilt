@@ -160,7 +160,7 @@ public class Shooter extends SubsystemBase {
 
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
         Logger.recordOutput("Shooter/At Setpoint", RobotContainer.shooter.atSetpoint());
-        if (RobotContainer.shooter.atSetpoint() && RobotContainer.shootTrigger.getAsBoolean()) {
+        if (RobotContainer.shooter.atSetpoint() && (RobotContainer.shootTrigger.getAsBoolean() || RobotContainer.ferryTrigger.getAsBoolean())) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
 
