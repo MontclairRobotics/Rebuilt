@@ -36,6 +36,7 @@ public class TurretConstants {
 	// ports
 	public static final int CAN_ID = 30;
 	public static final int ENCODER_ID = 29;
+
 	public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the canivore
 
 	// constraints
@@ -43,6 +44,7 @@ public class TurretConstants {
 	public static final Angle MAX_ANGLE = Rotations.of(0.475);
 	public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(4);
 	public static final AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(60);
+
 	public static final Angle ANGLE_TOLERANCE = Degrees.of(8);
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.25); // TODO: tune
 
@@ -54,7 +56,7 @@ public class TurretConstants {
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
-	public static Angle ANGLE_OFFSET = Rotations.of(0.375);
+	public static Angle ANGLE_OFFSET = Rotations.of(0.5);
 	public static final Angle ENCODER_OFFSET = Rotations.of(-0.48584);
 
 	// pid + ff gains

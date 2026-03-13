@@ -30,7 +30,7 @@ public class HoodConstants {
 
 	// CAD values
 	public static final Translation3d ORIGIN_TO_HOOD = new Translation3d(-0.1651, 0.2782, 0.4395);
-	public static final Translation3d TURRET_TO_HOOD = new Translation3d(-0.08, 0.08, 0.08128);
+	public static final Translation3d TURRET_TO_HOOD = new Translation3d(-0.12, 0, 0.08128);
 
 	// CAN
 	public static final int CAN_ID = 33;
