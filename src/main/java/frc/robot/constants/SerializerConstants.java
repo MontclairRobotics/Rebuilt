@@ -17,19 +17,19 @@ public class SerializerConstants {
     public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the canivore
 
     public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.1);
-	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(4.7 * (5.0 / 3));
+	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(4.5);
 	public static final double SPIN_VOLTAGE = 12;
 
 	// tuned 3/4
-    public static final double kP = 15.000555 * (3.0 / 5);
+    public static final double kP = 15.000555 ;
 	public static final double kD = 0;
-	public static final double kS = 4.000555 * (3.0 / 5);
-	public static final double kV = 1.5000555 * (3.0 / 5);
+	public static final double kS = 4.000555;
+	public static final double kV = 1.5000555;
 
     public static final double STATOR_CURRENT_LIMIT = 80;
     public static final double SUPPLY_CURRENT_LIMIT = 60;
 
-    public static final double GEARING = 12; // TODO: get
+    public static final double GEARING = 20; // TODO: get
     public static final double MOMENT_OF_INERTIA = 0.02;
 
     public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()

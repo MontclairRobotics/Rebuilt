@@ -42,7 +42,6 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.Indexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.IndexerIOSim;
@@ -52,10 +51,8 @@ import frc.robot.subsystems.shooter.spindexer.serializer.SerializerIOSim;
 import frc.robot.subsystems.shooter.spindexer.serializer.SerializerIOTalonFX;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
-import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
-import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -149,9 +146,9 @@ public class RobotContainer {
 			case REAL:
 				drivetrain = TunerConstants.createDrivetrain();
 
-				hood = new Hood(new HoodIOTalonFX());
-				flywheel = new Flywheel(new FlywheelIOTalonFX());
-				turret = new Turret(new TurretIOTalonFX());
+				hood = new Hood(new HoodIOSim());
+				flywheel = new Flywheel(new FlywheelIOSim());
+				turret = new Turret(new TurretIOSim());
 
 				serializer = new Serializer(new SerializerIOTalonFX());
 				indexer = new Indexer(new IndexerIOTalonFX());

@@ -57,7 +57,7 @@ public class TurretConstants {
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
 	public static Angle ANGLE_OFFSET = Rotations.of(0.5);
-	public static final Angle ENCODER_OFFSET = Rotations.of(-0.48584);
+	public static final Angle ENCODER_OFFSET = Rotations.of(-0.367432);
 
 	// pid + ff gains
 	public static final double kP = 55.0555;
