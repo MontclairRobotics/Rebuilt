@@ -163,7 +163,7 @@ public class Auto extends SubsystemBase {
 				setFeedback("Not a valid location for stationary auto!", NotificationLevel.ERROR);
 				return false;
 			}
-		} 
+		}
 
 		if(autoString.length() < 1) {
 			setFeedback("Auto string is too short!", NotificationLevel.ERROR);

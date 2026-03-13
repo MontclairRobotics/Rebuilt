@@ -173,9 +173,9 @@ public class RobotContainer {
 
 				vision = new Vision(
 					drivetrain::addVisionMeasurement,
-					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
-					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
-					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
+					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading)
+					// new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
+					// new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
 				);
 
 				break;
@@ -241,9 +241,9 @@ public class RobotContainer {
 		// 	Auto.drawAuto(autoName);
 		// }
 
-		// configureBindings();
+		configureBindings();
 		// configureCompetitionBindings();
-		configureTestingBindingsForMax();
+		// configureTestingBindingsForMax();
 
     	drivetrain.registerTelemetry(logger::telemeterize);
 	}
@@ -251,7 +251,7 @@ public class RobotContainer {
 	private void configureTestingBindingsForMax() {
 
 		// runs the spindexer + indexer at max speed
-		
+
 		operatorController.circle()
 			.whileTrue(
 				spindexer.spinUpCommand()
