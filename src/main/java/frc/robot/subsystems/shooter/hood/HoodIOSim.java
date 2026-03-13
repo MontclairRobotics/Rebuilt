@@ -1,28 +1,36 @@
 package frc.robot.subsystems.shooter.hood;
 
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.HoodConstants.*;
+import static frc.robot.constants.HoodConstants.SIM_SLOT0_CONFIGS;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+
 public class HoodIOSim implements HoodIO {
 
-	public DCMotor motor;
-	public SingleJointedArmSim sim;
+    private SingleJointedArmSim sim;
+    private double appliedVoltage;
 
-	private double appliedVoltage;
+    private PIDController pidController;
+    private ArmFeedforward feedforward;
 
-	public HoodIOSim() {
-		motor = DCMotor.getKrakenX44(1);
-
-		sim = new SingleJointedArmSim(
-			motor,
+    public HoodIOSim() {
+        sim = new SingleJointedArmSim(
+			DCMotor.getKrakenX44Foc(1),
 			GEARING,
 			MOMENT_OF_INERTIA,
-			HOOD_LENGTH.in(Meters),
+			HOOD_LENGTH.in(Meter),
 			MIN_ANGLE.in(Radians),
 			MAX_ANGLE.in(Radians),
 			true,
@@ -30,34 +38,74 @@ public class HoodIOSim implements HoodIO {
 			0.0,
 			0.0
 		);
-	}
 
-	@Override
-	public void updateInputs(HoodIOInputs inputs) {
+        pidController = new PIDController(SIM_SLOT0_CONFIGS.kP, SIM_SLOT0_CONFIGS.kI, SIM_SLOT0_CONFIGS.kD);
+        feedforward = new ArmFeedforward(SIM_SLOT0_CONFIGS.kS, SIM_SLOT0_CONFIGS.kG, SIM_SLOT0_CONFIGS.kV);
 
-		sim.setInputVoltage(appliedVoltage);
-		sim.update(0.02);
+    }
 
-		inputs.appliedVoltage = appliedVoltage;
-		inputs.current = sim.getCurrentDrawAmps();
-		inputs.angle = getAngle().in(Rotations);
-		inputs.tempCelsius = 0;
-		inputs.encoderConnected = false;
+    @Override
+    public void updateInputs(HoodIOInputs inputs) {
+        sim.setInputVoltage(appliedVoltage);
+        sim.update(0.02);
 
-	}
+        inputs.motorConnected = false;
 
-	@Override
-	public void setVoltage(double voltage) {
-		appliedVoltage = voltage;
-	}
+        inputs.appliedVoltage = appliedVoltage;
+        inputs.currentDrawAmps = sim.getCurrentDrawAmps();
+        inputs.tempCelcius = 0; // motor temperature is not simulated
 
-	@Override
-	public void stop() {
-		setVoltage(0);
-	}
+        inputs.hoodAngle = Radians.of(sim.getAngleRads());
+        inputs.hoodAngleSetpoint = Rotations.of(pidController.getSetpoint());
+        inputs.hoodVelocity = RadiansPerSecond.of(sim.getVelocityRadPerSec());
 
-	@Override
-	public Angle getAngle() {
-		return Radians.of(sim.getAngleRads());
-	}
+        inputs.isAtSetpoint = isAtSetpoint();
+    }
+
+    @Override
+    public void setAngle(Angle angle) {
+        pidController.setSetpoint(angle.in(Rotations));
+        double pidOutput = pidController.calculate(Radians.of(sim.getAngleRads()).in(Rotations));
+        double ffOutput = feedforward.calculate(sim.getAngleRads(), 0);
+        appliedVoltage = MathUtil.clamp(pidOutput + ffOutput, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
+    }
+
+    @Override
+    public void setVoltage(double voltage) {
+        appliedVoltage = voltage;
+    }
+
+    @Override
+    public void stop() {
+        appliedVoltage = 0;
+    }
+
+    @Override
+    public boolean isAtSetpoint() {
+       return pidController.atSetpoint();
+    }
+
+    @Override
+    public void resetEncoderPosition() {
+
+    }
+
+    @Override
+    public void setGains(double kP, double kD, double kS, double kG) {
+        pidController.setP(kP);
+        pidController.setD(kD);
+        feedforward.setKs(kS);
+        feedforward.setKg(kG);
+    }
+
+    @Override
+    public void setMotionMagic(double velocity, double acceleration, double jerk) {
+        // does nothing, not necessary
+    }
+
+
+    @Override
+    public void setNeutralMode(NeutralModeValue value) {
+        // does nothing, not necessary
+    }
 }

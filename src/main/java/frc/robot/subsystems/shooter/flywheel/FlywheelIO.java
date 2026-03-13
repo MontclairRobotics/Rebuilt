@@ -1,41 +1,43 @@
 package frc.robot.subsystems.shooter.flywheel;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+
 import org.littletonrobotics.junction.AutoLog;
 
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
-
+import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public interface FlywheelIO {
-	
-	@AutoLog
-	public class FlywheelIOInputs {
-		public double appliedVoltage = 0.0;
-		public double tempCelcius = 0.0;
-		public double motorVelocity = 0.0; // rotations per second
-		public double flywheelVelocity = 0.0; // rotations per second
-	}
-	// public static enum flywheelMode {
-	// 	COAST,
-	// 	NOT_COAST
-	// }
-	public void updateInputs(FlywheelIOInputs inputs);
 
-	public void setVoltage(double voltage);
+    @AutoLog
+    public class FlywheelIOInputs {
+        public boolean leftMotorConnected = false;
+        public boolean rightMotorConnected = false;
 
-	public void stop();
-	
-	/**
-	 * @return the angular velocity of the <b>motor shaft</b>, in rotations per second
-	 */
-	public AngularVelocity getMotorVelocity();
+        public AngularVelocity velocity = RotationsPerSecond.zero(); // velocity of the BIG FLYWHEEL
+        public AngularAcceleration acceleration = RotationsPerSecondPerSecond.zero(); // acceleration of the BIG FLYWHEEL
+        public AngularVelocity setpointVelocity = RotationsPerSecond.zero(); // setpoint velocity of the BIG FLYWHEEL
+        public AngularAcceleration setpointAcceleration = RotationsPerSecondPerSecond.zero(); // setpoint acceleration of the BIG FLYWHEEL
 
-	/**
-	 * @return the angular velocity of the <b>flywheel</b>, in rotations per second
-	 */
-	public AngularVelocity getFlywheelVelocity();
+        public double appliedVoltage = 0.0;
+        public double currentDrawAmps = 0.0;
+        public double tempCelsius = 0.0;
+        public boolean isAtSetpoint = false;
+    }
 
-	public double getMotorVoltage();
+    public void updateInputs(FlywheelIOInputs inputs);
 
-	public double getMotorTemp();
+    public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint);
+
+    public void setVoltage(double voltage);
+
+    public void stop();
+
+    public boolean isAtSetpoint();
+
+    public boolean isAtTimeAdjustedSetpoint();
+
+    public void setGains(double kP, double kD, double kS, double kV);
+
 }

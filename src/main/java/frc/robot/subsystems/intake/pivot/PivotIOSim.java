@@ -2,25 +2,30 @@ package frc.robot.subsystems.intake.pivot;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.PivotConstants.*;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class PivotIOSim implements PivotIO {
 
- public DCMotor motor;
-	public SingleJointedArmSim sim;
+	private SingleJointedArmSim sim;
+	private PIDController pidController = new  PIDController(10, 0, 0);
+	private ArmFeedforward feedforward = new ArmFeedforward(0, 0, 0);
 
 	private double appliedVoltage;
 
 	public PivotIOSim() {
-		motor = DCMotor.getKrakenX60(1);
 
 		sim = new SingleJointedArmSim(
-			motor,
+			DCMotor.getKrakenX44Foc(1),
 			GEARING,
 			MOMENT_OF_INERTIA,
 			ARM_LENGTH.in(Meters),
@@ -35,16 +40,15 @@ public class PivotIOSim implements PivotIO {
 
 	@Override
 	public void updateInputs(PivotIOInputs inputs) {
-
 		sim.setInputVoltage(appliedVoltage);
 		sim.update(0.02);
 
 		inputs.appliedVoltage = appliedVoltage;
-		inputs.current = sim.getCurrentDrawAmps();
-		inputs.angle = getAngle().in(Rotations);
-		inputs.tempCelsius = 0;
-		inputs.encoderConnected = false;
+		inputs.currentDrawAmps = sim.getCurrentDrawAmps();
+		inputs.angle = getAngle();
+		inputs.tempCelcius = 0;
 
+		inputs.isAtSetpoint = isAtSetpoint();
 	}
 
 	@Override
@@ -61,4 +65,37 @@ public class PivotIOSim implements PivotIO {
     public Angle getAngle() {
         return Radians.of(sim.getAngleRads());
     }
+
+	@Override
+	public void setAngle(Angle angle) {
+
+	}
+
+	@Override
+	public boolean isAtSetpoint() {
+		return pidController.atSetpoint();
+	}
+
+    @Override
+    public void setGains(double kP, double kD, double kS, double kG) {
+        pidController.setP(kP);
+        pidController.setD(kD);
+        feedforward.setKs(kS);
+        feedforward.setKg(kG);
+    }
+
+    @Override
+    public void setMotionMagic(AngularVelocity velocity, AngularAcceleration acceleration, double jerk) {
+        // does nothing, not necessary
+    }
+
+    @Override
+    public void resetEncoderPosition() {
+		// does nothing, not necessary
+    }
+
+	@Override
+	public void setNeutralMode(NeutralModeValue value) {
+		// does nothing, not necessary
+	}
 }

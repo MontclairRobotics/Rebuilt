@@ -1,50 +1,53 @@
 package frc.robot.subsystems.shooter.turret;
 
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import org.littletonrobotics.junction.AutoLog;
+
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public interface TurretIO {
 
-	@AutoLog
-	public static class TurretIOInputs {
-		public double appliedVoltage;
+    @AutoLog
+    public class TurretIOInputs {
+        public boolean motorConnected = false;
 
-		// velocities are in rotations per second
-		public double motorVelocity;
-		public double turretVelocity;
+        public double appliedVoltage = 0.0;
+        public double currentDrawAmps = 0.0;
+        public double tempCelcius = 0.0;
 
-		// angles are in rotations
-		public double robotRelativeAngle;
-		public double fieldRelativeAngle;
-	}
+        public AngularVelocity velocity = RotationsPerSecond.zero();
+        public Angle robotRelativeAngle = Rotations.zero();
+        public Angle fieldRelativeAngle = Rotations.zero();
+        public Angle robotRelativeAngleSetpoint = Rotations.zero();
 
-	public void updateInputs(TurretIOInputs inputs);
+        public boolean isAtSetpoint = false;
+    }
 
-	public void setVoltage(double volts);
+    public void updateInputs(TurretIOInputs inputs);
 
-	public void stop();
+    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity);
 
-	/**
-	 * @return the angular velocity of the <b>motor shaft</b>, in rotations per second
-	 */
-	public AngularVelocity getMotorVelocity();
+    public void setVoltage(double voltage);
 
-	/**
-	 * @return the angular velocity of the <b>turret</b>, in rotations per second
-	 */
-	public AngularVelocity getTurretVelocity();
+    public void stop();
 
-	/**
-	 * @return the angle of the turret <b>relative to its zero</b>, in rotations
-	 */
-	public Angle getRobotRelativeAngle();
+    public void applyFudgeFactor(Angle angle);
 
-	/**
-	 * @return the angle of the turret <b>relative to the field</b>, in rotations
-	 */
-	public Angle getFieldRelativeAngle();
+    public boolean isAtSetpoint();
 
-	public void zero();
+    public void disable();
+
+    public boolean isAtTimeAdjustedSetpoint();
+
+    public void setGains(double kP, double kD, double kS);
+
+    public void setMotionMagic(double velocity, double acceleration, double jerk);
+
+    public void setNeutralMode(NeutralModeValue value);
+
 }

@@ -1,7 +1,10 @@
 package frc.robot.subsystems.shooter.hood;
 
-import org.littletonrobotics.junction.Logger;
+import static edu.wpi.first.units.Units.Rotations;
+import static frc.robot.constants.HoodConstants.TURRET_TO_HOOD;
+import static frc.robot.constants.TurretConstants.ORIGIN_TO_TURRET;
 
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -9,13 +12,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.RobotContainer;
 
-import static edu.wpi.first.units.Units.Rotations;
-import static frc.robot.constants.HoodConstants.*;
-import static frc.robot.constants.TurretConstants.*;
-
 public class HoodVisualization {
-
-	public Pose3d hoodPose = new Pose3d();
+public Pose3d hoodPose = new Pose3d();
 
 	public void update() {
 		Translation3d turretToHoodFieldRelative = new Translation3d(
@@ -27,8 +25,8 @@ public class HoodVisualization {
 		hoodPose = new Pose3d(
 			ORIGIN_TO_TURRET.plus(turretToHoodFieldRelative),
 			new Rotation3d(
-				Rotations.zero(),
-				Rotations.of(-RobotContainer.hood.getAngle().in(Rotations)),
+				Rotations.of(-RobotContainer.hood.getAngle().in(Rotations)).times(0.7071),
+				Rotations.of(-RobotContainer.hood.getAngle().in(Rotations)).times(0.7071),
 				RobotContainer.turret.getRobotRelativeAngle()
 			)
 		);

@@ -1,63 +1,179 @@
 package frc.robot.subsystems.shooter.turret;
 
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.constants.TurretConstants.*;
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import frc.robot.RobotContainer;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.util.PhoenixUtil;
+
+import static edu.wpi.first.units.Units.Hertz;
+import static edu.wpi.first.units.Units.Rotations;
+import static frc.robot.constants.TurretConstants.*;
 
 public class TurretIOTalonFX implements TurretIO {
 
-	private TalonFX motor;
+    private final TalonFX motor;
+    private final CANcoder encoder;
 
-	public TurretIOTalonFX() {
-		motor = new TalonFX(CAN_ID);
-	}
+    private final TalonFXConfiguration config;
 
-	@Override
-	public void updateInputs(TurretIOInputs inputs) {
-		inputs.appliedVoltage = motor.getMotorVoltage().getValueAsDouble();
-		inputs.motorVelocity = getMotorVelocity().in(RotationsPerSecond);
-		inputs.turretVelocity = getTurretVelocity().in(RotationsPerSecond);
-		inputs.robotRelativeAngle = getRobotRelativeAngle().in(Rotations);
-		inputs.fieldRelativeAngle = getFieldRelativeAngle().in(Rotations);
-	}
+    private final StatusSignal<Angle> positionSignal;
+    private final StatusSignal<Double> setpointPositionSignal;
+    private final StatusSignal<AngularVelocity> velocitySignal;
+    private final StatusSignal<Voltage> appliedVoltageSignal;
+    private final StatusSignal<Current> currentDrawAmpsSignal;
+    private final StatusSignal<Temperature> tempCelsiusSignal;
 
-	@Override
-	public void setVoltage(double volts) {
-		motor.setVoltage(volts);
-	}
+    private final PositionVoltage request = new PositionVoltage(0).withEnableFOC(true);
+    private final NeutralOut neutralOut = new NeutralOut();
 
-	@Override
-	public void stop() {
-		motor.stopMotor();
-	}
+    public TurretIOTalonFX() {
+        motor = new TalonFX(CAN_ID, CAN_BUS);
+        encoder = new CANcoder(ENCODER_ID, CAN_BUS);
 
-	@Override
-	public AngularVelocity getMotorVelocity() {
-		return motor.getVelocity().getValue();
-	}
+        config = new TalonFXConfiguration()
+            .withSlot0(SLOT0_CONFIGS)
+            .withCurrentLimits(CURRENT_LIMITS_CONFIGS)
+            .withMotorOutput(MOTOR_OUTPUT_CONFIGS)
+            .withFeedback(FEEDBACK_CONFIGS)
+            .withMotionMagic(MOTION_MAGIC_CONFIGS);
 
-	@Override
-	public AngularVelocity getTurretVelocity() {
-		return getMotorVelocity().div(GEARING);
-	}
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAX_ANGLE.in(Rotations);
+        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MIN_ANGLE.in(Rotations);
 
-	@Override
-	public Angle getRobotRelativeAngle() {
-		return motor.getPosition().getValue().div(GEARING);
-	}
+        encoder.getConfigurator().apply(ENCODER_CONFIGS);
+        motor.getConfigurator().apply(config);
+        encoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
 
-	@Override
-	public Angle getFieldRelativeAngle() {
-		return RobotContainer.turret.toFieldRelativeAngle(getRobotRelativeAngle());
-	}
+        positionSignal = motor.getPosition();
+        setpointPositionSignal = motor.getClosedLoopReference();
+        velocitySignal = motor.getVelocity();
+        appliedVoltageSignal = motor.getMotorVoltage();
+        currentDrawAmpsSignal = motor.getStatorCurrent();
+        tempCelsiusSignal = motor.getDeviceTemp();
 
-	@Override
-	public void zero() {
-		motor.setPosition(0);
-	}
+        PhoenixUtil.registerStatusSignals(
+            Hertz.of(50),
+            positionSignal,
+            setpointPositionSignal,
+            velocitySignal,
+            appliedVoltageSignal,
+            currentDrawAmpsSignal,
+            tempCelsiusSignal
+        );
+
+        motor.optimizeBusUtilization();
+    }
+
+    @Override
+    public void updateInputs(TurretIOInputs inputs) {
+        BaseStatusSignal.refreshAll(
+            positionSignal,
+            setpointPositionSignal,
+            velocitySignal,
+            appliedVoltageSignal,
+            currentDrawAmpsSignal,
+            tempCelsiusSignal
+        );
+
+        inputs.motorConnected = BaseStatusSignal.isAllGood(
+            positionSignal,
+            setpointPositionSignal,
+            velocitySignal,
+            appliedVoltageSignal,
+            currentDrawAmpsSignal,
+            tempCelsiusSignal
+        );
+
+        inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
+        inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
+        inputs.tempCelcius = tempCelsiusSignal.getValueAsDouble();
+
+        inputs.velocity = velocitySignal.getValue();
+        inputs.robotRelativeAngle = positionSignal.getValue();
+        inputs.fieldRelativeAngle = Turret.toFieldRelativeAngle(inputs.robotRelativeAngle);
+        inputs.robotRelativeAngleSetpoint = Rotations.of(setpointPositionSignal.getValueAsDouble());
+
+        inputs.isAtSetpoint = isAtSetpoint();
+    }
+
+    @Override
+    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity) {
+        motor.setControl(request.withPosition(angle).withVelocity(velocity));
+    }
+
+    @Override
+    public void setVoltage(double voltage) {
+        motor.setControl(new VoltageOut(voltage));
+    }
+
+    @Override
+    public void stop() {
+        motor.setControl(neutralOut);
+    }
+
+    @Override
+    public boolean isAtSetpoint() {
+        double error = motor.getClosedLoopError().getValueAsDouble();
+        return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations)
+            // && Math.abs(velocitySignal.getValueAsDouble()) < MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond)
+        ;
+    }
+
+    @Override
+    public void disable() {
+        motor.disable();
+    }
+
+    @Override
+    public boolean isAtTimeAdjustedSetpoint() {
+        double error =
+            Turret.getSetpointForTime(Timer.getFPGATimestamp()).in(Rotations)
+            - positionSignal.getValue().in(Rotations);
+        return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations);
+    }
+
+    @Override
+    public void setGains(double kP, double kD, double kS) {
+        config.Slot0.kP = kP;
+        config.Slot0.kD = kD;
+        config.Slot0.kS = kS;
+
+        motor.getConfigurator().apply(config.Slot0);
+    }
+
+    @Override
+    public void setMotionMagic(double velocity, double acceleration, double jerk) {
+        config.MotionMagic.MotionMagicCruiseVelocity = velocity;
+        config.MotionMagic.MotionMagicAcceleration = acceleration;
+        config.MotionMagic.MotionMagicJerk = jerk;
+
+        motor.getConfigurator().apply(config.MotionMagic);
+    }
+
+    @Override
+    public void setNeutralMode(NeutralModeValue value) {
+        motor.setNeutralMode(value);
+    }
+
+    @Override
+    public void applyFudgeFactor(Angle angle) {
+       motor.setPosition(positionSignal.getValue().plus(angle));
+    }
+
 }

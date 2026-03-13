@@ -1,114 +1,136 @@
 package frc.robot.subsystems.shooter.flywheel;
 
-import static frc.robot.constants.FlywheelConstants.*;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
-import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
-
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.BangBangController;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import static frc.robot.constants.FlywheelConstants.*;
 
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.shooter.aiming.AimingConstants;
+import frc.robot.util.tunables.LoggedTunableNumber;
+
 public class Flywheel extends SubsystemBase {
-	private final FlywheelIO io;
-	private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
-	private PIDController pidController;
-	//private BangBangController bangBangController;
-	final 
-	private SimpleMotorFeedforward motorFeedforward;
+    private final FlywheelIO io;
+    private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
-	SysIdRoutine flyWheelRoutine;
+    private static final TimeInterpolatableBuffer<AngularVelocity> setpointBuffer = TimeInterpolatableBuffer.createBuffer(Flywheel::interpolate, AimingConstants.LATENCY * 2);
 
-	public Flywheel(FlywheelIO io) {
-		this.io = io;
-		//bangBangController = new BangBangController(TOLERANCE.in(RotationsPerSecond));
-		pidController = new PIDController(kP, kI, kD);
-		pidController.setTolerance(TOLERANCE.in(RotationsPerSecond));
+    private LoggedTunableNumber tunableKP;
+    private LoggedTunableNumber tunableKS;
+    private LoggedTunableNumber tunableKV;
 
-		motorFeedforward = new SimpleMotorFeedforward(kS, kV);
+    public LoggedTunableNumber tuningFlywheelSpeed;
 
-		flyWheelRoutine = new SysIdRoutine(
-			new SysIdRoutine.Config(
-				null,
-				Volts.of(4),
-				null,
-				state -> SignalLogger.writeString("SysIdFlywheel_State", state.toString())
-			),
-			new SysIdRoutine.Mechanism(output -> io.setVoltage(output.in(Volts)), null, this)
-		);
-	}
+    private int logCounter;
+    private final int loopsPerLog;
 
-	/**
-	 * Uses PID and FF Control to ramp up the Flywheel to a target angular velocity
-	 * @param targetFlywheelVelocity the target angular velocity of the flywheel
-	 */
-	public void setVelocityRPS(AngularVelocity targetFlywheelVelocity) {
-		double pidOutput = pidController.calculate(io.getFlywheelVelocity().in(RotationsPerSecond), targetFlywheelVelocity.in(RotationsPerSecond));
-		//double bangOutput = bangBangController.calculate(io.getFlywheelVelocity().in(RotationsPerSecond),targetFlywheelVelocity.in(RotationsPerSecond));
-		double ffOutput = motorFeedforward.calculate(targetFlywheelVelocity.in(RotationsPerSecond));
-		double totalOutput = pidOutput + ffOutput;
-		//double totalOutput = bangOutput + ffOutput;
-		io.setVoltage(MathUtil.clamp(totalOutput, 12.0, -12.0));
-	}
+    private int fudgeFactor = 0;
 
-	/**
-	 * Calls {@link #setVelocityRPS} to continuously ramp up the Flywheel to a changing target angular velocity
-	 * @param targetFlywheelVelocitySupplier supplier function (lambda) of the target angular velocity of the flywheel
-	 */
-	public void setVelocityRPS(Supplier<AngularVelocity> targetFlywheelVelocitySupplier) {
-		setVelocityRPS(targetFlywheelVelocitySupplier.get());
-	}
+    public Flywheel(FlywheelIO io) {
+        this.io = io;
+        loopsPerLog = RobotContainer.FLYWHEEL_DEBUG ? 1 : 5;
 
-	/**
-	 * @return whether or not the flywheel is within tolerance of its setpoint
-	 */
-	public boolean atSetpoint() {
-		return pidController.atSetpoint();
-		//return bangBangController.atSetpoint();
-	}
+        if(RobotContainer.FLYWHEEL_DEBUG) {
+            tunableKP = new LoggedTunableNumber("Flywheel/kP", SLOT0_CONFIGS.kP);
+            tunableKS = new LoggedTunableNumber("Flywheel/kS", SLOT0_CONFIGS.kS);
+            tunableKV = new LoggedTunableNumber("Flywheel/kV", SLOT0_CONFIGS.kV);
 
-	@Override
-	public void periodic() {
-		io.updateInputs(inputs);
-		Logger.processInputs("Flywheel", inputs);
-		//Logger.recordOutput("Flywheel/Setpoint", bangBangController.getSetpoint());
-		Logger.recordOutput("Flywheel/Setpoint", pidController.getSetpoint());
-		Logger.recordOutput("Flywheel/Velocity", io.getFlywheelVelocity().in(RotationsPerSecond));
+        }
+        tuningFlywheelSpeed = new LoggedTunableNumber("Flywheel/TuningFlywheelRPS", 0);
+    }
 
-	}
+    public static AngularVelocity interpolate(AngularVelocity startValue, AngularVelocity endValue, double t) {
+        return RotationsPerSecond.of(
+            MathUtil.interpolate(startValue.in(RotationsPerSecond), endValue.in(RotationsPerSecond), t)
+        );
+    }
 
+    public boolean atSetpoint() {
+        return io.isAtSetpoint();
+    }
 
+    public void increaseFudge() {
+        fudgeFactor++;
+    }
 
-	public Command holdVelocityCommand(AngularVelocity targetFlywheelVelocity) {
-		return Commands.run(() -> {
-			setVelocityRPS(targetFlywheelVelocity);
-		});
-	}
+    public void decreaseFudge() {
+        fudgeFactor--;
+    }
 
-	public Command holdVelocityCommand(Supplier<AngularVelocity> targetFlywheelVelocitySupplier) {
-		return Commands.run(() -> {
-			setVelocityRPS(targetFlywheelVelocitySupplier);
-		});
-	}
+    public boolean atTimeAdjustedSetpoint() {
+        return io.isAtTimeAdjustedSetpoint();
+    }
 
-	public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-		return flyWheelRoutine.quasistatic(direction);
-	}
+    public static void recordSetpoint(AngularVelocity setpointVelocity, double timeSecondsForSetpoint) {
+        setpointBuffer.addSample(timeSecondsForSetpoint, setpointVelocity);
+    }
 
-	public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-		return flyWheelRoutine.dynamic(direction);
-	}
+    public static AngularVelocity getSetpointForTime(double timeSeconds) {
+        return setpointBuffer.getSample(timeSeconds).orElseGet(() -> RotationsPerSecond.zero());
+    }
+
+    private void updateTunables() {
+        if(tunableKP.hasChanged(hashCode())
+                || tunableKS.hasChanged(hashCode())
+                || tunableKV.hasChanged(hashCode())) {
+            io.setGains(tunableKP.get(), 0, tunableKS.get(), tunableKV.get());
+        }
+    }
+
+    public void periodic() {
+        logCounter++;
+
+        io.updateInputs(inputs); // need to update inputs every frame
+
+        if(logCounter % loopsPerLog == 0) {
+            Logger.processInputs("Flywheel", inputs);
+            // Logger.recordOutput("Flywheel/Mode", FlywheelIOBangBang.phase);
+            Logger.recordOutput("Flywheel/Time Adjusted Setpoint", getSetpointForTime(Timer.getFPGATimestamp()));
+            Logger.recordOutput("Flywheel/Is At Time Adjusted Setpoint", atTimeAdjustedSetpoint());
+        }
+
+        if(RobotContainer.FLYWHEEL_DEBUG) updateTunables();
+    }
+
+    public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {
+        io.setVelocity(targetVelocity.plus(RotationsPerSecond.of(fudgeFactor)), timeSecondsForSetpoint);
+    }
+
+    public void setVelocity(Supplier<AngularVelocity> targetVelocitySupplier, double timeSecondsForSetpoint) {
+        setVelocity(targetVelocitySupplier.get(), timeSecondsForSetpoint);
+    }
+
+    public void applyJoystickInput() {
+        double input = -MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
+        double voltage = input * RobotController.getBatteryVoltage();
+        io.setVoltage(voltage);
+    }
+
+    public Command stopCommand() {
+        return Commands.runOnce(() -> io.stop(), this);
+    }
+
+    public Command setVelocityCommand(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {
+        return Commands.run(() -> io.setVelocity(targetVelocity, timeSecondsForSetpoint));
+    }
+
+    public Command setVelocityCommand(Supplier<AngularVelocity> targetVelocitySupplier, double timeSecondsForSetpoint) {
+        return Commands.run(() -> io.setVelocity(targetVelocitySupplier.get(), timeSecondsForSetpoint));
+    }
+
+    public Command joystickControlCommand() {
+        return Commands.run(() -> applyJoystickInput(), this);
+    }
+
 }

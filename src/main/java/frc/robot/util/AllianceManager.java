@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public final class AllianceManager {
     private static Alliance alliance = Alliance.Blue;
-    private static boolean allianceKnown = false;
+    public static boolean allianceKnown = false;
 
     private AllianceManager() {}
 

@@ -11,7 +11,7 @@ import frc.robot.constants.TurretConstants;
 
 public class TurretVisualization {
 
-	public Pose3d turretPose = new Pose3d();
+    public Pose3d turretPose = new Pose3d();
 
 	public void update() {
 		turretPose = new Pose3d(
@@ -25,6 +25,7 @@ public class TurretVisualization {
 	}
 
 	public void log() {
-		Logger.recordOutput("Turret/TurretPose", turretPose);
+		Logger.recordOutput("Turret/Turret Pose", turretPose);
 	}
+
 }

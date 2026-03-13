@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.976476868327403,
-        "y": 3.0720521945432973
+        "x": 3.6,
+        "y": 4.035
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.9764768683274037,
-        "y": 3.0720521945432973
+        "x": 3.1470561856709613,
+        "y": 2.391195588118631
+      },
+      "isLocked": false,
+      "linkedName": "Center (C)"
+    },
+    {
+      "anchor": {
+        "x": 3.4510554561717353,
+        "y": 0.7655813953488371
+      },
+      "prevControl": {
+        "x": 2.955029905270176,
+        "y": 1.2501103227361616
+      },
+      "nextControl": {
+        "x": 3.637786272628795,
+        "y": 0.5831785291181533
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.14,
-        "y": 6.48
+        "x": 4.43,
+        "y": 0.63
       },
       "prevControl": {
-        "x": 5.14,
-        "y": 6.48
+        "x": 4.184531490721386,
+        "y": 0.5826163429805673
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,10 +49,10 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 8.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxAngularAcceleration": 2000.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },

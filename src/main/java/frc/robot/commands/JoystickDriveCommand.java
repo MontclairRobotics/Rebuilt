@@ -36,14 +36,18 @@ public class JoystickDriveCommand extends Command {
 	private final DoubleSupplier yVelocitySupplier; // strafe velocity input, left/right relative to driver
 	private final DoubleSupplier omegaVelocitySupplier; // angular velocity input
 
+	private boolean shouldAimAssist;
+
 	@AutoLogOutput
 	private final Trigger shouldTrenchLockTrigger = new Trigger(this::shouldTrenchLock)
 		.and(() -> DriverStation.isEnabled()) // resets value when disabled
+		.and(() -> shouldAimAssist)
 		.debounce(0.1); // accounts for flickering
 
 	@AutoLogOutput
 	private final Trigger shouldBumpLockTrigger = new Trigger(this::shouldBumpLock)
 		.and(() -> DriverStation.isEnabled()) // resets value when disabled
+		.and(() -> shouldAimAssist)
 		.debounce(0.1); // accounts for flicker
 
 	private final PIDController thetaController =
@@ -54,11 +58,12 @@ public class JoystickDriveCommand extends Command {
 
 	private DriveMode currentDriveMode = DriveMode.NORMAL;
 
-	public JoystickDriveCommand() {
+	public JoystickDriveCommand(boolean shouldAimAssist) {
 		this.drivetrain = RobotContainer.drivetrain;
 		this.xVelocitySupplier = () -> drivetrain.getForwardVelocityFromController();
 		this.yVelocitySupplier = () -> drivetrain.getStrafeVelocityFromController();
 		this.omegaVelocitySupplier = () -> drivetrain.getOmegaVelocityFromController();
+		this.shouldAimAssist = shouldAimAssist;
 
 		shouldTrenchLockTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK))
 			.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.L1().getAsBoolean()))
@@ -150,8 +155,7 @@ public class JoystickDriveCommand extends Command {
 					xVelocitySupplier.getAsDouble(),
 					yVelocitySupplier.getAsDouble(),
 					omegaVelocitySupplier.getAsDouble(),
-					drivetrain.fieldRelative,
-					true
+					drivetrain.fieldRelative
 				);
 
 				break;
@@ -175,8 +179,7 @@ public class JoystickDriveCommand extends Command {
 					xVelocitySupplier.getAsDouble(),
 					yVelocity,
 					rotVelocityTrenchLock,
-					drivetrain.fieldRelative,
-					true
+					drivetrain.fieldRelative
 				);
 
 				break;
@@ -192,8 +195,7 @@ public class JoystickDriveCommand extends Command {
 					xVelocitySupplier.getAsDouble(),
 					yVelocitySupplier.getAsDouble(),
 					rotVelocityBumpLock,
-					drivetrain.fieldRelative,
-					true
+					drivetrain.fieldRelative
 				);
 
 				break;

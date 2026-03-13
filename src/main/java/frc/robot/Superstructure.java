@@ -2,6 +2,7 @@ package frc.robot;
 
 import org.littletonrobotics.junction.Logger;
 
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
@@ -17,8 +18,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Mode;
-import frc.robot.constants.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.constants.HoodConstants;
+import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LeftTrench;
@@ -26,13 +28,23 @@ import frc.robot.util.FieldConstants.LinesVertical;
 import frc.robot.util.HubTracker;
 import frc.robot.util.PoseUtils;
 
+
 public class Superstructure extends SubsystemBase {
 
 	private Shooter shooter;
+	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.8);
+
+	private int logCounter;
+	private final int loopsPerLog;
 
 	public Superstructure(Shooter shooter) {
+
+		loopsPerLog = RobotContainer.SUPERSTRUCTURE_DEBUG ? 1 : 10;
+
 		this.shooter = shooter;
 		if(CURRENT_MODE == Mode.SIM) {
+			shouldStowTrigger.whileTrue(
+				shooter.stowCommand());
 			scoringModeTrigger.whileTrue(
 				shooter.setSimParameters(
 					() -> RobotContainer.aiming.calculateSimShot(
@@ -48,94 +60,128 @@ public class Superstructure extends SubsystemBase {
 					() -> RobotContainer.aiming.calculateSimShot(
 						FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
-			shouldStowHoodTrigger.whileTrue(
-				shooter.stowCommand());
 		} else {
+			shouldStowTrigger.whileTrue(
+				shooter.stowCommand());
 			scoringModeTrigger.whileTrue(
 				shooter.setParameters(
-					() -> RobotContainer.aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryLeftTrigger.whileTrue(
 				shooter.setParameters(
-					() -> RobotContainer.aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryRightTrigger.whileTrue(
 				shooter.setParameters(
-					() -> RobotContainer.aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
-			shouldStowHoodTrigger.whileTrue(
-				shooter.stowCommand());
 		}
-
 	}
 
 	public final Trigger scoringModeTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldBeScoring());
+			new Trigger(() -> DriverStation.isEnabled() && shouldBeScoring()).and(() -> RobotContainer.shootTrigger.getAsBoolean());
 
 	public final Trigger ferryLeftTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryLeft());
+			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryLeft()).and(RobotContainer.shootTrigger);
 
 	public final Trigger ferryRightTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryRight());
+			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryRight()).and(RobotContainer.shootTrigger);
 
-	public final Trigger shouldStowHoodTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldStowHood());
+	public final Trigger shouldStowTrigger =
+			new Trigger(() -> DriverStation.isEnabled() && inTrenchDangerZone());
 
 	@Override
 	public void periodic() {
-		Logger.recordOutput("Superstructure/isallianceknown", AllianceManager.isAllianceKnown());
-		Logger.recordOutput("Superstructure/currentshiftempty", HubTracker.getCurrentShift().isEmpty());
-		Logger.recordOutput("Superstructure/shouldBeScoring", shouldBeScoring());
-		Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
-		Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
-		Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowHood());
-		updateTrenchZonesVeloBased();
+		logCounter++;
+
+		if(movingIntoObstacle()) {
+			updateTrenchZonesVeloBased();
+		} else {
+			resetTrenchZones();
+		}
+
+		if(logCounter % loopsPerLog == 0) {
+			Logger.recordOutput("Superstructure/isallianceknown", AllianceManager.isAllianceKnown());
+			Logger.recordOutput("Superstructure/currentshiftempty", HubTracker.getCurrentShift().isEmpty());
+			Logger.recordOutput("Superstructure/shouldBeScoring", scoringModeTrigger.getAsBoolean());
+			Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
+			Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
+			Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowTrigger.getAsBoolean());
+			Logger.recordOutput("Trench/Trench Danger Zones", FieldConstants.Zones.TRENCH_DANGER_ZONES);
+		}
+
 	};
 
-	public void updateTrenchZonesVeloBased(){
-		//Updates width of zone based on robot velocity
-		Distance dynamicTrenchDangerZoneWidth = Meters.of(0.15 + Math.abs(RobotContainer.drivetrain.getFieldRelativeVelocity().getX())* HoodConstants.HOOD_LOWER_TIME);
+	public void resetTrenchZones() {
 		FieldConstants.Zones.TRENCH_DANGER_ZONES = new Translation2d[][]{
 			// near right trench
-            new Translation2d[] {
-                new Translation2d(LinesVertical.HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), Meters.zero()),
-                new Translation2d(LinesVertical.HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.RightTrench.WIDTH)
-            },
+			new Translation2d[] {
+				new Translation2d(LinesVertical.HUB_CENTER.minus(TRENCH_ZONE_OFFSET), Meters.zero()),
+				new Translation2d(LinesVertical.HUB_CENTER.plus(TRENCH_ZONE_OFFSET), FieldConstants.RightTrench.WIDTH)
+			},
 
 			// near left trench
-            new Translation2d[] {
-                new Translation2d(LinesVertical.HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH.minus(LeftTrench.WIDTH)),
-                new Translation2d(LinesVertical.HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH)
-            },
+			new Translation2d[] {
+				new Translation2d(LinesVertical.HUB_CENTER.minus(TRENCH_ZONE_OFFSET), FieldConstants.FIELD_WIDTH.minus(LeftTrench.WIDTH)),
+				new Translation2d(LinesVertical.HUB_CENTER.plus(TRENCH_ZONE_OFFSET), FieldConstants.FIELD_WIDTH)
+			},
 
 			// far right trench
-            new Translation2d[] {
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), Meters.zero()),
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.RightTrench.WIDTH)
-            },
+			new Translation2d[] {
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_ZONE_OFFSET), Meters.zero()),
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_ZONE_OFFSET), FieldConstants.RightTrench.WIDTH)
+			},
 
 			// far left trench
-            new Translation2d[] {
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH.minus(LeftTrench.WIDTH)),
-                new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH)
-            }
-        };
+			new Translation2d[] {
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(TRENCH_ZONE_OFFSET), FieldConstants.FIELD_WIDTH.minus(LeftTrench.WIDTH)),
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(TRENCH_ZONE_OFFSET), FieldConstants.FIELD_WIDTH)
+			}
+		};
+	}
+
+	public void updateTrenchZonesVeloBased() {
+		//Updates width of zone based on robot velocity
+		Distance dynamicTrenchDangerZoneWidth = Meters.of(TRENCH_ZONE_OFFSET.in(Meters) + Math.abs(RobotContainer.drivetrain.getFieldRelativeVelocity().getX())* HoodConstants.HOOD_LOWER_TIME);
+		FieldConstants.Zones.TRENCH_DANGER_ZONES = new Translation2d[][]{
+			// near right trench
+			new Translation2d[] {
+				new Translation2d(LinesVertical.HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), Meters.zero()),
+				new Translation2d(LinesVertical.HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.RightTrench.WIDTH)
+			},
+
+			// near left trench
+			new Translation2d[] {
+				new Translation2d(LinesVertical.HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH.minus(LeftTrench.WIDTH)),
+				new Translation2d(LinesVertical.HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH)
+			},
+
+			// far right trench
+			new Translation2d[] {
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), Meters.zero()),
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.RightTrench.WIDTH)
+			},
+
+			// far left trench
+			new Translation2d[] {
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH.minus(LeftTrench.WIDTH)),
+				new Translation2d(LinesVertical.OPP_HUB_CENTER.plus(dynamicTrenchDangerZoneWidth), FieldConstants.FIELD_WIDTH)
+			}
+		};
 	}
 
     public boolean isRedAlliance() {
 		return AllianceManager.isRed();
     }
 
-    public boolean isInScoringZone() {
+    public static boolean isInScoringZone() {
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
 
         return
-			!shouldStowHood()
-			&&
 			(AllianceManager.isRed() ?
-				pos.getX() >= PoseUtils.flipTranslationAlliance(new Translation2d(FieldConstants.LinesVertical.STARTING.in(Meters), 0)).getX()
+				pos.getX() >= PoseUtils.flipTranslationAlliance(new Translation2d(FieldConstants.LinesVertical.HUB_CENTER.in(Meters), 0)).getX()
         		:
-				pos.getX() <= FieldConstants.LinesVertical.STARTING.in(Meters)
+				pos.getX() <= FieldConstants.LinesVertical.HUB_CENTER.in(Meters)
 			);
     }
 
@@ -144,9 +190,8 @@ public class Superstructure extends SubsystemBase {
 		// if(!AllianceManager.isAllianceKnown() || (HubTracker.getCurrentShift().isEmpty())) return false;
 
 		if(!AllianceManager.isAllianceKnown()) return false;
-		return
-			!shouldStowHood()
-			&& isInScoringZone();
+
+		return !inTrenchDangerZone() && isInScoringZone();
         //Are we in the scoring zone and is the hub active
         // return
 		// 	!inTrenchDangerZone()
@@ -154,13 +199,15 @@ public class Superstructure extends SubsystemBase {
         // 	&& HubTracker.isActive(DriverStation.getAlliance().get(), HubTracker.getCurrentShift().get());
 	}
 
+
     public boolean shouldFerryLeft() {
 		if(!AllianceManager.isAllianceKnown()) return false;
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
 
         return
-			!shouldStowHood()
-        	&& (AllianceManager.isRed() ?
+			!inTrenchDangerZone() &&
+			(
+			AllianceManager.isRed() ?
 				(
 					pos.getY() <= PoseUtils.flipTranslationAlliance(new Translation2d(0, FieldConstants.LinesHorizontal.CENTER.in(Meters))).getY()
 					&& pos.getX() <= PoseUtils.flipTranslationAlliance(new Translation2d(FieldConstants.LinesVertical.NEUTRAL_ZONE_NEAR.in(Meters), 0)).getX()
@@ -178,8 +225,7 @@ public class Superstructure extends SubsystemBase {
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
 
         return
-			!shouldStowHood()
-       		&&
+			!inTrenchDangerZone() &&
 			(AllianceManager.isRed() ?
         		(
 					pos.getY() >= PoseUtils.flipTranslationAlliance(new Translation2d(0, FieldConstants.LinesHorizontal.CENTER.in(Meters))).getY()
@@ -191,11 +237,6 @@ public class Superstructure extends SubsystemBase {
         			&& pos.getX() >= FieldConstants.LinesVertical.NEUTRAL_ZONE_NEAR.in(Meters)
 				)
         	);
-    }
-
-    public boolean shouldStowHood() {
-		if(!AllianceManager.isAllianceKnown()) return false;
-        return inTrenchDangerZone();
     }
 
 
@@ -214,12 +255,13 @@ public class Superstructure extends SubsystemBase {
     }
 
 	public static boolean inTrenchDangerZone() {
-		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+		Translation2d turretPose = RobotContainer.turret.getFieldRelativePosition();
         for (Translation2d[] zone : FieldConstants.Zones.TRENCH_DANGER_ZONES) {
-            if (robotPose.getX() >= zone[0].getX()
-                    && robotPose.getX() <= zone[1].getX()
-                    && robotPose.getY() >= zone[0].getY()
-                    && robotPose.getY() <= zone[1].getY()) {
+            if (
+					turretPose.getX() >= zone[0].getX()
+                    && turretPose.getX() <= zone[1].getX()
+                    && turretPose.getY() >= zone[0].getY()
+                    && turretPose.getY() <= zone[1].getY()) {
                 return true;
             }
         }

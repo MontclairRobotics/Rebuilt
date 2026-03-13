@@ -1,26 +1,48 @@
 package frc.robot.subsystems.shooter.hood;
 
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import org.littletonrobotics.junction.AutoLog;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 
 public interface HoodIO {
-	@AutoLog
-	public static class HoodIOInputs {
-		public double appliedVoltage;
-		public double current;
-		public double tempCelsius;
-		public double angle; // rotations
-		public boolean encoderConnected;
-	}
 
-	public void updateInputs(HoodIOInputs inputs);
+    @AutoLog
+    public class HoodIOInputs {
+        public boolean motorConnected = false;
 
-	public void setVoltage(double voltage);
+        public double appliedVoltage = 0.0;
+        public double currentDrawAmps = 0.0;
+        public double tempCelcius = 0.0;
 
-	/** Gets the angle in Rotations from the relative encoder */
-	public Angle getAngle();
+        public Angle hoodAngle = Rotations.zero();
+        public Angle hoodAngleSetpoint = Rotations.zero();
+        public AngularVelocity hoodVelocity = RotationsPerSecond.zero();
 
-	public void stop();
+        public boolean isAtSetpoint = false;
+    }
+
+    public void updateInputs(HoodIOInputs inputs);
+
+    public void setAngle(Angle angle);
+
+    public void setVoltage(double voltage);
+
+    public void stop();
+
+    public boolean isAtSetpoint();
+
+    public void resetEncoderPosition();
+
+    public void setGains(double kP, double kD, double kS, double kG);
+
+    public void setMotionMagic(double velocity, double acceleration, double jerk);
+
+    public void setNeutralMode(NeutralModeValue value);
 
 }

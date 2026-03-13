@@ -1,51 +1,85 @@
 package frc.robot.subsystems.intake.rollers;
 
-import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 
-import static frc.robot.constants.RollersConstants.INTAKE_VOLTAGE;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static frc.robot.constants.RollersConstants.*;
+
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class Rollers extends SubsystemBase {
 
 	private final RollersIO io;
 	private final RollersIOInputsAutoLogged inputs = new RollersIOInputsAutoLogged();
 
+	private int logCounter;
+	private final int loopsPerLog;
+
 	public Rollers(RollersIO io) {
 		this.io = io;
+		loopsPerLog = RobotContainer.ROLLERS_DEBUG ? 1 : 5;
 	}
 
-	public void intake() {
-		io.setVoltage(INTAKE_VOLTAGE);
-	}
-
-	public void outtake() {
-		io.setVoltage(-INTAKE_VOLTAGE);
-	}
-
-	public void stop() {
-		io.stop();
+	public boolean atSetpoint() {
+		return io.isAtSetpoint();
 	}
 
 	@Override
 	public void periodic() {
-		io.updateInputs(inputs);
-		Logger.processInputs("Intake", inputs);
+		// logCounter++;
+		// if(logCounter % loopsPerLog == 0) {
+		// 	io.updateInputs(inputs);
+		// 	Logger.processInputs("Rollers", inputs);
+		// }
 	}
 
-	public Command stopCommand() {
-		return Commands.runOnce(() -> stop(), this);
+	public void setVelocity(AngularVelocity velocity) {
+		io.setVelocity(velocity);
 	}
 
-	public Command intakeCommand() {
-		return Commands.run(() -> intake(), this)
-			.finallyDo(() -> stop());
+	public void setVelocity(Supplier<AngularVelocity> targetVelocitySupplier) {
+		io.setVelocity(targetVelocitySupplier.get());
 	}
 
-	public Command outtakeCommand() {
-		return Commands.run(() -> outtake(), this)
-			.finallyDo(() -> stop());
+	public void spinUp() {
+		setVelocity(SPIN_VELOCITY);
 	}
+
+	public void spinDown() {
+		setVelocity(RotationsPerSecond.zero());
+	}
+
+	public void applyJoystickInput() {
+        double input = -MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
+        double voltage = input * RobotController.getBatteryVoltage();
+        io.setVoltage(voltage);
+    }
+
+    public Command spinDownCommand() {
+        return setVoltageCommand(0);
+    }
+
+    public Command spinUpCommand() {
+		return setVoltageCommand(SPIN_VOLTAGE);
+	}
+
+	public Command setVoltageCommand(DoubleSupplier voltage) {
+		return Commands.run(() -> io.setVoltage(voltage.getAsDouble()), this);
+	}
+
+	public Command setVoltageCommand(double voltage) {
+		return Commands.run(() -> io.setVoltage(voltage), this);
+	}
+
+    public Command joystickControlCommand() {
+        return Commands.run(() -> applyJoystickInput(), this);
+    }
 }

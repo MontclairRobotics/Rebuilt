@@ -15,13 +15,12 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import dev.doglog.DogLog;
-import dev.doglog.DogLogOptions;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
@@ -45,8 +44,6 @@ public class Robot extends LoggedRobot {
 
 	public Robot() {
 
-		robotContainer = new RobotContainer();
-
 		// Record metadata
 		Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
 		Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -64,8 +61,8 @@ public class Robot extends LoggedRobot {
 		// Set up data receivers & replay source
 		switch (Constants.CURRENT_MODE) {
 		case REAL:
-			// Running on a real robot, log to a USB stick ("/U/logs")
-			Logger.addDataReceiver(new WPILOGWriter());
+			// Running on a real robot, log to roboRio
+			Logger.addDataReceiver(new WPILOGWriter("U/logs"));
 			Logger.addDataReceiver(new NT4Publisher());
 			break;
 
@@ -83,6 +80,7 @@ public class Robot extends LoggedRobot {
 			break;
 		}
 
+		robotContainer = new RobotContainer();
 		// Start AdvantageKit logger
 		Logger.start();
 	}
@@ -90,13 +88,13 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void robotInit() {
 		RobotContainer.drivetrain.resetPose(new Pose2d());
-		DogLog.setOptions(
-			new DogLogOptions()
-				.withLogExtras(true)
-				.withCaptureDs(true)
-				.withNtPublish(true)
-				.withCaptureNt(true));
-		DogLog.setPdh(new PowerDistribution());
+		// DogLog.setOptions(
+		// 	new DogLogOptions()
+		// 		.withLogExtras(true)
+		// 		.withCaptureDs(true)
+		// 		.withNtPublish(true)
+		// 		.withCaptureNt(true));
+		// DogLog.setPdh(new PowerDistribution(50, ModuleType.kRev));
 		if (isSimulation()) {
 			// Do not spam the logs with "Button x on port y not available" log messages.
 			DriverStation.silenceJoystickConnectionWarning(true);
@@ -106,22 +104,33 @@ public class Robot extends LoggedRobot {
 	/** This function is called periodically during all modes. */
 	@Override
 	public void robotPeriodic() {
-		AllianceManager.update();
-		// TODO: fix this
-		if(!hasAppliedTargetLocation && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+		// this should only run once
+		if(!AllianceManager.allianceKnown) {
+			AllianceManager.update();
+		}
+
+		// this should only run once
+		if(!hasAppliedTargetLocation && AllianceManager.allianceKnown && AllianceManager.isRed()) {
 			hasAppliedTargetLocation = true;
 			TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
 			TargetLocation.FERRY_LEFT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT));
 			TargetLocation.FERRY_RIGHT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT));
 		}
+
+		// PhoenixUtil.refreshAll();
 		CommandScheduler.getInstance().run();
 	}
 
 	/** This function is called once when the robot is disabled. */
 	@Override
 	public void disabledInit() {
+		// coast mode
+		RobotContainer.turret.setNeutralMode(NeutralModeValue.Coast);
+		RobotContainer.hood.setNeutralMode(NeutralModeValue.Coast);
+		RobotContainer.pivot.setNeutralMode(NeutralModeValue.Coast);
+
 		if (!RobotBase.isReal()) {
-		// robotContainer.resetSdimulation();
+			// robotContainer.resetSimulation();
 		}
 	}
 
@@ -147,6 +156,14 @@ public class Robot extends LoggedRobot {
 	/** This function is called once when teleop is enabled. */
 	@Override
 	public void teleopInit() {
+
+		RobotContainer.shouldShootAuto = false;
+
+		// brake mode
+		RobotContainer.pivot.setNeutralMode(NeutralModeValue.Brake);
+		RobotContainer.turret.setNeutralMode(NeutralModeValue.Brake);
+		RobotContainer.hood.setNeutralMode(NeutralModeValue.Brake);
+
 		if (autonomousCommand != null) {
 			autonomousCommand.cancel();
 		}
@@ -175,7 +192,11 @@ public class Robot extends LoggedRobot {
 	/** This function is called periodically whilst in simulation. */
 	@Override
 	public void simulationPeriodic() {
-		robotContainer.fuelSim.updateSim();
+		Logger.recordOutput("Zero Pose/1", new Pose3d());
+		Logger.recordOutput("Zero Pose/2", new Pose3d());
+		Logger.recordOutput("Zero Pose/3", new Pose3d());
+		Logger.recordOutput("Zero Pose/4", new Pose3d());
+		RobotContainer.fuelSim.updateSim();
 		RobotContainer.drivetrain.mapleSimSwerveDrivetrain.update();
 		robotContainer.displaySimFieldToAdvantageScope();
 	}
