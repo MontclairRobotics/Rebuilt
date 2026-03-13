@@ -488,6 +488,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		Logger.recordOutput("Drive/odometryPose", getRobotPose());
 		Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
 		Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
+		Logger.recordOutput("Drive/Speed", getFieldRelativeLinearVelocity().in(MetersPerSecond));
 
 		/*
 		* Periodically try to apply the operator perspective.

@@ -173,9 +173,9 @@ public class RobotContainer {
 
 				vision = new Vision(
 					drivetrain::addVisionMeasurement,
-					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading)
+					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
 					// new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
-					// new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
+					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
 				);
 
 				break;
@@ -337,6 +337,13 @@ public class RobotContainer {
 		// 	indexer.setCurrentCommand(() -> 0)
 		// 	.alongWith(serializer.setCurrentCommand(() -> 0)
 		// ));
+
+		driverController.triangle().whileTrue(
+			indexer.setVelocityCommand(() -> RotationsPerSecond.of(indexerVelocity.getAsDouble()))
+			.alongWith(serializer.setVelocityCommand(() -> RotationsPerSecond.of(serializerVelocity.getAsDouble())))
+		).onFalse(
+			spindexer.spinDownCommand()
+		);
 
 		// driverController.cross().whileTrue(
 		// 	indexer.setVelocityCommand(() -> RotationsPerSecond.of(indexerVelocity.get()))
