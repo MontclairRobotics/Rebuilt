@@ -1,6 +1,5 @@
 package frc.robot.subsystems.intake.rollers;
 
-import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -26,7 +25,7 @@ public class Rollers extends SubsystemBase {
 
 	public Rollers(RollersIO io) {
 		this.io = io;
-		loopsPerLog = RobotContainer.INTAKE_DEBUG ? 1 : 5;
+		loopsPerLog = RobotContainer.ROLLERS_DEBUG ? 1 : 5;
 	}
 
 	public boolean atSetpoint() {
@@ -35,11 +34,11 @@ public class Rollers extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		logCounter++;
-		if(logCounter % loopsPerLog == 0) {
-			io.updateInputs(inputs);
-			Logger.processInputs("Rollers", inputs);
-		}
+		// logCounter++;
+		// if(logCounter % loopsPerLog == 0) {
+		// 	io.updateInputs(inputs);
+		// 	Logger.processInputs("Rollers", inputs);
+		// }
 	}
 
 	public void setVelocity(AngularVelocity velocity) {

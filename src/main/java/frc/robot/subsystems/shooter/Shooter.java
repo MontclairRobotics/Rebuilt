@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.function.Supplier;
 
@@ -17,7 +18,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.constants.HoodConstants;
 import frc.robot.constants.TurretConstants;
+import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
@@ -46,7 +48,9 @@ public class Shooter extends SubsystemBase {
     private final int FIRE_RATE = 6;
     public int hopperCount;
 
-    private  double lastSimShotTime = 0.0;
+    private double lastSimShotTime = 0.0;
+
+    public static TargetLocation targetLocation;
 
     public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean withConstantVelocity, boolean whileMoving) {
         this.hood = hood;
@@ -70,6 +74,7 @@ public class Shooter extends SubsystemBase {
     public int getHopperCount() {
         return hopperCount;
     }
+
 
     public void addBall() {
         if (hopperCount < HOPPER_CAPACITY) {
@@ -110,14 +115,30 @@ public class Shooter extends SubsystemBase {
 	}
 
     public boolean atSetpoint() {
-        return turret.atSetpoint() && hood.atSetpoint() && flywheel.atGoal();
+        return hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation());
     }
 
     public Command setParameters(Supplier<ShootingParameters> paramsSupplier) {
         return Commands.parallel(
-            turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle())
-            // hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
-            // indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
+            turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation)),
+            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
+            indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
+        );
+    }
+
+    public Command setParametersNoTurret(Supplier<ShootingParameters> paramsSupplier) {
+        return Commands.parallel(
+            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
+            indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
+        );
+    }
+
+    public Command setConstantShotParameters() {
+        ShootingParameters params = new ShootingParameters(Rotations.of(0.125), Degrees.of(19), RotationsPerSecond.of(24.5));
+        return Commands.parallel(
+            turret.setRobotRelativeAngleCommand(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(TargetLocation.HUB)),
+            hood.setAngleCommand(() -> params.hoodAngle()),
+            indexAndShootCommand(() -> params.flywheelVelocity())
         );
     }
 
@@ -130,7 +151,7 @@ public class Shooter extends SubsystemBase {
                 Logger.recordOutput("setSimParameters()/Robot Relative Turret Angle", params.robotRelativeTurretAngle().in(Rotations));
                 Logger.recordOutput("setSimParameters()/Hood Angle", params.hoodAngle().in(Rotations));
                 Logger.recordOutput("setSimParameters()/Exit Velocity", params.exitVelocity().in(MetersPerSecond));
-                turret.setRobotRelativeAngle(() -> params.robotRelativeTurretAngle());
+                turret.setRobotRelativeAngle(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation));
                 hood.setAngle(() -> params.hoodAngle());
             })
         );
@@ -138,7 +159,8 @@ public class Shooter extends SubsystemBase {
 
 
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
-        if ((RobotContainer.driverController.R2().getAsBoolean() || DriverStation.isAutonomous()) && RobotContainer.shooter.atSetpoint()) {
+        Logger.recordOutput("Shooter/At Setpoint", RobotContainer.shooter.atSetpoint());
+        if (RobotContainer.shooter.atSetpoint() && RobotContainer.shootTrigger.getAsBoolean()) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
 
@@ -166,9 +188,9 @@ public class Shooter extends SubsystemBase {
 
     public Command indexAndShootCommand(Supplier<AngularVelocity> flywheelVelocitySupplier) {
         return Commands.run(() -> {
-            if (RobotContainer.driverController.R2().getAsBoolean() && this.atSetpoint()) {
-                spindexer.spinUp();
-                flywheel.setVelocity(flywheelVelocitySupplier);
+            if (RobotContainer.shootTrigger.getAsBoolean()) {
+                flywheel.setVelocity(flywheelVelocitySupplier, Timer.getFPGATimestamp());
+                if(this.atSetpoint()) spindexer.spinUp();
             }
         });
     }
@@ -176,7 +198,21 @@ public class Shooter extends SubsystemBase {
     public Command stowCommand(){
         return Commands.parallel (
 			hood.setAngleCommand(() -> HoodConstants.MIN_ANGLE),
-			turret.stopCommand()
+			turret.stopCommand(),
+            flywheel.stopCommand(),
+            spindexer.spinDownCommand()
 		);
+    }
+
+    public Command startShootingInAuto() {
+        return Commands.runOnce(() -> {
+            RobotContainer.shouldShootAuto = true;
+        });
+    }
+
+    public Command stopShootingInAuto() {
+        return Commands.runOnce(() -> {
+            RobotContainer.shouldShootAuto = false;
+        });
     }
 }

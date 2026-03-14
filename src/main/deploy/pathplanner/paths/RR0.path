@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.43,
+        "x": 3.59,
         "y": 0.63
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.593466476462195,
-        "y": 0.6774179743223976
+        "x": 8.27,
+        "y": 0.4898457888493476
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Right Trench (R)"
     },
     {
       "anchor": {
@@ -48,19 +48,23 @@
     },
     {
       "anchor": {
-        "x": 4.43,
+        "x": 3.59,
         "y": 0.63
       },
       "prevControl": {
-        "x": 7.23490727532097,
+        "x": 6.39490727532097,
         "y": 0.6386019971469341
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Right Trench (R)"
     }
   ],
   "rotationTargets": [
+    {
+      "waypointRelativePos": 0.18117229129662166,
+      "rotationDegrees": 0.0
+    },
     {
       "waypointRelativePos": 0.742004264392333,
       "rotationDegrees": 29.999999999999996
@@ -77,7 +81,7 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.5347738014854784,
+      "minWaypointRelativePos": 0.3644544431946039,
       "maxWaypointRelativePos": 2.05,
       "constraints": {
         "maxVelocity": 2.0,
@@ -93,7 +97,7 @@
       "minWaypointRelativePos": 0.3484132343011431,
       "maxWaypointRelativePos": 0.8831870357866283,
       "constraints": {
-        "maxVelocity": 3.93,
+        "maxVelocity": 2.0,
         "maxAcceleration": 5.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 2818.0,
@@ -104,9 +108,9 @@
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 1.2478055367994645,
-      "maxWaypointRelativePos": 2.228224172856183,
+      "maxWaypointRelativePos": 2.3757030371203665,
       "constraints": {
-        "maxVelocity": 3.93,
+        "maxVelocity": 2.0,
         "maxAcceleration": 8.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 2818.0,
@@ -118,10 +122,10 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.93,
-    "maxAcceleration": 11.7,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 8.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 2818.0,
+    "maxAngularAcceleration": 2000.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },

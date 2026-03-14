@@ -63,7 +63,7 @@ public class FlywheelIOSim implements FlywheelIO {
     }
 
     @Override
-    public void setVelocity(AngularVelocity targetVelocity) {
+    public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {
         double pidOutput = pidController.calculate(
             RadiansPerSecond.of(sim.getAngularVelocityRadPerSec()).in(RotationsPerSecond),
             targetVelocity.in(RotationsPerSecond)
@@ -94,6 +94,11 @@ public class FlywheelIOSim implements FlywheelIO {
         pidController.setD(kD);
         feedforward.setKs(kS);
         feedforward.setKv(kV);
+    }
+
+    @Override
+    public boolean isAtTimeAdjustedSetpoint() {
+        return false;
     }
 
 }

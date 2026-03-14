@@ -30,7 +30,7 @@ public class HoodConstants {
 
 	// CAD values
 	public static final Translation3d ORIGIN_TO_HOOD = new Translation3d(-0.1651, 0.2782, 0.4395);
-	public static final Translation3d TURRET_TO_HOOD = new Translation3d(-0.08, 0.08, 0.08128);
+	public static final Translation3d TURRET_TO_HOOD = new Translation3d(-0.12, 0, 0.08128);
 
 	// CAN
 	public static final int CAN_ID = 33;
@@ -47,9 +47,9 @@ public class HoodConstants {
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
 
 	public static final double MOMENT_OF_INERTIA = 0.03038161694; // from CAD on 3/3/2026
-	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.06326015625); // absolute encoder
+	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.399); // absolute encoder
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
-	public static final double HOOD_LOWER_TIME = 1;
+	public static final double HOOD_LOWER_TIME = 1.2;
 
 	// Gains (Tuned 2/22)
 	public static final double kP = 600;

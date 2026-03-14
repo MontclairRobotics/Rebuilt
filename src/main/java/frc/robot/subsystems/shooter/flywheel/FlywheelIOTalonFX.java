@@ -14,6 +14,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.*;
@@ -116,7 +117,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
     }
 
     @Override
-    public void setVelocity(AngularVelocity targetVelocity) {
+    public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {
         leftMotor.setControl(request.withVelocity(targetVelocity));
     }
 
@@ -144,6 +145,14 @@ public class FlywheelIOTalonFX implements FlywheelIO{
         leftMotorConfig.Slot0.kS = kS;
 
         leftMotor.getConfigurator().apply(leftMotorConfig.Slot0);
+    }
+
+    @Override
+    public boolean isAtTimeAdjustedSetpoint() {
+        double error =
+            Flywheel.getSetpointForTime(Timer.getFPGATimestamp()).in(RotationsPerSecond)
+            - velocitySignal.getValue().in(RotationsPerSecond);
+        return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
     }
 
 }

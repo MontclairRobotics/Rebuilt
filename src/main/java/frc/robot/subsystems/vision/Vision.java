@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+import frc.robot.util.PoseUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,11 +145,15 @@ public class Vision extends SubsystemBase {
 					|| observation.pose().getX() > aprilTagLayout.getFieldLength()
 					|| observation.pose().getY() < 0.0
 					|| observation.pose().getY() > aprilTagLayout.getFieldWidth()
-
+					|| Math.abs(
+						observation.pose().getRotation().toRotation2d()
+						.minus(
+							PoseUtils.wrapRotation(RobotContainer.drivetrain.getRobotPose().getRotation())
+						).getDegrees()) > 3
 					// max angular rate
-					|| RobotContainer.drivetrain.getAngularSpeed().in(DegreesPerSecond) > 720
+					|| RobotContainer.drivetrain.getAngularSpeed().in(DegreesPerSecond) > 360
 					// max tag distance
-					|| observation.averageTagDistance() > 5.0;
+					|| observation.averageTagDistance() > 3.0;
 
 				// Add pose to log
 				if (logCounter % loopsPerLog == 0) {
@@ -167,9 +172,11 @@ public class Vision extends SubsystemBase {
 
 				// Calculate standard deviations
 				double d = observation.averageTagDistance();
-				double stdDevFactor = (d * d) / Math.pow(observation.tagCount(), 1.5);
-				double linearStdDev = linearStdDevBaseline * stdDevFactor;
-				double angularStdDev = angularStdDevBaseline * stdDevFactor;
+				double stdDevFactor = (d * d) / observation.tagCount();
+				double linearStdDev = 0.3 + linearStdDevBaseline * stdDevFactor;
+				// double angularStdDev = angularStdDevBaseline * stdDevFactor;
+				double angularStdDev = Double.POSITIVE_INFINITY;
+
 				if (observation.type() == PoseObservationType.MEGATAG_2) {
 					linearStdDev *= linearStdDevMegatag2Factor;
 					angularStdDev *= angularStdDevMegatag2Factor;

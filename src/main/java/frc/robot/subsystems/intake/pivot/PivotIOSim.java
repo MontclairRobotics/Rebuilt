@@ -2,22 +2,25 @@ package frc.robot.subsystems.intake.pivot;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.PivotConstants.*;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class PivotIOSim implements PivotIO {
 
 	private SingleJointedArmSim sim;
-	private PIDController pidController = new  PIDController(0, 0, 0);
+	private PIDController pidController = new  PIDController(10, 0, 0);
 	private ArmFeedforward feedforward = new ArmFeedforward(0, 0, 0);
 
 	private double appliedVoltage;
@@ -42,7 +45,7 @@ public class PivotIOSim implements PivotIO {
 	public void updateInputs(PivotIOInputs inputs) {
 		sim.setInputVoltage(appliedVoltage);
 		sim.update(0.02);
-
+		inputs.angleSetpoint = Rotations.of(pidController.getSetpoint());
 		inputs.appliedVoltage = appliedVoltage;
 		inputs.currentDrawAmps = sim.getCurrentDrawAmps();
 		inputs.angle = getAngle();
@@ -68,7 +71,10 @@ public class PivotIOSim implements PivotIO {
 
 	@Override
 	public void setAngle(Angle angle) {
-
+		pidController.setSetpoint(angle.in(Rotations));
+        double pidOutput = pidController.calculate(Radians.of(sim.getAngleRads()).in(Rotations));
+        double ffOutput = feedforward.calculate(sim.getAngleRads(), 0);
+        appliedVoltage = MathUtil.clamp(pidOutput + ffOutput, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
 	}
 
 	@Override

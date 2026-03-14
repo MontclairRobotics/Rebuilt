@@ -32,7 +32,7 @@ import frc.robot.util.PoseUtils;
 public class Superstructure extends SubsystemBase {
 
 	private Shooter shooter;
-	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.2);
+	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.8);
 
 	private int logCounter;
 	private final int loopsPerLog;
@@ -43,7 +43,7 @@ public class Superstructure extends SubsystemBase {
 
 		this.shooter = shooter;
 		if(CURRENT_MODE == Mode.SIM) {
-			shouldStowHoodTrigger.whileTrue(
+			shouldStowTrigger.whileTrue(
 				shooter.stowCommand());
 			scoringModeTrigger.whileTrue(
 				shooter.setSimParameters(
@@ -61,7 +61,7 @@ public class Superstructure extends SubsystemBase {
 						FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 		} else {
-			shouldStowHoodTrigger.whileTrue(
+			shouldStowTrigger.whileTrue(
 				shooter.stowCommand());
 			scoringModeTrigger.whileTrue(
 				shooter.setParameters(
@@ -79,16 +79,16 @@ public class Superstructure extends SubsystemBase {
 	}
 
 	public final Trigger scoringModeTrigger =
-			new Trigger(() -> DriverStation.isEnabled() && shouldBeScoring());
+			new Trigger(() -> DriverStation.isEnabled() && shouldBeScoring()).and(() -> RobotContainer.shootTrigger.getAsBoolean());
 
 	public final Trigger ferryLeftTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryLeft());
+			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryLeft()).and(RobotContainer.shootTrigger);
 
 	public final Trigger ferryRightTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryRight());
+			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryRight()).and(RobotContainer.shootTrigger);
 
-	public final Trigger shouldStowHoodTrigger =
-			new Trigger(() -> DriverStation.isEnabled() && shouldStowHood());
+	public final Trigger shouldStowTrigger =
+			new Trigger(() -> DriverStation.isEnabled() && inTrenchDangerZone());
 
 	@Override
 	public void periodic() {
@@ -103,10 +103,10 @@ public class Superstructure extends SubsystemBase {
 		if(logCounter % loopsPerLog == 0) {
 			Logger.recordOutput("Superstructure/isallianceknown", AllianceManager.isAllianceKnown());
 			Logger.recordOutput("Superstructure/currentshiftempty", HubTracker.getCurrentShift().isEmpty());
-			Logger.recordOutput("Superstructure/shouldBeScoring", shouldBeScoring());
+			Logger.recordOutput("Superstructure/shouldBeScoring", scoringModeTrigger.getAsBoolean());
 			Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
 			Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
-			Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowHood());
+			Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowTrigger.getAsBoolean());
 			Logger.recordOutput("Trench/Trench Danger Zones", FieldConstants.Zones.TRENCH_DANGER_ZONES);
 		}
 
@@ -178,8 +178,6 @@ public class Superstructure extends SubsystemBase {
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
 
         return
-			!shouldStowHood()
-			&&
 			(AllianceManager.isRed() ?
 				pos.getX() >= PoseUtils.flipTranslationAlliance(new Translation2d(FieldConstants.LinesVertical.HUB_CENTER.in(Meters), 0)).getX()
         		:
@@ -193,9 +191,7 @@ public class Superstructure extends SubsystemBase {
 
 		if(!AllianceManager.isAllianceKnown()) return false;
 
-		return
-			!shouldStowHood()
-			&& isInScoringZone();
+		return !inTrenchDangerZone() && isInScoringZone();
         //Are we in the scoring zone and is the hub active
         // return
 		// 	!inTrenchDangerZone()
@@ -209,8 +205,9 @@ public class Superstructure extends SubsystemBase {
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
 
         return
-			!shouldStowHood()
-        	&& (AllianceManager.isRed() ?
+			!inTrenchDangerZone() &&
+			(
+			AllianceManager.isRed() ?
 				(
 					pos.getY() <= PoseUtils.flipTranslationAlliance(new Translation2d(0, FieldConstants.LinesHorizontal.CENTER.in(Meters))).getY()
 					&& pos.getX() <= PoseUtils.flipTranslationAlliance(new Translation2d(FieldConstants.LinesVertical.NEUTRAL_ZONE_NEAR.in(Meters), 0)).getX()
@@ -228,8 +225,7 @@ public class Superstructure extends SubsystemBase {
         Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
 
         return
-			!shouldStowHood()
-       		&&
+			!inTrenchDangerZone() &&
 			(AllianceManager.isRed() ?
         		(
 					pos.getY() >= PoseUtils.flipTranslationAlliance(new Translation2d(0, FieldConstants.LinesHorizontal.CENTER.in(Meters))).getY()
@@ -241,11 +237,6 @@ public class Superstructure extends SubsystemBase {
         			&& pos.getX() >= FieldConstants.LinesVertical.NEUTRAL_ZONE_NEAR.in(Meters)
 				)
         	);
-    }
-
-    public static boolean shouldStowHood() {
-		if(!AllianceManager.isAllianceKnown()) return false;
-        return inTrenchDangerZone();
     }
 
 
@@ -266,7 +257,8 @@ public class Superstructure extends SubsystemBase {
 	public static boolean inTrenchDangerZone() {
 		Translation2d turretPose = RobotContainer.turret.getFieldRelativePosition();
         for (Translation2d[] zone : FieldConstants.Zones.TRENCH_DANGER_ZONES) {
-            if (turretPose.getX() >= zone[0].getX()
+            if (
+					turretPose.getX() >= zone[0].getX()
                     && turretPose.getX() <= zone[1].getX()
                     && turretPose.getY() >= zone[0].getY()
                     && turretPose.getY() <= zone[1].getY()) {

@@ -20,7 +20,7 @@ public class RollersConstants {
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(1); // TODO: set
 	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(30);
-	public static final double SPIN_VOLTAGE = 9;
+	public static final double SPIN_VOLTAGE = 12;
 
     public static final double kP = 1;
 	public static final double kD = 0;

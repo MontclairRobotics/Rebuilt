@@ -3,77 +3,77 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.43,
+        "x": 3.59,
         "y": 0.63
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.520596498842593,
+        "x": 6.680596498842593,
         "y": 0.6471345486111113
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Right Trench (R)"
     },
     {
       "anchor": {
-        "x": 8.302083550347222,
-        "y": 0.9083956886574072
+        "x": 7.979501779359431,
+        "y": 1.017046263345195
       },
       "prevControl": {
-        "x": 8.028953691856474,
-        "y": 0.5500307281283441
+        "x": 7.706371920868683,
+        "y": 0.658681302816132
       },
       "nextControl": {
-        "x": 8.672323784722222,
-        "y": 1.3941760706018522
+        "x": 8.349742013734431,
+        "y": 1.5028266452896402
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.450363353587964,
-        "y": 3.5254686053240745
-      },
-      "prevControl": {
-        "x": 8.694828197337962,
-        "y": 3.12471947337963
-      },
-      "nextControl": {
-        "x": 8.274181440197857,
-        "y": 3.814282112298517
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 7.76538939525463,
+        "x": 8.194685646500595,
         "y": 3.366559895833334
       },
       "prevControl": {
-        "x": 7.892702730045925,
-        "y": 3.7473282261107377
+        "x": 8.439150490250594,
+        "y": 2.9658107638888893
       },
       "nextControl": {
-        "x": 7.116632450810186,
-        "y": 1.4262596209490748
+        "x": 8.018503733110489,
+        "y": 3.6553734028077765
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.43,
+        "x": 7.495338078291816,
+        "y": 3.0182562277580063
+      },
+      "prevControl": {
+        "x": 7.622651413083111,
+        "y": 3.39902455803541
+      },
+      "nextControl": {
+        "x": 6.846581133847372,
+        "y": 1.0779559528737472
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.59,
         "y": 0.63
       },
       "prevControl": {
-        "x": 6.926821180555557,
+        "x": 6.086821180555557,
         "y": 0.5226713686342601
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Right Trench (R)"
     }
   ],
   "rotationTargets": [
@@ -108,10 +108,10 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.93,
-    "maxAcceleration": 11.7,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 8.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 2818.0,
+    "maxAngularAcceleration": 2000.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },

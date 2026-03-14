@@ -33,7 +33,7 @@ public class Pivot extends SubsystemBase {
 		io.setGains(kP, kD, kS, kG);
 		io.setMotionMagic(MOTION_MAGIC_CRUISE_VELOCITY, MOTION_MAGIC_ACCELERATION, MOTION_MAGIC_JERK);
 
-		loopsPerLog = RobotContainer.INTAKE_DEBUG ? 1 : 5;
+		loopsPerLog = RobotContainer.PIVOT_DEBUG ? 1 : 5;
 	}
 
 	public boolean atSetpoint() {
@@ -50,8 +50,6 @@ public class Pivot extends SubsystemBase {
 
 	public void joystickControl() {
 		double voltage = MathUtil.copyDirectionPow(MathUtil.applyDeadband(-RobotContainer.driverController.getRightY(), 0.04), 1.5) * 12;
-		// Logger.recordOutput("Pivot/JoystickVoltage", voltage);
-		// Logger.recordOutput("Pivot/RawAxis", RobotContainer.driverController.getRightY());
 		io.setVoltage(voltage);
 	}
 
@@ -104,7 +102,7 @@ public class Pivot extends SubsystemBase {
 			Logger.processInputs("Pivot", inputs);
 		}
 
-		if(RobotContainer.INTAKE_DEBUG || Constants.CURRENT_MODE == Mode.SIM) {
+		if(RobotContainer.PIVOT_DEBUG || Constants.CURRENT_MODE == Mode.SIM) {
 			visualization.update();
 			visualization.log();
 		}

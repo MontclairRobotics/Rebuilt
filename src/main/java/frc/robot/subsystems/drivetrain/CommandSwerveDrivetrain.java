@@ -16,7 +16,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
-import dev.doglog.DogLog;
+// import dev.doglog.DogLog;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -43,7 +43,6 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -235,7 +234,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 					// PID constants for translation
 					new PIDConstants(10, 0, 0),
 					// PID constants for rotation
-					new PIDConstants(7, 0, 0)),
+					new PIDConstants(7, 0, 0.1)),
 				config,
 				// Assume the path needs to be flipped for Red vs Blue, this is normally the case
 				() -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
@@ -315,8 +314,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 			getForwardVelocityFromController(),
 			getStrafeVelocityFromController(),
 			getOmegaVelocityFromController(),
-			fieldRelative,
-			true
+			fieldRelative
 		);
 	}
 
@@ -326,13 +324,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		return new Rotation2d(x, y).plus(Rotation2d.kCW_90deg);
 	}
 
-	public void drive(ChassisSpeeds speeds, boolean fieldRelative, boolean respectOperatorPerspective) {
+	public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
 		drive(
 			speeds.vxMetersPerSecond,
 			speeds.vyMetersPerSecond,
 			speeds.omegaRadiansPerSecond,
-			fieldRelative,
-			respectOperatorPerspective
+			fieldRelative
 		);
 	}
 
@@ -340,17 +337,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		double xSpeed,
 		double ySpeed,
 		double thetaSpeed,
-		boolean fieldRelative,
-		boolean respectOperatorPerspective) {
-
-		if (respectOperatorPerspective) {
-			if (DriverStation.getAlliance().isPresent()
-				&& DriverStation.getAlliance().get() == Alliance.Red
-				&& fieldRelative) {
-				xSpeed *= -1;
-				ySpeed *= -1;
-			}
-		}
+		boolean fieldRelative) {
 
 		ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed);
 
@@ -374,14 +361,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	public void alignToAngleRobotRelative(boolean lockDrive) {
 		double response = thetaController.calculate(getWrappedHeading().getRadians());
 		if (lockDrive) {
-			drive(0, 0, response, false, true); // perspective doesn't matter in robot relative
+			drive(0, 0, response, false); // perspective doesn't matter in robot relative
 		} else {
 			drive(
 				getForwardVelocityFromController(),
 				getStrafeVelocityFromController(),
 				response,
-				false,
-				true
+				false
 			);
 		}
 	}
@@ -394,13 +380,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	public void alignToAngleFieldRelative(boolean lockDrive) {
 		double response = thetaController.calculate(getWrappedHeading().getRadians());
 		if (lockDrive) {
-			drive(0, 0, response, true, true);
+			drive(0, 0, response, true);
 		} else {
 			drive(
 				getForwardVelocityFromController(),
 				getStrafeVelocityFromController(),
 				response,
-				true,
 				true
 			);
 		}
@@ -430,6 +415,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 	public void zeroGyro() {
 		resetRotation(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)));
+	}
+
+	public Command setMaxSpeedsCommand(LinearVelocity maxSpeed, AngularVelocity maxRotSpeed) {
+		return Commands.runOnce(() -> {
+			MAX_SPEED = maxSpeed;
+			MAX_ANGULAR_SPEED = maxRotSpeed;
+		});
 	}
 
 	public Command driveJoystickInputCommand() {
@@ -480,7 +472,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	}
 
 	public Command stopCommand() {
-		return Commands.runOnce(() -> drive(0, 0, 0, false, false));
+		return Commands.runOnce(() -> drive(0, 0, 0, false));
 	}
 
 	@Override
@@ -491,13 +483,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		fieldRelative = !RobotContainer.driverController.L2().getAsBoolean();
 		isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
-		if(logCounter % loopsPerLog == 0) {
-			Logger.recordOutput("Drive/FieldRelative", fieldRelative);
-			Logger.recordOutput("Drive/odometryHeading", odometryHeading);
-			Logger.recordOutput("Drive/odometryPose", getRobotPose());
-			Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
-			Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
-		}
+		Logger.recordOutput("Drive/FieldRelative", fieldRelative);
+		Logger.recordOutput("Drive/odometryHeading", odometryHeading);
+		Logger.recordOutput("Drive/odometryPose", getRobotPose());
+		Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
+		Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
+		Logger.recordOutput("Drive/Speed", getFieldRelativeLinearVelocity().in(MetersPerSecond));
+
 		/*
 		* Periodically try to apply the operator perspective.
 		* If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
@@ -507,24 +499,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		*/
 
 		if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
-		DriverStation.getAlliance()
-			.ifPresent(
-				allianceColor -> {
-					setOperatorPerspectiveForward(
-						allianceColor == Alliance.Red
-							? kRedAlliancePerspectiveRotation
-							: kBlueAlliancePerspectiveRotation);
-					m_hasAppliedOperatorPerspective = true;
-				});
+			DriverStation.getAlliance()
+				.ifPresent(
+					allianceColor -> {
+						setOperatorPerspectiveForward(
+							allianceColor == Alliance.Red
+								? kRedAlliancePerspectiveRotation
+								: kBlueAlliancePerspectiveRotation);
+						m_hasAppliedOperatorPerspective = true;
+					}
+				);
 		}
 
-		DogLog.log("BatteryVoltage", RobotController.getBatteryVoltage());
+		// DogLog.log("BatteryVoltage", RobotController.getBatteryVoltage());
 
-		if (mapleSimSwerveDrivetrain != null) {
-		DogLog.log(
-			"Drive/SimulationPose",
-			mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose());
-		}
+		// if (mapleSimSwerveDrivetrain != null) {
+		// DogLog.log(
+		// 	"Drive/SimulationPose",
+		// 	mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose());
+		// }
 	}
 
 	public MapleSimSwerveDrivetrain mapleSimSwerveDrivetrain = null;

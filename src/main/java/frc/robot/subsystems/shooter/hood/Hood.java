@@ -13,6 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -29,14 +30,14 @@ public class Hood extends SubsystemBase {
 
     private ArmFeedforward feedforward;
 
-	private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Hood/kP", SLOT0_CONFIGS.kP);
-    private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Hood/kD", SLOT0_CONFIGS.kD);
-    private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Hood/kS", SLOT0_CONFIGS.kS);
-    private final LoggedTunableNumber tunableKG = new LoggedTunableNumber("Hood/kG", SLOT0_CONFIGS.kG);
+	// private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Hood/kP", SLOT0_CONFIGS.kP);
+    // private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Hood/kD", SLOT0_CONFIGS.kD);
+    // private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Hood/kS", SLOT0_CONFIGS.kS);
+    // private final LoggedTunableNumber tunableKG = new LoggedTunableNumber("Hood/kG", SLOT0_CONFIGS.kG);
 
-	private final LoggedTunableNumber tunableMotionMagicCruiseVelocity = new LoggedTunableNumber("Hood/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity);
-	private final LoggedTunableNumber tunableMotionMagicAcceleration = new LoggedTunableNumber("Hood/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration);
-	private final LoggedTunableNumber tunableMotionMagicJerk = new LoggedTunableNumber("Hood/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk);
+	// private final LoggedTunableNumber tunableMotionMagicCruiseVelocity = new LoggedTunableNumber("Hood/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity);
+	// private final LoggedTunableNumber tunableMotionMagicAcceleration = new LoggedTunableNumber("Hood/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration);
+	// private final LoggedTunableNumber tunableMotionMagicJerk = new LoggedTunableNumber("Hood/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk);
 
 	public final LoggedTunableNumber tunableHoodAngle = new LoggedTunableNumber("Hood/Tunable Hood Angle", 0);
 
@@ -46,7 +47,7 @@ public class Hood extends SubsystemBase {
     public Hood(HoodIO io) {
         this.io = io;
         feedforward = new ArmFeedforward(kS, kG, 0);
-		loopsPerLog = RobotContainer.SHOOTER_DEBUG ? 1 : 5;
+		loopsPerLog = RobotContainer.HOOD_DEBUG ? 1 : 5;
     }
 
 	public void periodic() {
@@ -58,12 +59,12 @@ public class Hood extends SubsystemBase {
 			Logger.processInputs("Hood", inputs);
 		}
 
-		if(RobotContainer.SHOOTER_DEBUG) {
-			visualization.update();
-			visualization.log();
-		}
+		visualization.update();
+		visualization.log();
 
-        updateTunables();
+		if(RobotContainer.HOOD_DEBUG || RobotBase.isSimulation()) {
+			updateTunables();
+		}
 	}
 
     public Angle getAngle() {
@@ -96,23 +97,22 @@ public class Hood extends SubsystemBase {
 	}
 
     public void updateTunables() {
-		if(tunableKP.hasChanged(hashCode())
-                || tunableKD.hasChanged(hashCode())
-                || tunableKS.hasChanged(hashCode())
-                || tunableKG.hasChanged(hashCode())) {
-            io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get(), tunableKG.get());
-        }
+		// if(tunableKP.hasChanged(hashCode())
+        //         || tunableKD.hasChanged(hashCode())
+        //         || tunableKS.hasChanged(hashCode())
+        //         || tunableKG.hasChanged(hashCode())) {
+        //     io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get(), tunableKG.get());
+        // }
 
-		if(tunableMotionMagicAcceleration.hasChanged(hashCode())
-				|| tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
-				|| tunableMotionMagicJerk.hasChanged(hashCode())) {
-			io.setMotionMagic(
-				tunableMotionMagicCruiseVelocity.get(),
-				tunableMotionMagicAcceleration.get(),
-				tunableMotionMagicJerk.get()
-			);
-		}
-
+		// if(tunableMotionMagicAcceleration.hasChanged(hashCode())
+		// 		|| tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
+		// 		|| tunableMotionMagicJerk.hasChanged(hashCode())) {
+		// 	io.setMotionMagic(
+		// 		tunableMotionMagicCruiseVelocity.get(),
+		// 		tunableMotionMagicAcceleration.get(),
+		// 		tunableMotionMagicJerk.get()
+		// 	);
+		// }
     }
 
 	public void setNeutralMode(NeutralModeValue value) {

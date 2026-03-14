@@ -30,13 +30,19 @@ public interface TurretIO {
 
     public void updateInputs(TurretIOInputs inputs);
 
-    public void setRobotRelativeAngle(Angle angle);
+    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity);
 
     public void setVoltage(double voltage);
 
     public void stop();
 
+    public void applyFudgeFactor(Angle angle);
+
     public boolean isAtSetpoint();
+
+    public void disable();
+
+    public boolean isAtTimeAdjustedSetpoint();
 
     public void setGains(double kP, double kD, double kS);
 
