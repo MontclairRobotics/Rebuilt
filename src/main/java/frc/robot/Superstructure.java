@@ -69,11 +69,11 @@ public class Superstructure extends SubsystemBase {
 				));
 			ferryLeftTrigger.whileTrue(
 				shooter.setParameters(
-					() -> Aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryRightTrigger.whileTrue(
 				shooter.setParameters(
-					() -> Aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 		}
 	}

@@ -295,17 +295,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	}
 
 	public double getStrafeVelocityFromController() {
-		double xInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.2);
+		double xInput = -MathUtil.applyDeadband(RobotContainer.controller.getLeftX(), 0.2);
 		return MathUtil.copyDirectionPow(xInput, JOYSTICK_INPUT_GAIN) * MAX_SPEED.in(MetersPerSecond);
 	}
 
 	public double getForwardVelocityFromController() {
-		double yInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.2);
+		double yInput = -MathUtil.applyDeadband(RobotContainer.controller.getLeftY(), 0.2);
 		return MathUtil.copyDirectionPow(yInput, JOYSTICK_INPUT_GAIN) * MAX_SPEED.in(MetersPerSecond);
 	}
 
 	public double getOmegaVelocityFromController() {
-		double rotInput = -MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.2);
+		double rotInput = -MathUtil.applyDeadband(RobotContainer.controller.getRightX(), 0.2);
 		return MathUtil.copyDirectionPow(rotInput, JOYSTICK_INPUT_ROT_GAIN) * MAX_ANGULAR_SPEED.in(RadiansPerSecond);
 	}
 
@@ -480,7 +480,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		logCounter++;
 
 		odometryHeading = this.getState().Pose.getRotation();
-		fieldRelative = !RobotContainer.driverController.L2().getAsBoolean();
+		fieldRelative = !RobotContainer.controller.L2().getAsBoolean();
 		isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
 		Logger.recordOutput("Drive/FieldRelative", fieldRelative);

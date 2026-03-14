@@ -19,6 +19,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -157,6 +159,7 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void teleopInit() {
 
+		RobotContainer.drivetrain.resetPose(new Pose2d(new Translation2d(3.6, 4.035), new Rotation2d()));
 		RobotContainer.shouldShootAuto = false;
 
 		// brake mode

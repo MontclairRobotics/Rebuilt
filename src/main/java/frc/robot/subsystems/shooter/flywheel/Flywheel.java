@@ -112,7 +112,7 @@ public class Flywheel extends SubsystemBase {
     }
 
     public void applyJoystickInput() {
-        double input = -MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
+        double input = -MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.controller.getRightY(), 0.1), 1.5);
         double voltage = input * RobotController.getBatteryVoltage();
         io.setVoltage(voltage);
     }

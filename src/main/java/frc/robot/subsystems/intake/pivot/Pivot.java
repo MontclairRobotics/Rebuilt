@@ -49,7 +49,7 @@ public class Pivot extends SubsystemBase {
 	}
 
 	public void joystickControl() {
-		double voltage = MathUtil.copyDirectionPow(MathUtil.applyDeadband(-RobotContainer.driverController.getRightY(), 0.04), 1.5) * 12;
+		double voltage = MathUtil.copyDirectionPow(MathUtil.applyDeadband(-RobotContainer.controller.getRightY(), 0.04), 1.5) * 12;
 		io.setVoltage(voltage);
 	}
 
