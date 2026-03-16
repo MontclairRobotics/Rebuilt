@@ -79,13 +79,13 @@ public class Superstructure extends SubsystemBase {
 	}
 
 	public final Trigger scoringModeTrigger =
-			new Trigger(() -> DriverStation.isEnabled() && shouldBeScoringBasedOnZones() && RobotContainer.shootTrigger.getAsBoolean());
+			new Trigger(() -> (RobotContainer.shouldShootAuto || RobotContainer.shootButtonTrigger.getAsBoolean()) && DriverStation.isEnabled() && shouldBeScoringBasedOnZones());
 
 	public final Trigger ferryLeftTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryLeft()).and(RobotContainer.shootTrigger);
+			new Trigger(() -> (RobotContainer.shouldShootAuto || RobotContainer.shootButtonTrigger.getAsBoolean()) && DriverStation.isTeleopEnabled() && shouldFerryLeft());
 
 	public final Trigger ferryRightTrigger =
-			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryRight()).and(RobotContainer.shootTrigger);
+			new Trigger(() -> (RobotContainer.shouldShootAuto || RobotContainer.shootButtonTrigger.getAsBoolean()) && DriverStation.isTeleopEnabled() && shouldFerryRight());
 
 	public final Trigger shouldStowTrigger =
 			new Trigger(() -> DriverStation.isEnabled() && inTrenchDangerZone());

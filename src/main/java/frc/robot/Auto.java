@@ -527,7 +527,7 @@ public class Auto extends SubsystemBase {
 	public void periodic() {
 
 		Logger.recordOutput("Auto/Should Shoot Auto", RobotContainer.shouldShootAuto);
-		Logger.recordOutput("Auto/shootTrigger", RobotContainer.shootTrigger.getAsBoolean());
+		Logger.recordOutput("Auto/shootButtonTrigger", RobotContainer.shootButtonTrigger.getAsBoolean());
 
 		if(DriverStation.isDisabled()) {
 			String str = stringEnt.get();

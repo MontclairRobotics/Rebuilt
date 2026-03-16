@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
 import static edu.wpi.first.units.Units.Degrees;
@@ -130,7 +129,7 @@ public class RobotContainer {
 
 	public static boolean shouldShootAuto = false;
 
-	public static Trigger shootTrigger = operatorController.circle().or(() -> shouldShootAuto);
+	public static Trigger shootButtonTrigger = operatorController.circle();
 	public LoggedTunableNumber indexerCurrent = new LoggedTunableNumber("Spindexer/Index Current", 0);
 	public LoggedTunableNumber serializerCurrent = new LoggedTunableNumber("Spindexer/Serializer Current", 0);
 
@@ -315,9 +314,6 @@ public class RobotContainer {
 	}
 
 	private void configureBindings() {
-
-		// driver
-		shootTrigger = operatorController.circle().or(() -> DriverStation.isAutonomous());
 
 		driverController.povRight().whileTrue(new WheelRadiusCharacterization(Direction.CLOCKWISE, drivetrain));
 		driverController.povLeft().whileTrue(new WheelRadiusCharacterization(Direction.COUNTER_CLOCKWISE, drivetrain));
