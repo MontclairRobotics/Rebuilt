@@ -40,8 +40,8 @@ public class TurretConstants {
 	public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the canivore
 
 	// constraints
-	public static final Angle MIN_ANGLE = Rotations.of(-0.475);
-	public static final Angle MAX_ANGLE = Rotations.of(0.475);
+	public static final Angle MIN_ANGLE = Rotations.of(-0.51);
+	public static final Angle MAX_ANGLE = Rotations.of(0.51);
 	public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(4);
 	public static final AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(60);
 

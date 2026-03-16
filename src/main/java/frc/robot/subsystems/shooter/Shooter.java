@@ -65,6 +65,7 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
+        Logger.recordOutput("Shooter/At Setpoint", RobotContainer.shooter.atSetpoint());
         // Logger.recordOutput("Fuel/Hopper Count", hopperCount);
         // Logger.recordOutput("Fuel/Blue Score", Hub.BLUE_HUB.getScore());
         // Logger.recordOutput("Fuel/Red Score", Hub.RED_HUB.getScore());
@@ -115,7 +116,7 @@ public class Shooter extends SubsystemBase {
 	}
 
     public boolean atSetpoint() {
-        return hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation());
+        return turret.atSetpoint() && hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation());
     }
 
     public Command setParameters(Supplier<ShootingParameters> paramsSupplier) {

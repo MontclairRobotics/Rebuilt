@@ -34,14 +34,13 @@ import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.pivot.Pivot;
 import frc.robot.subsystems.intake.pivot.PivotIOSim;
-import frc.robot.subsystems.intake.pivot.PivotIOTalonFX;
 import frc.robot.subsystems.intake.rollers.Rollers;
 import frc.robot.subsystems.intake.rollers.RollersIOSim;
-import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.Indexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.IndexerIOSim;
@@ -51,8 +50,10 @@ import frc.robot.subsystems.shooter.spindexer.serializer.SerializerIOSim;
 import frc.robot.subsystems.shooter.spindexer.serializer.SerializerIOTalonFX;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
+import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
+import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -116,7 +117,7 @@ public class RobotContainer {
 	// debug, set to true to increase logging, set to false to increase performance and reduce loop overruns
 	public static boolean VISION_DEBUG = false;
 	public static boolean TURRET_DEBUG = false;
-	public static boolean FLYWHEEL_DEBUG = false;
+	public static boolean FLYWHEEL_DEBUG = true;
 	public static boolean HOOD_DEBUG  = false;
 	public static boolean INDEXER_DEBUG = false;
 	public static boolean SERIALIZER_DEBUG = false;
@@ -146,9 +147,9 @@ public class RobotContainer {
 			case REAL:
 				drivetrain = TunerConstants.createDrivetrain();
 
-				hood = new Hood(new HoodIOSim());
-				flywheel = new Flywheel(new FlywheelIOSim());
-				turret = new Turret(new TurretIOSim());
+				hood = new Hood(new HoodIOTalonFX());
+				flywheel = new Flywheel(new FlywheelIOTalonFX());
+				turret = new Turret(new TurretIOTalonFX());
 
 				serializer = new Serializer(new SerializerIOTalonFX());
 				indexer = new Indexer(new IndexerIOTalonFX());
@@ -162,8 +163,8 @@ public class RobotContainer {
 				superstructure = new Superstructure(shooter);
 				aiming = new Aiming(turret);
 
-				pivot = new Pivot(new PivotIOTalonFX());
-				rollers = new Rollers(new RollersIOTalonFX());
+				pivot = new Pivot(new PivotIOSim());
+				rollers = new Rollers(new RollersIOSim());
 				intake = new Intake(pivot, rollers);
 
 				auto = new Auto();
@@ -171,7 +172,7 @@ public class RobotContainer {
 				vision = new Vision(
 					drivetrain::addVisionMeasurement,
 					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
-					// new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
+					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
 					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
 				);
 
