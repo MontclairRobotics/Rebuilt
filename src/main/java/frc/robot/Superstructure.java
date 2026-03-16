@@ -79,7 +79,7 @@ public class Superstructure extends SubsystemBase {
 	}
 
 	public final Trigger scoringModeTrigger =
-			new Trigger(() -> DriverStation.isEnabled() && shouldBeScoring()).and(() -> RobotContainer.shootTrigger.getAsBoolean());
+			new Trigger(() -> DriverStation.isEnabled() && shouldBeScoringBasedOnZones() && RobotContainer.shootTrigger.getAsBoolean());
 
 	public final Trigger ferryLeftTrigger =
 			new Trigger(() -> DriverStation.isTeleopEnabled() && shouldFerryLeft()).and(RobotContainer.shootTrigger);
@@ -185,7 +185,7 @@ public class Superstructure extends SubsystemBase {
 			);
     }
 
-    public boolean shouldBeScoring() {
+    public boolean shouldBeScoringBasedOnZones() {
 		//for now
 		// if(!AllianceManager.isAllianceKnown() || (HubTracker.getCurrentShift().isEmpty())) return false;
 

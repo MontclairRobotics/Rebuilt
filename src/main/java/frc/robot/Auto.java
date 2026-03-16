@@ -220,8 +220,8 @@ public class Auto extends SubsystemBase {
 			Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
 
 			return new SequentialCommandGroup(
-				Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-				RobotContainer.shooter.startShootingInAuto()
+				Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain)
+				// RobotContainer.shooter.startShootingInAuto()
 			);
 		} else if(autoString.equals("1")) {
 			try {
@@ -243,8 +243,8 @@ public class Auto extends SubsystemBase {
 				Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
 
 				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					RobotContainer.shooter.startShootingInAuto()
+					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain)
+					// RobotContainer.shooter.startShootingInAuto()
 				);
 			}
 
@@ -269,8 +269,8 @@ public class Auto extends SubsystemBase {
 				Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
 
 				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					RobotContainer.shooter.startShootingInAuto()
+					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain)
+					// RobotContainer.shooter.startShootingInAuto()
 				);
 			}
 
@@ -295,8 +295,8 @@ public class Auto extends SubsystemBase {
 				Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
 
 				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					RobotContainer.shooter.startShootingInAuto()
+					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain)
+					// RobotContainer.shooter.startShootingInAuto()
 				);
 			}
 
@@ -321,8 +321,8 @@ public class Auto extends SubsystemBase {
 				Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
 
 				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					RobotContainer.shooter.startShootingInAuto()
+					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain)
+					// RobotContainer.shooter.startShootingInAuto()
 				);
 			}
 
@@ -527,6 +527,7 @@ public class Auto extends SubsystemBase {
 	public void periodic() {
 
 		Logger.recordOutput("Auto/Should Shoot Auto", RobotContainer.shouldShootAuto);
+		Logger.recordOutput("Auto/shootTrigger", RobotContainer.shootTrigger.getAsBoolean());
 
 		if(DriverStation.isDisabled()) {
 			String str = stringEnt.get();
