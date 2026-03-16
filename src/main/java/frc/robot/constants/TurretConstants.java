@@ -60,7 +60,7 @@ public class TurretConstants {
 	public static final Angle ENCODER_OFFSET = Rotations.of(-0.367432);
 
 	// pid + ff gains
-	public static final double kP = 55.0555;
+	public static final double kP = 45.0555;
 	public static final double kD = 0.00555;
 	public static final double kS = 1;
 

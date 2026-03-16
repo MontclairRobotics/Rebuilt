@@ -441,15 +441,9 @@ public class Auto extends SubsystemBase {
 				(currentPos == 'L' || currentPos == 'R')
 				&& currentPos == autoString.charAt(i)
 				|| ((autoString.charAt(i+1) == '0') && (currentPos == 'D' || currentPos == 'O'))) {
-				// followPathCommands.addCommands(
-				// 	Commands.deadline(
-				// 		Commands.waitSeconds(timeToEmptyFuel),
-				// 		RobotContainer.shooter.setParameters(() -> Aiming.calculateShot(TargetLocation.HUB, false, true))
-				// 	),
-				// 	RobotContainer.shooter.stowCommand().withTimeout(1)
-				// );
+				
 				followPathCommands.addCommands(Commands.waitSeconds(timeToEmptyFuel));
-				// followPathCommands.addCommands(RobotContainer.hood.setAngleCommand(HoodConstants.MIN_ANGLE));
+
 			}
 			try {
 				PathPlannerPath path = PathPlannerPath.fromPathFile(pathString);
@@ -531,6 +525,9 @@ public class Auto extends SubsystemBase {
     }
 
 	public void periodic() {
+
+		Logger.recordOutput("Auto/Should Shoot Auto", RobotContainer.shouldShootAuto);
+		
 		if(DriverStation.isDisabled()) {
 			String str = stringEnt.get();
 			SmartDashboard.putData(field);
