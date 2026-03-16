@@ -441,7 +441,7 @@ public class Auto extends SubsystemBase {
 				(currentPos == 'L' || currentPos == 'R')
 				&& currentPos == autoString.charAt(i)
 				|| ((autoString.charAt(i+1) == '0') && (currentPos == 'D' || currentPos == 'O'))) {
-				
+
 				followPathCommands.addCommands(Commands.waitSeconds(timeToEmptyFuel));
 
 			}
@@ -527,7 +527,7 @@ public class Auto extends SubsystemBase {
 	public void periodic() {
 
 		Logger.recordOutput("Auto/Should Shoot Auto", RobotContainer.shouldShootAuto);
-		
+
 		if(DriverStation.isDisabled()) {
 			String str = stringEnt.get();
 			SmartDashboard.putData(field);

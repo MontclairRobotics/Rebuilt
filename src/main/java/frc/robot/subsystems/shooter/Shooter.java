@@ -160,7 +160,7 @@ public class Shooter extends SubsystemBase {
 
 
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
-        Logger.recordOutput("Shooter/At Setpoint", RobotContainer.shooter.atSetpoint());
+        // Logger.recordOutput("Shooter/At Setpoint", RobotContainer.shooter.atSetpoint());
         if (RobotContainer.shooter.atSetpoint() && RobotContainer.shootTrigger.getAsBoolean()) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
@@ -169,7 +169,7 @@ public class Shooter extends SubsystemBase {
                 lastSimShotTime = currentTime;
                 removeBall();
 
-                LinearVelocity exitVelocity = velocitySupplier.get().times(1 + ((Math.random() * 0.1)-0.05));
+                LinearVelocity exitVelocity = velocitySupplier.get().times(1 + ((Math.random() * 0.05)-0.025));
                 Angle robotRelativeTurretAngle = RobotContainer.turret.getRobotRelativeAngle();
                 Angle hoodAngle = RobotContainer.hood.getAngle();
 
@@ -180,7 +180,7 @@ public class Shooter extends SubsystemBase {
                 RobotContainer.fuelSim.launchFuel(
                     exitVelocity,
                     Degrees.of(90).plus(hoodAngle),
-                    robotRelativeTurretAngle.plus(Radians.of(RobotContainer.drivetrain.getWrappedHeading().getRadians())).minus(Rotations.of(0.125)),
+                    robotRelativeTurretAngle.plus(Radians.of(RobotContainer.drivetrain.getWrappedHeading().getRadians())).minus(Rotations.of(0)),
                     TurretConstants.ORIGIN_TO_TURRET.getMeasureZ()
                 );
             }
