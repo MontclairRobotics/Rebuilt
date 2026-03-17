@@ -58,10 +58,12 @@ public class RollersIOSim implements RollersIO {
 
 	@Override
 	public void setVelocity(AngularVelocity targetVelocity) {
+
 		double pidOutput = pidController.calculate(
             RadiansPerSecond.of(sim.getAngularVelocityRadPerSec()).in(RotationsPerSecond),
             targetVelocity.in(RotationsPerSecond)
         );
+
 		double ffOutput = feedforward.calculate(targetVelocity.in(RotationsPerSecond));
 		double totalOutput = pidOutput + ffOutput;
         appliedVoltage = MathUtil.clamp(totalOutput, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
