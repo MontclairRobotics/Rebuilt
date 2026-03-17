@@ -3,17 +3,17 @@ package frc.robot.subsystems.intake.rollers;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.RollersConstants.*;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
 
 public class Rollers extends SubsystemBase {
 
@@ -34,11 +34,13 @@ public class Rollers extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// logCounter++;
-		// if(logCounter % loopsPerLog == 0) {
-		// 	io.updateInputs(inputs);
-		// 	Logger.processInputs("Rollers", inputs);
-		// }
+		logCounter++;
+
+		io.updateInputs(inputs);
+
+		if(logCounter % loopsPerLog == 0) {
+			Logger.processInputs("Rollers", inputs);
+		}
 	}
 
 	public void setVelocity(AngularVelocity velocity) {
@@ -49,17 +51,10 @@ public class Rollers extends SubsystemBase {
 		io.setVelocity(targetVelocitySupplier.get());
 	}
 
-	public void spinUp() {
-		setVelocity(SPIN_VELOCITY);
-	}
-
-	public void spinDown() {
-		setVelocity(RotationsPerSecond.zero());
-	}
-
-	public void applyJoystickInput() {
+	public void applyJoystickInput() { //Unused open loop
         double input = -MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
-        double voltage = input * RobotController.getBatteryVoltage();
+        double voltage = input * 12;
+
         io.setVoltage(voltage);
     }
 
@@ -72,14 +67,14 @@ public class Rollers extends SubsystemBase {
 	}
 
 	public Command setVoltageCommand(DoubleSupplier voltage) {
-		return Commands.run(() -> io.setVoltage(voltage.getAsDouble()), this);
+		return setVoltageCommand(voltage.getAsDouble());
 	}
 
 	public Command setVoltageCommand(double voltage) {
 		return Commands.run(() -> io.setVoltage(voltage), this);
 	}
 
-    public Command joystickControlCommand() {
+    public Command joystickControlCommand() { //Unused
         return Commands.run(() -> applyJoystickInput(), this);
     }
 }

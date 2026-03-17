@@ -298,7 +298,7 @@ public class RobotContainer {
 		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
 
-		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(10))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
+		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.spinUpCommand())).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
 		operatorController.L2().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
 		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
@@ -355,7 +355,7 @@ public class RobotContainer {
 		// 	.onFalse(rollers.setVoltageCommand(() -> 0));
 
 		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
-		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(turretFudge))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
+		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.spinUpCommand())).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
 		// operatorController.square().whileTrue(pivot.goToAngleCommand(PivotConstants.MAX_ANGLE.div(2))).onFalse(pivot.stopCommand());
 
 

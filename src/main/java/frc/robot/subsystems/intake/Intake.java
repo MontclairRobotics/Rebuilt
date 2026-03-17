@@ -27,7 +27,7 @@ public class Intake {
         .finallyDo(() -> pivot.stopCommand());
     }
 
-    public Command stopCommand() {
+    public Command stopCommand() { //unused
         return Commands.parallel(
             rollers.spinDownCommand(),
             pivot.stopCommand()
