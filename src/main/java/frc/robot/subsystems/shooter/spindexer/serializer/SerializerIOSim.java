@@ -84,7 +84,6 @@ public class SerializerIOSim implements SerializerIO {
 
 	@Override
 	public void setCurrent(double currentDrawAmps) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'setCurrent'");
+		//not necessary
 	}
 }
