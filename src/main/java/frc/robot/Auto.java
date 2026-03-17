@@ -53,9 +53,6 @@ public class Auto extends SubsystemBase {
 	private boolean prevYeet;
 	private boolean yeet;
 
-	private boolean shouldShootPreloaded;
-	private boolean prevShouldShootPreloaded;
-
 	NetworkTableInstance inst = NetworkTableInstance.getDefault();
 	NetworkTable auto = inst.getTable("Auto");
 
@@ -64,9 +61,6 @@ public class Auto extends SubsystemBase {
 
 	BooleanTopic yeetTopic = auto.getBooleanTopic("Yeet?");
 	BooleanEntry yeetEntry = yeetTopic.getEntry(false);
-
-	BooleanTopic shouldShootPreloadedTopic = auto.getBooleanTopic("Shooting preloaded?");
-	BooleanEntry shouldShootPreloadedEntry = shouldShootPreloadedTopic.getEntry(false);
 
 	StringTopic feedbackTopic = auto.getStringTopic("Auto Feedback");
 	StringPublisher feedbackPub = feedbackTopic.publish();
@@ -86,8 +80,6 @@ public class Auto extends SubsystemBase {
 		stringEnt.set("");
 		yeetTopic.setRetained(true);
 		yeetEntry.set(false);
-		shouldShootPreloadedTopic.setRetained(true);
-		shouldShootPreloadedEntry.set(false);
 		feedbackTopic.setRetained(true);
 		feedbackPub.set("Enter auto string");
 		SmartDashboard.putData("Field", field);
@@ -224,29 +216,13 @@ public class Auto extends SubsystemBase {
 	}
 
 	public Command buildYeetAuto(String autoString) {
-
-		SequentialCommandGroup shootPreloadedCommand = new SequentialCommandGroup();
-
-		if(shouldShootPreloaded) {
-			shootPreloadedCommand.addCommands(
-				RobotContainer.shooter.startShootingInAuto(),
-				Commands.waitSeconds(2.5),
-				RobotContainer.shooter.stopShootingInAuto()
-			);
-		} else {
-			shootPreloadedCommand.addCommands(
-				Commands.none()
-			);
-		}
-
 		if(autoString.equals("0")) {
 			Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
 
 			return new SequentialCommandGroup(
-				Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-				shootPreloadedCommand
+				Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain)
+				// RobotContainer.shooter.startShootingInAuto()
 			);
-
 		} else if(autoString.equals("1")) {
 			try {
 				PathPlannerPath path = PathPlannerPath.fromPathFile("1");
@@ -256,7 +232,6 @@ public class Auto extends SubsystemBase {
 
 				return new SequentialCommandGroup(
 					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					shootPreloadedCommand,
 					AutoBuilder.followPath(path),
 					Commands.run(
 						() -> RobotContainer.drivetrain.drive(0, 0, 6, false)
@@ -268,8 +243,8 @@ public class Auto extends SubsystemBase {
 				Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
 
 				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					shootPreloadedCommand
+					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain)
+					// RobotContainer.shooter.startShootingInAuto()
 				);
 			}
 
@@ -283,7 +258,6 @@ public class Auto extends SubsystemBase {
 
 				return new SequentialCommandGroup(
 					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					shootPreloadedCommand,
 					AutoBuilder.followPath(path),
 					Commands.run(
 						() -> RobotContainer.drivetrain.drive(0, 0, 6, false)
@@ -295,8 +269,8 @@ public class Auto extends SubsystemBase {
 				Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
 
 				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					shootPreloadedCommand
+					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain)
+					// RobotContainer.shooter.startShootingInAuto()
 				);
 			}
 
@@ -310,7 +284,6 @@ public class Auto extends SubsystemBase {
 
 				return new SequentialCommandGroup(
 					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					shootPreloadedCommand,
 					AutoBuilder.followPath(path),
 					Commands.run(
 						() -> RobotContainer.drivetrain.drive(0, 0, 6, false)
@@ -322,8 +295,8 @@ public class Auto extends SubsystemBase {
 				Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
 
 				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					shootPreloadedCommand
+					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain)
+					// RobotContainer.shooter.startShootingInAuto()
 				);
 			}
 
@@ -337,7 +310,6 @@ public class Auto extends SubsystemBase {
 
 				return new SequentialCommandGroup(
 					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					shootPreloadedCommand,
 					AutoBuilder.followPath(path),
 					Commands.run(
 						() -> RobotContainer.drivetrain.drive(0, 0, 6, false)
@@ -349,8 +321,8 @@ public class Auto extends SubsystemBase {
 				Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
 
 				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					shootPreloadedCommand
+					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain)
+					// RobotContainer.shooter.startShootingInAuto()
 				);
 			}
 
@@ -439,8 +411,6 @@ public class Auto extends SubsystemBase {
 
 		SequentialCommandGroup followPathCommands = new SequentialCommandGroup();
 
-		Command resetPoseCommand;
-
 		currentPos = autoString.charAt(1);
 
 		try {
@@ -450,9 +420,8 @@ public class Auto extends SubsystemBase {
 			Optional<Pose2d>  opPose = firstPath.getStartingHolonomicPose();
 			Pose2d pose = opPose.isPresent() ? PoseUtils.flipPoseAlliance(opPose.get()) : new Pose2d();
 
-			resetPoseCommand = Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain);
-
 			followPathCommands.addCommands(
+				Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
 				AutoBuilder.followPath(firstPath)
 			);
 			try {
@@ -462,7 +431,6 @@ public class Auto extends SubsystemBase {
 			}
 		} catch(Exception e) {
 			setFeedback("Unknown error with the first path", NotificationLevel.ERROR);
-			resetPoseCommand = Commands.none();
 		}
 
 		for (int i = 3; i < autoString.length(); i += 2) {
@@ -504,26 +472,9 @@ public class Auto extends SubsystemBase {
 				Commands.none()
 			);
 		}
-
-		SequentialCommandGroup shootPreloadedCommand = new SequentialCommandGroup();
-
-		if(shouldShootPreloaded) {
-			shootPreloadedCommand.addCommands(
-				RobotContainer.shooter.startShootingInAuto(),
-				Commands.waitSeconds(2.5),
-				RobotContainer.shooter.stopShootingInAuto()
-			);
-		} else {
-			shootPreloadedCommand.addCommands(
-				Commands.none()
-			);
-		}
-
 		if(AllianceManager.getAlliance() == DriverStation.Alliance.Blue) {
 			autoCommand.addCommands(
 				pivotCommandGroup,
-				resetPoseCommand,
-				shootPreloadedCommand,
 				Commands.parallel(
 					Commands.waitSeconds(3).andThen(RobotContainer.shooter.startShootingInAuto()),
 					followPathCommands,
@@ -534,8 +485,6 @@ public class Auto extends SubsystemBase {
 		} else {
 			autoCommand.addCommands(
 				pivotCommandGroup,
-				resetPoseCommand,
-				shootPreloadedCommand,
 				Commands.parallel(
 					Commands.waitSeconds(3).andThen(RobotContainer.shooter.startShootingInAuto()),
 					followPathCommands,
@@ -585,7 +534,6 @@ public class Auto extends SubsystemBase {
 			SmartDashboard.putData(field);
 
 			yeet = yeetEntry.get();
-			shouldShootPreloaded = shouldShootPreloadedEntry.get();
 
 			String autoString = "";
 			Optional<Alliance> alliance = DriverStation.getAlliance();
@@ -596,9 +544,8 @@ public class Auto extends SubsystemBase {
                 }
             }
 
-			if(!autoString.equals(prevAutoString) || yeet != prevYeet || shouldShootPreloaded != prevShouldShootPreloaded) {
+			if(!autoString.equals(prevAutoString) || yeet != prevYeet) {
 				prevAutoString = autoString;
-				prevShouldShootPreloaded = shouldShootPreloaded;
 				prevYeet = yeet;
 				validateAndCreatePaths(autoString, yeet);
 				Logger.recordOutput("Auto/Auto String", autoString);

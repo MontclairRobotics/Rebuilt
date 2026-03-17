@@ -10,9 +10,11 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Time;
 
 public class AimingConstants {
 
@@ -51,25 +53,25 @@ public class AimingConstants {
 	public static final InterpolatingTreeMap<Double, ShotSettings> REAL_MAP =
 		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShotSettings::interpolate);
 
-	public static final InterpolatingDoubleTreeMap REAL_TIME_MAP =
+	public static final InterpolatingDoubleTreeMap REAL_TIME_MAP = 
 		new InterpolatingDoubleTreeMap();
 
 	public static final InterpolatingTreeMap<Double, ShotSettings> REAL_FERRY_MAP =
 		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShotSettings::interpolate);
 
-	public static final InterpolatingDoubleTreeMap REAL_FERRY_TIME_MAP =
+	public static final InterpolatingDoubleTreeMap REAL_FERRY_TIME_MAP = 
 		new InterpolatingDoubleTreeMap();
 
 	public static final InterpolatingTreeMap<Double, SimShotSettings> SIM_MAP =
 		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), SimShotSettings::interpolate);
 
-	public static final InterpolatingDoubleTreeMap SIM_TIME_MAP =
+	public static final InterpolatingDoubleTreeMap SIM_TIME_MAP = 
 		new InterpolatingDoubleTreeMap();
 
 	public static final InterpolatingTreeMap<Double, SimShotSettings> SIM_FERRY_MAP =
 		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), SimShotSettings::interpolate);
 
-	public static final InterpolatingDoubleTreeMap SIM_FERRY_TIME_MAP =
+	public static final InterpolatingDoubleTreeMap SIM_FERRY_TIME_MAP = 
 		new InterpolatingDoubleTreeMap();
 
 	static {
@@ -78,13 +80,13 @@ public class AimingConstants {
 
 		// fake start point, avoids code crashes
 		REAL_MAP.put(0.00, new ShotSettings(Degrees.of(0.0), RotationsPerSecond.of(20)));
-
+		
 		// real data
 		REAL_MAP.put(1.21, new ShotSettings(Degrees.of(0), RotationsPerSecond.of(21.2)));
 		REAL_MAP.put(2.56, new ShotSettings(Degrees.of(9.5), RotationsPerSecond.of(23)));
 		REAL_MAP.put(3.78, new ShotSettings(Degrees.of(16.5), RotationsPerSecond.of(24)));
 		REAL_MAP.put(5.48, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(27)));
-
+		
 		// fake end point, avoids code crashes
 		REAL_MAP.put(7.00, new ShotSettings(Degrees.of(24.5), RotationsPerSecond.of(33)));
 
@@ -106,14 +108,14 @@ public class AimingConstants {
 
 		// fake start point
 		REAL_FERRY_MAP.put(20.0, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(50)));
-
+		
 		// real data
 		REAL_FERRY_MAP.put(9.59, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(40)));
 		REAL_FERRY_MAP.put(8.67, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(37.4)));
 		REAL_FERRY_MAP.put(6.63, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(28.9)));
 		REAL_FERRY_MAP.put(5.15, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(25.5)));
 		REAL_FERRY_MAP.put(3.67, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(22.44)));
-
+		
 		// fake end point
 		REAL_FERRY_MAP.put(0.0, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(15)));
 
@@ -160,7 +162,7 @@ public class AimingConstants {
 		SIM_FERRY_MAP.put(8.666543502404746, new SimShotSettings(Degrees.of(30), MetersPerSecond.of(11)));
 		SIM_FERRY_MAP.put(6.628582671689323, new SimShotSettings(Degrees.of(40), MetersPerSecond.of(8.5)));
 		SIM_FERRY_MAP.put(5.147707889525594, new SimShotSettings(Degrees.of(40), MetersPerSecond.of(7.5)));
-
+	
 		/** SIMULATION FERRY MAP TIME OF FLIGHT VALUES */
 
 		// real data
