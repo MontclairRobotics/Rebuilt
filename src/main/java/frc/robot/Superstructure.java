@@ -195,7 +195,7 @@ public class Superstructure extends SubsystemBase {
         return
 			(AllianceManager.isRed() ?
 				pos.getX() >= PoseUtils.flipTranslationAlliance(new Translation2d(FieldConstants.LinesVertical.HUB_CENTER.in(Meters), 0)).getX()
-        		:
+				:
 				pos.getX() <= FieldConstants.LinesVertical.HUB_CENTER.in(Meters)
 			);
     }
@@ -204,14 +204,13 @@ public class Superstructure extends SubsystemBase {
 		//for now
 		// if(!AllianceManager.isAllianceKnown() || (HubTracker.getCurrentShift().isEmpty())) return false;
 
-		if(!AllianceManager.isAllianceKnown()) return false;
-
-		return !inTrenchDangerZone() && isInScoringZone();
         //Are we in the scoring zone and is the hub active
         // return
 		// 	!inTrenchDangerZone()
         // 	&& isInScoringZone()
         // 	&& HubTracker.isActive(DriverStation.getAlliance().get(), HubTracker.getCurrentShift().get());
+
+		return AllianceManager.isAllianceKnown() ? !inTrenchDangerZone() && isInScoringZone() : false;
 	}
 
 
@@ -263,9 +262,11 @@ public class Superstructure extends SubsystemBase {
                     && robotPose.getX() <= zone[1].getX()
                     && robotPose.getY() >= zone[0].getY()
                     && robotPose.getY() <= zone[1].getY()) {
+
                 return true;
             }
         }
+
         return false;
     }
 
@@ -277,9 +278,11 @@ public class Superstructure extends SubsystemBase {
                     && turretPose.getX() <= zone[1].getX()
                     && turretPose.getY() >= zone[0].getY()
                     && turretPose.getY() <= zone[1].getY()) {
+
                 return true;
             }
         }
+
         return false;
 	}
 
@@ -295,9 +298,11 @@ public class Superstructure extends SubsystemBase {
                     && robotPose.getX() <= zone[1].getX()
                     && robotPose.getY() >= zone[0].getY()
                     && robotPose.getY() <= zone[1].getY()) {
+
                 return true;
             }
         }
+
         return false;
 	}
 
@@ -319,7 +324,6 @@ public class Superstructure extends SubsystemBase {
 			|| (robotPose.getX() > FieldConstants.LinesVertical.OPP_ALLIANCE_ZONE.minus(FieldConstants.Hub.WIDTH.div(2)).minus(Constants.BUMPER_WIDTH).in(Meters)
 			&& RobotContainer.drivetrain.getForwardVelocityFromController() < 0);
 
-		if(AllianceManager.isRed()) return !movingIntoObstacleOnBlue;
-		return movingIntoObstacleOnBlue;
+		return AllianceManager.isRed() ? !movingIntoObstacleOnBlue : movingIntoObstacleOnBlue;
 	}
 }
