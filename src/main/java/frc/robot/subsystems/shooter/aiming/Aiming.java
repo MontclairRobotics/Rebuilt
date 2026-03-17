@@ -2,7 +2,6 @@ package frc.robot.subsystems.shooter.aiming;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
@@ -10,7 +9,6 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.constants.TurretConstants.ORIGIN_TO_TURRET;
 
-import javax.naming.TimeLimitExceededException;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -39,24 +37,19 @@ public class Aiming {
 		Shooter.targetLocation = target;
 		Translation2d targetLocation = target.getLocation();
 		InterpolatingTreeMap<Double, ShotSettings> map;
-		InterpolatingDoubleTreeMap timeMap;
 
 		switch(target) {
 			case HUB:
-				map = AimingConstants.REAL_MAP;
-				timeMap = AimingConstants.REAL_TIME_MAP;
+				map = withConstantVelocity ? AimingConstants.REAL_CONSTANT_VELOCITY_MAP : AimingConstants.REAL_MAP;
 				break;
 			case FERRY_LEFT:
-				map = AimingConstants.REAL_FERRY_MAP;
-				timeMap = AimingConstants.REAL_FERRY_TIME_MAP;
+				map = withConstantVelocity ? AimingConstants.REAL_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.REAL_FERRY_MAP;
 				break;
 			case FERRY_RIGHT:
-				map = AimingConstants.REAL_FERRY_MAP;
-				timeMap = AimingConstants.REAL_FERRY_TIME_MAP;
+				map = withConstantVelocity ? AimingConstants.REAL_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.REAL_FERRY_MAP;
 				break;
 			default:
 				map = AimingConstants.REAL_MAP;
-				timeMap = AimingConstants.REAL_TIME_MAP;
 		}
 
 		Angle robotRelativeTurretAngle;
@@ -82,7 +75,7 @@ public class Aiming {
 
 		Translation2d virtualTarget = targetLocation;
 		double virtualDistance = realDistanceToTarget;
-		double estimatedTOF = timeMap.get(realDistanceToTarget);
+		double estimatedTOF = map.get(realDistanceToTarget).timeOfFlight().in(Seconds);
 
 		if(whileMoving) {
 			for(int i = 0; i < 5; i++) {
@@ -93,7 +86,7 @@ public class Aiming {
 
 				virtualTarget = targetLocation.minus(robotDisplacementDuringShot);
 				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
-				double newTOF = timeMap.get(virtualDistance);
+				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
 
 				if (Math.abs(newTOF - estimatedTOF) < 0.02) break;
 				estimatedTOF = newTOF;
@@ -113,24 +106,19 @@ public class Aiming {
 		Shooter.targetLocation = target;
 		Translation2d targetLocation = target.getLocation();
 		InterpolatingTreeMap<Double, SimShotSettings> map;
-		InterpolatingDoubleTreeMap timeMap;
 
 		switch(target) {
 			case HUB:
-				map = AimingConstants.SIM_MAP;
-				timeMap = AimingConstants.SIM_TIME_MAP;
+				map = withConstantVelocity ? AimingConstants.SIM_CONSTANT_VELOCITY_MAP : AimingConstants.SIM_MAP;
 				break;
 			case FERRY_LEFT:
-				map = AimingConstants.SIM_FERRY_MAP;
-				timeMap = AimingConstants.SIM_FERRY_TIME_MAP;
+				map = withConstantVelocity ? AimingConstants.SIM_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.SIM_FERRY_MAP;
 				break;
 			case FERRY_RIGHT:
-				map = AimingConstants.SIM_FERRY_MAP;
-				timeMap = AimingConstants.SIM_FERRY_TIME_MAP;
+				map = withConstantVelocity ? AimingConstants.SIM_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.SIM_FERRY_MAP;
 				break;
 			default:
 				map = AimingConstants.SIM_MAP;
-				timeMap = AimingConstants.SIM_TIME_MAP;
 		}
 
 		Angle robotRelativeTurretAngle;
@@ -156,7 +144,7 @@ public class Aiming {
 
 		Translation2d virtualTarget = targetLocation;
 		double virtualDistance = realDistanceToTarget;
-		double estimatedTOF = timeMap.get(realDistanceToTarget);
+		double estimatedTOF = map.get(realDistanceToTarget).timeOfFlight().in(Seconds);
 
 		if(whileMoving) {
 			for(int i = 0; i < 5; i++) {
@@ -167,7 +155,7 @@ public class Aiming {
 
 				virtualTarget = targetLocation.minus(robotDisplacementDuringShot);
 				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
-				double newTOF = timeMap.get(virtualDistance);
+				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
 
 				if (Math.abs(newTOF - estimatedTOF) < 0.02) break;
 				estimatedTOF = newTOF;
