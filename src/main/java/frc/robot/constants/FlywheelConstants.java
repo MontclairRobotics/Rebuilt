@@ -24,10 +24,10 @@ public class FlywheelConstants {
 	// tuned 3/4
 	public static final double kP = 30;
 	public static final double kD = 0;
-	public static final double kS = 21.5;
-	public static final double kV = 0.46;
+	public static final double kS = 13;
+	public static final double kV = 0.62;
 
-	public static final double STATOR_CURRENT_LIMIT = 100; // Amps
+	public static final double STATOR_CURRENT_LIMIT = 90; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 60; // Amps
 
 	public static final double MOMENT_OF_INERTIA = 0.00233846427; // From CAD on 2026.02.11, probably wrong
@@ -38,10 +38,10 @@ public class FlywheelConstants {
 		.withKS(kS).withKV(kV);
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
-		// .withStatorCurrentLimit(STATOR_CURRENT_LIMIT)
-		.withStatorCurrentLimitEnable(false)
-		// .withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
-		.withSupplyCurrentLimitEnable(false);
+		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)
+		.withStatorCurrentLimitEnable(true)
+		.withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
+		.withSupplyCurrentLimitEnable(true);
 
 	public static final MotorOutputConfigs LEFT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
 		.withInverted(InvertedValue.Clockwise_Positive)
