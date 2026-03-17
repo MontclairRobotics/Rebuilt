@@ -37,6 +37,7 @@ public class Aiming {
 		Shooter.targetLocation = target;
 		Translation2d targetLocation = target.getLocation();
 		InterpolatingTreeMap<Double, ShotSettings> map;
+		whileMoving = true;
 
 		switch(target) {
 			case HUB:

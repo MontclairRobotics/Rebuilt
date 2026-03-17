@@ -1,6 +1,5 @@
 package frc.robot;
 
-import org.littletonrobotics.junction.Logger;
 
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,7 +24,6 @@ import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LeftTrench;
 import frc.robot.util.FieldConstants.LinesVertical;
-import frc.robot.util.HubTracker;
 import frc.robot.util.PoseUtils;
 
 
@@ -100,15 +98,15 @@ public class Superstructure extends SubsystemBase {
 			resetTrenchZones();
 		}
 
-		if(logCounter % loopsPerLog == 0) {
-			Logger.recordOutput("Superstructure/isallianceknown", AllianceManager.isAllianceKnown());
-			Logger.recordOutput("Superstructure/currentshiftempty", HubTracker.getCurrentShift().isEmpty());
-			Logger.recordOutput("Superstructure/shouldBeScoring", scoringModeTrigger.getAsBoolean());
-			Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
-			Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
-			Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowTrigger.getAsBoolean());
-			Logger.recordOutput("Trench/Trench Danger Zones", FieldConstants.Zones.TRENCH_DANGER_ZONES);
-		}
+		// if(logCounter % loopsPerLog == 0) {
+		// 	Logger.recordOutput("Superstructure/isallianceknown", AllianceManager.isAllianceKnown());
+		// 	Logger.recordOutput("Superstructure/currentshiftempty", HubTracker.getCurrentShift().isEmpty());
+		// 	Logger.recordOutput("Superstructure/shouldBeScoring", scoringModeTrigger.getAsBoolean());
+		// 	Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
+		// 	Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
+		// 	Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowTrigger.getAsBoolean());
+		// 	Logger.recordOutput("Trench/Trench Danger Zones", FieldConstants.Zones.TRENCH_DANGER_ZONES);
+		// }
 
 	};
 

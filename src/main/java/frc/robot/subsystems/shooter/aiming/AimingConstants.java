@@ -14,11 +14,13 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
+import frc.robot.util.tunables.Tunable;
 
 public class AimingConstants {
 
-	public static double LATENCY = 0.02; // seconds it takes to reach desired state once state is set
-
+	public static double LATENCY = 0.25; // seconds it takes to reach desired state once state is set
+	public static Tunable latencyTunable = new Tunable("latency", LATENCY, (input)->LATENCY=input);
+	
 	public record ShotSettings(Angle angle, AngularVelocity flywheelVelocity, Time timeOfFlight, boolean withConstantVelocity) implements Interpolatable<ShotSettings> {
 		public ShotSettings(Angle angle, AngularVelocity flywheelVelocity, Time timeOfFlight, boolean withConstantVelocity) {
 			this.angle = angle;
@@ -89,12 +91,13 @@ public class AimingConstants {
 		// REAL_MAP.put(3.45, new ShotSettings(Degrees.of(20), RotationsPerSecond.of(26), Seconds.of(1.125), false));
 		// REAL_MAP.put(4.30, new ShotSettings(Degrees.of(24), RotationsPerSecond.of(27.75), Seconds.of(1.25), false));
 
-		REAL_MAP.put(0.00, new ShotSettings(Degrees.of(0.0), RotationsPerSecond.of(20), Seconds.of(1), false));
-		REAL_MAP.put(1.21, new ShotSettings(Degrees.of(0), RotationsPerSecond.of(21.2), Seconds.of(0.968), false));
-		REAL_MAP.put(2.56, new ShotSettings(Degrees.of(9.5), RotationsPerSecond.of(23), Seconds.of(0.9), false));
-		REAL_MAP.put(3.78, new ShotSettings(Degrees.of(16.5), RotationsPerSecond.of(24), Seconds.of(0.9), false));
-		REAL_MAP.put(5.48, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(27), Seconds.of(1.027), false));
-		REAL_MAP.put(7.00, new ShotSettings(Degrees.of(24.5), RotationsPerSecond.of(33), Seconds.of(1.05), false));
+		REAL_MAP.put(0.00, new ShotSettings(Degrees.of(0.0), RotationsPerSecond.of(20), Seconds.of(0.8), false));
+		REAL_MAP.put(1.50, new ShotSettings(Degrees.of(0), RotationsPerSecond.of(22), Seconds.of(0.81), false));
+		REAL_MAP.put(2.50, new ShotSettings(Degrees.of(9.5), RotationsPerSecond.of(23), Seconds.of(0.86), false));
+		REAL_MAP.put(3.45, new ShotSettings(Degrees.of(9), RotationsPerSecond.of(27), Seconds.of(0.98), false));
+		REAL_MAP.put(4.52, new ShotSettings(Degrees.of(11), RotationsPerSecond.of(27.5), Seconds.of(1.1), false));
+		REAL_MAP.put(5.11, new ShotSettings(Degrees.of(11), RotationsPerSecond.of(28.5), Seconds.of(1.14), false));
+		REAL_MAP.put(7.00, new ShotSettings(Degrees.of(24.5), RotationsPerSecond.of(33), Seconds.of(1.2), false));
 
 		REAL_FERRY_MAP.put(20.0, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(50), Seconds.of(3), false));
 		REAL_FERRY_MAP.put(9.59, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(40), Seconds.of(1.8), false));
