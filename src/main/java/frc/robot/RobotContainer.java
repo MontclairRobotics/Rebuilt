@@ -26,6 +26,7 @@ import frc.robot.commands.WheelRadiusCharacterization;
 import frc.robot.commands.WheelRadiusCharacterization.Direction;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
+//import frc.robot.constants.HoodConstants;
 import frc.robot.constants.PivotConstants;
 import frc.robot.constants.TurretConstants;
 import frc.robot.constants.Constants.Mode;
@@ -391,7 +392,7 @@ public class RobotContainer {
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
 		// driverController.circle()
 		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
-		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
+		//driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
 
 		if(Constants.CURRENT_MODE == Mode.SIM) driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
 

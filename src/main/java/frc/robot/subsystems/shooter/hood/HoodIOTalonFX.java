@@ -127,9 +127,7 @@ public class HoodIOTalonFX implements HoodIO {
     @Override
     public boolean isAtSetpoint() {
         double error = motor.getClosedLoopError().getValueAsDouble();
-        return Math.abs(error) < TOLERANCE.in(Rotations)
-            // && Math.abs(velocitySignal.getValueAsDouble()) < VELOCITY_TOLERANCE.in(RotationsPerSecond)
-        ;
+        return Math.abs(error) < TOLERANCE.in(Rotations);
     }
 
     @Override

@@ -50,15 +50,12 @@ public class HoodIOSim implements HoodIO {
         sim.update(0.02);
 
         inputs.motorConnected = false;
-
         inputs.appliedVoltage = appliedVoltage;
         inputs.currentDrawAmps = sim.getCurrentDrawAmps();
         inputs.tempCelcius = 0; // motor temperature is not simulated
-
         inputs.hoodAngle = Radians.of(sim.getAngleRads());
         inputs.hoodAngleSetpoint = Rotations.of(pidController.getSetpoint());
         inputs.hoodVelocity = RadiansPerSecond.of(sim.getVelocityRadPerSec());
-
         inputs.isAtSetpoint = isAtSetpoint();
     }
 
