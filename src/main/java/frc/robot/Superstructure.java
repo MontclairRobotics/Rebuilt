@@ -44,37 +44,52 @@ public class Superstructure extends SubsystemBase {
 		this.shooter = shooter;
 		if(CURRENT_MODE == Mode.SIM) {
 			shouldStowTrigger.whileTrue(
-				shooter.stowCommand());
+				shooter.stowCommand()
+			);
+
 			scoringModeTrigger.whileTrue(
 				shooter.setSimParameters(
 					() -> RobotContainer.aiming.calculateSimShot(
 						HUB, shooter.withConstantVelocity, shooter.whileMoving)
-				));
+				)
+			);
+
 			ferryLeftTrigger.whileTrue(
 				shooter.setSimParameters(
 					() -> RobotContainer.aiming.calculateSimShot(
 						FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
-				));
+				)
+			);
+
 			ferryRightTrigger.whileTrue(
 				shooter.setSimParameters(
 					() -> RobotContainer.aiming.calculateSimShot(
 						FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
-				));
+				)
+			);
+
 		} else {
 			shouldStowTrigger.whileTrue(
-				shooter.stowCommand());
+				shooter.stowCommand()
+			);
+
 			scoringModeTrigger.whileTrue(
 				shooter.setParameters(
 					() -> Aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
-				));
+				)
+			);
+
 			ferryLeftTrigger.whileTrue(
 				shooter.setParameters(
 					() -> Aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
-				));
+				)
+			);
+
 			ferryRightTrigger.whileTrue(
 				shooter.setParameters(
 					() -> Aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
-				));
+				)
+			);
 		}
 	}
 
@@ -143,7 +158,7 @@ public class Superstructure extends SubsystemBase {
 	public void updateTrenchZonesVeloBased() {
 		//Updates width of zone based on robot velocity
 		Distance dynamicTrenchDangerZoneWidth = Meters.of(TRENCH_ZONE_OFFSET.in(Meters) + Math.abs(RobotContainer.drivetrain.getFieldRelativeVelocity().getX())* HoodConstants.HOOD_LOWER_TIME);
-		FieldConstants.Zones.TRENCH_DANGER_ZONES = new Translation2d[][]{
+		FieldConstants.Zones.TRENCH_DANGER_ZONES = new Translation2d[][] {
 			// near right trench
 			new Translation2d[] {
 				new Translation2d(LinesVertical.HUB_CENTER.minus(dynamicTrenchDangerZoneWidth), Meters.zero()),
