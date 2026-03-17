@@ -6,6 +6,8 @@ import static frc.robot.constants.SerializerConstants.*;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
@@ -37,13 +39,13 @@ public class Serializer extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// logCounter++;
+		logCounter++;
 
-		// io.updateInputs(inputs);
+		io.updateInputs(inputs);
 
-		// if(logCounter % loopsPerLog == 0) {
-		// 	Logger.processInputs("Serializer", inputs);
-		// }
+		if(logCounter % loopsPerLog == 0) {
+			Logger.processInputs("Serializer", inputs);
+		}
 	}
 
 	public void setVelocity(AngularVelocity velocity) {
@@ -72,7 +74,7 @@ public class Serializer extends SubsystemBase {
 
 	public void applyJoystickInput() {
         double input = -MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
-        double voltage = input * RobotController.getBatteryVoltage();
+        double voltage = input * 12;
         io.setVoltage(voltage);
     }
 
