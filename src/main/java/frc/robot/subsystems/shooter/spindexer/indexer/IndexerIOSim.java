@@ -84,7 +84,7 @@ public class IndexerIOSim implements IndexerIO {
 
 	@Override
 	public void setCurrent(double currentDrawAmps) {
-		//not necessary 
+		//not necessary
 	}
 
 }

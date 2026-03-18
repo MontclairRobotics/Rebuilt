@@ -35,6 +35,7 @@ import frc.robot.subsystems.intake.pivot.Pivot;
 import frc.robot.subsystems.intake.pivot.PivotIOSim;
 import frc.robot.subsystems.intake.rollers.Rollers;
 import frc.robot.subsystems.intake.rollers.RollersIOSim;
+import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
@@ -163,7 +164,7 @@ public class RobotContainer {
 				aiming = new Aiming(turret);
 
 				pivot = new Pivot(new PivotIOSim());
-				rollers = new Rollers(new RollersIOSim());
+				rollers = new Rollers(new RollersIOTalonFX());
 				intake = new Intake(pivot, rollers);
 
 				auto = new Auto();
@@ -238,8 +239,8 @@ public class RobotContainer {
 		// 	Auto.drawAuto(autoName);
 		// }
 
-		configureBindings();
-		// configureCompetitionBindings();
+		// configureBindings();
+		configureCompetitionBindings();
 		// configureTestingBindingsForMax();
 
     	drivetrain.registerTelemetry(logger::telemeterize);

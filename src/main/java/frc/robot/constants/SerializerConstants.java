@@ -29,7 +29,7 @@ public class SerializerConstants {
     public static final double STATOR_CURRENT_LIMIT = 80;
     public static final double SUPPLY_CURRENT_LIMIT = 60;
 
-    public static final double GEARING = 20; 
+    public static final double GEARING = 20;
     public static final double MOMENT_OF_INERTIA = 0.02;
 
     public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
