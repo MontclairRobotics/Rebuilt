@@ -3,6 +3,7 @@ package frc.robot.subsystems.shooter.flywheel;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.FlywheelConstants.*;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -103,11 +104,11 @@ public class Flywheel extends SubsystemBase {
         if(RobotContainer.FLYWHEEL_DEBUG) updateTunables();
     }
 
-    public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {
-        io.setVelocity(targetVelocity.plus(RotationsPerSecond.of(fudgeFactor)), timeSecondsForSetpoint);
+    public void setVelocity(AngularVelocity targetVelocity, DoubleSupplier timeSecondsForSetpoint) {
+        io.setVelocity(targetVelocity.plus(RotationsPerSecond.of(fudgeFactor)), timeSecondsForSetpoint.getAsDouble());
     }
 
-    public void setVelocity(Supplier<AngularVelocity> targetVelocitySupplier, double timeSecondsForSetpoint) {
+    public void setVelocity(Supplier<AngularVelocity> targetVelocitySupplier, DoubleSupplier timeSecondsForSetpoint) {
         setVelocity(targetVelocitySupplier.get(), timeSecondsForSetpoint);
     }
 
@@ -121,12 +122,12 @@ public class Flywheel extends SubsystemBase {
         return Commands.runOnce(() -> io.stop(), this);
     }
 
-    public Command setVelocityCommand(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {
-        return Commands.run(() -> io.setVelocity(targetVelocity, timeSecondsForSetpoint));
+    public Command setVelocityCommand(AngularVelocity targetVelocity, DoubleSupplier timeSecondsForSetpoint) {
+        return Commands.run(() -> io.setVelocity(targetVelocity, timeSecondsForSetpoint.getAsDouble()));
     }
 
-    public Command setVelocityCommand(Supplier<AngularVelocity> targetVelocitySupplier, double timeSecondsForSetpoint) {
-        return Commands.run(() -> io.setVelocity(targetVelocitySupplier.get(), timeSecondsForSetpoint));
+    public Command setVelocityCommand(Supplier<AngularVelocity> targetVelocitySupplier, DoubleSupplier timeSecondsForSetpoint) {
+        return Commands.run(() -> io.setVelocity(targetVelocitySupplier.get(), timeSecondsForSetpoint.getAsDouble()));
     }
 
     public Command joystickControlCommand() {

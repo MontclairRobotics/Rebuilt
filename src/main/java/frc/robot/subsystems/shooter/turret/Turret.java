@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.TurretConstants.*;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -23,6 +24,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -71,6 +73,8 @@ public class Turret extends SubsystemBase {
 			Logger.processInputs("Turret", inputs);
 			Logger.recordOutput("Turret/AngleToHub", getAngleToHub());
 			Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
+			Logger.recordOutput("Turret/At Time Adjusted Setpoint", atTimeAdjustedSetpoint());
+			Logger.recordOutput("Turret/Time Adjusted Setpoint", getSetpointForTime(Timer.getFPGATimestamp()));
 		}
 
 		visualization.update();
@@ -253,12 +257,12 @@ public class Turret extends SubsystemBase {
 		return io.isAtSetpoint();
 	}
 
-	public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity) {
-		io.setRobotRelativeAngle(angle, velocity);
+	public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, DoubleSupplier timeSecondsForSetpoint) {
+		io.setRobotRelativeAngle(angle, velocity, timeSecondsForSetpoint.getAsDouble());
 	}
 
-	public void setRobotRelativeAngle(Supplier<Angle> angleSupplier, Supplier<AngularVelocity> velocitySupplier) {
-		setRobotRelativeAngle(angleSupplier.get(), velocitySupplier.get());
+	public void setRobotRelativeAngle(Supplier<Angle> angleSupplier, Supplier<AngularVelocity> velocitySupplier, DoubleSupplier timeSecondsForSetpoint) {
+		setRobotRelativeAngle(angleSupplier.get(), velocitySupplier.get(), timeSecondsForSetpoint);
 	}
 
 	public Command joystickControlCommand() {
@@ -273,7 +277,7 @@ public class Turret extends SubsystemBase {
 		return Commands.runOnce(() -> io.setVoltage(voltage));
 	}
 
-	public Command setRobotRelativeAngleCommand(Supplier<Angle> angleSupplier, Supplier<AngularVelocity> velocitySupplier) {
-		return Commands.run(() -> setRobotRelativeAngle(angleSupplier.get(), velocitySupplier.get()));
+	public Command setRobotRelativeAngleCommand(Supplier<Angle> angleSupplier, Supplier<AngularVelocity> velocitySupplier, DoubleSupplier timeSecondsForSetpoint) {
+		return Commands.run(() -> setRobotRelativeAngle(angleSupplier.get(), velocitySupplier.get(), timeSecondsForSetpoint));
 	}
 }

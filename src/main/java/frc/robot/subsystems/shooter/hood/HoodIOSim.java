@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.HoodConstants.*;
-import static frc.robot.constants.HoodConstants.SIM_SLOT0_CONFIGS;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -63,7 +62,7 @@ public class HoodIOSim implements HoodIO {
     }
 
     @Override
-    public void setAngle(Angle angle) {
+    public void setAngle(Angle angle, double timeSecondsForSetpoint) {
         pidController.setSetpoint(angle.in(Rotations));
         double pidOutput = pidController.calculate(Radians.of(sim.getAngleRads()).in(Rotations));
         double ffOutput = feedforward.calculate(sim.getAngleRads(), 0);
@@ -88,6 +87,11 @@ public class HoodIOSim implements HoodIO {
     @Override
     public void resetEncoderPosition() {
 
+    }
+
+    @Override
+    public boolean isAtTimeAdjustedSetpoint() {
+        return false; // not needed
     }
 
     @Override

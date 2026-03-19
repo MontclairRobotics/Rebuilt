@@ -18,6 +18,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.util.PhoenixUtil;
 
 public class HoodIOTalonFX implements HoodIO {
@@ -110,7 +112,8 @@ public class HoodIOTalonFX implements HoodIO {
     }
 
     @Override
-    public void setAngle(Angle angle) {
+    public void setAngle(Angle angle, double timeSecondsForSetpoint) {
+        Hood.recordSetpoint(angle, timeSecondsForSetpoint);
         motor.setControl(request.withPosition(angle));
     }
 
@@ -135,6 +138,14 @@ public class HoodIOTalonFX implements HoodIO {
     @Override
     public void resetEncoderPosition() {
         encoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
+    }
+
+    @Override
+    public boolean isAtTimeAdjustedSetpoint() {
+        double error =
+            Turret.getSetpointForTime(Timer.getFPGATimestamp()).in(Rotations)
+            - positionSignal.getValue().in(Rotations);
+        return Math.abs(error) < TOLERANCE.in(Rotations);
     }
 
     @Override

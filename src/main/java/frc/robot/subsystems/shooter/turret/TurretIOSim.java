@@ -79,7 +79,8 @@ public class TurretIOSim implements TurretIO {
     }
 
     @Override
-    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity) {
+    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, double timeSecondsForSetpoint) {
+        Turret.recordSetpoint(angle, timeSecondsForSetpoint);
         pidController.setGoal(new State(angle.in(Rotations), velocity.in(RotationsPerSecond)));
         double pidOutput = pidController.calculate(Radians.of(sim.getAngleRads()).in(Rotations));
         double ffOutput = feedforward.calculate(velocity.in(RotationsPerSecond));

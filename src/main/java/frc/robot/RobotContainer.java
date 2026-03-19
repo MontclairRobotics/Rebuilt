@@ -289,7 +289,7 @@ public class RobotContainer {
 
 		// operator
 		operatorController.touchpad().whileTrue(shooter.stowCommand());
-		operatorController.circle().onFalse(shooter.stowCommand());
+		operatorController.circle().whileFalse(shooter.stowCommand());
 		operatorController.triangle()
 			.whileTrue(shooter.setConstantShotParameters())
 			.onFalse(shooter.stowCommand());
