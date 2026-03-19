@@ -107,7 +107,6 @@ public class RobotContainer {
 	public static SimShootingParameters simShootingParameters = new SimShootingParameters(Degrees.zero(), Degrees.zero(), MetersPerSecond.zero());
 
 	private SwerveDriveSimulation driveSimulation;
-	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
 	public static FuelSim fuelSim = new FuelSim("fuel");
 
 	private boolean useConstantVelocityMap = false;
@@ -242,13 +241,10 @@ public class RobotContainer {
 		// configureCompetitionBindings();
 		// configureTestingBindingsForMax();
 
-    	drivetrain.registerTelemetry(logger::telemeterize);
+    	drivetrain.registerTelemetry(new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond))::telemeterize);
 	}
-
+/**Max's Bindings. Runs the spindexer + indexer at max speed. */
 	private void configureTestingBindingsForMax() {
-
-		// runs the spindexer + indexer at max speed
-
 		operatorController.circle()
 			.whileTrue(
 				spindexer.spinUpCommand()
@@ -266,7 +262,7 @@ public class RobotContainer {
 			);
 
 	}
-
+/**Comp bindings, dont change.*/
 	private void configureCompetitionBindings() {
 
 		// driver
@@ -312,7 +308,7 @@ public class RobotContainer {
 			.onFalse(pivot.deployCommand());
 
 	}
-
+/**Testing bindings. Feel free to adjust. */
 	private void configureBindings() {
 
 		driverController.povRight().whileTrue(new WheelRadiusCharacterization(Direction.CLOCKWISE, drivetrain));
