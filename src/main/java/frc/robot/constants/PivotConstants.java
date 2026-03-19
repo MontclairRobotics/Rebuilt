@@ -35,7 +35,7 @@ public class PivotConstants {
 
 	public static final double ROTOR_TO_SENSOR_RATIO = (72.0 / 46) * 9;
 	public static final double SENSOR_TO_MECHANISM_RATIO = 1; // CANcoder is on the mechanism
-	public static final double ENCODER_OFFSET = -0.0463691563;
+	public static final double ENCODER_OFFSET = 0.046885;
 
 	// constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);
@@ -58,8 +58,8 @@ public class PivotConstants {
 
 	public static final Angle TOLERANCE = Degrees.of(1);
 
-	public static final double STATOR_CURRENT_LIMIT = 80; // Amps
-	public static final double SUPPLY_CURRENT_LIMIT = 40; // Amps
+	public static final double STATOR_CURRENT_LIMIT = 40; // Amps
+	public static final double SUPPLY_CURRENT_LIMIT = 30; // Amps
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(4);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(40);
@@ -100,7 +100,7 @@ public class PivotConstants {
 	public static final CANcoderConfiguration ENCODER_CONFIGS = new CANcoderConfiguration()
         .withMagnetSensor(
             new MagnetSensorConfigs()
-                .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
+                .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
                 .withMagnetOffset(ENCODER_OFFSET)
         );
 }
