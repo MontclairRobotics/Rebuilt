@@ -30,7 +30,7 @@ public class RollersConstants {
     public static final double STATOR_CURRENT_LIMIT = 60;
     public static final double SUPPLY_CURRENT_LIMIT = 40;
 
-    public static final double GEARING = 3;
+    public static final double GEARING = 1;
     public static final double MOMENT_OF_INERTIA = 0.02; //TODO: get
 
     public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
