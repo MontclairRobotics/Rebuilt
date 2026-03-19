@@ -65,7 +65,7 @@ public class Turret extends SubsystemBase {
 	@Override
 	public void periodic() {
 		logCounter++;
-		
+
 		if(logCounter % loopsPerLog == 0) {
 			io.updateInputs(inputs);
 			Logger.processInputs("Turret", inputs);

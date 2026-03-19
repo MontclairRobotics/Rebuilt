@@ -16,7 +16,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.networktables.NetworkTable;
@@ -36,8 +35,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.PivotConstants;
-import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.Elastic;
 import frc.robot.util.Elastic.Notification;
@@ -186,8 +183,8 @@ public class Auto extends SubsystemBase {
 
 		String currentAutoString = autoString.substring(0,3);
 		String currentPos = autoString.substring(1,2);
-		
-		if(Integer.parseInt(String.valueOf(currentAutoString.charAt(2))) >= 5) {
+
+		if(Integer.parseInt(String.valueOf(currentAutoString.charAt(2))) >= 6) {
 			if(currentPos == "R") {
 				RobotContainer.drivetrain.setFieldRelativeAngle(new Rotation2d(Radians.of(-Math.PI / 2)));
 			}
