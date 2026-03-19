@@ -106,9 +106,7 @@ public class Vision extends SubsystemBase {
 
 		// loops through the different cameras
 		for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
-
 			io[cameraIndex].updateInputs(inputs[cameraIndex]);
-
 			if (logCounter % loopsPerLog == 0) {
 				Logger.processInputs("Vision/Camera" + Integer.toString(cameraIndex), inputs[cameraIndex]);
 			}
@@ -181,6 +179,7 @@ public class Vision extends SubsystemBase {
 					linearStdDev *= linearStdDevMegatag2Factor;
 					angularStdDev *= angularStdDevMegatag2Factor;
 				}
+				
 				if (cameraIndex < cameraStdDevFactors.length) {
 					linearStdDev *= cameraStdDevFactors[cameraIndex];
 					angularStdDev *= cameraStdDevFactors[cameraIndex];

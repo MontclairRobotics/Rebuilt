@@ -72,33 +72,37 @@ public class VisionIOLimelight implements VisionIO {
 		List<PoseObservation> poseObservations = new LinkedList<>();
 
 		for (var rawSample : megatag2Subscriber.readQueue()) {
-		if (rawSample.value.length == 0) continue;
-		for (int i = 11; i < rawSample.value.length; i += 7) {
-			tagIds.add((int) rawSample.value[i]);
-		}
-		poseObservations.add(
-			new PoseObservation(
-				// Timestamp, based on server timestamp of publish and latency
-				rawSample.timestamp * 1.0e-6 - rawSample.value[6] * 1.0e-3,
+			if (rawSample.value.length == 0) continue;
+				for (int i = 11; i < rawSample.value.length; i += 7) {
+					tagIds.add((int) rawSample.value[i]);
+				}
 
-				// 3D pose estimate
-				parsePose(rawSample.value),
+			poseObservations.add(
+				new PoseObservation(
+					// Timestamp, based on server timestamp of publish and latency
+					rawSample.timestamp * 1.0e-6 - rawSample.value[6] * 1.0e-3,
 
-				// Ambiguity, zeroed because the pose is already disambiguated
-				0.0,
+					// 3D pose estimate
+					parsePose(rawSample.value),
 
-				// Tag count
-				(int) rawSample.value[7],
+					// Ambiguity, zeroed because the pose is already disambiguated
+					0.0,
 
-				// Average tag distance
-				rawSample.value[9],
+					// Tag count
+					(int) rawSample.value[7],
 
-				// Observation type
-				PoseObservationType.MEGATAG_2));
+					// Average tag distance
+					rawSample.value[9],
+
+					// Observation type
+					PoseObservationType.MEGATAG_2
+				)
+			);
 		}
 
 		// Save pose observations to inputs object
 		inputs.poseObservations = new PoseObservation[poseObservations.size()];
+
 		for (int i = 0; i < poseObservations.size(); i++) {
 			inputs.poseObservations[i] = poseObservations.get(i);
 		}
@@ -106,6 +110,7 @@ public class VisionIOLimelight implements VisionIO {
 		// Save tag IDs to inputs objects
 		inputs.tagIds = new int[tagIds.size()];
 		int i = 0;
+		
 		for (int id : tagIds) {
 			inputs.tagIds[i++] = id;
 		}
