@@ -33,7 +33,6 @@ import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.pivot.Pivot;
 import frc.robot.subsystems.intake.pivot.PivotIOSim;
-import frc.robot.subsystems.intake.pivot.PivotIOTalonFX;
 import frc.robot.subsystems.intake.rollers.Rollers;
 import frc.robot.subsystems.intake.rollers.RollersIOSim;
 import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
@@ -164,7 +163,7 @@ public class RobotContainer {
 				superstructure = new Superstructure(shooter);
 				aiming = new Aiming(turret);
 
-				pivot = new Pivot(new PivotIOTalonFX());
+				pivot = new Pivot(new PivotIOSim());
 				rollers = new Rollers(new RollersIOTalonFX());
 				intake = new Intake(pivot, rollers);
 
@@ -275,7 +274,7 @@ public class RobotContainer {
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 		driverController.R2()
-			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(2), RotationsPerSecond.of(1)))
+			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(1), RotationsPerSecond.of(0.5)))
 			.onFalse(drivetrain.setMaxSpeedsCommand(TunerConstants.kSpeedAt12Volts, RotationsPerSecond.of(1.624)));
 
 		driverController.triangle()

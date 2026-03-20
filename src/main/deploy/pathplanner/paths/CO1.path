@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 1.8771914132379237,
-        "y": 0.8629338103756714
+        "y": 0.862933810375671
       },
       "isLocked": false,
       "linkedName": null
@@ -47,7 +47,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
+    "maxVelocity": 3.0,
     "maxAcceleration": 8.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 2000.0,

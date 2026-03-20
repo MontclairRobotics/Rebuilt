@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -181,6 +183,16 @@ public class Auto extends SubsystemBase {
 
 		String currentAutoString = autoString.substring(0,3);
 		String currentPos = autoString.substring(1,2);
+
+		if(Integer.parseInt(String.valueOf(currentAutoString.charAt(2))) >= 6) {
+			if(currentPos == "R") {
+				RobotContainer.drivetrain.setFieldRelativeAngle(new Rotation2d(Radians.of(-Math.PI / 2)));
+			}
+
+			if(currentPos == "L") {
+				RobotContainer.drivetrain.setFieldRelativeAngle(new Rotation2d(Radians.of(Math.PI / 2)));
+			}
+		}
 
 		try {
 			AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentAutoString));
