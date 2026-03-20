@@ -9,7 +9,7 @@ import static frc.robot.constants.PivotConstants.*;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -36,7 +36,7 @@ public class PivotIOTalonFX implements PivotIO {
     private final StatusSignal<Current> currentDrawAmpsSignal;
     private final StatusSignal<Temperature> tempCelsiusSignal;
 
-    private final MotionMagicVoltage request = new MotionMagicVoltage(0).withEnableFOC(true);
+    private final PositionVoltage request = new PositionVoltage(0).withEnableFOC(true);
 
 	public PivotIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
