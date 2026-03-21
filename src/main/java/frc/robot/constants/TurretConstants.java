@@ -65,9 +65,9 @@ public class TurretConstants {
 	public static final double kS = 3;
 	public static final double kV = 16;
 
-	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(6);
-	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(60);
-	public static final double MOTION_MAGIC_JERK = 100; // Rotations Per Second Per Second Per Second
+	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(3.5);
+	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(70);
+	public static final double MOTION_MAGIC_JERK = 700; // Rotations Per Second Per Second Per Second
 
 	public static final double STATOR_CURRENT_LIMIT = 60; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 40; // Amps
