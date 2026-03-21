@@ -18,7 +18,7 @@ import frc.robot.util.tunables.Tunable;
 
 public class AimingConstants {
 
-	public static double LATENCY = 0.2; // seconds it takes to reach desired state once state is set
+	public static double LATENCY = 0.08; // seconds it takes to reach desired state once state is set
 	public static Tunable latencyTunable = new Tunable("latency", LATENCY, (input)->LATENCY=input);
 
 	public record ShotSettings(Angle angle, AngularVelocity flywheelVelocity, Time timeOfFlight, boolean withConstantVelocity) implements Interpolatable<ShotSettings> {

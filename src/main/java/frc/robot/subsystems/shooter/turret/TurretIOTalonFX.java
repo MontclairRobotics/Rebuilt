@@ -5,8 +5,6 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -22,7 +20,6 @@ import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
 public class TurretIOTalonFX implements TurretIO {
@@ -41,8 +38,6 @@ public class TurretIOTalonFX implements TurretIO {
 
     private final MotionMagicVoltage request = new MotionMagicVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
-
-    private final double LOOKAHEAD_TIME = 0.1; // seconds
 
     public TurretIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
@@ -113,15 +108,14 @@ public class TurretIOTalonFX implements TurretIO {
         inputs.fieldRelativeAngle = Turret.toFieldRelativeAngle(inputs.robotRelativeAngle);
         inputs.robotRelativeAngleSetpoint = Rotations.of(setpointPositionSignal.getValueAsDouble());
 
-        inputs.isAtSetpoint = isAtSetpoint();
+        inputs.isAtSetpoint = isAtTimeAdjustedSetpoint();
     }
 
     @Override
-    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, double timeSecondsForSetpoint) {
-        Angle predictedAngle = angle.plus(
-            Rotations.of((velocity.in(RotationsPerSecond) * LOOKAHEAD_TIME))
-        );
-        motor.setControl(request.withPosition(predictedAngle));
+    public void setRobotRelativeAngle(Angle angle, double timeSecondsForSetpoint) {
+        angle = Turret.constrainAngle(angle);
+        Turret.recordSetpoint(angle, timeSecondsForSetpoint);
+        motor.setControl(request.withPosition(angle));
     }
 
     @Override
@@ -137,9 +131,7 @@ public class TurretIOTalonFX implements TurretIO {
     @Override
     public boolean isAtSetpoint() {
         double error = motor.getClosedLoopError().getValueAsDouble();
-        return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations)
-            // && Math.abs(velocitySignal.getValueAsDouble()) < MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond)
-        ;
+        return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations);
     }
 
     @Override

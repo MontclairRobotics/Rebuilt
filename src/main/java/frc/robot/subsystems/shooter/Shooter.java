@@ -153,7 +153,7 @@ public class Shooter extends SubsystemBase {
                 Logger.recordOutput("setSimParameters()/Robot Relative Turret Angle", params.robotRelativeTurretAngle().in(Rotations));
                 Logger.recordOutput("setSimParameters()/Hood Angle", params.hoodAngle().in(Rotations));
                 Logger.recordOutput("setSimParameters()/Exit Velocity", params.exitVelocity().in(MetersPerSecond));
-                turret.setRobotRelativeAngle(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation), () -> Timer.getFPGATimestamp());
+                turret.setRobotRelativeAngle(() -> params.robotRelativeTurretAngle(), () -> Timer.getFPGATimestamp());
                 hood.setAngle(() -> params.hoodAngle(), () -> Timer.getFPGATimestamp());
             })
         );

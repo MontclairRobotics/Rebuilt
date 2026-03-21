@@ -38,7 +38,6 @@ public class Aiming {
 		Shooter.targetLocation = target;
 		Translation2d targetLocation = target.getLocation();
 		InterpolatingTreeMap<Double, ShotSettings> map;
-		whileMoving = true;
 
 		switch(target) {
 			case HUB:
@@ -90,7 +89,7 @@ public class Aiming {
 				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
 				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
 
-				if (Math.abs(newTOF - estimatedTOF) < 0.02) break;
+				if (Math.abs(newTOF - estimatedTOF) < 0.01) break;
 				estimatedTOF = newTOF;
 			}
 		}

@@ -22,7 +22,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,18 +40,12 @@ public class Turret extends SubsystemBase {
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 	private final TurretVisualization visualization = new TurretVisualization();
 
+	/** tracks both the turret setpoint and time for that specific setpoint */
 	private static final TimeInterpolatableBuffer<Angle> setpointBuffer = TimeInterpolatableBuffer.createBuffer(Turret::interpolate, AimingConstants.LATENCY * 2);
-
-	// private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Turret/kP", SLOT0_CONFIGS.kP);
-    // private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Turret/kD", SLOT0_CONFIGS.kD);
-    // private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Turret/kS", SLOT0_CONFIGS.kS);
-
-	// private final LoggedTunableNumber tunableMotionMagicCruiseVelocity = new LoggedTunableNumber("Turret/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity);
-	// private final LoggedTunableNumber tunableMotionMagicAcceleration = new LoggedTunableNumber("Turret/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration);
-	// private final LoggedTunableNumber tunableMotionMagicJerk = new LoggedTunableNumber("Turret/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk);
 
 	public final LoggedTunableNumber tunableRobotRelativeTurretAngle = new LoggedTunableNumber("Turret/Tunable Robot Relative Angle", 0);
 
+	/** for fudging the turret angle mid-match should it get off */
 	private Angle fudgeFactor = Degrees.of(0);
 	private final Angle step = Degrees.of(3);
 
@@ -61,15 +54,16 @@ public class Turret extends SubsystemBase {
 
     public Turret(TurretIO io) {
         this.io = io;
-		loopsPerLog = RobotContainer.TURRET_DEBUG ? 1 : 5;
+		loopsPerLog = RobotContainer.TURRET_DEBUG ? 1 : 5; // faster logging during debug mode, slower otherwise
     }
 
 	@Override
 	public void periodic() {
 		logCounter++;
 
+		io.updateInputs(inputs); // THIS HAS TO BE EVERY LOOP
+
 		if(logCounter % loopsPerLog == 0) {
-			io.updateInputs(inputs);
 			Logger.processInputs("Turret", inputs);
 			Logger.recordOutput("Turret/AngleToHub", getAngleToHub());
 			Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
@@ -77,21 +71,20 @@ public class Turret extends SubsystemBase {
 			Logger.recordOutput("Turret/Time Adjusted Setpoint", getSetpointForTime(Timer.getFPGATimestamp()));
 		}
 
-		visualization.update();
-		visualization.log();
-
-		if(RobotContainer.TURRET_DEBUG || RobotBase.isSimulation()) {
-			updateTunables();
+		/** only visualize when in debug mode */
+		if(RobotContainer.TURRET_DEBUG) {
+			visualization.update();
+			visualization.log();
 		}
 	}
 
 	public void increaseFudgeFactor() {
-		fudgeFactor.plus(step);
+		fudgeFactor = fudgeFactor.plus(step);
 		io.applyFudgeFactor(fudgeFactor);
 	}
 
 	public void decreaseFudgeFactor() {
-		fudgeFactor.minus(step);
+		fudgeFactor = fudgeFactor.minus(step);
 		io.applyFudgeFactor(fudgeFactor);
 	}
 
@@ -103,20 +96,24 @@ public class Turret extends SubsystemBase {
 		return Commands.runOnce(() -> decreaseFudgeFactor());
 	}
 
+	/** used for setpoint buffer */
 	public static Angle interpolate(Angle startValue, Angle endValue, double t) {
         return Rotations.of(
             MathUtil.interpolate(startValue.in(Rotations), endValue.in(Rotations), t)
         );
     }
 
+	/** returns true if we are at the setpoint for the present timestamp */
 	public boolean atTimeAdjustedSetpoint() {
         return io.isAtTimeAdjustedSetpoint();
     }
 
+	/** records a setpoint and when we're supposed to reach said setpoint */
     public static void recordSetpoint(Angle setpoint, double timeSecondsForSetpoint) {
         setpointBuffer.addSample(timeSecondsForSetpoint, setpoint);
     }
 
+	/** returns the setpoint for a specified timestamp */
     public static Angle getSetpointForTime(double timeSeconds) {
         return setpointBuffer.getSample(timeSeconds).orElseGet(() -> Rotations.zero());
     }
@@ -127,6 +124,7 @@ public class Turret extends SubsystemBase {
 	 * @return the new angle, constrained between our min and max angles
 	 */
 	public static Angle constrainAngle(Angle angle) {
+		
 		while (angle.in(Rotations) > MAX_ANGLE.in(Rotations)) {
     		angle = angle.minus(Rotations.of(1));
 		}
@@ -162,24 +160,6 @@ public class Turret extends SubsystemBase {
 		io.setNeutralMode(value);
 	}
 
-	public void updateTunables() {
-		// if(tunableKP.hasChanged(hashCode())
-        //         || tunableKD.hasChanged(hashCode())
-        //         || tunableKS.hasChanged(hashCode())) {
-        //     io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get());
-        // }
-
-		// if(tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
-		// 		|| tunableMotionMagicAcceleration.hasChanged(hashCode())
-		// 		|| tunableMotionMagicJerk.hasChanged(hashCode())) {
-		// 	io.setMotionMagic(
-		// 		tunableMotionMagicCruiseVelocity.get(),
-		// 		tunableMotionMagicAcceleration.get(),
-		// 		tunableMotionMagicJerk.get()
-		// 	);
-		// }
-	}
-
 	public void applyJoystickInput() {
 		double input = MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.1), 1.5);
 		double voltage = input * RobotController.getBatteryVoltage();
@@ -194,6 +174,10 @@ public class Turret extends SubsystemBase {
 		return inputs.fieldRelativeAngle;
 	}
 
+	/**
+	 * 
+	 * @return the field relative pose of the center of the turret
+	 */
 	public Translation2d getFieldRelativePosition() {
 		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
 		Rotation2d robotHeading = robotPose.getRotation();
@@ -201,6 +185,10 @@ public class Turret extends SubsystemBase {
 		return robotPose.getTranslation().plus(fieldRelativeOffset);
 	}
 
+	/**
+	 * 
+	 * @return the field relative velocity of the center of the turret
+	 */
 	public Translation2d getFieldRelativeVelocity() {
 		ChassisSpeeds fieldSpeeds = RobotContainer.drivetrain.getFieldRelativeSpeeds();
 		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
@@ -220,11 +208,20 @@ public class Turret extends SubsystemBase {
 		);
 	}
 
+	/**
+	 * 
+	 * @return the distance from the center of the turret to the center of the hub
+	 */
 	public Distance getDistanceToHub() {
 		Translation2d hublocation = PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION);
       	return Meters.of(getFieldRelativePosition().getDistance(hublocation));
 	}
 
+	/**
+	 * 
+	 * @param location the point to calculate the distance to
+	 * @return the distance from the center of the turret to the specified location
+	 */
 	public Distance getDistanceToPoint(Translation2d location) {
       	return Meters.of(getFieldRelativePosition().getDistance(location));
   	}
@@ -238,12 +235,22 @@ public class Turret extends SubsystemBase {
 		return robotToHub.getAngle().getMeasure();
 	}
 
+	/**
+	 * 
+	 * @param point the point to calculate the angle towards
+	 * @return the field relative angle to align the turret to in order to point at the specific location
+	 */
 	public Angle getAngleToPoint(Translation2d point) {
 		Translation2d robotPose = getFieldRelativePosition();
 		Translation2d robotToPoint = point.minus(robotPose);
 		return robotToPoint.getAngle().getMeasure();
 	}
 
+	/**
+	 * 
+	 * @param target the target to aim at
+	 * @return the robot relative velocity the turret should maintain in order to have a field relative velocity of zero
+	 */
 	public AngularVelocity calculateTargetVelocity(TargetLocation target) {
 		Translation2d location = target.getLocation();
 		Translation2d fieldRelativeVelocity = this.getFieldRelativeVelocity();
@@ -257,16 +264,12 @@ public class Turret extends SubsystemBase {
 		return RadiansPerSecond.of(radialVelocity.getY() / distance);
 	}
 
-	public boolean atSetpoint() {
-		return io.isAtSetpoint();
+	public void setRobotRelativeAngle(Angle angle, DoubleSupplier timeSecondsForSetpoint) {
+		io.setRobotRelativeAngle(angle, timeSecondsForSetpoint.getAsDouble());
 	}
 
-	public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, DoubleSupplier timeSecondsForSetpoint) {
-		io.setRobotRelativeAngle(angle, velocity, timeSecondsForSetpoint.getAsDouble());
-	}
-
-	public void setRobotRelativeAngle(Supplier<Angle> angleSupplier, Supplier<AngularVelocity> velocitySupplier, DoubleSupplier timeSecondsForSetpoint) {
-		setRobotRelativeAngle(angleSupplier.get(), velocitySupplier.get(), timeSecondsForSetpoint);
+	public void setRobotRelativeAngle(Supplier<Angle> angleSupplier, DoubleSupplier timeSecondsForSetpoint) {
+		setRobotRelativeAngle(angleSupplier.get(), timeSecondsForSetpoint);
 	}
 
 	public Command joystickControlCommand() {
@@ -282,6 +285,6 @@ public class Turret extends SubsystemBase {
 	}
 
 	public Command setRobotRelativeAngleCommand(Supplier<Angle> angleSupplier, Supplier<AngularVelocity> velocitySupplier, DoubleSupplier timeSecondsForSetpoint) {
-		return Commands.run(() -> setRobotRelativeAngle(angleSupplier.get(), velocitySupplier.get(), timeSecondsForSetpoint));
+		return Commands.run(() -> setRobotRelativeAngle(angleSupplier.get(), timeSecondsForSetpoint));
 	}
 }
