@@ -256,7 +256,7 @@ public class RobotContainer {
 				spindexer.spinUpCommand()
 					.alongWith(
 						flywheel.setVelocityCommand(
-							RotationsPerSecond.of(20), Timer.getFPGATimestamp()
+							RotationsPerSecond.of(20), () -> Timer.getFPGATimestamp()
 						)
 					)
 			)
@@ -369,7 +369,7 @@ public class RobotContainer {
 		driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
 		driverController.square()
-			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
+			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get()), () -> Timer.getFPGATimestamp()))
 			.onFalse(hood.stopCommand());
 
 		// driverController.square()
@@ -377,7 +377,7 @@ public class RobotContainer {
 		// 	.onFalse(turret.stopCommand());
 
 		driverController.circle()
-			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), Timer.getFPGATimestamp()))
+			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), () -> Timer.getFPGATimestamp()))
 			.onFalse(flywheel.stopCommand());
 
 		// driverController.triangle()

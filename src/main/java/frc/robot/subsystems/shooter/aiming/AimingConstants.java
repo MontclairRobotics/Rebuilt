@@ -127,11 +127,12 @@ public class AimingConstants {
 		SIM_CONSTANT_VELOCITY_FERRY_MAP.put(0.0, new SimShotSettings(Degrees.zero(), MetersPerSecond.zero(), Seconds.zero(), true));
 	}
 
-	public record ShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity) {
-		public ShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity) {
+	public record ShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity, double timeSecondsForSetpoint) {
+		public ShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity, double timeSecondsForSetpoint) {
 			this.robotRelativeTurretAngle = robotRelativeTurretAngle;
 			this.hoodAngle = hoodAngle;
 			this.flywheelVelocity = flywheelVelocity;
+			this.timeSecondsForSetpoint = timeSecondsForSetpoint;
 		}
 	}
 

@@ -116,30 +116,30 @@ public class Shooter extends SubsystemBase {
 	}
 
     public boolean atSetpoint() {
-        return turret.atSetpoint() && hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation());
+        return turret.atTimeAdjustedSetpoint() && hood.atTimeAdjustedSetpoint() && (flywheel.atTimeAdjustedSetpoint() || RobotBase.isSimulation());
     }
 
     public Command setParameters(Supplier<ShootingParameters> paramsSupplier) {
         return Commands.parallel(
-            turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation)),
-            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
-            flywheel.setVelocityCommand(() -> paramsSupplier.get().flywheelVelocity(), Timer.getFPGATimestamp()),
+            turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation), () -> paramsSupplier.get().timeSecondsForSetpoint()),
+            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle(), () -> paramsSupplier.get().timeSecondsForSetpoint()),
+            flywheel.setVelocityCommand(() -> paramsSupplier.get().flywheelVelocity(), () -> paramsSupplier.get().timeSecondsForSetpoint()),
             Commands.waitSeconds(1).andThen(indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity()))
         );
     }
 
     public Command setParametersNoTurret(Supplier<ShootingParameters> paramsSupplier) {
         return Commands.parallel(
-            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
+            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle(), () -> paramsSupplier.get().timeSecondsForSetpoint()),
             indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
         );
     }
 
     public Command setConstantShotParameters() {
-        ShootingParameters params = new ShootingParameters(Rotations.of(0.125), Degrees.of(19), RotationsPerSecond.of(24.5));
+        ShootingParameters params = new ShootingParameters(Rotations.of(0.125), Degrees.of(19), RotationsPerSecond.of(24.5), Timer.getFPGATimestamp());
         return Commands.parallel(
-            turret.setRobotRelativeAngleCommand(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(TargetLocation.HUB)),
-            hood.setAngleCommand(() -> params.hoodAngle()),
+            turret.setRobotRelativeAngleCommand(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(TargetLocation.HUB), () -> params.timeSecondsForSetpoint()),
+            hood.setAngleCommand(() -> params.hoodAngle(), () -> params.timeSecondsForSetpoint()),
             indexAndShootCommand(() -> params.flywheelVelocity())
         );
     }
@@ -153,8 +153,8 @@ public class Shooter extends SubsystemBase {
                 Logger.recordOutput("setSimParameters()/Robot Relative Turret Angle", params.robotRelativeTurretAngle().in(Rotations));
                 Logger.recordOutput("setSimParameters()/Hood Angle", params.hoodAngle().in(Rotations));
                 Logger.recordOutput("setSimParameters()/Exit Velocity", params.exitVelocity().in(MetersPerSecond));
-                turret.setRobotRelativeAngle(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation));
-                hood.setAngle(() -> params.hoodAngle());
+                turret.setRobotRelativeAngle(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation), () -> Timer.getFPGATimestamp());
+                hood.setAngle(() -> params.hoodAngle(), () -> Timer.getFPGATimestamp());
             })
         );
     }
@@ -191,7 +191,7 @@ public class Shooter extends SubsystemBase {
     public Command indexAndShootCommand(Supplier<AngularVelocity> flywheelVelocitySupplier) {
         return Commands.run(() -> {
             if (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto) {
-                flywheel.setVelocity(flywheelVelocitySupplier, Timer.getFPGATimestamp());
+                flywheel.setVelocity(flywheelVelocitySupplier, () -> Timer.getFPGATimestamp());
                 if(this.atSetpoint()) spindexer.spinUp();
             }
         });
@@ -199,7 +199,7 @@ public class Shooter extends SubsystemBase {
 
     public Command stowCommand(){
         return Commands.parallel (
-			hood.setAngleCommand(() -> HoodConstants.MIN_ANGLE),
+			hood.setAngleCommand(() -> HoodConstants.MIN_ANGLE, () -> Timer.getFPGATimestamp()),
 			turret.stopCommand(),
             flywheel.stopCommand(),
             spindexer.spinDownCommand()

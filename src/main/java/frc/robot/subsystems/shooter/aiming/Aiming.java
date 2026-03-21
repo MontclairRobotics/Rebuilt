@@ -13,6 +13,7 @@ import static frc.robot.constants.TurretConstants.ORIGIN_TO_TURRET;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
@@ -99,7 +100,7 @@ public class Aiming {
 		hoodAngle = map.get(virtualDistance).angle();
 		flywheelVelocity = map.get(virtualDistance).flywheelVelocity();
 
-		return new ShootingParameters(robotRelativeTurretAngle, hoodAngle, flywheelVelocity);
+		return new ShootingParameters(robotRelativeTurretAngle, hoodAngle, flywheelVelocity, Timer.getFPGATimestamp() + AimingConstants.LATENCY);
 	}
 
 	public SimShootingParameters calculateSimShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {

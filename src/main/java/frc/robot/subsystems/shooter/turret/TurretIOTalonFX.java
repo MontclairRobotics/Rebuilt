@@ -117,7 +117,7 @@ public class TurretIOTalonFX implements TurretIO {
     }
 
     @Override
-    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity) {
+    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, double timeSecondsForSetpoint) {
         Angle predictedAngle = angle.plus(
             Rotations.of((velocity.in(RotationsPerSecond) * LOOKAHEAD_TIME))
         );

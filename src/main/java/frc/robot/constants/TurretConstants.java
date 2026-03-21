@@ -63,7 +63,6 @@ public class TurretConstants {
 	public static final double kP = 60.0555;
 	public static final double kD = 1.00555;
 	public static final double kS = 3;
-	public static final double kV = 16;
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(3.5);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(70);
@@ -78,7 +77,7 @@ public class TurretConstants {
 		.withMotionMagicJerk(MOTION_MAGIC_JERK);
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
-		.withKP(kP).withKD(kD).withKS(kS).withKV(kV);
+		.withKP(kP).withKD(kD).withKS(kS);
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
 		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)

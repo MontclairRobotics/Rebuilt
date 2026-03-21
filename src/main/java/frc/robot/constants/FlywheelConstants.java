@@ -21,7 +21,7 @@ public class FlywheelConstants {
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.5);
 
-	// tuned 3/4
+	// tuned 3/18
 	public static final double kP = 30;
 	public static final double kD = 0;
 	public static final double kS = 13;
