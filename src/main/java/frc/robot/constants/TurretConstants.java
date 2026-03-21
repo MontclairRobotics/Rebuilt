@@ -62,11 +62,12 @@ public class TurretConstants {
 	// pid + ff gains
 	public static final double kP = 60.0555;
 	public static final double kD = 1.00555;
-	public static final double kS = 1;
+	public static final double kS = 3;
+	public static final double kV = 16;
 
-	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(6);
-	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(60);
-	public static final double MOTION_MAGIC_JERK = 100; // Rotations Per Second Per Second Per Second
+	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(3.5);
+	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(70);
+	public static final double MOTION_MAGIC_JERK = 700; // Rotations Per Second Per Second Per Second
 
 	public static final double STATOR_CURRENT_LIMIT = 60; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 40; // Amps
@@ -77,7 +78,7 @@ public class TurretConstants {
 		.withMotionMagicJerk(MOTION_MAGIC_JERK);
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
-		.withKP(kP).withKD(kD).withKS(kS);
+		.withKP(kP).withKD(kD).withKS(kS).withKV(kV);
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
 		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)

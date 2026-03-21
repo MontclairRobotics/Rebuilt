@@ -3,6 +3,7 @@ package frc.robot.subsystems.shooter.turret;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -21,6 +22,7 @@ import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
 public class TurretIOTalonFX implements TurretIO {
@@ -37,8 +39,10 @@ public class TurretIOTalonFX implements TurretIO {
     private final StatusSignal<Current> currentDrawAmpsSignal;
     private final StatusSignal<Temperature> tempCelsiusSignal;
 
-    private final PositionVoltage request = new PositionVoltage(0).withEnableFOC(true);
+    private final MotionMagicVoltage request = new MotionMagicVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
+
+    private final double LOOKAHEAD_TIME = 0.1; // seconds
 
     public TurretIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
@@ -113,9 +117,11 @@ public class TurretIOTalonFX implements TurretIO {
     }
 
     @Override
-    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, double timeSecondsForSetpoint) {
-        Turret.recordSetpoint(angle, timeSecondsForSetpoint);
-        motor.setControl(request.withPosition(angle).withVelocity(velocity));
+    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity) {
+        Angle predictedAngle = angle.plus(
+            Rotations.of((velocity.in(RotationsPerSecond) * LOOKAHEAD_TIME))
+        );
+        motor.setControl(request.withPosition(predictedAngle));
     }
 
     @Override
