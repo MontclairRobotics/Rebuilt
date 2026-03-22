@@ -96,7 +96,6 @@ public class Flywheel extends SubsystemBase {
 
         if(logCounter % loopsPerLog == 0) {
             Logger.processInputs("Flywheel", inputs);
-            // Logger.recordOutput("Flywheel/Mode", FlywheelIOBangBang.phase);
             Logger.recordOutput("Flywheel/Time Adjusted Setpoint", getSetpointForTime(Timer.getFPGATimestamp()));
             Logger.recordOutput("Flywheel/Is At Time Adjusted Setpoint", atTimeAdjustedSetpoint());
         }

@@ -76,8 +76,6 @@ import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters
 
 public class RobotContainer {
 
-	// private final SendableChooser<Command> autoChooser;
-
 	// Controllers
 	public static CommandPS5Controller driverController = new CommandPS5Controller(0);
 	public static CommandPS5Controller operatorController = new CommandPS5Controller(1);
@@ -233,13 +231,6 @@ public class RobotContainer {
 				default:
 					vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 		}
-
-		// autoChooser = AutoBuilder.buildAutoChooser();
-		// SmartDashboard.putData("Auto Chooser", autoChooser);
-		// if(autoChooser.getSelected() != null) {
-		// 	String autoName = autoChooser.getSelected().getName();
-		// 	Auto.drawAuto(autoName);
-		// }
 
 		// configureBindings();
 		configureCompetitionBindings();

@@ -124,7 +124,7 @@ public class Shooter extends SubsystemBase {
             turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation), () -> paramsSupplier.get().timeSecondsForSetpoint()),
             hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle(), () -> paramsSupplier.get().timeSecondsForSetpoint()),
             flywheel.setVelocityCommand(() -> paramsSupplier.get().flywheelVelocity(), () -> paramsSupplier.get().timeSecondsForSetpoint()),
-            Commands.waitSeconds(1).andThen(indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity()))
+            Commands.waitSeconds(0.5).andThen(indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity()))
         );
     }
 

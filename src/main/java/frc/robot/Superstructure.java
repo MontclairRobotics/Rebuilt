@@ -1,7 +1,5 @@
 package frc.robot;
 
-
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
@@ -13,7 +11,6 @@ import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.FERRY_LE
 import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.FERRY_RIGHT;
 import static frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation.HUB;
 
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Constants;
@@ -110,17 +107,6 @@ public class Superstructure extends SubsystemBase {
 		} else {
 			resetTrenchZones();
 		}
-
-		// if(logCounter % loopsPerLog == 0) {
-		// 	Logger.recordOutput("Superstructure/isallianceknown", AllianceManager.isAllianceKnown());
-		// 	Logger.recordOutput("Superstructure/currentshiftempty", HubTracker.getCurrentShift().isEmpty());
-		// 	Logger.recordOutput("Superstructure/shouldBeScoring", scoringModeTrigger.getAsBoolean());
-		// 	Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
-		// 	Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
-		// 	Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowTrigger.getAsBoolean());
-		// 	Logger.recordOutput("Trench/Trench Danger Zones", FieldConstants.Zones.TRENCH_DANGER_ZONES);
-		// }
-
 	};
 
 	public void resetTrenchZones() {
@@ -197,17 +183,8 @@ public class Superstructure extends SubsystemBase {
     }
 
     public boolean shouldBeScoringBasedOnZones() {
-		//for now
-		// if(!AllianceManager.isAllianceKnown() || (HubTracker.getCurrentShift().isEmpty())) return false;
-
 		if(!AllianceManager.isAllianceKnown()) return false;
-
 		return !inTrenchDangerZone() && isInScoringZone();
-        //Are we in the scoring zone and is the hub active
-        // return
-		// 	!inTrenchDangerZone()
-        // 	&& isInScoringZone()
-        // 	&& HubTracker.isActive(DriverStation.getAlliance().get(), HubTracker.getCurrentShift().get());
 	}
 
 
