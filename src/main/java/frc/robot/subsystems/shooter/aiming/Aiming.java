@@ -33,7 +33,7 @@ public class Aiming {
 		TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
 	}
 
-	public static ShootingParameters calculateShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
+	public ShootingParameters calculateShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
 
 		Shooter.targetLocation = target;
 		Translation2d targetLocation = target.getLocation();

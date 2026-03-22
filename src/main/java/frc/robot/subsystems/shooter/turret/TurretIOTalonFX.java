@@ -16,10 +16,13 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.RobotContainer;
+import frc.robot.constants.DriveConstants;
 import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
 public class TurretIOTalonFX implements TurretIO {
@@ -112,10 +115,12 @@ public class TurretIOTalonFX implements TurretIO {
     }
 
     @Override
-    public void setRobotRelativeAngle(Angle angle, double timeSecondsForSetpoint) {
+    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, double timeSecondsForSetpoint) {
         angle = Turret.constrainAngle(angle);
+        double percentVelocity = velocity.in(RotationsPerSecond) / DriveConstants.MAX_ANGULAR_SPEED.in(RotationsPerSecond);
+        double velocityFeedforward = percentVelocity * 4; // 4 volts for max velocity, linearly scaled
         Turret.recordSetpoint(angle, timeSecondsForSetpoint);
-        motor.setControl(request.withPosition(angle));
+        motor.setControl(request.withPosition(angle).withFeedForward(velocityFeedforward));
     }
 
     @Override

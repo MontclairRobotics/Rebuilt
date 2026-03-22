@@ -36,10 +36,10 @@ import frc.robot.subsystems.shooter.spindexer.Spindexer;
 
 public class Shooter extends SubsystemBase {
 
-    private Hood hood;
-    private Flywheel flywheel;
-    private Turret turret;
-    private Spindexer spindexer;
+    public Hood hood;
+    public Flywheel flywheel;
+    public Turret turret;
+    public Spindexer spindexer;
 
     public boolean withConstantVelocity;
     public boolean whileMoving;
@@ -65,7 +65,7 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.recordOutput("Shooter/At Setpoint", RobotContainer.shooter.atSetpoint());
+        Logger.recordOutput("Shooter/At Setpoint", atSetpoint());
         // Logger.recordOutput("Fuel/Hopper Count", hopperCount);
         // Logger.recordOutput("Fuel/Blue Score", Hub.BLUE_HUB.getScore());
         // Logger.recordOutput("Fuel/Red Score", Hub.RED_HUB.getScore());
@@ -148,12 +148,12 @@ public class Shooter extends SubsystemBase {
         return Commands.parallel(
             Commands.run(() -> {
                 SimShootingParameters params = paramsSupplier.get();
-                Logger.recordOutput("launchFuel()/At Setpoint", RobotContainer.shooter.atSetpoint());
+                Logger.recordOutput("launchFuel()/At Setpoint", atSetpoint());
                 launchFuel(() -> params.exitVelocity(), FIRE_RATE);
                 Logger.recordOutput("setSimParameters()/Robot Relative Turret Angle", params.robotRelativeTurretAngle().in(Rotations));
                 Logger.recordOutput("setSimParameters()/Hood Angle", params.hoodAngle().in(Rotations));
                 Logger.recordOutput("setSimParameters()/Exit Velocity", params.exitVelocity().in(MetersPerSecond));
-                turret.setRobotRelativeAngle(() -> params.robotRelativeTurretAngle(), () -> Timer.getFPGATimestamp());
+                turret.setRobotRelativeAngle(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation), () -> Timer.getFPGATimestamp());
                 hood.setAngle(() -> params.hoodAngle(), () -> Timer.getFPGATimestamp());
             })
         );
@@ -161,7 +161,6 @@ public class Shooter extends SubsystemBase {
 
 
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
-        // Logger.recordOutput("Shooter/At Setpoint", RobotContainer.shooter.atSetpoint());
         if (RobotContainer.shooter.atSetpoint() && (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto)) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
@@ -171,8 +170,8 @@ public class Shooter extends SubsystemBase {
                 removeBall();
 
                 LinearVelocity exitVelocity = velocitySupplier.get().times(1 + ((Math.random() * 0.05)-0.025));
-                Angle robotRelativeTurretAngle = RobotContainer.turret.getRobotRelativeAngle();
-                Angle hoodAngle = RobotContainer.hood.getAngle();
+                Angle robotRelativeTurretAngle = turret.getRobotRelativeAngle();
+                Angle hoodAngle = hood.getAngle();
 
                 Logger.recordOutput("launchFuelCommand()/Robot Relative Turret Angle", robotRelativeTurretAngle.in(Rotations));
                 Logger.recordOutput("launchFuelCommand()/Hood Angle", hoodAngle.in(Rotations));

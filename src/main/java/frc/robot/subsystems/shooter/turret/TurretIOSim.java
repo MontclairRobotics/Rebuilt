@@ -15,6 +15,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
@@ -74,7 +75,7 @@ public class TurretIOSim implements TurretIO {
     }
 
     @Override
-    public void setRobotRelativeAngle(Angle angle, double timeSecondsForSetpoint) {
+    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, double timeSecondsForSetpoint) {
         Turret.recordSetpoint(angle, timeSecondsForSetpoint);
         pidController.setGoal(angle.in(Rotations));
         double pidOutput = pidController.calculate(Radians.of(sim.getAngleRads()).in(Rotations));
