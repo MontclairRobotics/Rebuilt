@@ -27,6 +27,7 @@ import frc.robot.commands.WheelRadiusCharacterization.Direction;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.PivotConstants;
+import frc.robot.constants.RollersConstants;
 import frc.robot.constants.TurretConstants;
 import frc.robot.constants.Constants.Mode;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
@@ -135,6 +136,8 @@ public class RobotContainer {
 
 	public LoggedTunableNumber indexerVelocity = new LoggedTunableNumber("Spindexer/Index Velocity", 0);
 	public LoggedTunableNumber serializerVelocity = new LoggedTunableNumber("Spindexer/Serializer Velocity", 0);
+
+	public LoggedTunableNumber intakeVoltage = new LoggedTunableNumber("Intake/Intake Voltage", RollersConstants.SPIN_VOLTAGE);
 
 	public RobotContainer() {
 
@@ -262,7 +265,6 @@ public class RobotContainer {
 	}
 
 	private void configureCompetitionBindings() {
-
 		// driver
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
@@ -294,7 +296,7 @@ public class RobotContainer {
 		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
 
-		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.spinUpCommand())).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
+		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(() -> intakeVoltage.get()))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
 		operatorController.L2().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
 		operatorController.povUp().onTrue(Commands.runOnce(() -> flywheel.increaseFudge()));
