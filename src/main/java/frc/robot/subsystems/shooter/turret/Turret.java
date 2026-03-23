@@ -109,6 +109,10 @@ public class Turret extends SubsystemBase {
         return io.isAtTimeAdjustedSetpoint();
     }
 
+	public boolean atSetpoint() {
+		return io.isAtSetpoint();
+	}
+
 	/** records a setpoint and when we're supposed to reach said setpoint */
     public static void recordSetpoint(Angle setpoint, double timeSecondsForSetpoint) {
         setpointBuffer.addSample(timeSecondsForSetpoint, setpoint);
