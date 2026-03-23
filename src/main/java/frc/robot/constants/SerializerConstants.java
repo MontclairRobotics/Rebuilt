@@ -26,8 +26,8 @@ public class SerializerConstants {
 	public static final double kS = 4.000555;
 	public static final double kV = 1.5000555;
 
-    public static final double STATOR_CURRENT_LIMIT = 80;
-    public static final double SUPPLY_CURRENT_LIMIT = 60;
+    public static final double STATOR_CURRENT_LIMIT = 40;
+    public static final double SUPPLY_CURRENT_LIMIT = 30;
 
     public static final double GEARING = 20;
     public static final double MOMENT_OF_INERTIA = 0.02;
