@@ -126,11 +126,9 @@ public class Turret extends SubsystemBase {
 		while (angle.in(Rotations) > MAX_ANGLE.in(Rotations)) {
     		angle = angle.minus(Rotations.of(1));
 		}
-
 		while (angle.in(Rotations) < MIN_ANGLE.in(Rotations)) {
    			angle = angle.plus(Rotations.of(1));
 		}
-
 		return angle;
 	}
 
@@ -245,11 +243,9 @@ public class Turret extends SubsystemBase {
 		Translation2d fieldRelativeVelocity = this.getFieldRelativeVelocity();
 		Translation2d fieldRelativePosition = this.getFieldRelativePosition();
 		Translation2d r = location.minus(fieldRelativePosition);
-
 		double distance = r.getNorm();
 		Rotation2d r_angle = r.getAngle();
 		Translation2d radialVelocity = fieldRelativeVelocity.rotateBy(r_angle.unaryMinus());
-
 		return RadiansPerSecond.of(radialVelocity.getY() / distance);
 	}
 

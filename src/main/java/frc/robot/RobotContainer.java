@@ -33,6 +33,7 @@ import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.pivot.Pivot;
 import frc.robot.subsystems.intake.pivot.PivotIOSim;
+import frc.robot.subsystems.intake.pivot.PivotIOTalonFX;
 import frc.robot.subsystems.intake.rollers.Rollers;
 import frc.robot.subsystems.intake.rollers.RollersIOSim;
 import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
@@ -163,7 +164,7 @@ public class RobotContainer {
 				superstructure = new Superstructure(shooter);
 				aiming = new Aiming(turret);
 
-				pivot = new Pivot(new PivotIOSim());
+				pivot = new Pivot(new PivotIOTalonFX());
 				rollers = new Rollers(new RollersIOTalonFX());
 				intake = new Intake(pivot, rollers);
 
@@ -288,7 +289,7 @@ public class RobotContainer {
 
 		// operator
 		operatorController.touchpad().whileTrue(shooter.stowCommand());
-		operatorController.circle().whileFalse(shooter.stowCommand());
+		operatorController.circle().onFalse(shooter.stowCommand());
 		operatorController.triangle()
 			.whileTrue(shooter.setConstantShotParameters())
 			.onFalse(shooter.stowCommand());
