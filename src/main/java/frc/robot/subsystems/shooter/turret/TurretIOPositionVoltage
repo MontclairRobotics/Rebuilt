@@ -25,7 +25,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
-public class TurretIOTalonFX implements TurretIO {
+public class TurretIOPositionVoltage implements TurretIO {
 
     private final TalonFX motor;
     private final CANcoder encoder;
@@ -39,10 +39,10 @@ public class TurretIOTalonFX implements TurretIO {
     private final StatusSignal<Current> currentDrawAmpsSignal;
     private final StatusSignal<Temperature> tempCelsiusSignal;
 
-    private final MotionMagicVoltage request = new MotionMagicVoltage(0).withEnableFOC(true);
+    private final PositionVoltage request = new PositionVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
 
-    public TurretIOTalonFX() {
+    public TurretIOPositionVoltage() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
         encoder = new CANcoder(ENCODER_ID, CAN_BUS);
 
@@ -117,9 +117,8 @@ public class TurretIOTalonFX implements TurretIO {
     @Override
     public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, double timeSecondsForSetpoint) {
         angle = Turret.constrainAngle(angle);
-        double velocityFeedforward = velocity.in(RotationsPerSecond) * 4; // 4 volts per rotation/s, equivalent to "kV"
         Turret.recordSetpoint(angle, timeSecondsForSetpoint);
-        motor.setControl(request.withPosition(angle).withFeedForward(velocityFeedforward));
+        motor.setControl(request.withPosition(angle).withVelocity(velocity));
     }
 
     @Override
