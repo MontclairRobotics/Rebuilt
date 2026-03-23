@@ -22,6 +22,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -72,7 +73,7 @@ public class Turret extends SubsystemBase {
 		}
 
 		/** only visualize when in debug mode */
-		if(RobotContainer.TURRET_DEBUG) {
+		if(RobotContainer.TURRET_DEBUG || RobotBase.isSimulation()) {
 			visualization.update();
 			visualization.log();
 		}
@@ -124,7 +125,7 @@ public class Turret extends SubsystemBase {
 	 * @return the new angle, constrained between our min and max angles
 	 */
 	public static Angle constrainAngle(Angle angle) {
-		
+
 		while (angle.in(Rotations) > MAX_ANGLE.in(Rotations)) {
     		angle = angle.minus(Rotations.of(1));
 		}
@@ -175,7 +176,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return the field relative pose of the center of the turret
 	 */
 	public Translation2d getFieldRelativePosition() {
@@ -186,7 +187,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return the field relative velocity of the center of the turret
 	 */
 	public Translation2d getFieldRelativeVelocity() {
@@ -209,7 +210,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return the distance from the center of the turret to the center of the hub
 	 */
 	public Distance getDistanceToHub() {
@@ -218,7 +219,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param location the point to calculate the distance to
 	 * @return the distance from the center of the turret to the specified location
 	 */
@@ -236,7 +237,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param point the point to calculate the angle towards
 	 * @return the field relative angle to align the turret to in order to point at the specific location
 	 */
@@ -247,7 +248,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param target the target to aim at
 	 * @return the robot relative velocity the turret should maintain in order to have a field relative velocity of zero
 	 */

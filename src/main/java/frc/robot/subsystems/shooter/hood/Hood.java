@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.HoodConstants.*;
 
-import java.security.Timestamp;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -25,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.shooter.aiming.AimingConstants;
-import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.tunables.LoggedTunableNumber;
 

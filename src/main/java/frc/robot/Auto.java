@@ -1,6 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Radians;
 
 import java.io.IOException;
 import java.util.ArrayList;

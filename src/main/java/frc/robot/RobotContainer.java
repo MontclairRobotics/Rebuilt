@@ -283,7 +283,7 @@ public class RobotContainer {
 
 		// operator
 
-		shooter.setDefaultCommand(shooter.stowCommand());
+		//shooter.setDefaultCommand(shooter.stowCommand());
 
 		operatorController.circle().onFalse(shooter.stowCommand());
 		operatorController.triangle()

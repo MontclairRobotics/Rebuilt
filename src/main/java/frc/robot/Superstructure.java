@@ -35,7 +35,7 @@ public class Superstructure extends SubsystemBase {
 	private Shooter shooter;
 	private Vision vision;
 	private Aiming aiming;
-	
+
 	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.8);
 
 	private int logCounter;
