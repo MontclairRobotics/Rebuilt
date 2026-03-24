@@ -3,8 +3,8 @@ package frc.robot.subsystems.shooter.turret;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -39,7 +39,7 @@ public class TurretIOTalonFX implements TurretIO {
     private final StatusSignal<Current> currentDrawAmpsSignal;
     private final StatusSignal<Temperature> tempCelsiusSignal;
 
-    private final MotionMagicVoltage request = new MotionMagicVoltage(0).withEnableFOC(true);
+    private final PositionVoltage request = new PositionVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
 
     public TurretIOTalonFX() {
@@ -117,7 +117,7 @@ public class TurretIOTalonFX implements TurretIO {
     @Override
     public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, double timeSecondsForSetpoint) {
         angle = Turret.constrainAngle(angle);
-        double velocityFeedforward = velocity.in(RotationsPerSecond) * 4; // 4 volts per rotation/s, equivalent to "kV"
+        double velocityFeedforward = velocity.in(RotationsPerSecond) * 5.05; // 4 volts per rotation/s, equivalent to "kV"
         Turret.recordSetpoint(angle, timeSecondsForSetpoint);
         motor.setControl(request.withPosition(angle).withFeedForward(velocityFeedforward));
     }
