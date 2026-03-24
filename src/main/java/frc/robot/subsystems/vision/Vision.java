@@ -6,6 +6,7 @@ package frc.robot.subsystems.vision;
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.Constants;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 
 import java.util.ArrayList;
@@ -124,10 +126,10 @@ public class Vision extends SubsystemBase {
 							> maxZError // Must have realistic Z coordinate
 
 						// Must be within the field boundaries
-						|| observation.pose().getX() < 0.0
-						|| observation.pose().getX() > aprilTagLayout.getFieldLength()
-						|| observation.pose().getY() < 0.0
-						|| observation.pose().getY() > aprilTagLayout.getFieldWidth();
+						|| observation.pose().getX() < Constants.BUMPER_WIDTH.in(Meters) / 2
+						|| observation.pose().getX() > aprilTagLayout.getFieldLength() - Constants.BUMPER_WIDTH.in(Meters) / 2
+						|| observation.pose().getY() < Constants.BUMPER_WIDTH.in(Meters) / 2
+						|| observation.pose().getY() > aprilTagLayout.getFieldWidth() - Constants.BUMPER_WIDTH.in(Meters) / 2;
 
 				// Add pose to log
 				if (logCounter % 5 == 0) {
