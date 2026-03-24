@@ -4,19 +4,24 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
+import static frc.robot.subsystems.vision.VisionConstants.camera2Name;
+
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
-
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -25,10 +30,10 @@ import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.commands.WheelRadiusCharacterization;
 import frc.robot.commands.WheelRadiusCharacterization.Direction;
 import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.Mode;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.PivotConstants;
 import frc.robot.constants.TurretConstants;
-import frc.robot.constants.Constants.Mode;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.pivot.Pivot;
@@ -40,6 +45,9 @@ import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
+import frc.robot.subsystems.shooter.hood.Hood;
+import frc.robot.subsystems.shooter.hood.HoodIOSim;
+import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.Indexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.IndexerIOSim;
@@ -50,9 +58,6 @@ import frc.robot.subsystems.shooter.spindexer.serializer.SerializerIOTalonFX;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
 import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
-import frc.robot.subsystems.shooter.hood.Hood;
-import frc.robot.subsystems.shooter.hood.HoodIOSim;
-import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -63,59 +68,48 @@ import frc.robot.util.sim.FuelSim;
 import frc.robot.util.tunables.LoggedTunableNumber;
 import frc.robot.util.tunables.Tunable;
 
-import static frc.robot.subsystems.vision.VisionConstants.*;
-
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.Logger;
-
-
-import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
-
 public class RobotContainer {
-
-	// private final SendableChooser<Command> autoChooser;
 
 	// Controllers
 	public static CommandPS5Controller driverController = new CommandPS5Controller(0);
 	public static CommandPS5Controller operatorController = new CommandPS5Controller(1);
 
 	// Subsystems
-	public static Vision vision;
 	public static CommandSwerveDrivetrain drivetrain;
-
-	// shooter
-	public static Shooter shooter;
-	public static Turret turret;
-	public static Flywheel flywheel;
-	public static Hood hood;
-
-	public static Spindexer spindexer;
-	public static Serializer serializer;
-	public static Indexer indexer;
-
-	// intake
-	public static Pivot pivot;
-	public static Rollers rollers;
-	public static Intake intake;
-
+	public static Vision vision;
+	public static Auto auto = new Auto();;
 	public static Superstructure superstructure;
-	public static Aiming aiming;
-
-	public static Auto auto;
-
-	public static SimShootingParameters simShootingParameters = new SimShootingParameters(Degrees.zero(), Degrees.zero(), MetersPerSecond.zero());
-
+	public static Aiming aiming = new Aiming();;
 	private SwerveDriveSimulation driveSimulation;
 	public static FuelSim fuelSim = new FuelSim("fuel");
 
+	// shooter
+	public static Turret turret;
+	public static Flywheel flywheel;
+	public static Hood hood;
+	public static Shooter shooter;
+	
+	// spindexer
+	public static Serializer serializer;
+	public static Indexer indexer;
+	public static Spindexer spindexer;
+
+	// intake
+	public static Rollers rollers;
+	public static Intake intake;
+	public static Pivot pivot;
+
+	//changing variables
 	private boolean useConstantVelocityMap = false;
 	private boolean shootWhileMoving = true;
+	public double turretFudge = 0;
+	public static boolean shouldShootAuto = false;
+
 
 	// debug, set to true to increase logging, set to false to increase performance and reduce loop overruns
 	public static boolean VISION_DEBUG = false;
 	public static boolean TURRET_DEBUG = false;
-	public static boolean FLYWHEEL_DEBUG = true;
+	public static boolean FLYWHEEL_DEBUG = false;
 	public static boolean HOOD_DEBUG  = false;
 	public static boolean INDEXER_DEBUG = false;
 	public static boolean SERIALIZER_DEBUG = false;
@@ -124,55 +118,45 @@ public class RobotContainer {
 	public static boolean DRIVETRAIN_DEBUG = false;
 	public static boolean SUPERSTRUCTURE_DEBUG = false;
 
-	public double turretFudge = 0;
-
-	public static boolean shouldShootAuto = false;
-
-	public static Trigger shootButtonTrigger = operatorController.circle();
+	public static Trigger shootButtonTrigger;
 	public LoggedTunableNumber indexerCurrent = new LoggedTunableNumber("Spindexer/Index Current", 0);
 	public LoggedTunableNumber serializerCurrent = new LoggedTunableNumber("Spindexer/Serializer Current", 0);
-
 	public LoggedTunableNumber indexerVelocity = new LoggedTunableNumber("Spindexer/Index Velocity", 0);
 	public LoggedTunableNumber serializerVelocity = new LoggedTunableNumber("Spindexer/Serializer Velocity", 0);
 
 	public RobotContainer() {
 
 		Tunable turretFudgeTunable = new Tunable("Turret Fudge", turretFudge, (value) -> TurretConstants.ANGLE_OFFSET = Rotations.of(0.375).plus(Degrees.of(value)));
-
 		System.out.println("Constants.CURRENT_MODE: " + Constants.CURRENT_MODE);
 
 		switch (Constants.CURRENT_MODE) {
 			case REAL:
 				drivetrain = TunerConstants.createDrivetrain();
-
-				hood = new Hood(new HoodIOTalonFX());
-				flywheel = new Flywheel(new FlywheelIOTalonFX());
-				turret = new Turret(new TurretIOTalonFX());
-
-				serializer = new Serializer(new SerializerIOTalonFX());
-				indexer = new Indexer(new IndexerIOTalonFX());
-				spindexer = new Spindexer(serializer, indexer);
-
-				shooter = new Shooter(
-					hood, flywheel, turret, spindexer,
-					useConstantVelocityMap, shootWhileMoving
-				);
-
-				superstructure = new Superstructure(shooter);
-				aiming = new Aiming(turret);
-
-				pivot = new Pivot(new PivotIOSim());
-				rollers = new Rollers(new RollersIOSim());
-				intake = new Intake(pivot, rollers);
-
-				auto = new Auto();
-
 				vision = new Vision(
 					drivetrain::addVisionMeasurement,
 					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
 					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
 					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
 				);
+				superstructure = new Superstructure(shooter);
+
+				turret = new Turret(new TurretIOTalonFX());
+				flywheel = new Flywheel(new FlywheelIOTalonFX());
+				hood = new Hood(new HoodIOTalonFX());
+				shooter = new Shooter(
+					hood, flywheel, turret, spindexer,
+					useConstantVelocityMap, shootWhileMoving
+				);
+
+				serializer = new Serializer(new SerializerIOTalonFX());
+				indexer = new Indexer(new IndexerIOTalonFX());
+				spindexer = new Spindexer(serializer, indexer);
+
+				pivot = new Pivot(new PivotIOSim());
+				rollers = new Rollers(new RollersIOSim());
+				intake = new Intake(pivot, rollers);
+
+				
 
 				break;
 
@@ -194,7 +178,7 @@ public class RobotContainer {
 				);
 
 				superstructure = new Superstructure(shooter);
-				aiming = new Aiming(turret);
+				aiming = new Aiming();
 
 				pivot = new Pivot(new PivotIOSim());
 				rollers = new Rollers(new RollersIOSim());
@@ -264,7 +248,7 @@ public class RobotContainer {
 	}
 /**Comp bindings, dont change.*/
 	private void configureCompetitionBindings() {
-
+		shootButtonTrigger  = operatorController.circle();
 		// driver
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
@@ -310,7 +294,7 @@ public class RobotContainer {
 	}
 /**Testing bindings. Feel free to adjust. */
 	private void configureBindings() {
-
+		shootButtonTrigger  = operatorController.circle();
 		driverController.povRight().whileTrue(new WheelRadiusCharacterization(Direction.CLOCKWISE, drivetrain));
 		driverController.povLeft().whileTrue(new WheelRadiusCharacterization(Direction.COUNTER_CLOCKWISE, drivetrain));
 

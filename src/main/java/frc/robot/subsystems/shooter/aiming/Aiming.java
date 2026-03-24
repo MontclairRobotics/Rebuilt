@@ -25,10 +25,9 @@ import frc.robot.util.PoseUtils;
 
 public class Aiming {
 
-	private final Turret turret;
 
-	public Aiming(Turret turret) {
-		this.turret = turret;
+
+	public Aiming() {
 		TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
 	}
 
