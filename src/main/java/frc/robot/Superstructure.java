@@ -1,7 +1,5 @@
 package frc.robot;
 
-
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
@@ -17,9 +15,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Mode;
+import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.constants.HoodConstants;
 import frc.robot.subsystems.shooter.aiming.Aiming;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LeftTrench;
@@ -29,33 +30,42 @@ import frc.robot.util.PoseUtils;
 
 public class Superstructure extends SubsystemBase {
 
+	private CommandSwerveDrivetrain drivetrain;
+	private Intake intake;
 	private Shooter shooter;
+	private Vision vision;
+	private Aiming aiming;
+
 	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.8);
 
 	private int logCounter;
 	private final int loopsPerLog;
 
-	public Superstructure(Shooter shooter) {
+	public Superstructure(CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter, Vision vision, Aiming aiming) {
 
 		loopsPerLog = RobotContainer.SUPERSTRUCTURE_DEBUG ? 1 : 10;
 
+		this.drivetrain = drivetrain;
+		this.intake = intake;
+		this.vision = vision;
 		this.shooter = shooter;
+
 		if(CURRENT_MODE == Mode.SIM) {
 			shouldStowTrigger.whileTrue(
 				shooter.stowCommand());
 			scoringModeTrigger.whileTrue(
 				shooter.setSimParameters(
-					() -> RobotContainer.aiming.calculateSimShot(
+					() -> aiming.calculateSimShot(
 						HUB, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryLeftTrigger.whileTrue(
 				shooter.setSimParameters(
-					() -> RobotContainer.aiming.calculateSimShot(
+					() -> aiming.calculateSimShot(
 						FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryRightTrigger.whileTrue(
 				shooter.setSimParameters(
-					() -> RobotContainer.aiming.calculateSimShot(
+					() -> aiming.calculateSimShot(
 						FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 		} else {
@@ -63,15 +73,15 @@ public class Superstructure extends SubsystemBase {
 				shooter.stowCommand());
 			scoringModeTrigger.whileTrue(
 				shooter.setParameters(
-					() -> Aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryLeftTrigger.whileTrue(
 				shooter.setParameters(
-					() -> Aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryRightTrigger.whileTrue(
 				shooter.setParameters(
-					() -> Aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 		}
 	}
@@ -97,17 +107,6 @@ public class Superstructure extends SubsystemBase {
 		} else {
 			resetTrenchZones();
 		}
-
-		// if(logCounter % loopsPerLog == 0) {
-		// 	Logger.recordOutput("Superstructure/isallianceknown", AllianceManager.isAllianceKnown());
-		// 	Logger.recordOutput("Superstructure/currentshiftempty", HubTracker.getCurrentShift().isEmpty());
-		// 	Logger.recordOutput("Superstructure/shouldBeScoring", scoringModeTrigger.getAsBoolean());
-		// 	Logger.recordOutput("Superstructure/shouldFerryLeft", shouldFerryLeft());
-		// 	Logger.recordOutput("Superstructure/shouldFerryRight", shouldFerryRight());
-		// 	Logger.recordOutput("Superstructure/inTrenchDangerZone", shouldStowTrigger.getAsBoolean());
-		// 	Logger.recordOutput("Trench/Trench Danger Zones", FieldConstants.Zones.TRENCH_DANGER_ZONES);
-		// }
-
 	};
 
 	public void resetTrenchZones() {
@@ -140,7 +139,7 @@ public class Superstructure extends SubsystemBase {
 
 	public void updateTrenchZonesVeloBased() {
 		//Updates width of zone based on robot velocity
-		Distance dynamicTrenchDangerZoneWidth = Meters.of(TRENCH_ZONE_OFFSET.in(Meters) + Math.abs(RobotContainer.drivetrain.getFieldRelativeVelocity().getX())* HoodConstants.HOOD_LOWER_TIME);
+		Distance dynamicTrenchDangerZoneWidth = Meters.of(TRENCH_ZONE_OFFSET.in(Meters) + Math.abs(drivetrain.getFieldRelativeVelocity().getX())* HoodConstants.HOOD_LOWER_TIME);
 		FieldConstants.Zones.TRENCH_DANGER_ZONES = new Translation2d[][]{
 			// near right trench
 			new Translation2d[] {
@@ -172,8 +171,8 @@ public class Superstructure extends SubsystemBase {
 		return AllianceManager.isRed();
     }
 
-    public static boolean isInScoringZone() {
-        Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
+    public boolean isInScoringZone() {
+        Translation2d pos = shooter.turret.getFieldRelativePosition();
 
         return
 			(AllianceManager.isRed() ?
@@ -184,23 +183,14 @@ public class Superstructure extends SubsystemBase {
     }
 
     public boolean shouldBeScoringBasedOnZones() {
-		//for now
-		// if(!AllianceManager.isAllianceKnown() || (HubTracker.getCurrentShift().isEmpty())) return false;
-
 		if(!AllianceManager.isAllianceKnown()) return false;
-
 		return !inTrenchDangerZone() && isInScoringZone();
-        //Are we in the scoring zone and is the hub active
-        // return
-		// 	!inTrenchDangerZone()
-        // 	&& isInScoringZone()
-        // 	&& HubTracker.isActive(DriverStation.getAlliance().get(), HubTracker.getCurrentShift().get());
 	}
 
 
     public boolean shouldFerryLeft() {
 		if(!AllianceManager.isAllianceKnown()) return false;
-        Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
+        Translation2d pos = shooter.turret.getFieldRelativePosition();
 
         return
 			!inTrenchDangerZone() &&
@@ -220,7 +210,7 @@ public class Superstructure extends SubsystemBase {
 
     public boolean shouldFerryRight() {
 		if(!AllianceManager.isAllianceKnown()) return false;
-        Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
+        Translation2d pos = shooter.turret.getFieldRelativePosition();
 
         return
 			!inTrenchDangerZone() &&
@@ -239,8 +229,8 @@ public class Superstructure extends SubsystemBase {
 
 
 	// whether we are in the zone to apply trench lock
-	public static boolean inTrenchZone() {
-        Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+	public boolean inTrenchZone() {
+        Pose2d robotPose = drivetrain.getRobotPose();
         for (Translation2d[] zone : FieldConstants.Zones.TRENCH_ZONES) {
             if (robotPose.getX() >= zone[0].getX()
                     && robotPose.getX() <= zone[1].getX()
@@ -252,8 +242,8 @@ public class Superstructure extends SubsystemBase {
         return false;
     }
 
-	public static boolean inTrenchDangerZone() {
-		Translation2d turretPose = RobotContainer.turret.getFieldRelativePosition();
+	public boolean inTrenchDangerZone() {
+		Translation2d turretPose = shooter.turret.getFieldRelativePosition();
         for (Translation2d[] zone : FieldConstants.Zones.TRENCH_DANGER_ZONES) {
             if (
 					turretPose.getX() >= zone[0].getX()
@@ -271,8 +261,8 @@ public class Superstructure extends SubsystemBase {
 	}
 
 	// whether we are in the zone to apply bump lock
-	public static boolean inBumpZone() {
-		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+	public boolean inBumpZone() {
+		Pose2d robotPose = drivetrain.getRobotPose();
 		for (Translation2d[] zone : FieldConstants.Zones.BUMP_ZONES) {
             if (robotPose.getX() >= zone[0].getX()
                     && robotPose.getX() <= zone[1].getX()
@@ -285,22 +275,22 @@ public class Superstructure extends SubsystemBase {
 	}
 
 	// are we moving INTO the trench?
-	public static boolean movingIntoObstacle() {
-		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+	public boolean movingIntoObstacle() {
+		Pose2d robotPose = drivetrain.getRobotPose();
 		boolean movingIntoObstacleOnBlue =
 			(robotPose.getX() < FieldConstants.LinesVertical.ALLIANCE_ZONE.plus(FieldConstants.Hub.WIDTH.div(2)).plus(Constants.BUMPER_WIDTH).in(Meters)
-			&& RobotContainer.drivetrain.getForwardVelocityFromController() > 0 )
+			&& drivetrain.getForwardVelocityFromController() > 0 )
 
 			|| (robotPose.getX() > FieldConstants.LinesVertical.ALLIANCE_ZONE.in(Meters)
 			&& robotPose.getX() < FieldConstants.LinesVertical.CENTER.in(Meters)
-			&& RobotContainer.drivetrain.getForwardVelocityFromController() < 0)
+			&& drivetrain.getForwardVelocityFromController() < 0)
 
 			|| (robotPose.getX() < FieldConstants.LinesVertical.OPP_ALLIANCE_ZONE.in(Meters)
 			&& robotPose.getX() > FieldConstants.LinesVertical.CENTER.in(Meters)
-			&& RobotContainer.drivetrain.getForwardVelocityFromController() > 0)
+			&& drivetrain.getForwardVelocityFromController() > 0)
 
 			|| (robotPose.getX() > FieldConstants.LinesVertical.OPP_ALLIANCE_ZONE.minus(FieldConstants.Hub.WIDTH.div(2)).minus(Constants.BUMPER_WIDTH).in(Meters)
-			&& RobotContainer.drivetrain.getForwardVelocityFromController() < 0);
+			&& drivetrain.getForwardVelocityFromController() < 0);
 
 		if(AllianceManager.isRed()) return !movingIntoObstacleOnBlue;
 		return movingIntoObstacleOnBlue;

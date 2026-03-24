@@ -21,13 +21,13 @@ public class FlywheelConstants {
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.5);
 
-	// tuned 3/4
+	// tuned 3/18
 	public static final double kP = 30;
 	public static final double kD = 0;
 	public static final double kS = 13;
 	public static final double kV = 0.62;
 
-	public static final double STATOR_CURRENT_LIMIT = 80; // Amps
+	public static final double STATOR_CURRENT_LIMIT = 90; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 60; // Amps
 
 	public static final double MOMENT_OF_INERTIA = 0.00233846427; // From CAD on 2026.02.11, probably wrong

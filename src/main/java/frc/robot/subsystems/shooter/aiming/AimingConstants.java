@@ -18,7 +18,7 @@ import frc.robot.util.tunables.Tunable;
 
 public class AimingConstants {
 
-	public static double LATENCY = 0.2; // seconds it takes to reach desired state once state is set
+	public static double LATENCY = 0.08; // seconds it takes to reach desired state once state is set
 	public static Tunable latencyTunable = new Tunable("latency", LATENCY, (input)->LATENCY=input);
 
 	public record ShotSettings(Angle angle, AngularVelocity flywheelVelocity, Time timeOfFlight, boolean withConstantVelocity) implements Interpolatable<ShotSettings> {
@@ -99,11 +99,11 @@ public class AimingConstants {
 		REAL_MAP.put(5.11, new ShotSettings(Degrees.of(11), RotationsPerSecond.of(28), Seconds.of(1.14), false));
 		REAL_MAP.put(7.00, new ShotSettings(Degrees.of(24.5), RotationsPerSecond.of(32.5), Seconds.of(1.2), false));
 
-		REAL_FERRY_MAP.put(20.0, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(50), Seconds.of(3), false));
-		REAL_FERRY_MAP.put(9.59, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(40), Seconds.of(1.8), false));
-		REAL_FERRY_MAP.put(8.67, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(37.4), Seconds.of(1.78), false));
-		REAL_FERRY_MAP.put(6.63, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(28.9), Seconds.of(1.38), false));
-		REAL_FERRY_MAP.put(5.15, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(25.5), Seconds.of(1.22), false));
+		REAL_FERRY_MAP.put(20.0, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(45), Seconds.of(3), false));
+		REAL_FERRY_MAP.put(9.59, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(37), Seconds.of(1.8), false));
+		REAL_FERRY_MAP.put(8.67, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(34.4), Seconds.of(1.78), false));
+		REAL_FERRY_MAP.put(6.63, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(26.9), Seconds.of(1.38), false));
+		REAL_FERRY_MAP.put(5.15, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(24.5), Seconds.of(1.22), false));
 		REAL_FERRY_MAP.put(3.67, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(22.44), Seconds.of(1.06), false));
 		REAL_FERRY_MAP.put(0.0, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(15), Seconds.of(1), false));
 
@@ -127,11 +127,12 @@ public class AimingConstants {
 		SIM_CONSTANT_VELOCITY_FERRY_MAP.put(0.0, new SimShotSettings(Degrees.zero(), MetersPerSecond.zero(), Seconds.zero(), true));
 	}
 
-	public record ShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity) {
-		public ShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity) {
+	public record ShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity, double timeSecondsForSetpoint) {
+		public ShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity, double timeSecondsForSetpoint) {
 			this.robotRelativeTurretAngle = robotRelativeTurretAngle;
 			this.hoodAngle = hoodAngle;
 			this.flywheelVelocity = flywheelVelocity;
+			this.timeSecondsForSetpoint = timeSecondsForSetpoint;
 		}
 	}
 

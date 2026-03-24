@@ -13,6 +13,7 @@ import static frc.robot.constants.TurretConstants.ORIGIN_TO_TURRET;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
@@ -32,12 +33,11 @@ public class Aiming {
 		TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
 	}
 
-	public static ShootingParameters calculateShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
+	public ShootingParameters calculateShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
 
 		Shooter.targetLocation = target;
 		Translation2d targetLocation = target.getLocation();
 		InterpolatingTreeMap<Double, ShotSettings> map;
-		whileMoving = true;
 
 		switch(target) {
 			case HUB:
@@ -89,7 +89,7 @@ public class Aiming {
 				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
 				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
 
-				if (Math.abs(newTOF - estimatedTOF) < 0.02) break;
+				if (Math.abs(newTOF - estimatedTOF) < 0.01) break;
 				estimatedTOF = newTOF;
 			}
 		}
@@ -99,7 +99,7 @@ public class Aiming {
 		hoodAngle = map.get(virtualDistance).angle();
 		flywheelVelocity = map.get(virtualDistance).flywheelVelocity();
 
-		return new ShootingParameters(robotRelativeTurretAngle, hoodAngle, flywheelVelocity);
+		return new ShootingParameters(robotRelativeTurretAngle, hoodAngle, flywheelVelocity, Timer.getFPGATimestamp() + AimingConstants.LATENCY);
 	}
 
 	public SimShootingParameters calculateSimShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {

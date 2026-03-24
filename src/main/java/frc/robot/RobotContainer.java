@@ -27,12 +27,14 @@ import frc.robot.commands.WheelRadiusCharacterization.Direction;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.PivotConstants;
+import frc.robot.constants.RollersConstants;
 import frc.robot.constants.TurretConstants;
 import frc.robot.constants.Constants.Mode;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.pivot.Pivot;
 import frc.robot.subsystems.intake.pivot.PivotIOSim;
+import frc.robot.subsystems.intake.pivot.PivotIOTalonFX;
 import frc.robot.subsystems.intake.rollers.Rollers;
 import frc.robot.subsystems.intake.rollers.RollersIOSim;
 import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
@@ -74,8 +76,6 @@ import org.littletonrobotics.junction.Logger;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
 
 public class RobotContainer {
-
-	// private final SendableChooser<Command> autoChooser;
 
 	// Controllers
 	public static CommandPS5Controller driverController = new CommandPS5Controller(0);
@@ -137,6 +137,8 @@ public class RobotContainer {
 	public LoggedTunableNumber indexerVelocity = new LoggedTunableNumber("Spindexer/Index Velocity", 0);
 	public LoggedTunableNumber serializerVelocity = new LoggedTunableNumber("Spindexer/Serializer Velocity", 0);
 
+	public LoggedTunableNumber intakeVoltage = new LoggedTunableNumber("Intake/Intake Voltage", RollersConstants.SPIN_VOLTAGE);
+
 	public RobotContainer() {
 
 		Tunable turretFudgeTunable = new Tunable("Turret Fudge", turretFudge, (value) -> TurretConstants.ANGLE_OFFSET = Rotations.of(0.375).plus(Degrees.of(value)));
@@ -160,10 +162,9 @@ public class RobotContainer {
 					useConstantVelocityMap, shootWhileMoving
 				);
 
-				superstructure = new Superstructure(shooter);
 				aiming = new Aiming(turret);
 
-				pivot = new Pivot(new PivotIOSim());
+				pivot = new Pivot(new PivotIOTalonFX());
 				rollers = new Rollers(new RollersIOTalonFX());
 				intake = new Intake(pivot, rollers);
 
@@ -175,6 +176,8 @@ public class RobotContainer {
 					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
 					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
 				);
+
+				superstructure = new Superstructure(drivetrain, intake, shooter, vision, aiming);
 
 				break;
 
@@ -195,7 +198,6 @@ public class RobotContainer {
 					useConstantVelocityMap, shootWhileMoving
 				);
 
-				superstructure = new Superstructure(shooter);
 				aiming = new Aiming(turret);
 
 				pivot = new Pivot(new PivotIOSim());
@@ -225,19 +227,13 @@ public class RobotContainer {
 				fuelSim.spawnStartingFuel();
 
 				auto = new Auto();
+				superstructure = new Superstructure(drivetrain, intake, shooter, vision, aiming);
 
 				break;
 
 				default:
 					vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 		}
-
-		// autoChooser = AutoBuilder.buildAutoChooser();
-		// SmartDashboard.putData("Auto Chooser", autoChooser);
-		// if(autoChooser.getSelected() != null) {
-		// 	String autoName = autoChooser.getSelected().getName();
-		// 	Auto.drawAuto(autoName);
-		// }
 
 		// configureBindings();
 		configureCompetitionBindings();
@@ -255,7 +251,7 @@ public class RobotContainer {
 				spindexer.spinUpCommand()
 					.alongWith(
 						flywheel.setVelocityCommand(
-							RotationsPerSecond.of(20), Timer.getFPGATimestamp()
+							RotationsPerSecond.of(20), () -> Timer.getFPGATimestamp()
 						)
 					)
 			)
@@ -269,12 +265,11 @@ public class RobotContainer {
 	}
 
 	private void configureCompetitionBindings() {
-
 		// driver
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 		driverController.R2()
-			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(2), RotationsPerSecond.of(1)))
+			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(1), RotationsPerSecond.of(0.5)))
 			.onFalse(drivetrain.setMaxSpeedsCommand(TunerConstants.kSpeedAt12Volts, RotationsPerSecond.of(1.624)));
 
 		driverController.triangle()
@@ -287,23 +282,23 @@ public class RobotContainer {
 			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(-90)), false));
 
 		// operator
-		operatorController.touchpad().whileTrue(shooter.stowCommand());
-		operatorController.circle().whileFalse(shooter.stowCommand());
-		operatorController.triangle()
-			.whileTrue(shooter.setConstantShotParameters())
-			.onFalse(shooter.stowCommand());
-		operatorController.square()
-			.whileTrue(shooter.setParametersNoTurret(() -> Aiming.calculateShot(Shooter.targetLocation, useConstantVelocityMap, shootWhileMoving)))
-			.onFalse(shooter.stowCommand());
+
+		//shooter.setDefaultCommand(shooter.stowCommand());
+
+		operatorController.circle().onFalse(shooter.stowCommand());
+		// operatorController.triangle()
+		// 	.whileTrue(shooter.setConstantShotParameters())
+		// 	.onFalse(shooter.stowCommand());
+		// operatorController.square()
+		// 	.whileTrue(shooter.setParametersNoTurret(() -> aiming.calculateShot(Shooter.targetLocation, useConstantVelocityMap, shootWhileMoving)))
+		// 	.onFalse(shooter.stowCommand());
 
 		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
 
-		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.spinUpCommand())).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
+		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(() -> intakeVoltage.get()))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
 		operatorController.L2().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
-		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
-		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
 		operatorController.povUp().onTrue(Commands.runOnce(() -> flywheel.increaseFudge()));
 		operatorController.povDown().onTrue(Commands.runOnce(() -> flywheel.decreaseFudge()));
 
@@ -320,18 +315,8 @@ public class RobotContainer {
 		driverController.povLeft().whileTrue(new WheelRadiusCharacterization(Direction.COUNTER_CLOCKWISE, drivetrain));
 
 		operatorController.circle().onFalse(shooter.stowCommand());
-		// operatorController.povUp().onTrue(turret.increaseFudgeFactorCommand());
-		// operatorController.povDown().onTrue(turret.decreaseFudgeFactorCommand());
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
-
-		// driverController.triangle().whileTrue(
-		// 	indexer.setCurrentCommand(() -> indexerCurrent.getAsDouble())
-		// 	.alongWith(serializer.setCurrentCommand(() -> serializerCurrent.getAsDouble()))
-		// ).onFalse(
-		// 	indexer.setCurrentCommand(() -> 0)
-		// 	.alongWith(serializer.setCurrentCommand(() -> 0)
-		// ));
 
 		driverController.triangle().whileTrue(
 			indexer.setVelocityCommand(() -> RotationsPerSecond.of(indexerVelocity.getAsDouble()))
@@ -340,59 +325,18 @@ public class RobotContainer {
 			spindexer.spinDownCommand()
 		);
 
-		// driverController.cross().whileTrue(
-		// 	indexer.setVelocityCommand(() -> RotationsPerSecond.of(indexerVelocity.get()))
-		// 	.alongWith(serializer.setVelocityCommand(() -> RotationsPerSecond.of(serializerVelocity.get())))
-		// )
-		// .onFalse(
-		// 	indexer.spinDownCommand()
-		// 	.alongWith(serializer.spinDownCommand())
-		// );
-
-		// driverController.R1().whileTrue(rollers.setVoltageCommand(() -> intakeVoltage)).onFalse(rollers.setVoltageCommand(() -> 0));
-
-		// operatorController.L2()
-		// 	.whileTrue(rollers.setVoltageCommand(intakeVoltage))
-		// 	.onFalse(rollers.setVoltageCommand(() -> 0));
-
 		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
 		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.spinUpCommand())).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
-		// operatorController.square().whileTrue(pivot.goToAngleCommand(PivotConstants.MAX_ANGLE.div(2))).onFalse(pivot.stopCommand());
-
-
-		// driverController.circle().whileTrue(rollers.spinUpCommand()).onFalse(rollers.spinDownCommand());
-		// hood.setDefaultCommand(hood.joystickControlCommand());
-		// turret.setDefaultCommand(turret.joystickControlCommand());
-		// flywheel.setDefaultCommand(flywheel.joystickControlCommand());
 
 		driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
 		driverController.square()
-			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
+			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get()), () -> Timer.getFPGATimestamp()))
 			.onFalse(hood.stopCommand());
 
-		// driverController.square()
-		// 	.whileTrue(turret.setRobotRelativeAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
-		// 	.onFalse(turret.stopCommand());
-
 		driverController.circle()
-			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), Timer.getFPGATimestamp()))
+			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), () -> Timer.getFPGATimestamp()))
 			.onFalse(flywheel.stopCommand());
-
-		// driverController.triangle()
-		// 	.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.ze))
-		// 	.onFalse(flywheel.stopCommand());
-		//.times(1).minus(Rotations.of(drivetrain.getWrappedHeading().getRotations()))
-		// driverController.circle().whileTrue(Commands.runOnce(() -> fuelSim.launchFuel(MetersPerSecond.of(launchSpeed),Degrees.of(90-hoodAngle),turret.getAngleToHub(),TurretConstants.ORIGIN_TO_TURRET.getMeasureZ())));
-		// driverController.triangle()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
-		// driverController.square()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand((Rotation2d.fromDegrees(90)), false));
-		// driverController.cross()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
-		// driverController.circle()
-		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(Rotation2d.fromDegrees(-90), false));
-		// driverController.cross().onTrue(hood.setAngleCommand(HoodConstants.MAX_ANGLE));
 
 		if(Constants.CURRENT_MODE == Mode.SIM) driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));
 
