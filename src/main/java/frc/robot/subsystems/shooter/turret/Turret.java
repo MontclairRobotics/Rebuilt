@@ -264,8 +264,11 @@ public class Turret extends SubsystemBase {
 
 		double distance = r.getNorm();
 		Rotation2d r_angle = r.getAngle();
+		// Rotation2d v_angle = fieldRelativeVelocity.getAngle();
+		// Rotation2d r_to_v = r_angle.plus(v_angle);
+		// double radialVelocity = fieldRelativeVelocity.getNorm() * Math.cos(r_to_v.getRadians());
 		Translation2d radialVelocity = fieldRelativeVelocity.rotateBy(r_angle.unaryMinus());
-
+		
 		return RadiansPerSecond.of(radialVelocity.getY() / distance);
 	}
 
