@@ -8,32 +8,27 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.3219400855920111,
-        "y": 0.8973751783166914
+        "x": 1.4878666666666667,
+        "y": 0.7413777777777772
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.43,
+        "x": 3.59,
         "y": 0.63
       },
       "prevControl": {
-        "x": 2.719315263908701,
+        "x": 1.8793152639087012,
         "y": 0.7421112696148365
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Right Trench (R)"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.8400852878464791,
-      "rotationDegrees": 0.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -47,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": null,
