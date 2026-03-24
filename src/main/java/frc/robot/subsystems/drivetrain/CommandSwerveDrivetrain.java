@@ -294,6 +294,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		return RadiansPerSecond.of(Math.abs(getFieldRelativeSpeeds().omegaRadiansPerSecond));
 	}
 
+	public AngularVelocity getAngularVelocity() {
+		return RadiansPerSecond.of(getFieldRelativeSpeeds().omegaRadiansPerSecond);
+	}
+
 	public double getStrafeVelocityFromController() {
 		double xInput = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftX(), 0.1);
 		return MathUtil.copyDirectionPow(xInput, JOYSTICK_INPUT_GAIN) * MAX_SPEED.in(MetersPerSecond);

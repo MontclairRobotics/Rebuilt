@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
 import java.util.function.DoubleSupplier;
@@ -69,6 +70,7 @@ public class Turret extends SubsystemBase {
 		Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
 		Logger.recordOutput("Turret/At Time Adjusted Setpoint", atTimeAdjustedSetpoint());
 		Logger.recordOutput("Turret/Time Adjusted Setpoint", getSetpointForTime(Timer.getFPGATimestamp()));
+		Logger.recordOutput("Turret/Target Velocity", calculateTargetVelocity(TargetLocation.HUB).in(RotationsPerSecond));
 
 		if(logCounter % loopsPerLog == 0) {
 
@@ -259,19 +261,16 @@ public class Turret extends SubsystemBase {
 	 * @return the robot relative velocity the turret should maintain in order to have a field relative velocity of zero
 	 */
 	public AngularVelocity calculateTargetVelocity(TargetLocation target) {
-		Translation2d location = target.getLocation();
-		Translation2d fieldRelativeVelocity = this.getFieldRelativeVelocity();
-		Translation2d fieldRelativePosition = this.getFieldRelativePosition();
-		Translation2d r = location.minus(fieldRelativePosition);
+		Translation2d turretPos = getFieldRelativePosition();
+		Translation2d turretVel = getFieldRelativeVelocity();
+    	Translation2d r = target.getLocation().minus(turretPos);
+    	double distance = r.getNorm();
+    	Translation2d rHat = r.div(distance); // unit vector towards target
+    	Translation2d rHatPerp = new Translation2d(-rHat.getY(), rHat.getX()); // perpendicular unit vector
+    	double tangentialVelocity = turretVel.dot(rHatPerp);
+    	double omega = ((tangentialVelocity / distance) + RobotContainer.drivetrain.getAngularVelocity().in(RadiansPerSecond));
 
-		double distance = r.getNorm();
-		Rotation2d r_angle = r.getAngle();
-		// Rotation2d v_angle = fieldRelativeVelocity.getAngle();
-		// Rotation2d r_to_v = r_angle.plus(v_angle);
-		// double radialVelocity = fieldRelativeVelocity.getNorm() * Math.cos(r_to_v.getRadians());
-		Translation2d radialVelocity = fieldRelativeVelocity.rotateBy(r_angle.unaryMinus());
-
-		return RadiansPerSecond.of(radialVelocity.getY() / distance);
+    	return RadiansPerSecond.of(-omega);
 	}
 
 	public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, DoubleSupplier timeSecondsForSetpoint) {
