@@ -15,6 +15,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.RobotContainer;
 import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.*;
@@ -152,7 +153,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
     public boolean isAtTimeAdjustedSetpoint() {
         double error =
             Flywheel.getSetpointForTime(Timer.getFPGATimestamp()).in(RotationsPerSecond)
-            - velocitySignal.getValue().in(RotationsPerSecond);
+            - RobotContainer.flywheel.getVelocity().in(RotationsPerSecond);
         return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
     }
 

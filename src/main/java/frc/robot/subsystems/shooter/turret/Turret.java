@@ -64,12 +64,14 @@ public class Turret extends SubsystemBase {
 
 		io.updateInputs(inputs); // THIS HAS TO BE EVERY LOOP
 
+		Logger.processInputs("Turret", inputs);
+		Logger.recordOutput("Turret/AngleToHub", getAngleToHub());
+		Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
+		Logger.recordOutput("Turret/At Time Adjusted Setpoint", atTimeAdjustedSetpoint());
+		Logger.recordOutput("Turret/Time Adjusted Setpoint", getSetpointForTime(Timer.getFPGATimestamp()));
+
 		if(logCounter % loopsPerLog == 0) {
-			Logger.processInputs("Turret", inputs);
-			Logger.recordOutput("Turret/AngleToHub", getAngleToHub());
-			Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
-			Logger.recordOutput("Turret/At Time Adjusted Setpoint", atTimeAdjustedSetpoint());
-			Logger.recordOutput("Turret/Time Adjusted Setpoint", getSetpointForTime(Timer.getFPGATimestamp()));
+
 		}
 
 		/** only visualize when in debug mode */
@@ -268,7 +270,7 @@ public class Turret extends SubsystemBase {
 		// Rotation2d r_to_v = r_angle.plus(v_angle);
 		// double radialVelocity = fieldRelativeVelocity.getNorm() * Math.cos(r_to_v.getRadians());
 		Translation2d radialVelocity = fieldRelativeVelocity.rotateBy(r_angle.unaryMinus());
-		
+
 		return RadiansPerSecond.of(radialVelocity.getY() / distance);
 	}
 

@@ -14,7 +14,10 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.shooter.turret.Turret;
 
 public class HoodIOSim implements HoodIO {
 
@@ -91,7 +94,10 @@ public class HoodIOSim implements HoodIO {
 
     @Override
     public boolean isAtTimeAdjustedSetpoint() {
-        return false; // not needed
+        double error =
+            Turret.getSetpointForTime(Timer.getFPGATimestamp()).in(Rotations)
+            - RobotContainer.hood.getAngle().in(Rotations);
+        return Math.abs(error) < TOLERANCE.in(Rotations);
     }
 
     @Override
