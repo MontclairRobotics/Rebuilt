@@ -93,6 +93,11 @@ public class TurretConstants {
 		.withRotorToSensorRatio(ROTOR_TO_SENSOR_RATIO)
 		.withSensorToMechanismRatio(SENSOR_TO_MECHANISM_RATIO);
 
+	public static final FeedbackConfigs BACKUP_FEEDBACK_CONFIGS = new FeedbackConfigs()
+		.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
+		.withRotorToSensorRatio(1)
+		.withSensorToMechanismRatio(GEARING);
+
 	public static final CANcoderConfiguration ENCODER_CONFIGS = new CANcoderConfiguration()
 		.withMagnetSensor(
 			new MagnetSensorConfigs()

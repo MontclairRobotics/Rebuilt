@@ -79,6 +79,10 @@ public class PivotIOTalonFX implements PivotIO {
 	}
 
 	public void updateInputs(PivotIOInputs inputs) {
+        if(!encoder.isConnected()){
+            configs.Feedback=BACKUP_FEEDBACK_CONFIGS;
+            motor.getConfigurator().apply(configs);
+        }
 		BaseStatusSignal.refreshAll(
             positionSignal,
             setpointPositionSignal,

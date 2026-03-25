@@ -84,6 +84,10 @@ public class TurretIOTalonFX implements TurretIO {
 
     @Override
     public void updateInputs(TurretIOInputs inputs) {
+        if(!encoder.isConnected()){
+            config.Feedback=BACKUP_FEEDBACK_CONFIGS;
+            motor.getConfigurator().apply(config);
+        }
         BaseStatusSignal.refreshAll(
             positionSignal,
             setpointPositionSignal,

@@ -82,7 +82,10 @@ public class HoodIOTalonFX implements HoodIO {
 
     @Override
     public void updateInputs(HoodIOInputs inputs) {
-
+        if(!encoder.isConnected()){
+            config.Feedback=BACKUP_FEEDBACK_CONFIGS;
+            motor.getConfigurator().apply(config);
+        }
         BaseStatusSignal.refreshAll(
             positionSignal,
             setpointPositionSignal,
@@ -91,7 +94,7 @@ public class HoodIOTalonFX implements HoodIO {
             currentDrawAmpsSignal,
             tempCelsiusSignal
         );
-
+        
         inputs.motorConnected = BaseStatusSignal.isAllGood(
             positionSignal,
             setpointPositionSignal,
