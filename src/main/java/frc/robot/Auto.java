@@ -526,7 +526,7 @@ public class Auto extends SubsystemBase {
     }
 
 	public void periodic() {
-
+		field.setRobotPose(RobotContainer.drivetrain.getRobotPose());
 		if(DriverStation.isDisabled()) {
 			String str = stringEnt.get();
 			SmartDashboard.putData(field);
