@@ -269,7 +269,7 @@ public class RobotContainer {
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 		driverController.R2()
-			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(1), RotationsPerSecond.of(0.5)))
+			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(0.8), RotationsPerSecond.of(0.25)))
 			.onFalse(drivetrain.setMaxSpeedsCommand(TunerConstants.kSpeedAt12Volts, RotationsPerSecond.of(1.624)));
 
 		driverController.triangle()
