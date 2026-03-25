@@ -32,9 +32,12 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -63,6 +66,7 @@ import static frc.robot.constants.DriveConstants.ROTATION_TOLERANCE;
 import static frc.robot.constants.DriveConstants.ROTATION_kD;
 import static frc.robot.constants.DriveConstants.ROTATION_kI;
 import static frc.robot.constants.DriveConstants.ROTATION_kP;
+import static frc.robot.subsystems.vision.VisionConstants.aprilTagLayout;
 
 import frc.robot.util.PoseUtils;
 import frc.robot.util.TunerConstants;
@@ -417,7 +421,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		if (Utils.isSimulation() && mapleSimSwerveDrivetrain != null) {
 			return mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose();
 		} else {
-			return this.getState().Pose;
+			return new Pose2d(MathUtil.clamp(this.getState().Pose.getMeasureX().baseUnitMagnitude(), Constants.BUMPER_WIDTH.in(Meters) / 2, aprilTagLayout.getFieldLength() - Constants.BUMPER_WIDTH.in(Meters) / 2),
+			MathUtil.clamp(this.getState().Pose.getMeasureY().baseUnitMagnitude(), Constants.BUMPER_WIDTH.in(Meters) / 2, aprilTagLayout.getFieldWidth() - Constants.BUMPER_WIDTH.in(Meters) / 2),
+			this.getState().Pose.getRotation());
 		}
 	}
 
