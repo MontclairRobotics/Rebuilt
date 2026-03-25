@@ -14,10 +14,13 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.RobotContainer;
 
 public class TurretIOSim implements TurretIO {
 
@@ -40,7 +43,7 @@ public class TurretIOSim implements TurretIO {
 		);
 
         pidController = new ProfiledPIDController(
-            22.5, 0, 8,
+            22.5, 0, 0,
             new Constraints(
                 MOTION_MAGIC_CRUISE_VELOCITY.in(RotationsPerSecond),
                 MOTION_MAGIC_ACCELERATION.in(RotationsPerSecondPerSecond)
@@ -77,7 +80,7 @@ public class TurretIOSim implements TurretIO {
     @Override
     public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, double timeSecondsForSetpoint) {
         Turret.recordSetpoint(angle, timeSecondsForSetpoint);
-        pidController.setGoal(angle.in(Rotations));
+        pidController.setGoal(new State(angle.in(Rotations), velocity.in(RotationsPerSecond)));
         double pidOutput = pidController.calculate(Radians.of(sim.getAngleRads()).in(Rotations));
         appliedVoltage = MathUtil.clamp(pidOutput, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
     }
@@ -99,7 +102,10 @@ public class TurretIOSim implements TurretIO {
 
     @Override
     public boolean isAtTimeAdjustedSetpoint() {
-        return false;
+        double error =
+            Turret.getSetpointForTime(Timer.getFPGATimestamp()).in(Rotations)
+            - RobotContainer.turret.getRobotRelativeAngle().in(Rotations);
+        return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations);
     }
 
     @Override

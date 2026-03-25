@@ -51,35 +51,35 @@ public class Superstructure extends SubsystemBase {
 		this.shooter = shooter;
 
 		if(CURRENT_MODE == Mode.SIM) {
-			shouldStowTrigger.onTrue(
+			shouldStowTrigger.whileTrue(
 				shooter.stowCommand());
-			scoringModeTrigger.onTrue(
+			scoringModeTrigger.whileTrue(
 				shooter.setSimParameters(
 					() -> aiming.calculateSimShot(
 						HUB, shooter.withConstantVelocity, shooter.whileMoving)
 				));
-			ferryLeftTrigger.onTrue(
+			ferryLeftTrigger.whileTrue(
 				shooter.setSimParameters(
 					() -> aiming.calculateSimShot(
 						FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
-			ferryRightTrigger.onTrue(
+			ferryRightTrigger.whileTrue(
 				shooter.setSimParameters(
 					() -> aiming.calculateSimShot(
 						FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 		} else {
-			shouldStowTrigger.onTrue(
+			shouldStowTrigger.whileTrue(
 				shooter.stowCommand());
-			scoringModeTrigger.onTrue(
+			scoringModeTrigger.whileTrue(
 				shooter.setParameters(
 					() -> aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
 				));
-			ferryLeftTrigger.onTrue(
+			ferryLeftTrigger.whileTrue(
 				shooter.setParameters(
 					() -> aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
-			ferryRightTrigger.onTrue(
+			ferryRightTrigger.whileTrue(
 				shooter.setParameters(
 					() -> aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));

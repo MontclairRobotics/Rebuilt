@@ -103,6 +103,9 @@ public class Flywheel extends SubsystemBase {
         if(RobotContainer.FLYWHEEL_DEBUG) updateTunables();
     }
 
+    public AngularVelocity getVelocity() {
+        return inputs.velocity;
+    }
     public void setVelocity(AngularVelocity targetVelocity, DoubleSupplier timeSecondsForSetpoint) {
         io.setVelocity(targetVelocity.plus(RotationsPerSecond.of(fudgeFactor)), timeSecondsForSetpoint.getAsDouble());
     }

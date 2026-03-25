@@ -19,6 +19,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.util.PhoenixUtil;
 
@@ -144,7 +145,7 @@ public class HoodIOTalonFX implements HoodIO {
     public boolean isAtTimeAdjustedSetpoint() {
         double error =
             Turret.getSetpointForTime(Timer.getFPGATimestamp()).in(Rotations)
-            - positionSignal.getValue().in(Rotations);
+            - RobotContainer.hood.getAngle().in(Rotations);
         return Math.abs(error) < TOLERANCE.in(Rotations);
     }
 

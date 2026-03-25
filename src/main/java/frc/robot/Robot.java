@@ -157,7 +157,6 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void teleopInit() {
 
-		CommandScheduler.getInstance().schedule(RobotContainer.shooter.stowCommand());
 		RobotContainer.shouldShootAuto = false;
 
 		// brake mode
