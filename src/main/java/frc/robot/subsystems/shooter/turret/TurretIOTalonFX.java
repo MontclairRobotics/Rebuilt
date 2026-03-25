@@ -17,6 +17,9 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotContainer;
+import frc.robot.util.Elastic;
+import frc.robot.util.Elastic.Notification;
+import frc.robot.util.Elastic.Notification.NotificationLevel;
 import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.Hertz;
@@ -87,6 +90,8 @@ public class TurretIOTalonFX implements TurretIO {
         if(!encoder.isConnected()){
             config.Feedback=BACKUP_FEEDBACK_CONFIGS;
             motor.getConfigurator().apply(config);
+            Elastic.sendNotification(new Notification(NotificationLevel.WARNING,"ENCODER DISCONNECT!","Turret Absolute Encoder Disconnected, Switched to Motor Encoder."));
+
         }
         BaseStatusSignal.refreshAll(
             positionSignal,
