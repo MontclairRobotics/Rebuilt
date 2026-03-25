@@ -91,6 +91,11 @@ public class PivotConstants {
 		.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
 		.withRotorToSensorRatio(ROTOR_TO_SENSOR_RATIO)
 		.withSensorToMechanismRatio(SENSOR_TO_MECHANISM_RATIO);
+	
+	public static final FeedbackConfigs BACKUP_FEEDBACK_CONFIGS = new FeedbackConfigs()
+		.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
+		.withRotorToSensorRatio(1)
+		.withSensorToMechanismRatio(GEARING);
 
 	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
 		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)

@@ -21,6 +21,9 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.shooter.turret.Turret;
+import frc.robot.util.Elastic;
+import frc.robot.util.Elastic.Notification;
+import frc.robot.util.Elastic.Notification.NotificationLevel;
 import frc.robot.util.PhoenixUtil;
 
 public class HoodIOTalonFX implements HoodIO {
@@ -82,7 +85,12 @@ public class HoodIOTalonFX implements HoodIO {
 
     @Override
     public void updateInputs(HoodIOInputs inputs) {
+        if(!encoder.isConnected()){
+            config.Feedback=BACKUP_FEEDBACK_CONFIGS;
+            motor.getConfigurator().apply(config);
+            Elastic.sendNotification(new Notification(NotificationLevel.WARNING,"ENCODER DISCONNECT!","Hood Absolute Encoder Disconnected, Switched to Motor Encoder."));
 
+        }
         BaseStatusSignal.refreshAll(
             positionSignal,
             setpointPositionSignal,
@@ -91,7 +99,7 @@ public class HoodIOTalonFX implements HoodIO {
             currentDrawAmpsSignal,
             tempCelsiusSignal
         );
-
+        
         inputs.motorConnected = BaseStatusSignal.isAllGood(
             positionSignal,
             setpointPositionSignal,
