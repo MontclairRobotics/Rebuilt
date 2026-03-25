@@ -235,8 +235,8 @@ public class RobotContainer {
 					vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 		}
 
-		configureBindings();
-		// configureCompetitionBindings();
+		// configureBindings();
+		configureCompetitionBindings();
 		// configureTestingBindingsForMax();
 
     	drivetrain.registerTelemetry(logger::telemeterize);

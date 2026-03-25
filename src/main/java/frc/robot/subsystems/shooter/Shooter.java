@@ -191,9 +191,8 @@ public class Shooter extends SubsystemBase {
         return Commands.run(() -> {
             if (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto) {
                 flywheel.setVelocity(flywheelVelocitySupplier, () -> Timer.getFPGATimestamp());
-                if(this.atSetpoint()) spindexer.spinUp();
             }
-        });
+        }).alongWith(spindexer.jiggleCommand()).onlyWhile(() -> this.atSetpoint() && (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto));
     }
 
     public Command stowCommand(){

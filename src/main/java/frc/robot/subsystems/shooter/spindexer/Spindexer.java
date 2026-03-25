@@ -45,9 +45,12 @@ public class Spindexer {
     }
 
     public Command jiggleCommand() {
-        return Commands.repeatingSequence(
-            spinUpCommand().withTimeout(spinUpTime.getAsDouble()),
-            spinDownCommand().withTimeout(spindDownTime.getAsDouble())
+        return Commands.parallel(
+            indexer.spinUpCommand(),
+            Commands.repeatingSequence(
+                serializer.spinUpCommand().withTimeout(spinUpTime.getAsDouble()),
+                serializer.spinDownCommand().withTimeout(spindDownTime.getAsDouble())
+            )
         );
     }
 }
