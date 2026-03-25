@@ -40,8 +40,8 @@ public class Pivot extends SubsystemBase {
 		return io.isAtSetpoint();
 	}
 
-	public Command testVoltageCommand() {
-		return Commands.run(() -> io.setVoltage(2));
+	public Command setVoltageCommand(double voltage) {
+		return Commands.run(() -> io.setVoltage(voltage));
 	}
 
 	public void setPivotAngle(Angle angle) {

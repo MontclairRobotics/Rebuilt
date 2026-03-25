@@ -9,11 +9,13 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.constants.PivotConstants;
 import frc.robot.subsystems.intake.pivot.Pivot;
 import frc.robot.subsystems.intake.rollers.Rollers;
+import frc.robot.util.tunables.LoggedTunableNumber;
 
 public class Intake {
     private Pivot pivot;
     private Rollers rollers;
 
+    public LoggedTunableNumber pivotJiggleVoltage = new LoggedTunableNumber("Pivot/Pivot Jiggle Voltage", 4);
     public Intake(Pivot pivot, Rollers rollers){
         this.pivot = pivot;
         this.rollers = rollers;
@@ -38,6 +40,13 @@ public class Intake {
         return Commands.parallel(
             pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
             rollers.spinUpCommand()
+        );
+    }
+
+    public Command jiggleCommand() {
+        return Commands.repeatingSequence(
+            pivot.setVoltageCommand(pivotJiggleVoltage.getAsDouble()),
+            pivot.goToAngleCommand(PivotConstants.MIN_ANGLE)
         );
     }
 
