@@ -81,6 +81,10 @@ public class Serializer extends SubsystemBase {
         return Commands.run(() -> spinDown(), this);
     }
 
+	public Command reverseCommand() {
+		return Commands.run(() -> io.setVelocity(SPIN_VELOCITY.unaryMinus()));
+	}
+
     public Command spinUpCommand() {
 		return Commands.run(() -> spinUp(), this);
 	}
