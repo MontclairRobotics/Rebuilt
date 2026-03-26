@@ -85,7 +85,7 @@ public class HoodIOTalonFX implements HoodIO {
 
     @Override
     public void updateInputs(HoodIOInputs inputs) {
-        if(!encoder.isConnected()){
+        if(!encoder.isConnected()&&!(config.Feedback==BACKUP_FEEDBACK_CONFIGS)){
             config.Feedback=BACKUP_FEEDBACK_CONFIGS;
             motor.getConfigurator().apply(config);
             Elastic.sendNotification(new Notification(NotificationLevel.WARNING,"ENCODER DISCONNECT!","Hood Absolute Encoder Disconnected, Switched to Motor Encoder."));

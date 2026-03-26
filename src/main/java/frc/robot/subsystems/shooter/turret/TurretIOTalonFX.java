@@ -90,7 +90,7 @@ public class TurretIOTalonFX implements TurretIO {
 
     @Override
     public void updateInputs(TurretIOInputs inputs) {
-        if(!encoder.isConnected()){
+        if(!encoder.isConnected()&&!(config.Feedback==BACKUP_FEEDBACK_CONFIGS)){
             config.Feedback=BACKUP_FEEDBACK_CONFIGS;
             motor.getConfigurator().apply(config);
             Elastic.sendNotification(new Notification(NotificationLevel.WARNING,"ENCODER DISCONNECT!","Turret Absolute Encoder Disconnected, Switched to Motor Encoder."));
