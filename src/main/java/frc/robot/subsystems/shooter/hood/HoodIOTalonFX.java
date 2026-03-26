@@ -99,7 +99,7 @@ public class HoodIOTalonFX implements HoodIO {
             currentDrawAmpsSignal,
             tempCelsiusSignal
         );
-        
+
         inputs.motorConnected = BaseStatusSignal.isAllGood(
             positionSignal,
             setpointPositionSignal,

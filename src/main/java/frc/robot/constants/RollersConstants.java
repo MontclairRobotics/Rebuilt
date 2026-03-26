@@ -27,7 +27,7 @@ public class RollersConstants {
 	public static final double kS = 12;
 	public static final double kV = 0.29;
 
-    public static final double STATOR_CURRENT_LIMIT = 40;
+    public static final double STATOR_CURRENT_LIMIT = 80;
     public static final double SUPPLY_CURRENT_LIMIT = 30;
 
     public static final double GEARING = 1;

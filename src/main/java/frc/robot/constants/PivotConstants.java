@@ -58,7 +58,7 @@ public class PivotConstants {
 
 	public static final Angle TOLERANCE = Degrees.of(1);
 
-	public static final double STATOR_CURRENT_LIMIT = 40; // Amps
+	public static final double STATOR_CURRENT_LIMIT = 60; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 30; // Amps
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(4);
@@ -91,7 +91,7 @@ public class PivotConstants {
 		.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
 		.withRotorToSensorRatio(ROTOR_TO_SENSOR_RATIO)
 		.withSensorToMechanismRatio(SENSOR_TO_MECHANISM_RATIO);
-	
+
 	public static final FeedbackConfigs BACKUP_FEEDBACK_CONFIGS = new FeedbackConfigs()
 		.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
 		.withRotorToSensorRatio(1)
