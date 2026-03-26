@@ -43,7 +43,7 @@ public class TurretConstants {
 	public static final Angle MIN_ANGLE = Rotations.of(-0.51);
 	public static final Angle MAX_ANGLE = Rotations.of(0.51);
 
-	public static final Angle ANGLE_TOLERANCE = Degrees.of(8);
+	public static final Angle ANGLE_TOLERANCE = Degrees.of(5);
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.25); // TODO: tune
 
 	// physical properties
@@ -58,7 +58,7 @@ public class TurretConstants {
 	public static final Angle ENCODER_OFFSET = Rotations.of(0.159912);
 
 	// pid + ff gains
-	public static final double kP = 45;
+	public static final double kP = 40;
 	public static final double kD = 0;
 	public static final double kS = 20;
 

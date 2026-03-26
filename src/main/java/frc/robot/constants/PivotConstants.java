@@ -35,7 +35,7 @@ public class PivotConstants {
 
 	public static final double ROTOR_TO_SENSOR_RATIO = (72.0 / 46) * 9 * 5;
 	public static final double SENSOR_TO_MECHANISM_RATIO = 1; // CANcoder is on the mechanism
-	public static final double ENCODER_OFFSET = -0.296387;
+	public static final double ENCODER_OFFSET = -0.2944;
 
 	// constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);
@@ -47,9 +47,9 @@ public class PivotConstants {
 	public static final double MOMENT_OF_INERTIA = 1; // TODO: set
 
 	// pid gains
-	public static final double kP = 30;
+	public static final double kP = 100;
 	public static final double kI = 0;
-	public static final double kD = 2;
+	public static final double kD = 0;
 
 	// ff gains
 	public static final double kS = 0;
