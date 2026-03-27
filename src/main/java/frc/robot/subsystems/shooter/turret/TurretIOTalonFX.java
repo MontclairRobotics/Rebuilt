@@ -46,7 +46,7 @@ public class TurretIOTalonFX implements TurretIO {
     private final PositionVoltage request = new PositionVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
 
-    public LoggedTunableNumber kV = new LoggedTunableNumber("Turret/kV FUDGE", 5.05);
+    public LoggedTunableNumber kV = new LoggedTunableNumber("Turret/kV FUDGE", 7.05);
 
     public TurretIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
