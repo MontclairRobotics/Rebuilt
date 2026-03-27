@@ -47,18 +47,18 @@ public class Spindexer {
         return Commands.run(() -> spinDown(), serializer, indexer);
     }
 
-    public Command jiggleCommand() {
-        return Commands.parallel(
-            indexer.spinUpCommand(),
-            Commands.repeatingSequence(
-                spinUpCommand().withTimeout(1),
-                Commands.run(() -> {
-                    indexer.setVelocity(SPIN_VELOCITY);
-                    serializer.setVelocity(SPIN_VELOCITY.unaryMinus());
-                }).withTimeout(1)
-            )
-        );
-    }
+    // public Command jiggleCommand() {
+    //     return Commands.parallel(
+    //         indexer.spinUpCommand(),
+    //         Commands.repeatingSequence(
+    //             spinUpCommand().withTimeout(1),
+    //             Commands.run(() -> {
+    //                 indexer.setVelocity(SPIN_VELOCITY);
+    //                 serializer.setVelocity(SPIN_VELOCITY.unaryMinus());
+    //             }).withTimeout(1)
+    //         )
+    //     );
+    // }
 
     public Command jiggleFoReal() {
         return Commands.parallel(

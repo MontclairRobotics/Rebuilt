@@ -192,7 +192,7 @@ public class Shooter extends SubsystemBase {
             if (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto) {
                 flywheel.setVelocity(flywheelVelocitySupplier, () -> Timer.getFPGATimestamp());
             }
-        }).alongWith(spindexer.jiggleCommand()).onlyWhile(() -> this.atSetpoint() && !Turret.isSpinningAround && (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto));
+        }).alongWith(spindexer.spinUpCommand()).onlyWhile(() -> this.atSetpoint() && !Turret.isSpinningAround && (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto));
     }
 
     public Command stowCommand(){
