@@ -15,6 +15,8 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -54,6 +56,10 @@ public class Turret extends SubsystemBase {
 	private int logCounter;
 	private final int loopsPerLog;
 
+	public static boolean isSpinningAround;
+	private static boolean hasRecentlyConstrainedAngle;
+	Debouncer spinningAroundDebouncer = new Debouncer(1, DebounceType.kFalling);
+
     public Turret(TurretIO io) {
         this.io = io;
 		loopsPerLog = RobotContainer.TURRET_DEBUG ? 1 : 5; // faster logging during debug mode, slower otherwise
@@ -62,6 +68,12 @@ public class Turret extends SubsystemBase {
 	@Override
 	public void periodic() {
 		logCounter++;
+
+		if(hasRecentlyConstrainedAngle) {
+			hasRecentlyConstrainedAngle = false;
+		}
+
+		isSpinningAround = spinningAroundDebouncer.calculate(hasRecentlyConstrainedAngle);
 
 		io.updateInputs(inputs); // THIS HAS TO BE EVERY LOOP
 
@@ -136,10 +148,12 @@ public class Turret extends SubsystemBase {
 
 		while (angle.in(Rotations) > MAX_ANGLE.in(Rotations)) {
     		angle = angle.minus(Rotations.of(1));
+			hasRecentlyConstrainedAngle = true;
 		}
 
 		while (angle.in(Rotations) < MIN_ANGLE.in(Rotations)) {
    			angle = angle.plus(Rotations.of(1));
+			hasRecentlyConstrainedAngle = true;
 		}
 
 		return angle;

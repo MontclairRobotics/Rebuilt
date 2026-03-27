@@ -5,7 +5,6 @@ import static frc.robot.constants.SerializerConstants.SPIN_VELOCITY;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.constants.IndexerConstants;
 import frc.robot.subsystems.shooter.spindexer.indexer.Indexer;
 import frc.robot.subsystems.shooter.spindexer.serializer.Serializer;
 import frc.robot.util.tunables.LoggedTunableNumber;
@@ -66,13 +65,13 @@ public class Spindexer {
             indexer.spinUpCommand(),
             Commands.repeatingSequence(
                 Commands.startEnd(
-                    () -> serializer.spinUp(), 
-                    () -> serializer.stop(), 
+                    () -> serializer.spinUp(),
+                    () -> serializer.stop(),
                     serializer
                 ).withTimeout(spinUpTime.getAsDouble()),
                 Commands.startEnd(
-                    () -> serializer.setVelocity(SPIN_VELOCITY.unaryMinus()), 
-                    () -> serializer.stop(), 
+                    () -> serializer.setVelocity(SPIN_VELOCITY.unaryMinus()),
+                    () -> serializer.stop(),
                     serializer
                 ).withTimeout(spinDownTime.getAsDouble())
             )

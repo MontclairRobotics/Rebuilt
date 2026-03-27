@@ -443,7 +443,12 @@ public class Auto extends SubsystemBase {
 				&& currentPos == autoString.charAt(i)
 				|| ((autoString.charAt(i+1) == '0') && (currentPos == 'D' || currentPos == 'O'))) {
 
-				followPathCommands.addCommands(Commands.waitSeconds(timeToEmptyFuel));
+				followPathCommands.addCommands(
+					Commands.waitSeconds(timeToEmptyFuel)
+						.deadlineFor(
+							RobotContainer.intake.jiggleCommand()
+						)
+				);
 
 			}
 			try {

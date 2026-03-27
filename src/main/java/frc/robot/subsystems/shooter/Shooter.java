@@ -161,7 +161,7 @@ public class Shooter extends SubsystemBase {
 
 
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
-        if (RobotContainer.shooter.atSetpoint() && (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto)) {
+        if (RobotContainer.shooter.atSetpoint() && !Turret.isSpinningAround && (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto)) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
 
@@ -192,7 +192,7 @@ public class Shooter extends SubsystemBase {
             if (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto) {
                 flywheel.setVelocity(flywheelVelocitySupplier, () -> Timer.getFPGATimestamp());
             }
-        }).alongWith(spindexer.jiggleCommand()).onlyWhile(() -> this.atSetpoint() && (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto));
+        }).alongWith(spindexer.jiggleCommand()).onlyWhile(() -> this.atSetpoint() && !Turret.isSpinningAround && (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto));
     }
 
     public Command stowCommand(){
