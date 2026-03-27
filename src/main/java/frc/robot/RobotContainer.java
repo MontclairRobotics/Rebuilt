@@ -286,6 +286,9 @@ public class RobotContainer {
 
 		// operator
 
+		operatorController.touchpad().onTrue(serializer.setVoltageCommand(-12));
+		operatorController.PS().whileTrue(rollers.setVoltageCommand(-12));
+
 		operatorController.circle().onFalse(shooter.stowCommand());
 
 		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
