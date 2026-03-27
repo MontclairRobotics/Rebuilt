@@ -89,7 +89,7 @@ public class Aiming {
 				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
 				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
 
-				if (Math.abs(newTOF - estimatedTOF) < 0.01) break;
+				if (Math.abs(newTOF - estimatedTOF) < 0.02) break;
 				estimatedTOF = newTOF;
 			}
 		}

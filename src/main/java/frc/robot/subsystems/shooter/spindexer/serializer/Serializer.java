@@ -71,6 +71,14 @@ public class Serializer extends SubsystemBase {
 		setVelocity(RotationsPerSecond.zero());
 	}
 
+	public void stop() {
+		io.stop();
+	}
+
+	public Command stopCommand() {
+		return Commands.runOnce(() -> stop(), this);
+	}
+
 	public void applyJoystickInput() {
         double input = -MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
         double voltage = input * 12;
@@ -86,7 +94,8 @@ public class Serializer extends SubsystemBase {
 	}
 
     public Command spinUpCommand() {
-		return Commands.run(() -> spinUp(), this);
+		return Commands.run(() -> spinUp(), this)
+			.finallyDo(() -> setVoltage(0));
 	}
 
 	public Command setCurrentCommand(DoubleSupplier currentSupplier) {
