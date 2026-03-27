@@ -264,6 +264,10 @@ public class RobotContainer {
 	}
 
 	private void configureCompetitionBindings() {
+
+		driverController.povRight().whileTrue(new WheelRadiusCharacterization(Direction.CLOCKWISE, drivetrain));
+		driverController.povLeft().whileTrue(new WheelRadiusCharacterization(Direction.COUNTER_CLOCKWISE, drivetrain));
+
 		// driver
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
