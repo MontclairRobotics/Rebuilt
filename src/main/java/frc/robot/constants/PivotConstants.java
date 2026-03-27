@@ -40,6 +40,8 @@ public class PivotConstants {
 	// constraints
 	public static final Angle MIN_ANGLE = Degrees.of(0);
 	public static final Angle MAX_ANGLE = Rotations.of(0.3);
+	public static final Angle STOW_ANGLE = Degrees.of(90);
+	public static final Angle JIGGLE_ANGLE = Degrees.of(60);
 
 	// physical properties
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // rotations of the motor shaft per rotations of the intake pivot

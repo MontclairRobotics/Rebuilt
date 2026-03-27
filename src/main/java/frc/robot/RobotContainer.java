@@ -304,7 +304,7 @@ public class RobotContainer {
 
 		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
 		operatorController.R2()
-			.whileTrue(pivot.goToAngleCommand(PivotConstants.MAX_ANGLE.div(2).plus(Degrees.of(10))))
+			.whileTrue(intake.jiggleCommand())
 			.onFalse(pivot.deployCommand());
 
 	}

@@ -104,4 +104,9 @@ public class PivotIOSim implements PivotIO {
 	public void setNeutralMode(NeutralModeValue value) {
 		// does nothing, not necessary
 	}
+
+	@Override
+	public void applyFeedforward() {
+		appliedVoltage = feedforward.calculate(sim.getAngleRads(), 0);
+	}
 }

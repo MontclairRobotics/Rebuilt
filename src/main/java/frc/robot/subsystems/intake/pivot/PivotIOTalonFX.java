@@ -174,4 +174,9 @@ public class PivotIOTalonFX implements PivotIO {
 	public void setNeutralMode(NeutralModeValue value) {
 		motor.setNeutralMode(value);
 	}
+
+    @Override
+	public void applyFeedforward() {
+		motor.setPosition(motor.getPosition().getValueAsDouble());
+	}
 }
