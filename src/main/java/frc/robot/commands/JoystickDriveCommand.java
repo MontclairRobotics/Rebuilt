@@ -65,12 +65,12 @@ public class JoystickDriveCommand extends Command {
 		this.shouldAimAssist = shouldAimAssist;
 
 		shouldTrenchLockTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK))
-			.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.L1().getAsBoolean()))
-			.onFalse(updateDriveMode(DriveMode.XMODE).onlyIf(() -> RobotContainer.driverController.L1().getAsBoolean()));
+			.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.R1().getAsBoolean()))
+			.onFalse(updateDriveMode(DriveMode.XMODE).onlyIf(() -> RobotContainer.driverController.R1().getAsBoolean()));
 		shouldBumpLockTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK))
-			.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.L1().getAsBoolean()))
-			.onFalse(updateDriveMode(DriveMode.XMODE).onlyIf(() -> RobotContainer.driverController.L1().getAsBoolean()));
-		RobotContainer.driverController.L1().onTrue(updateDriveMode(DriveMode.XMODE)).onFalse(updateDriveMode(DriveMode.NORMAL));
+			.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.R1().getAsBoolean()))
+			.onFalse(updateDriveMode(DriveMode.XMODE).onlyIf(() -> RobotContainer.driverController.R1().getAsBoolean()));
+		RobotContainer.driverController.R1().onTrue(updateDriveMode(DriveMode.XMODE)).onFalse(updateDriveMode(DriveMode.NORMAL));
 
 		addRequirements(drivetrain);
 	}

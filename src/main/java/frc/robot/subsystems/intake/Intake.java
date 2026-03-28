@@ -45,10 +45,10 @@ public class Intake {
 
     public Command jiggleCommand() {
         return Commands.repeatingSequence(
-            pivot.goToAngleCommand(PivotConstants.JIGGLE_ANGLE),
-            Commands.waitSeconds(0.2),
-            pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-            Commands.waitSeconds(0.2)
+            pivot.goToAngleCommand(PivotConstants.JIGGLE_ANGLE).withTimeout(1),
+            Commands.waitSeconds(0.1),
+            pivot.goToAngleCommand(PivotConstants.MIN_ANGLE).withTimeout(1),
+            Commands.waitSeconds(0.1)
         );
     }
 

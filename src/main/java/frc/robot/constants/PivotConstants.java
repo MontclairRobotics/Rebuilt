@@ -63,9 +63,9 @@ public class PivotConstants {
 	public static final double STATOR_CURRENT_LIMIT = 60; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 30; // Amps
 
-	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(4);
-	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(40);
-	public static final double MOTION_MAGIC_JERK = 100; // Rotations Per Second Per Second Per Second
+	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(8);
+	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(80);
+	public static final double MOTION_MAGIC_JERK = 400; // Rotations Per Second Per Second Per Second
 	public static final AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(0.05);
 
 	// Configs
