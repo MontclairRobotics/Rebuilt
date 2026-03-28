@@ -286,8 +286,8 @@ public class RobotContainer {
 
 		// operator
 
-		operatorController.touchpad().onTrue(serializer.setVoltageCommand(-12));
-		operatorController.PS().whileTrue(rollers.setVoltageCommand(-12));
+		operatorController.touchpad().whileTrue(serializer.setVoltageCommand(-12)).onFalse(serializer.stopCommand());
+		operatorController.PS().whileTrue(rollers.setVoltageCommand(-12)).onFalse(serializer.stopCommand());
 
 		operatorController.circle().onFalse(shooter.stowCommand());
 

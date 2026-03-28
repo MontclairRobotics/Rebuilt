@@ -82,11 +82,7 @@ public class PivotIOTalonFX implements PivotIO {
 	}
 
 	public void updateInputs(PivotIOInputs inputs) {
-        if(!encoder.isConnected()&&!(configs.Feedback==BACKUP_FEEDBACK_CONFIGS)){
-            configs.Feedback=BACKUP_FEEDBACK_CONFIGS;
-            motor.getConfigurator().apply(configs);
-            Elastic.sendNotification(new Notification(NotificationLevel.WARNING,"ENCODER DISCONNECT!","Pivot Absolute Encoder Disconnected, Switched to Motor Encoder."));
-        }
+        
 		BaseStatusSignal.refreshAll(
             positionSignal,
             setpointPositionSignal,
