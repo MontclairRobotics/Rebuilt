@@ -153,7 +153,7 @@ public class Vision extends SubsystemBase {
 					// max angular rate
 					|| RobotContainer.drivetrain.getAngularSpeed().in(DegreesPerSecond) > 360
 					// max tag distance
-					|| observation.averageTagDistance() > 3.0;
+					|| observation.averageTagDistance() > 2.5;
 
 				// Add pose to log
 				if (logCounter % loopsPerLog == 0) {
@@ -172,7 +172,7 @@ public class Vision extends SubsystemBase {
 
 				// Calculate standard deviations
 				double d = observation.averageTagDistance();
-				double stdDevFactor = (d * d) / observation.tagCount();
+				double stdDevFactor = (d * d * d) / observation.tagCount();
 				double linearStdDev = 0.3 + linearStdDevBaseline * stdDevFactor;
 				// double angularStdDev = angularStdDevBaseline * stdDevFactor;
 				double angularStdDev = Double.POSITIVE_INFINITY;

@@ -171,7 +171,7 @@ public class RobotContainer {
 
 				vision = new Vision(
 					drivetrain::addVisionMeasurement,
-					// new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
+					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
 					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
 					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
 				);
