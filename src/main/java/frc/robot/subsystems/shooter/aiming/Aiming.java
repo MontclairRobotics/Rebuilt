@@ -28,6 +28,10 @@ public class Aiming {
 
 	private final Turret turret;
 
+	private double loopCounter;
+	private ShootingParameters cachedShot;
+	private SimShootingParameters cachedSimShot;
+
 	public Aiming(Turret turret) {
 		this.turret = turret;
 		TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
@@ -35,140 +39,155 @@ public class Aiming {
 
 	public ShootingParameters calculateShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
 
-		Shooter.targetLocation = target;
-		Translation2d targetLocation = target.getLocation();
-		InterpolatingTreeMap<Double, ShotSettings> map;
+		loopCounter++;
 
-		switch(target) {
-			case HUB:
-				map = withConstantVelocity ? AimingConstants.REAL_CONSTANT_VELOCITY_MAP : AimingConstants.REAL_MAP;
-				break;
-			case FERRY_LEFT:
-				map = withConstantVelocity ? AimingConstants.REAL_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.REAL_FERRY_MAP;
-				break;
-			case FERRY_RIGHT:
-				map = withConstantVelocity ? AimingConstants.REAL_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.REAL_FERRY_MAP;
-				break;
-			default:
-				map = AimingConstants.REAL_MAP;
-		}
+		if(loopCounter%3 == 0) {
 
-		Angle robotRelativeTurretAngle;
-		Angle hoodAngle;
-		AngularVelocity flywheelVelocity;
+			Shooter.targetLocation = target;
+			Translation2d targetLocation = target.getLocation();
+			InterpolatingTreeMap<Double, ShotSettings> map;
 
-		ChassisSpeeds fieldRelativeSpeeds = RobotContainer.drivetrain.getFieldRelativeSpeeds();
-		Translation2d futureRobotPose = RobotContainer.drivetrain.getRobotPose().getTranslation()
-			.plus(new Translation2d(
-				fieldRelativeSpeeds.vxMetersPerSecond * AimingConstants.LATENCY,
-				fieldRelativeSpeeds.vyMetersPerSecond * AimingConstants.LATENCY
-			));
-
-		double robotOmega = RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond;
-		Rotation2d futureRobotHeading = RobotContainer.drivetrain.getWrappedHeading()
-			.plus(new Rotation2d(robotOmega * AimingConstants.LATENCY));
-
-		Translation2d rotatedOffset = ORIGIN_TO_TURRET.toTranslation2d().rotateBy(futureRobotHeading);
-		Translation2d futureTurretPosition = futureRobotPose.plus(rotatedOffset);
-
-		Translation2d displacementToTarget = targetLocation.minus(futureTurretPosition);
-		double realDistanceToTarget = displacementToTarget.getNorm();
-
-		Translation2d virtualTarget = targetLocation;
-		double virtualDistance = realDistanceToTarget;
-		double estimatedTOF = map.get(realDistanceToTarget).timeOfFlight().in(Seconds);
-
-		if(whileMoving) {
-			for(int i = 0; i < 5; i++) {
-				Translation2d robotDisplacementDuringShot = new Translation2d(
-					fieldRelativeSpeeds.vxMetersPerSecond * estimatedTOF,
-					fieldRelativeSpeeds.vyMetersPerSecond * estimatedTOF
-				);
-
-				virtualTarget = targetLocation.minus(robotDisplacementDuringShot);
-				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
-				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
-
-				if (Math.abs(newTOF - estimatedTOF) < 0.02) break;
-				estimatedTOF = newTOF;
+			switch(target) {
+				case HUB:
+					map = withConstantVelocity ? AimingConstants.REAL_CONSTANT_VELOCITY_MAP : AimingConstants.REAL_MAP;
+					break;
+				case FERRY_LEFT:
+					map = withConstantVelocity ? AimingConstants.REAL_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.REAL_FERRY_MAP;
+					break;
+				case FERRY_RIGHT:
+					map = withConstantVelocity ? AimingConstants.REAL_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.REAL_FERRY_MAP;
+					break;
+				default:
+					map = AimingConstants.REAL_MAP;
 			}
+
+			Angle robotRelativeTurretAngle;
+			Angle hoodAngle;
+			AngularVelocity flywheelVelocity;
+
+			ChassisSpeeds fieldRelativeSpeeds = RobotContainer.drivetrain.getFieldRelativeSpeeds();
+			Translation2d futureRobotPose = RobotContainer.drivetrain.getRobotPose().getTranslation()
+				.plus(new Translation2d(
+					fieldRelativeSpeeds.vxMetersPerSecond * AimingConstants.LATENCY,
+					fieldRelativeSpeeds.vyMetersPerSecond * AimingConstants.LATENCY
+				));
+
+			double robotOmega = RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond;
+			Rotation2d futureRobotHeading = RobotContainer.drivetrain.getWrappedHeading()
+				.plus(new Rotation2d(robotOmega * AimingConstants.LATENCY));
+
+			Translation2d rotatedOffset = ORIGIN_TO_TURRET.toTranslation2d().rotateBy(futureRobotHeading);
+			Translation2d futureTurretPosition = futureRobotPose.plus(rotatedOffset);
+
+			Translation2d displacementToTarget = targetLocation.minus(futureTurretPosition);
+			double realDistanceToTarget = displacementToTarget.getNorm();
+
+			Translation2d virtualTarget = targetLocation;
+			double virtualDistance = realDistanceToTarget;
+			double estimatedTOF = map.get(realDistanceToTarget).timeOfFlight().in(Seconds);
+
+			if(whileMoving) {
+				for(int i = 0; i < 3; i++) {
+					Translation2d robotDisplacementDuringShot = new Translation2d(
+						fieldRelativeSpeeds.vxMetersPerSecond * estimatedTOF,
+						fieldRelativeSpeeds.vyMetersPerSecond * estimatedTOF
+					);
+
+					virtualTarget = targetLocation.minus(robotDisplacementDuringShot);
+					virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
+					double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
+
+					if (Math.abs(newTOF - estimatedTOF) < 0.02) break;
+					estimatedTOF = newTOF;
+				}
+			}
+
+			Translation2d aimingVector = virtualTarget.minus(futureTurretPosition);
+			robotRelativeTurretAngle = Turret.toRobotRelativeAngle(Rotations.of(aimingVector.getAngle().getRotations()));
+			hoodAngle = map.get(virtualDistance).angle();
+			flywheelVelocity = map.get(virtualDistance).flywheelVelocity();
+
+			cachedShot = new ShootingParameters(robotRelativeTurretAngle, hoodAngle, flywheelVelocity, Timer.getFPGATimestamp() + AimingConstants.LATENCY);
 		}
 
-		Translation2d aimingVector = virtualTarget.minus(futureTurretPosition);
-		robotRelativeTurretAngle = Turret.toRobotRelativeAngle(Rotations.of(aimingVector.getAngle().getRotations()));
-		hoodAngle = map.get(virtualDistance).angle();
-		flywheelVelocity = map.get(virtualDistance).flywheelVelocity();
-
-		return new ShootingParameters(robotRelativeTurretAngle, hoodAngle, flywheelVelocity, Timer.getFPGATimestamp() + AimingConstants.LATENCY);
+		return cachedShot;
 	}
 
 	public SimShootingParameters calculateSimShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
 
-		Shooter.targetLocation = target;
-		Translation2d targetLocation = target.getLocation();
-		InterpolatingTreeMap<Double, SimShotSettings> map;
+		loopCounter++;
 
-		switch(target) {
-			case HUB:
-				map = withConstantVelocity ? AimingConstants.SIM_CONSTANT_VELOCITY_MAP : AimingConstants.SIM_MAP;
-				break;
-			case FERRY_LEFT:
-				map = withConstantVelocity ? AimingConstants.SIM_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.SIM_FERRY_MAP;
-				break;
-			case FERRY_RIGHT:
-				map = withConstantVelocity ? AimingConstants.SIM_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.SIM_FERRY_MAP;
-				break;
-			default:
-				map = AimingConstants.SIM_MAP;
-		}
+		if(loopCounter%3 == 0) {
 
-		Angle robotRelativeTurretAngle;
-		Angle hoodAngle;
-		LinearVelocity exitVelocity;
+			Shooter.targetLocation = target;
+			Translation2d targetLocation = target.getLocation();
+			InterpolatingTreeMap<Double, SimShotSettings> map;
 
-		ChassisSpeeds fieldRelativeSpeeds = RobotContainer.drivetrain.getFieldRelativeSpeeds();
-		Translation2d futureRobotPose = RobotContainer.drivetrain.getRobotPose().getTranslation()
-			.plus(new Translation2d(
-				fieldRelativeSpeeds.vxMetersPerSecond * AimingConstants.LATENCY,
-				fieldRelativeSpeeds.vyMetersPerSecond * AimingConstants.LATENCY
-			));
-
-		double robotOmega = RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond;
-		Rotation2d futureRobotHeading = RobotContainer.drivetrain.getWrappedHeading()
-			.plus(new Rotation2d(robotOmega * AimingConstants.LATENCY));
-
-		Translation2d rotatedOffset = ORIGIN_TO_TURRET.toTranslation2d().rotateBy(futureRobotHeading);
-		Translation2d futureTurretPosition = futureRobotPose.plus(rotatedOffset);
-
-		Translation2d displacementToTarget = targetLocation.minus(futureTurretPosition);
-		double realDistanceToTarget = displacementToTarget.getNorm();
-
-		Translation2d virtualTarget = targetLocation;
-		double virtualDistance = realDistanceToTarget;
-		double estimatedTOF = map.get(realDistanceToTarget).timeOfFlight().in(Seconds);
-
-		if(whileMoving) {
-			for(int i = 0; i < 5; i++) {
-				Translation2d robotDisplacementDuringShot = new Translation2d(
-					fieldRelativeSpeeds.vxMetersPerSecond * estimatedTOF,
-					fieldRelativeSpeeds.vyMetersPerSecond * estimatedTOF
-				);
-
-				virtualTarget = targetLocation.minus(robotDisplacementDuringShot);
-				virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
-				double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
-
-				if (Math.abs(newTOF - estimatedTOF) < 0.02) break;
-				estimatedTOF = newTOF;
+			switch(target) {
+				case HUB:
+					map = withConstantVelocity ? AimingConstants.SIM_CONSTANT_VELOCITY_MAP : AimingConstants.SIM_MAP;
+					break;
+				case FERRY_LEFT:
+					map = withConstantVelocity ? AimingConstants.SIM_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.SIM_FERRY_MAP;
+					break;
+				case FERRY_RIGHT:
+					map = withConstantVelocity ? AimingConstants.SIM_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.SIM_FERRY_MAP;
+					break;
+				default:
+					map = AimingConstants.SIM_MAP;
 			}
+
+			Angle robotRelativeTurretAngle;
+			Angle hoodAngle;
+			LinearVelocity exitVelocity;
+
+			ChassisSpeeds fieldRelativeSpeeds = RobotContainer.drivetrain.getFieldRelativeSpeeds();
+			Translation2d futureRobotPose = RobotContainer.drivetrain.getRobotPose().getTranslation()
+				.plus(new Translation2d(
+					fieldRelativeSpeeds.vxMetersPerSecond * AimingConstants.LATENCY,
+					fieldRelativeSpeeds.vyMetersPerSecond * AimingConstants.LATENCY
+				));
+
+			double robotOmega = RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond;
+			Rotation2d futureRobotHeading = RobotContainer.drivetrain.getWrappedHeading()
+				.plus(new Rotation2d(robotOmega * AimingConstants.LATENCY));
+
+			Translation2d rotatedOffset = ORIGIN_TO_TURRET.toTranslation2d().rotateBy(futureRobotHeading);
+			Translation2d futureTurretPosition = futureRobotPose.plus(rotatedOffset);
+
+			Translation2d displacementToTarget = targetLocation.minus(futureTurretPosition);
+			double realDistanceToTarget = displacementToTarget.getNorm();
+
+			Translation2d virtualTarget = targetLocation;
+			double virtualDistance = realDistanceToTarget;
+			double estimatedTOF = map.get(realDistanceToTarget).timeOfFlight().in(Seconds);
+
+			if(whileMoving) {
+				for(int i = 0; i < 5; i++) {
+					Translation2d robotDisplacementDuringShot = new Translation2d(
+						fieldRelativeSpeeds.vxMetersPerSecond * estimatedTOF,
+						fieldRelativeSpeeds.vyMetersPerSecond * estimatedTOF
+					);
+
+					virtualTarget = targetLocation.minus(robotDisplacementDuringShot);
+					virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
+					double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
+
+					if (Math.abs(newTOF - estimatedTOF) < 0.02) break;
+					estimatedTOF = newTOF;
+				}
+			}
+
+			Translation2d aimingVector = virtualTarget.minus(futureTurretPosition);
+			robotRelativeTurretAngle = Turret.toRobotRelativeAngle(Rotations.of(aimingVector.getAngle().getRotations()));
+			hoodAngle = map.get(virtualDistance).angle();
+			exitVelocity = map.get(virtualDistance).exitVelocity();
+
+			cachedSimShot = new SimShootingParameters(robotRelativeTurretAngle, hoodAngle, exitVelocity);
+			
 		}
 
-		Translation2d aimingVector = virtualTarget.minus(futureTurretPosition);
-		robotRelativeTurretAngle = Turret.toRobotRelativeAngle(Rotations.of(aimingVector.getAngle().getRotations()));
-		hoodAngle = map.get(virtualDistance).angle();
-		exitVelocity = map.get(virtualDistance).exitVelocity();
-
-		return new SimShootingParameters(robotRelativeTurretAngle, hoodAngle, exitVelocity);
+		return cachedSimShot;
 	}
 
 	public enum TargetLocation {
