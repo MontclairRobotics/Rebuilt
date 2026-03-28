@@ -326,6 +326,8 @@ public class RobotContainer {
 		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
 		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.spinUpCommand())).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
 
+		operatorController.cross().onTrue(turret.lockForever());
+
 		driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
 		driverController.square()

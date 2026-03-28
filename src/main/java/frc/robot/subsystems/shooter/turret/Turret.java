@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter.turret;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -31,6 +32,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.shooter.aiming.AimingConstants;
 import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
@@ -95,6 +97,23 @@ public class Turret extends SubsystemBase {
 		}
 	}
 
+	public boolean hasJoystickInput() {
+		return Math.hypot(RobotContainer.operatorController.getLeftX(), RobotContainer.operatorController.getLeftY()) > 0.2;
+	}
+
+	public Angle calculateRobotRelativeAngleManualJoystickAim() {
+		double x = RobotContainer.operatorController.getLeftX();
+		double y = RobotContainer.operatorController.getLeftY();
+
+		// deadband
+		if (Math.hypot(x, y) < 0.2) {
+			return getRobotRelativeAngle(); // hold last
+		}
+
+		double fieldAngleRad = Math.atan2(y, x);
+		return Turret.toRobotRelativeAngle(Radians.of(fieldAngleRad));
+	}
+
 	public void increaseFudgeFactor() {
 		fudgeFactor = fudgeFactor.plus(step);
 		io.applyFudgeFactor(fudgeFactor);
@@ -111,6 +130,10 @@ public class Turret extends SubsystemBase {
 
 	public Command decreaseFudgeFactorCommand() {
 		return Commands.runOnce(() -> decreaseFudgeFactor());
+	}
+
+	public Command lockForever() {
+		return Commands.run(() -> io.stop(), this).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
 	}
 
 	/** used for setpoint buffer */
@@ -288,6 +311,10 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, DoubleSupplier timeSecondsForSetpoint) {
+		if(hasJoystickInput()) {
+			angle = calculateRobotRelativeAngleManualJoystickAim();
+			velocity = RotationsPerSecond.zero();
+		}
 		io.setRobotRelativeAngle(angle, velocity, timeSecondsForSetpoint.getAsDouble());
 	}
 
