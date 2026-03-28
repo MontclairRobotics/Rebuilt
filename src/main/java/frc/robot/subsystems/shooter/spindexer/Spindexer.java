@@ -33,7 +33,7 @@ public class Spindexer {
 
     public Command setVoltageCommand(double voltage) {
         return Commands.run(() -> {
-            serializer.setVoltage(6);
+            serializer.setVoltage(voltage);
             indexer.setVoltage(voltage);
         }, serializer, indexer);
     }
