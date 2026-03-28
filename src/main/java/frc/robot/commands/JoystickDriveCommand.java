@@ -66,11 +66,11 @@ public class JoystickDriveCommand extends Command {
 
 		shouldTrenchLockTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK))
 			.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.L1().getAsBoolean()))
-			.onFalse(updateDriveMode(DriveMode.SNAKE).onlyIf(() -> RobotContainer.driverController.L1().getAsBoolean()));
+			.onFalse(updateDriveMode(DriveMode.XMODE).onlyIf(() -> RobotContainer.driverController.L1().getAsBoolean()));
 		shouldBumpLockTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK))
 			.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.L1().getAsBoolean()))
-			.onFalse(updateDriveMode(DriveMode.SNAKE).onlyIf(() -> RobotContainer.driverController.L1().getAsBoolean()));
-		RobotContainer.driverController.L1().onTrue(updateDriveMode(DriveMode.SNAKE)).onFalse(updateDriveMode(DriveMode.NORMAL));
+			.onFalse(updateDriveMode(DriveMode.XMODE).onlyIf(() -> RobotContainer.driverController.L1().getAsBoolean()));
+		RobotContainer.driverController.L1().onTrue(updateDriveMode(DriveMode.XMODE)).onFalse(updateDriveMode(DriveMode.NORMAL));
 
 		addRequirements(drivetrain);
 	}
@@ -199,11 +199,9 @@ public class JoystickDriveCommand extends Command {
 
 				break;
 
-			case SNAKE:
+			case XMODE:
 
-				Rotation2d targetAngle = drivetrain.getSnakeDriveAngle();
-				drivetrain.setFieldRelativeAngle(targetAngle);
-				drivetrain.alignToAngleFieldRelative(false);
+				drivetrain.enableXMode();
 
 				break;
 
@@ -222,7 +220,7 @@ public class JoystickDriveCommand extends Command {
         NORMAL,
         TRENCH_LOCK,
         BUMP_LOCK,
-		SNAKE
+		XMODE
     }
 
 }

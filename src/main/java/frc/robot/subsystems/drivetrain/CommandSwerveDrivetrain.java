@@ -84,6 +84,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds =
 		new SwerveRequest.ApplyRobotSpeeds();
 
+	private final SwerveRequest.SwerveDriveBrake xModeRequest =
+		new SwerveRequest.SwerveDriveBrake();
+
 	private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric()
 		// .withDeadband(MAX_SPEED.times(0.05))
 		// .withRotationalDeadband(MAX_ANGULAR_SPEED.times(0.1))
@@ -311,6 +314,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	public double getOmegaVelocityFromController() {
 		double rotInput = -MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.1);
 		return MathUtil.copyDirectionPow(rotInput, JOYSTICK_INPUT_ROT_GAIN) * MAX_ANGULAR_SPEED.in(RadiansPerSecond);
+	}
+
+	public void enableXMode() {
+		setControl(xModeRequest);
 	}
 
 	public void driveJoystick() {
