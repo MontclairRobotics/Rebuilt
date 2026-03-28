@@ -20,9 +20,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.util.Elastic;
-import frc.robot.util.Elastic.Notification;
-import frc.robot.util.Elastic.Notification.NotificationLevel;
 import frc.robot.util.PhoenixUtil;
 
 public class PivotIOTalonFX implements PivotIO {
@@ -82,7 +79,7 @@ public class PivotIOTalonFX implements PivotIO {
 	}
 
 	public void updateInputs(PivotIOInputs inputs) {
-        
+
 		BaseStatusSignal.refreshAll(
             positionSignal,
             setpointPositionSignal,
