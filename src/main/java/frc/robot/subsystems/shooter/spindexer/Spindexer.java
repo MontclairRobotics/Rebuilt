@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter.spindexer;
 
-import static frc.robot.constants.SerializerConstants.SPIN_VELOCITY;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -60,23 +59,23 @@ public class Spindexer {
     //     );
     // }
 
-    public Command jiggleFoReal() {
-        return Commands.parallel(
-            indexer.spinUpCommand(),
-            Commands.repeatingSequence(
-                Commands.startEnd(
-                    () -> serializer.spinUp(),
-                    () -> serializer.stop(),
-                    serializer
-                ).withTimeout(spinUpTime.getAsDouble()),
-                Commands.startEnd(
-                    () -> serializer.setVelocity(SPIN_VELOCITY.unaryMinus()),
-                    () -> serializer.stop(),
-                    serializer
-                ).withTimeout(spinDownTime.getAsDouble())
-            )
-        );
-    }
+    // public Command jiggleFoReal() {
+    //     return Commands.parallel(
+    //         indexer.spinUpCommand(),
+    //         Commands.repeatingSequence(
+    //             Commands.startEnd(
+    //                 () -> serializer.spinUp(),
+    //                 () -> serializer.stop(),
+    //                 serializer
+    //             ).withTimeout(spinUpTime.getAsDouble()),
+    //             Commands.startEnd(
+    //                 () -> serializer.setVelocity(SPIN_VELOCITY.unaryMinus()),
+    //                 () -> serializer.stop(),
+    //                 serializer
+    //             ).withTimeout(spinDownTime.getAsDouble())
+    //         )
+    //     );
+    // }
 
     public Command jiggleSerializerCommand() {
         return new SequentialCommandGroup(
