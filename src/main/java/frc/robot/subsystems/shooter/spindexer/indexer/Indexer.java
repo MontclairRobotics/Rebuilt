@@ -42,9 +42,9 @@ public class Indexer extends SubsystemBase {
 
 		io.updateInputs(inputs);
 
-		if(logCounter % loopsPerLog == 0) {
-			Logger.processInputs("Indexer", inputs);
-		}
+		// if(logCounter % loopsPerLog == 0) {
+		// 	Logger.processInputs("Indexer", inputs);
+		// }
 	}
 
 	public void setVelocity(AngularVelocity velocity) {

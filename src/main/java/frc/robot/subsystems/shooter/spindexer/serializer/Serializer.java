@@ -42,9 +42,9 @@ public class Serializer extends SubsystemBase {
 
 		io.updateInputs(inputs);
 
-		if(logCounter % loopsPerLog == 0) {
-			Logger.processInputs("Serializer", inputs);
-		}
+		// if(logCounter % loopsPerLog == 0) {
+		// 	Logger.processInputs("Serializer", inputs);
+		// }
 	}
 
 	public void setVelocity(AngularVelocity velocity) {

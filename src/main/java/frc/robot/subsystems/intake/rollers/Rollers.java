@@ -34,13 +34,13 @@ public class Rollers extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		logCounter++;
+		// logCounter++;
 
 		io.updateInputs(inputs);
 
-		if(logCounter % loopsPerLog == 0) {
-			Logger.processInputs("Rollers", inputs);
-		}
+		// if(logCounter % loopsPerLog == 0) {
+		// 	Logger.processInputs("Rollers", inputs);
+		// }
 	}
 
 	public void setVelocity(AngularVelocity velocity) {
