@@ -36,6 +36,6 @@ public final class Constants {
 	}
 
 	public static final Mass ROBOT_MASS = Pounds.of(135);
-	public static final Distance BUMPER_WIDTH = Inches.of(30); // robot is a square, so bumper width = bumper length
+	public static final Distance BUMPER_WIDTH = Inches.of(34); // robot is a square, so bumper width = bumper length
 
 }

@@ -61,6 +61,7 @@ import static frc.robot.constants.DriveConstants.ROTATION_kD;
 import static frc.robot.constants.DriveConstants.ROTATION_kI;
 import static frc.robot.constants.DriveConstants.ROTATION_kP;
 
+import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.TunerConstants.TunerSwerveDrivetrain;
@@ -418,9 +419,37 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	@AutoLogOutput
 	public Pose2d getRobotPose() {
 		if (Utils.isSimulation() && mapleSimSwerveDrivetrain != null) {
-			return mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose();
+			Pose2d pose = mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose();
+
+			if(pose.getX() > FieldConstants.FieldBoundaries.FAR_WALL_BOUNDARY) {
+				pose = new Pose2d(FieldConstants.FieldBoundaries.FAR_WALL_BOUNDARY, pose.getY(), pose.getRotation());
+			} else if(pose.getX() < FieldConstants.FieldBoundaries.NEAR_WALL_BOUNDARY) {
+				pose = new Pose2d(FieldConstants.FieldBoundaries.NEAR_WALL_BOUNDARY, pose.getY(), pose.getRotation());
+			}
+
+			if(pose.getY() > FieldConstants.FieldBoundaries.LEFT_WALL_BOUNDARY) {
+				pose = new Pose2d(pose.getX(), FieldConstants.FieldBoundaries.LEFT_WALL_BOUNDARY, pose.getRotation());
+			} else if (pose.getY() < FieldConstants.FieldBoundaries.RIGHT_WALL_BOUNDARY) {
+				pose = new Pose2d(pose.getX(), FieldConstants.FieldBoundaries.RIGHT_WALL_BOUNDARY, pose.getRotation());
+			}
+
+			return pose;
 		} else {
-			return this.getState().Pose;
+			Pose2d pose = this.getState().Pose;
+
+			if(pose.getX() > FieldConstants.FieldBoundaries.FAR_WALL_BOUNDARY) {
+				pose = new Pose2d(FieldConstants.FieldBoundaries.FAR_WALL_BOUNDARY, pose.getY(), pose.getRotation());
+			} else if(pose.getX() < FieldConstants.FieldBoundaries.NEAR_WALL_BOUNDARY) {
+				pose = new Pose2d(FieldConstants.FieldBoundaries.NEAR_WALL_BOUNDARY, pose.getY(), pose.getRotation());
+			}
+
+			if(pose.getY() > FieldConstants.FieldBoundaries.LEFT_WALL_BOUNDARY) {
+				pose = new Pose2d(pose.getX(), FieldConstants.FieldBoundaries.LEFT_WALL_BOUNDARY, pose.getRotation());
+			} else if (pose.getY() < FieldConstants.FieldBoundaries.RIGHT_WALL_BOUNDARY) {
+				pose = new Pose2d(pose.getX(), FieldConstants.FieldBoundaries.RIGHT_WALL_BOUNDARY, pose.getRotation());
+			}
+
+			return pose;
 		}
 	}
 

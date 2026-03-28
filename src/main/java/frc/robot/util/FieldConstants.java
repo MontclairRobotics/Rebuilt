@@ -14,6 +14,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static frc.robot.constants.Constants.BUMPER_WIDTH;
+
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.constants.Constants;
 
@@ -401,6 +403,13 @@ public class FieldConstants {
 
 		public static final double LEFT_FERRYING_HEIGHT = 0.0;
 		public static final double RIGHT_FERRYING_HEIGHT = 0.0;
+	}
+
+	public static class FieldBoundaries {
+		public static final double FAR_WALL_BOUNDARY = FIELD_LENGTH.minus(Constants.BUMPER_WIDTH.div(2)).in(Meters);
+		public static final double NEAR_WALL_BOUNDARY = BUMPER_WIDTH.div(2).in(Meters);
+		public static final double LEFT_WALL_BOUNDARY = FIELD_WIDTH.minus(Constants.BUMPER_WIDTH.div(2)).in(Meters);
+		public static final double RIGHT_WALL_BOUNDARY = BUMPER_WIDTH.div(2).in(Meters);
 	}
 
 	public enum FieldType {
