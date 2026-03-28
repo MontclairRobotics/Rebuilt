@@ -38,7 +38,7 @@ public class PivotConstants {
 	public static final double ENCODER_OFFSET = -0.457764;
 
 	// constraints
-	public static final Angle MIN_ANGLE = Degrees.of(0);
+	public static final Angle MIN_ANGLE = Degrees.of(-5);
 	public static final Angle MAX_ANGLE = Rotations.of(0.3);
 	public static final Angle STOW_ANGLE = Degrees.of(90);
 	public static final Angle JIGGLE_ANGLE = Degrees.of(60);
