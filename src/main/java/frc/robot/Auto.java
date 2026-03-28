@@ -445,9 +445,6 @@ public class Auto extends SubsystemBase {
 
 				followPathCommands.addCommands(
 					Commands.waitSeconds(timeToEmptyFuel)
-						.deadlineFor(
-							RobotContainer.intake.jiggleCommand()
-						)
 				);
 
 			}
@@ -470,8 +467,7 @@ public class Auto extends SubsystemBase {
 
 		if(RobotBase.isReal()) {
 			pivotCommandGroup.addCommands(
-				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint())
+				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE).withTimeout(1)
 			);
 		} else {
 			pivotCommandGroup.addCommands(
