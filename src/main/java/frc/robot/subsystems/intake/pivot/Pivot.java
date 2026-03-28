@@ -13,7 +13,6 @@ import frc.robot.constants.Constants.Mode;
 
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 

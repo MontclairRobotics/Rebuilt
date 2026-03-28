@@ -62,19 +62,19 @@ public class Hood extends SubsystemBase {
 
 		io.updateInputs(inputs); // need to update inputs every frame
 
-		Logger.recordOutput("Hood/At Time Adjusted Setpoint", atTimeAdjustedSetpoint());
-		Logger.recordOutput("Hood/Time Adjusted Setpoint", getSetpointForTime(Timer.getFPGATimestamp()));
+		// Logger.recordOutput("Hood/At Time Adjusted Setpoint", atTimeAdjustedSetpoint());
+		// Logger.recordOutput("Hood/Time Adjusted Setpoint", getSetpointForTime(Timer.getFPGATimestamp()));
 
 		if(logCounter % loopsPerLog == 0) {
 			Logger.processInputs("Hood", inputs);
 		}
 
-		visualization.update();
-		visualization.log();
+		// visualization.update();
+		// visualization.log();
 
-		if(RobotContainer.HOOD_DEBUG || RobotBase.isSimulation()) {
-			updateTunables();
-		}
+		// if(RobotContainer.HOOD_DEBUG || RobotBase.isSimulation()) {
+		// 	updateTunables();
+		// }
 	}
 
 	public static Angle interpolate(Angle startValue, Angle endValue, double t) {
