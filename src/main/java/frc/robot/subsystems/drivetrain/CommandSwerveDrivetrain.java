@@ -476,6 +476,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		return Commands.runOnce(() -> zeroGyro(), RobotContainer.drivetrain);
 	}
 
+	public Command resetPoseCommand(Pose2d pose) {
+		return Commands.runOnce(() -> resetPose(PoseUtils.flipPoseAlliance(pose)), this);
+	}
+
 	public Command toRobotRelativeCommand() {
 		return Commands.runOnce(() -> toRobotRelative(), RobotContainer.drivetrain);
 	}
