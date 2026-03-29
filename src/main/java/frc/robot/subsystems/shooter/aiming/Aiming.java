@@ -41,7 +41,7 @@ public class Aiming {
 
 		loopCounter++;
 
-		if(loopCounter%3 == 0) {
+		if(loopCounter%3 == 0 || cachedShot == null) {
 
 			Shooter.targetLocation = target;
 			Translation2d targetLocation = target.getLocation();
@@ -117,7 +117,7 @@ public class Aiming {
 
 		loopCounter++;
 
-		if(loopCounter%3 == 0) {
+		if(loopCounter%3 == 0 || cachedSimShot == null) {
 
 			Shooter.targetLocation = target;
 			Translation2d targetLocation = target.getLocation();
@@ -184,7 +184,7 @@ public class Aiming {
 			exitVelocity = map.get(virtualDistance).exitVelocity();
 
 			cachedSimShot = new SimShootingParameters(robotRelativeTurretAngle, hoodAngle, exitVelocity);
-			
+
 		}
 
 		return cachedSimShot;
