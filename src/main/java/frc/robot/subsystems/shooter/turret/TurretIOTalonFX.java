@@ -3,8 +3,8 @@ package frc.robot.subsystems.shooter.turret;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -17,7 +17,11 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotContainer;
+import frc.robot.util.Elastic;
+import frc.robot.util.Elastic.Notification;
+import frc.robot.util.Elastic.Notification.NotificationLevel;
 import frc.robot.util.PhoenixUtil;
+import frc.robot.util.tunables.LoggedTunableNumber;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
@@ -39,8 +43,10 @@ public class TurretIOTalonFX implements TurretIO {
     private final StatusSignal<Current> currentDrawAmpsSignal;
     private final StatusSignal<Temperature> tempCelsiusSignal;
 
-    private final MotionMagicVoltage request = new MotionMagicVoltage(0).withEnableFOC(true);
+    private final PositionVoltage request = new PositionVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
+
+    public LoggedTunableNumber kV = new LoggedTunableNumber("Turret/kV FUDGE", 7.05);
 
     public TurretIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
@@ -84,6 +90,12 @@ public class TurretIOTalonFX implements TurretIO {
 
     @Override
     public void updateInputs(TurretIOInputs inputs) {
+        if(!encoder.isConnected()&&!(config.Feedback==BACKUP_FEEDBACK_CONFIGS)){
+            config.Feedback=BACKUP_FEEDBACK_CONFIGS;
+            motor.getConfigurator().apply(config);
+            Elastic.sendNotification(new Notification(NotificationLevel.WARNING,"ENCODER DISCONNECT!","Turret Absolute Encoder Disconnected, Switched to Motor Encoder."));
+
+        }
         BaseStatusSignal.refreshAll(
             positionSignal,
             setpointPositionSignal,
@@ -116,8 +128,7 @@ public class TurretIOTalonFX implements TurretIO {
 
     @Override
     public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, double timeSecondsForSetpoint) {
-        angle = Turret.constrainAngle(angle);
-        double velocityFeedforward = velocity.in(RotationsPerSecond) * 4; // 4 volts per rotation/s, equivalent to "kV"
+        double velocityFeedforward = velocity.in(RotationsPerSecond) * kV.getAsDouble(); // 5.05 volts per rotation/s, equivalent to "kV"
         Turret.recordSetpoint(angle, timeSecondsForSetpoint);
         motor.setControl(request.withPosition(angle).withFeedForward(velocityFeedforward));
     }

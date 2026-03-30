@@ -47,20 +47,20 @@ public class HoodConstants {
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
 
 	public static final double MOMENT_OF_INERTIA = 0.03038161694; // from CAD on 3/3/2026
-	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(-.61298); // absolute encoder
+	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.452); // absolute encoder
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
 	public static final double HOOD_LOWER_TIME = 1.2;
 
 	// Gains (Tuned 2/22)
-	public static final double kP = 600;
+	public static final double kP = 250;
 	public static final double kD = 0;
 	public static final double kS = 0;
-	public static final double kG = 0.45;
+	public static final double kG = 0.36;
 
 	public static final Angle TOLERANCE = Degrees.of(1);
 
 	public static final double STATOR_CURRENT_LIMIT = 60; // Amps
-	public static final double SUPPLY_CURRENT_LIMIT = 40; // Amps
+	public static final double SUPPLY_CURRENT_LIMIT = 30; // Amps
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(3);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(30);
@@ -92,6 +92,11 @@ public class HoodConstants {
 		.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
 		.withRotorToSensorRatio(ROTOR_TO_SENSOR_RATIO)
 		.withSensorToMechanismRatio(SENSOR_TO_MECHANISM_RATIO);
+
+	public static final FeedbackConfigs BACKUP_FEEDBACK_CONFIGS = new FeedbackConfigs()
+		.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
+		.withRotorToSensorRatio(1)
+		.withSensorToMechanismRatio(GEARING);
 
 	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
 		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)

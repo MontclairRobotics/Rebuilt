@@ -43,7 +43,7 @@ public class TurretConstants {
 	public static final Angle MIN_ANGLE = Rotations.of(-0.51);
 	public static final Angle MAX_ANGLE = Rotations.of(0.51);
 
-	public static final Angle ANGLE_TOLERANCE = Degrees.of(3);
+	public static final Angle ANGLE_TOLERANCE = Degrees.of(5);
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.25); // TODO: tune
 
 	// physical properties
@@ -55,19 +55,19 @@ public class TurretConstants {
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
 	public static Angle ANGLE_OFFSET = Rotations.of(0.5);
-	public static final Angle ENCODER_OFFSET = Rotations.of(-0.367432);
+	public static final Angle ENCODER_OFFSET = Rotations.of(0.159912);
 
 	// pid + ff gains
 	public static final double kP = 40;
-	public static final double kD = 2;
-	public static final double kS = 3;
+	public static final double kD = 0;
+	public static final double kS = 20;
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(4);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(80);
 	public static final double MOTION_MAGIC_JERK = 200; // Rotations Per Second Per Second Per Second
 
 	public static final double STATOR_CURRENT_LIMIT = 60; // Amps
-	public static final double SUPPLY_CURRENT_LIMIT = 40; // Amps
+	public static final double SUPPLY_CURRENT_LIMIT = 30; // Amps
 
 	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
 		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)
@@ -92,6 +92,11 @@ public class TurretConstants {
 		.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
 		.withRotorToSensorRatio(ROTOR_TO_SENSOR_RATIO)
 		.withSensorToMechanismRatio(SENSOR_TO_MECHANISM_RATIO);
+
+	public static final FeedbackConfigs BACKUP_FEEDBACK_CONFIGS = new FeedbackConfigs()
+		.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
+		.withRotorToSensorRatio(1)
+		.withSensorToMechanismRatio(GEARING);
 
 	public static final CANcoderConfiguration ENCODER_CONFIGS = new CANcoderConfiguration()
 		.withMagnetSensor(

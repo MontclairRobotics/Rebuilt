@@ -20,6 +20,9 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.util.Elastic;
+import frc.robot.util.Elastic.Notification;
+import frc.robot.util.Elastic.Notification.NotificationLevel;
 import frc.robot.util.PhoenixUtil;
 
 public class PivotIOTalonFX implements PivotIO {
@@ -79,6 +82,11 @@ public class PivotIOTalonFX implements PivotIO {
 	}
 
 	public void updateInputs(PivotIOInputs inputs) {
+        if(!encoder.isConnected()&&!(configs.Feedback==BACKUP_FEEDBACK_CONFIGS)){
+            configs.Feedback=BACKUP_FEEDBACK_CONFIGS;
+            motor.getConfigurator().apply(configs);
+            Elastic.sendNotification(new Notification(NotificationLevel.WARNING,"ENCODER DISCONNECT!","Pivot Absolute Encoder Disconnected, Switched to Motor Encoder."));
+        }
 		BaseStatusSignal.refreshAll(
             positionSignal,
             setpointPositionSignal,
@@ -165,5 +173,10 @@ public class PivotIOTalonFX implements PivotIO {
     @Override
 	public void setNeutralMode(NeutralModeValue value) {
 		motor.setNeutralMode(value);
+	}
+
+    @Override
+	public void applyFeedforward() {
+		motor.setPosition(motor.getPosition().getValueAsDouble());
 	}
 }

@@ -127,7 +127,6 @@ public class Robot extends LoggedRobot {
 		// coast mode
 		RobotContainer.turret.setNeutralMode(NeutralModeValue.Coast);
 		RobotContainer.hood.setNeutralMode(NeutralModeValue.Coast);
-		RobotContainer.pivot.setNeutralMode(NeutralModeValue.Coast);
 
 		if (!RobotBase.isReal()) {
 			// robotContainer.resetSimulation();

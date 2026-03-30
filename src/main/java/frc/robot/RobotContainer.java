@@ -26,7 +26,6 @@ import frc.robot.commands.WheelRadiusCharacterization;
 import frc.robot.commands.WheelRadiusCharacterization.Direction;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
-import frc.robot.constants.PivotConstants;
 import frc.robot.constants.RollersConstants;
 import frc.robot.constants.TurretConstants;
 import frc.robot.constants.Constants.Mode;
@@ -172,7 +171,7 @@ public class RobotContainer {
 
 				vision = new Vision(
 					drivetrain::addVisionMeasurement,
-					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
+					// new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
 					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
 					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
 				);
@@ -269,7 +268,7 @@ public class RobotContainer {
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 		driverController.R2()
-			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(1), RotationsPerSecond.of(0.5)))
+			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(0.8), RotationsPerSecond.of(0.25)))
 			.onFalse(drivetrain.setMaxSpeedsCommand(TunerConstants.kSpeedAt12Volts, RotationsPerSecond.of(1.624)));
 
 		driverController.triangle()
@@ -283,15 +282,7 @@ public class RobotContainer {
 
 		// operator
 
-		//shooter.setDefaultCommand(shooter.stowCommand());
-
 		operatorController.circle().onFalse(shooter.stowCommand());
-		// operatorController.triangle()
-		// 	.whileTrue(shooter.setConstantShotParameters())
-		// 	.onFalse(shooter.stowCommand());
-		// operatorController.square()
-		// 	.whileTrue(shooter.setParametersNoTurret(() -> aiming.calculateShot(Shooter.targetLocation, useConstantVelocityMap, shootWhileMoving)))
-		// 	.onFalse(shooter.stowCommand());
 
 		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
@@ -304,7 +295,7 @@ public class RobotContainer {
 
 		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
 		operatorController.R2()
-			.whileTrue(pivot.goToAngleCommand(PivotConstants.MAX_ANGLE.div(2).plus(Degrees.of(10))))
+			.whileTrue(intake.jiggleCommand())
 			.onFalse(pivot.deployCommand());
 
 	}

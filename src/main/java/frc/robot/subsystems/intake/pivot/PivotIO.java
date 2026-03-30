@@ -50,4 +50,6 @@ public interface PivotIO {
 	public void setMotionMagic(AngularVelocity velocity, AngularAcceleration acceleration, double jerk);
 
 	public void setNeutralMode(NeutralModeValue value);
+
+	public void applyFeedforward();
 }

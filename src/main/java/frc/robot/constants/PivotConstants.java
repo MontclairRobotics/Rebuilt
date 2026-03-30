@@ -33,13 +33,15 @@ public class PivotConstants {
 
 	public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the canivore
 
-	public static final double ROTOR_TO_SENSOR_RATIO = (72.0 / 46) * 9;
+	public static final double ROTOR_TO_SENSOR_RATIO = (72.0 / 46) * 9 * 5;
 	public static final double SENSOR_TO_MECHANISM_RATIO = 1; // CANcoder is on the mechanism
-	public static final double ENCODER_OFFSET = 0.046885;
+	public static final double ENCODER_OFFSET = -0.2944;
 
 	// constraints
-	public static final Angle MIN_ANGLE = Degrees.of(-10);
+	public static final Angle MIN_ANGLE = Degrees.of(0);
 	public static final Angle MAX_ANGLE = Rotations.of(0.3);
+	public static final Angle STOW_ANGLE = Degrees.of(90);
+	public static final Angle JIGGLE_ANGLE = Degrees.of(60);
 
 	// physical properties
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // rotations of the motor shaft per rotations of the intake pivot
@@ -47,9 +49,9 @@ public class PivotConstants {
 	public static final double MOMENT_OF_INERTIA = 1; // TODO: set
 
 	// pid gains
-	public static final double kP = 30;
+	public static final double kP = 100;
 	public static final double kI = 0;
-	public static final double kD = 2;
+	public static final double kD = 0;
 
 	// ff gains
 	public static final double kS = 0;
@@ -58,7 +60,7 @@ public class PivotConstants {
 
 	public static final Angle TOLERANCE = Degrees.of(1);
 
-	public static final double STATOR_CURRENT_LIMIT = 40; // Amps
+	public static final double STATOR_CURRENT_LIMIT = 60; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 30; // Amps
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(4);
@@ -91,6 +93,11 @@ public class PivotConstants {
 		.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
 		.withRotorToSensorRatio(ROTOR_TO_SENSOR_RATIO)
 		.withSensorToMechanismRatio(SENSOR_TO_MECHANISM_RATIO);
+
+	public static final FeedbackConfigs BACKUP_FEEDBACK_CONFIGS = new FeedbackConfigs()
+		.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
+		.withRotorToSensorRatio(1)
+		.withSensorToMechanismRatio(GEARING);
 
 	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
 		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)

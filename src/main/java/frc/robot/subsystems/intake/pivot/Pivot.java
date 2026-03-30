@@ -40,8 +40,8 @@ public class Pivot extends SubsystemBase {
 		return io.isAtSetpoint();
 	}
 
-	public Command testVoltageCommand() {
-		return Commands.run(() -> io.setVoltage(2));
+	public Command setVoltageCommand(double voltage) {
+		return Commands.run(() -> io.setVoltage(voltage));
 	}
 
 	public void setPivotAngle(Angle angle) {
@@ -71,7 +71,11 @@ public class Pivot extends SubsystemBase {
 	}
 
 	public Command stowCommand() {
-		return Commands.run(() -> setPivotAngle(MAX_ANGLE), this);
+		return Commands.run(() -> setPivotAngle(STOW_ANGLE), this);
+	}
+
+	public Command setJiggleAngle() {
+		return Commands.run(() -> setPivotAngle(JIGGLE_ANGLE), this);
 	}
 
 	public Command goToAngleCommand(Supplier<Angle> angle) {
@@ -90,6 +94,10 @@ public class Pivot extends SubsystemBase {
 
 	public Command joystickControlCommand() {
 		return Commands.run(this::joystickControl, this);
+	}
+
+	public Command applyFeedforwardCommand() {
+		return Commands.run(() -> io.applyFeedforward(), this);
 	}
 
 	@Override
