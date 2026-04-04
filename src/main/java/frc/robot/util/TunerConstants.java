@@ -54,16 +54,42 @@ public class TunerConstants {
     // This needs to be tuned to your individual robot
     private static final Current kSlipCurrent = Amps.of(70);
 
+    public static final CurrentLimitsConfigs defaultDriveCurrentLimitsConfig = new CurrentLimitsConfigs()
+        .withStatorCurrentLimit((kSlipCurrent))
+        .withSupplyCurrentLimit(Amps.of(50))
+        .withStatorCurrentLimitEnable(true)
+        .withSupplyCurrentLimitEnable(true);
+
+    public static final CurrentLimitsConfigs turboDriveCurrentLimitsConfig = new CurrentLimitsConfigs()
+        .withStatorCurrentLimit((Amps.of(100)))
+        .withSupplyCurrentLimit(Amps.of(80))
+        .withStatorCurrentLimitEnable(true)
+        .withSupplyCurrentLimitEnable(true);
+
+    public static final CurrentLimitsConfigs precisionDriveCurrentLimitsConfig = new CurrentLimitsConfigs()
+        .withStatorCurrentLimit(Amps.of(50))
+        .withSupplyCurrentLimit(Amps.of(30))
+        .withStatorCurrentLimitEnable(true)
+        .withSupplyCurrentLimitEnable(true);
+
+    public static final TalonFXConfiguration turboDriveConfiguration = new TalonFXConfiguration()
+        .withCurrentLimits(turboDriveCurrentLimitsConfig)
+        .withClosedLoopRamps(
+            new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(0)
+        );
+
+    public static final TalonFXConfiguration precisionDriveConfiguration = new TalonFXConfiguration()
+        .withCurrentLimits(precisionDriveCurrentLimitsConfig)
+        .withClosedLoopRamps(
+            new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(0.05)
+        );
+
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
     // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
-    private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration()
-        .withCurrentLimits(
-            new CurrentLimitsConfigs()
-                .withStatorCurrentLimit((kSlipCurrent))
-                .withSupplyCurrentLimit(Amps.of(50))
-                .withStatorCurrentLimitEnable(true)
-                .withSupplyCurrentLimitEnable(true)
-        )
+    public static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration()
+        .withCurrentLimits(defaultDriveCurrentLimitsConfig)
         .withClosedLoopRamps(
             new ClosedLoopRampsConfigs()
                 .withVoltageClosedLoopRampPeriod(0.01)

@@ -23,6 +23,7 @@ import static frc.robot.constants.DriveConstants.TRENCH_TRANSLATION_kI;
 import static frc.robot.constants.DriveConstants.TRENCH_TRANSLATION_kP;
 
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain.ConfigurationMode;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LeftTrench;
@@ -64,13 +65,25 @@ public class JoystickDriveCommand extends Command {
 		this.omegaVelocitySupplier = () -> drivetrain.getOmegaVelocityFromController();
 		this.shouldAimAssist = shouldAimAssist;
 
-		shouldTrenchLockTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK))
-			.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.R1().getAsBoolean()))
-			.onFalse(updateDriveMode(DriveMode.XMODE).onlyIf(() -> RobotContainer.driverController.R1().getAsBoolean()));
-		shouldBumpLockTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK))
-			.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.R1().getAsBoolean()))
-			.onFalse(updateDriveMode(DriveMode.XMODE).onlyIf(() -> RobotContainer.driverController.R1().getAsBoolean()));
-		RobotContainer.driverController.R1().onTrue(updateDriveMode(DriveMode.XMODE)).onFalse(updateDriveMode(DriveMode.NORMAL));
+		// shouldTrenchLockTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK))
+		// 	.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.R1().getAsBoolean()))
+		// 	.onFalse(updateDriveMode(DriveMode.XMODE).onlyIf(() -> RobotContainer.driverController.R1().getAsBoolean()));
+
+		// shouldBumpLockTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK))
+		// 	.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.R1().getAsBoolean()))
+		// 	.onFalse(updateDriveMode(DriveMode.XMODE).onlyIf(() -> RobotContainer.driverController.R1().getAsBoolean()));
+
+		RobotContainer.xModeTrigger
+			.onTrue(updateDriveMode(DriveMode.XMODE))
+			.onFalse(updateDriveMode(DriveMode.NORMAL));
+
+		RobotContainer.turboTrigger
+			.onTrue(updateDriveMode(DriveMode.TURBO))
+			.onFalse(updateDriveMode(DriveMode.NORMAL));
+
+		RobotContainer.precisionTrigger
+			.onTrue(updateDriveMode(DriveMode.PRECISION))
+			.onFalse(updateDriveMode(DriveMode.NORMAL));
 
 		addRequirements(drivetrain);
 	}
@@ -150,6 +163,7 @@ public class JoystickDriveCommand extends Command {
 		switch (currentDriveMode) {
 			case NORMAL:
 
+				drivetrain.swapConfigurationModeTo(ConfigurationMode.NORMAL);
 				drivetrain.drive(
 					xVelocitySupplier.getAsDouble(),
 					yVelocitySupplier.getAsDouble(),
@@ -160,6 +174,8 @@ public class JoystickDriveCommand extends Command {
 				break;
 
 			case TRENCH_LOCK:
+
+				drivetrain.swapConfigurationModeTo(ConfigurationMode.NORMAL);
 
 				// reverses PID contribution direction for red alliance
 				double pidContribution =
@@ -185,6 +201,8 @@ public class JoystickDriveCommand extends Command {
 
 			case BUMP_LOCK:
 
+				drivetrain.swapConfigurationModeTo(ConfigurationMode.NORMAL);
+
 				// bump lock only changes angle of robot
 				double rotVelocityBumpLock = thetaController.calculate(
 					drivetrain.getWrappedHeading().getRadians(), getBumpLockAngle().getRadians()
@@ -199,8 +217,33 @@ public class JoystickDriveCommand extends Command {
 
 				break;
 
+			case TURBO:
+
+				drivetrain.swapConfigurationModeTo(ConfigurationMode.TURBO);
+				drivetrain.drive(
+					xVelocitySupplier.getAsDouble(),
+					yVelocitySupplier.getAsDouble(),
+					omegaVelocitySupplier.getAsDouble(),
+					drivetrain.fieldRelative
+				);
+
+				break;
+
+			case PRECISION:
+
+				drivetrain.swapConfigurationModeTo(ConfigurationMode.PRECISION);
+				drivetrain.drive(
+					xVelocitySupplier.getAsDouble(),
+					yVelocitySupplier.getAsDouble(),
+					omegaVelocitySupplier.getAsDouble(),
+					drivetrain.fieldRelative
+				);
+
+				break;
+
 			case XMODE:
 
+				drivetrain.swapConfigurationModeTo(ConfigurationMode.NORMAL);
 				drivetrain.enableXMode();
 
 				break;
@@ -220,6 +263,8 @@ public class JoystickDriveCommand extends Command {
         NORMAL,
         TRENCH_LOCK,
         BUMP_LOCK,
+		PRECISION,
+		TURBO,
 		XMODE
     }
 

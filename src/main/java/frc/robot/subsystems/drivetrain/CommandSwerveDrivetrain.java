@@ -7,7 +7,12 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -166,9 +171,27 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	public boolean fieldRelative; //whether or not to drive field relative
 
 	public RobotConfig config;
+	public ConfigurationMode currentConfigurationMode;
 
 	private int logCounter = 0;
 	private final int loopsPerLog;
+
+	public enum ConfigurationMode {
+		TURBO(TunerConstants.turboDriveConfiguration),
+		PRECISION(TunerConstants.precisionDriveConfiguration),
+		NORMAL(TunerConstants.driveInitialConfigs);
+
+		private TalonFXConfiguration config;
+
+		ConfigurationMode(TalonFXConfiguration config) {
+			this.config = config;
+		}
+
+		public TalonFXConfiguration getConfiguration() {
+			return config;
+		}
+
+	}
 
 	/**
 	 * Constructs a CTRE SwerveDrivetrain using the specified constants.
@@ -219,6 +242,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 		loopsPerLog = RobotContainer.DRIVETRAIN_DEBUG ? 1 : 5;
 
+		currentConfigurationMode = ConfigurationMode.NORMAL;
 	}
 
 	private void configureAutoBuilder() {
@@ -260,6 +284,35 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 	public Command sysIdDynamic(SysIdRoutine.Direction direction) {
 		return m_sysIdRoutineToApply.dynamic(direction);
+	}
+
+	public void applyDriveConfig(TalonFXConfiguration config) {
+		for(SwerveModule<TalonFX, TalonFX, CANcoder> module: getModules()) {
+			TalonFXConfigurator configurator = module.getDriveMotor().getConfigurator();
+			configurator.apply(config.CurrentLimits);
+			configurator.apply(config.ClosedLoopRamps);
+		}
+	}
+
+	public void swapConfigurationModeTo(ConfigurationMode configMode) {
+
+		if(currentConfigurationMode == configMode) return; // no need to reapply
+
+		switch (configMode) {
+			case TURBO:
+				applyDriveConfig(configMode.getConfiguration());
+				break;
+
+			case PRECISION:
+				applyDriveConfig(configMode.getConfiguration());
+				break;
+
+			case NORMAL:
+				applyDriveConfig(configMode.getConfiguration());
+				break;
+		}
+
+		currentConfigurationMode = configMode;
 	}
 
 	/**
@@ -524,7 +577,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		logCounter++;
 
 		odometryHeading = this.getState().Pose.getRotation();
-		fieldRelative = !RobotContainer.driverController.L2().getAsBoolean();
+		fieldRelative = !RobotContainer.robotRelativeTrigger.getAsBoolean();
 		isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
 		Logger.recordOutput("Drive/FieldRelative", fieldRelative);
