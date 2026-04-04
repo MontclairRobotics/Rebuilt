@@ -27,7 +27,7 @@ public class IndexerConstants {
 	public static final double kV = 0.35;
 
     public static final double STATOR_CURRENT_LIMIT = 60;
-    public static final double SUPPLY_CURRENT_LIMIT = 30;
+    public static final double SUPPLY_CURRENT_LIMIT = 20;
 
     public static final double GEARING = 1;
     public static final double MOMENT_OF_INERTIA = 0.02;

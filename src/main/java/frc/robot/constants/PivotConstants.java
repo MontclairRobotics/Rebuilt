@@ -60,8 +60,8 @@ public class PivotConstants {
 
 	public static final Angle TOLERANCE = Degrees.of(1);
 
-	public static final double STATOR_CURRENT_LIMIT = 60; // Amps
-	public static final double SUPPLY_CURRENT_LIMIT = 30; // Amps
+	public static final double STATOR_CURRENT_LIMIT = 40; // Amps
+	public static final double SUPPLY_CURRENT_LIMIT = 20; // Amps
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(8);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(80);

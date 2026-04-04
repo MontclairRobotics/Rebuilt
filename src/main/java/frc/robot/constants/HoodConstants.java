@@ -59,8 +59,8 @@ public class HoodConstants {
 
 	public static final Angle TOLERANCE = Degrees.of(1);
 
-	public static final double STATOR_CURRENT_LIMIT = 60; // Amps
-	public static final double SUPPLY_CURRENT_LIMIT = 30; // Amps
+	public static final double STATOR_CURRENT_LIMIT = 15; // Amps
+	public static final double SUPPLY_CURRENT_LIMIT = 10; // Amps
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(3);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(30);

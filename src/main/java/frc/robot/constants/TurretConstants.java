@@ -66,8 +66,8 @@ public class TurretConstants {
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(80);
 	public static final double MOTION_MAGIC_JERK = 200; // Rotations Per Second Per Second Per Second
 
-	public static final double STATOR_CURRENT_LIMIT = 60; // Amps
-	public static final double SUPPLY_CURRENT_LIMIT = 30; // Amps
+	public static final double STATOR_CURRENT_LIMIT = 40; // Amps
+	public static final double SUPPLY_CURRENT_LIMIT = 20; // Amps
 
 	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
 		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)
