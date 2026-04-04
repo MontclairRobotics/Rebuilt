@@ -34,14 +34,13 @@ public class Superstructure extends SubsystemBase {
 	private Intake intake;
 	private Shooter shooter;
 	private Vision vision;
-	private Aiming aiming;
 
 	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.8);
 
 	private int logCounter;
 	private final int loopsPerLog;
 
-	public Superstructure(CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter, Vision vision, Aiming aiming) {
+	public Superstructure(CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter, Vision vision) {
 
 		loopsPerLog = RobotContainer.SUPERSTRUCTURE_DEBUG ? 1 : 10;
 
@@ -55,17 +54,17 @@ public class Superstructure extends SubsystemBase {
 				shooter.stowCommand());
 			scoringModeTrigger.whileTrue(
 				shooter.setSimParameters(
-					() -> aiming.calculateSimShot(
+					() -> Aiming.calculateSimShot(
 						HUB, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryLeftTrigger.whileTrue(
 				shooter.setSimParameters(
-					() -> aiming.calculateSimShot(
+					() -> Aiming.calculateSimShot(
 						FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryRightTrigger.whileTrue(
 				shooter.setSimParameters(
-					() -> aiming.calculateSimShot(
+					() -> Aiming.calculateSimShot(
 						FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 		} else {
@@ -73,15 +72,15 @@ public class Superstructure extends SubsystemBase {
 				shooter.stowCommand());
 			scoringModeTrigger.whileTrue(
 				shooter.setParameters(
-					() -> aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(HUB, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryLeftTrigger.whileTrue(
 				shooter.setParameters(
-					() -> aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(FERRY_LEFT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 			ferryRightTrigger.whileTrue(
 				shooter.setParameters(
-					() -> aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
+					() -> Aiming.calculateShot(FERRY_RIGHT, shooter.withConstantVelocity, shooter.whileMoving)
 				));
 		}
 	}

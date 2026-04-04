@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter.aiming;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 
@@ -9,11 +10,9 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Time;
 import frc.robot.util.tunables.Tunable;
 
 public class AimingConstants {
@@ -21,54 +20,42 @@ public class AimingConstants {
 	public static double LATENCY = 0.08; // seconds it takes to reach desired state once state is set
 	public static Tunable latencyTunable = new Tunable("latency", LATENCY, (input)->LATENCY=input);
 
-	public record ShotSettings(Angle angle, AngularVelocity flywheelVelocity, Time timeOfFlight, boolean withConstantVelocity) implements Interpolatable<ShotSettings> {
-		public ShotSettings(Angle angle, AngularVelocity flywheelVelocity, Time timeOfFlight, boolean withConstantVelocity) {
+	public record ShotSettings(Angle angle, AngularVelocity flywheelVelocity) implements Interpolatable<ShotSettings> {
+		public ShotSettings(Angle angle, AngularVelocity flywheelVelocity) {
 			this.angle = angle;
 			this.flywheelVelocity = flywheelVelocity;
-			this.timeOfFlight = timeOfFlight;
-			this.withConstantVelocity = withConstantVelocity;
 		}
 
 		@Override
 		public ShotSettings interpolate(ShotSettings endValue, double t) {
 			return new ShotSettings(
 				Rotations.of(MathUtil.interpolate(this.angle.in(Rotations), endValue.angle.in(Rotations), t)),
-				withConstantVelocity ? flywheelVelocity : RotationsPerSecond.of(MathUtil.interpolate(this.flywheelVelocity.in(RotationsPerSecond), endValue.flywheelVelocity.in(RotationsPerSecond), t)),
-				Seconds.of(MathUtil.interpolate(this.timeOfFlight.in(Seconds), endValue.timeOfFlight.in(Seconds), t)),
-				withConstantVelocity
+				RotationsPerSecond.of(MathUtil.interpolate(this.flywheelVelocity.in(RotationsPerSecond), endValue.flywheelVelocity.in(RotationsPerSecond), t))
 			);
 		}
     }
 
-	public record SimShotSettings(Angle angle, LinearVelocity exitVelocity, Time timeOfFlight, boolean withConstantVelocity) implements Interpolatable<SimShotSettings> {
-		public SimShotSettings(Angle angle, LinearVelocity exitVelocity, Time timeOfFlight, boolean withConstantVelocity) {
+	public record SimShotSettings(Angle angle, LinearVelocity exitVelocity) implements Interpolatable<SimShotSettings> {
+		public SimShotSettings(Angle angle, LinearVelocity exitVelocity) {
 			this.angle = angle;
 			this.exitVelocity = exitVelocity;
-			this.timeOfFlight = timeOfFlight;
-			this.withConstantVelocity = withConstantVelocity;
 		}
 
 		@Override
 		public SimShotSettings interpolate(SimShotSettings endValue, double t) {
 			return new SimShotSettings(
 				Rotations.of(MathUtil.interpolate(this.angle.in(Rotations), endValue.angle.in(Rotations), t)),
-				withConstantVelocity ? exitVelocity : MetersPerSecond.of(MathUtil.interpolate(this.exitVelocity.in(MetersPerSecond), endValue.exitVelocity.in(MetersPerSecond), t)),
-				Seconds.of(MathUtil.interpolate(this.timeOfFlight.in(Seconds), endValue.timeOfFlight.in(Seconds), t)),
-				withConstantVelocity
+				MetersPerSecond.of(MathUtil.interpolate(this.exitVelocity.in(MetersPerSecond), endValue.exitVelocity.in(MetersPerSecond), t))
 			);
 		}
     }
+
+	// parameter maps
 
 	public static final InterpolatingTreeMap<Double, ShotSettings> REAL_MAP =
 		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShotSettings::interpolate);
 
 	public static final InterpolatingTreeMap<Double, ShotSettings> REAL_FERRY_MAP =
-		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShotSettings::interpolate);
-
-	public static final InterpolatingTreeMap<Double, ShotSettings> REAL_CONSTANT_VELOCITY_MAP =
-		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShotSettings::interpolate);
-
-	public static final InterpolatingTreeMap<Double, ShotSettings> REAL_CONSTANT_VELOCITY_FERRY_MAP =
 		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShotSettings::interpolate);
 
 	public static final InterpolatingTreeMap<Double, SimShotSettings> SIM_MAP =
@@ -77,54 +64,81 @@ public class AimingConstants {
 	public static final InterpolatingTreeMap<Double, SimShotSettings> SIM_FERRY_MAP =
 		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), SimShotSettings::interpolate);
 
-	public static final InterpolatingTreeMap<Double, SimShotSettings> SIM_CONSTANT_VELOCITY_MAP =
-		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), SimShotSettings::interpolate);
+	// time of flight maps
 
-	public static final InterpolatingTreeMap<Double, SimShotSettings> SIM_CONSTANT_VELOCITY_FERRY_MAP =
-		new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), SimShotSettings::interpolate);
+	public static final InterpolatingDoubleTreeMap REAL_TOF_MAP =
+		new InterpolatingDoubleTreeMap();
+
+	public static final InterpolatingDoubleTreeMap REAL_FERRY_TOF_MAP =
+		new InterpolatingDoubleTreeMap();
+
+	public static final InterpolatingDoubleTreeMap SIM_TOF_MAP =
+		new InterpolatingDoubleTreeMap();
+
+	public static final InterpolatingDoubleTreeMap SIM_FERRY_TOF_MAP =
+		new InterpolatingDoubleTreeMap();
+
 
 	static {
 
-		// REAL_MAP.put(0.0, new ShotSettings(Rotations.zero(), RotationsPerSecond.of(1), Seconds.of(0), false));
-		// REAL_MAP.put(5.0, new ShotSettings(Rotations.zero(), RotationsPerSecond.of(1), Seconds.of(0), false));
-		// REAL_MAP.put(2.24, new ShotSettings(Degrees.of(17), RotationsPerSecond.of(23.5), Seconds.of(1), false));
-		// REAL_MAP.put(3.45, new ShotSettings(Degrees.of(20), RotationsPerSecond.of(26), Seconds.of(1.125), false));
-		// REAL_MAP.put(4.30, new ShotSettings(Degrees.of(24), RotationsPerSecond.of(27.75), Seconds.of(1.25), false));
+		REAL_MAP.put(0.00, new ShotSettings(Degrees.of(0.0), RotationsPerSecond.of(19.5)));
+		REAL_MAP.put(1.50, new ShotSettings(Degrees.of(0), RotationsPerSecond.of(21)));
+		REAL_MAP.put(2.50, new ShotSettings(Degrees.of(9.5), RotationsPerSecond.of(22)));
+		REAL_MAP.put(3.45, new ShotSettings(Degrees.of(9), RotationsPerSecond.of(24.5)));
+		REAL_MAP.put(4.52, new ShotSettings(Degrees.of(11), RotationsPerSecond.of(26.25)));
+		REAL_MAP.put(5.11, new ShotSettings(Degrees.of(11), RotationsPerSecond.of(27.5)));
+		REAL_MAP.put(7.00, new ShotSettings(Degrees.of(24.5), RotationsPerSecond.of(32)));
 
-		REAL_MAP.put(0.00, new ShotSettings(Degrees.of(0.0), RotationsPerSecond.of(19.5), Seconds.of(0.8), false));
-		REAL_MAP.put(1.50, new ShotSettings(Degrees.of(0), RotationsPerSecond.of(21), Seconds.of(0.81), false));
-		REAL_MAP.put(2.50, new ShotSettings(Degrees.of(9.5), RotationsPerSecond.of(22), Seconds.of(0.86), false));
-		REAL_MAP.put(3.45, new ShotSettings(Degrees.of(9), RotationsPerSecond.of(24.5), Seconds.of(0.98), false));
-		REAL_MAP.put(4.52, new ShotSettings(Degrees.of(11), RotationsPerSecond.of(26.25), Seconds.of(1.1), false));
-		REAL_MAP.put(5.11, new ShotSettings(Degrees.of(11), RotationsPerSecond.of(27.5), Seconds.of(1.14), false));
-		REAL_MAP.put(7.00, new ShotSettings(Degrees.of(24.5), RotationsPerSecond.of(32), Seconds.of(1.2), false));
+		REAL_TOF_MAP.put(0.00, 0.8);
+		REAL_TOF_MAP.put(1.50, 0.81);
+		REAL_TOF_MAP.put(2.50, 0.86);
+		REAL_TOF_MAP.put(3.45, 0.98);
+		REAL_TOF_MAP.put(4.52, 1.1);
+		REAL_TOF_MAP.put(5.11, 1.14);
+		REAL_TOF_MAP.put(7.00, 1.2);
 
-		REAL_FERRY_MAP.put(20.0, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(40), Seconds.of(3), false));
-		REAL_FERRY_MAP.put(9.59, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(34), Seconds.of(1.8), false));
-		REAL_FERRY_MAP.put(8.67, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(30.4), Seconds.of(1.78), false));
-		REAL_FERRY_MAP.put(6.63, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(26.9), Seconds.of(1.38), false));
-		REAL_FERRY_MAP.put(5.15, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(24.5), Seconds.of(1.22), false));
-		REAL_FERRY_MAP.put(3.67, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(22.44), Seconds.of(1.06), false));
-		REAL_FERRY_MAP.put(0.0, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(15), Seconds.of(1), false));
+		REAL_FERRY_MAP.put(20.0, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(40)));
+		REAL_FERRY_MAP.put(9.59, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(34)));
+		REAL_FERRY_MAP.put(8.67, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(30.4)));
+		REAL_FERRY_MAP.put(6.63, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(26.9)));
+		REAL_FERRY_MAP.put(5.15, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(24.5)));
+		REAL_FERRY_MAP.put(3.67, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(22.44)));
+		REAL_FERRY_MAP.put(0.0, new ShotSettings(Degrees.of(22.5), RotationsPerSecond.of(15)));
 
-		SIM_CONSTANT_VELOCITY_MAP.put(0.8516690912634933, new SimShotSettings(Degrees.of(3), MetersPerSecond.of(9), Seconds.of(1.52), true));		SIM_CONSTANT_VELOCITY_MAP.put(2.0927103773901443, new SimShotSettings(Degrees.of(10), MetersPerSecond.of(9), Seconds.of(1.504), true));
-		SIM_CONSTANT_VELOCITY_MAP.put(3.3339369176475455, new SimShotSettings(Degrees.of(15), MetersPerSecond.of(9), Seconds.of(1.512), true));
-		SIM_CONSTANT_VELOCITY_MAP.put(4.5789466791916436, new SimShotSettings(Degrees.of(25), MetersPerSecond.of(9), Seconds.of(1.34), true));
-		SIM_CONSTANT_VELOCITY_MAP.put(5.8242079384087, new SimShotSettings(Degrees.of(40), MetersPerSecond.of(9), Seconds.of(1.04), true));
+		REAL_FERRY_TOF_MAP.put(20.0, 3.0);
+		REAL_FERRY_TOF_MAP.put(9.59, 1.8);
+		REAL_FERRY_TOF_MAP.put(8.67, 1.78);
+		REAL_FERRY_TOF_MAP.put(6.63, 1.38);
+		REAL_FERRY_TOF_MAP.put(5.15, 1.22);
+		REAL_FERRY_TOF_MAP.put(3.67, 1.06);
+		REAL_FERRY_TOF_MAP.put(0.0, 1.0);
 
-		SIM_MAP.put(0.99912, new SimShotSettings(Degrees.of(7), MetersPerSecond.of(7), Seconds.of(1.12), false));
-		SIM_MAP.put(2.005294, new SimShotSettings(Degrees.of(16), MetersPerSecond.of(7), Seconds.of(1.12), false));
-		SIM_MAP.put(3.000977, new SimShotSettings(Degrees.of(22), MetersPerSecond.of(7.4), Seconds.of(1), false));
-		SIM_MAP.put(3.993633, new SimShotSettings(Degrees.of(26), MetersPerSecond.of(8.2), Seconds.of(1.16), false));
-		SIM_MAP.put(4.998351, new SimShotSettings(Degrees.of(33), MetersPerSecond.of(8.6), Seconds.of(1.1), false));
-		SIM_MAP.put(5.714192, new SimShotSettings(Degrees.of(37), MetersPerSecond.of(9), Seconds.of(1.14), false));
+		SIM_MAP.put(0.99912, new SimShotSettings(Degrees.of(7), MetersPerSecond.of(7)));
+		SIM_MAP.put(2.005294, new SimShotSettings(Degrees.of(16), MetersPerSecond.of(7)));
+		SIM_MAP.put(3.000977, new SimShotSettings(Degrees.of(22), MetersPerSecond.of(7.4)));
+		SIM_MAP.put(3.993633, new SimShotSettings(Degrees.of(26), MetersPerSecond.of(8.2)));
+		SIM_MAP.put(4.998351, new SimShotSettings(Degrees.of(33), MetersPerSecond.of(8.6)));
+		SIM_MAP.put(5.714192, new SimShotSettings(Degrees.of(37), MetersPerSecond.of(9)));
 
-		SIM_FERRY_MAP.put(9.59, new SimShotSettings(Degrees.of(40), MetersPerSecond.of(10.75), Seconds.of(1.8), false));
-		SIM_FERRY_MAP.put(3.6669131055202966, new SimShotSettings(Degrees.of(30), MetersPerSecond.of(6.6), Seconds.of(1.06), false));//
-		SIM_FERRY_MAP.put(8.666543502404746, new SimShotSettings(Degrees.of(30), MetersPerSecond.of(11), Seconds.of(1.78), false));//
-		SIM_FERRY_MAP.put(6.628582671689323, new SimShotSettings(Degrees.of(40), MetersPerSecond.of(8.5), Seconds.of(1.38), false));//
-		SIM_FERRY_MAP.put(5.147707889525594, new SimShotSettings(Degrees.of(40), MetersPerSecond.of(7.5), Seconds.of(1.22), false));//
-		SIM_CONSTANT_VELOCITY_FERRY_MAP.put(0.0, new SimShotSettings(Degrees.zero(), MetersPerSecond.zero(), Seconds.zero(), true));
+		SIM_TOF_MAP.put(0.99912, 1.12);
+		SIM_TOF_MAP.put(2.005294, 1.12);
+		SIM_TOF_MAP.put(3.000977, 1.0);
+		SIM_TOF_MAP.put(3.993633, 1.16);
+		SIM_TOF_MAP.put(4.998351, 1.1);
+		SIM_TOF_MAP.put(5.714192, 1.14);
+
+		SIM_FERRY_MAP.put(9.59, new SimShotSettings(Degrees.of(40), MetersPerSecond.of(10.75)));
+		SIM_FERRY_MAP.put(3.6669131055202966, new SimShotSettings(Degrees.of(30), MetersPerSecond.of(6.6)));//
+		SIM_FERRY_MAP.put(8.666543502404746, new SimShotSettings(Degrees.of(30), MetersPerSecond.of(11)));//
+		SIM_FERRY_MAP.put(6.628582671689323, new SimShotSettings(Degrees.of(40), MetersPerSecond.of(8.5)));//
+		SIM_FERRY_MAP.put(5.147707889525594, new SimShotSettings(Degrees.of(40), MetersPerSecond.of(7.5)));//
+
+		SIM_FERRY_TOF_MAP.put(9.59, 1.8);
+		SIM_FERRY_TOF_MAP.put(3.6669131055202966, 1.06);//
+		SIM_FERRY_TOF_MAP.put(8.666543502404746, 1.78);//
+		SIM_FERRY_TOF_MAP.put(6.628582671689323, 1.38);//
+		SIM_FERRY_TOF_MAP.put(5.147707889525594, 1.22);//
+
 	}
 
 	public record ShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity, double timeSecondsForSetpoint) {

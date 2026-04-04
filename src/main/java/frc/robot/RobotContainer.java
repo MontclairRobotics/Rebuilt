@@ -38,7 +38,6 @@ import frc.robot.subsystems.intake.rollers.Rollers;
 import frc.robot.subsystems.intake.rollers.RollersIOSim;
 import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
@@ -101,7 +100,6 @@ public class RobotContainer {
 	public static Intake intake;
 
 	public static Superstructure superstructure;
-	public static Aiming aiming;
 
 	public static Auto auto;
 
@@ -162,8 +160,6 @@ public class RobotContainer {
 					useConstantVelocityMap, shootWhileMoving
 				);
 
-				aiming = new Aiming(turret);
-
 				pivot = new Pivot(new PivotIOTalonFX());
 				rollers = new Rollers(new RollersIOTalonFX());
 				intake = new Intake(pivot, rollers);
@@ -177,7 +173,7 @@ public class RobotContainer {
 					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
 				);
 
-				superstructure = new Superstructure(drivetrain, intake, shooter, vision, aiming);
+				superstructure = new Superstructure(drivetrain, intake, shooter, vision);
 
 				break;
 
@@ -197,8 +193,6 @@ public class RobotContainer {
 					hood, flywheel, turret, spindexer,
 					useConstantVelocityMap, shootWhileMoving
 				);
-
-				aiming = new Aiming(turret);
 
 				pivot = new Pivot(new PivotIOSim());
 				rollers = new Rollers(new RollersIOSim());
@@ -227,7 +221,7 @@ public class RobotContainer {
 				fuelSim.spawnStartingFuel();
 
 				auto = new Auto();
-				superstructure = new Superstructure(drivetrain, intake, shooter, vision, aiming);
+				superstructure = new Superstructure(drivetrain, intake, shooter, vision);
 
 				break;
 

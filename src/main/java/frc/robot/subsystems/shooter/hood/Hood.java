@@ -16,6 +16,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -67,9 +68,10 @@ public class Hood extends SubsystemBase {
 			Logger.processInputs("Hood", inputs);
 		}
 
-		// visualization.update();
-		// visualization.log();
-
+		if(RobotBase.isSimulation()) {
+			visualization.update();
+			visualization.log();
+		}
 		// if(RobotContainer.HOOD_DEBUG || RobotBase.isSimulation()) {
 		// 	updateTunables();
 		// }

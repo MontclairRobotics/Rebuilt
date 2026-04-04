@@ -2,13 +2,12 @@ package frc.robot.subsystems.shooter.aiming;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.constants.TurretConstants.ORIGIN_TO_TURRET;
-
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -26,39 +25,41 @@ import frc.robot.util.PoseUtils;
 
 public class Aiming {
 
-	private final Turret turret;
+	private static double loopCounter;
+	private static final double LOOPS_PER_CALCULATION = 3;
+	private static ShootingParameters cachedShot;
+	private static SimShootingParameters cachedSimShot;
 
-	private double loopCounter;
-	private ShootingParameters cachedShot;
-	private SimShootingParameters cachedSimShot;
-
-	public Aiming(Turret turret) {
-		this.turret = turret;
+	public static void initializeTargetLocations() {
 		TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
+		TargetLocation.FERRY_LEFT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT));
+		TargetLocation.FERRY_RIGHT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT));
 	}
 
-	public ShootingParameters calculateShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
+	public static ShootingParameters calculateShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
 
 		loopCounter++;
 
-		if(loopCounter%3 == 0 || cachedShot == null) {
+		if(loopCounter % LOOPS_PER_CALCULATION == 0 || cachedShot == null) {
 
 			Shooter.targetLocation = target;
 			Translation2d targetLocation = target.getLocation();
 			InterpolatingTreeMap<Double, ShotSettings> map;
+			InterpolatingDoubleTreeMap tofMap;
 
 			switch(target) {
 				case HUB:
-					map = withConstantVelocity ? AimingConstants.REAL_CONSTANT_VELOCITY_MAP : AimingConstants.REAL_MAP;
+					map = AimingConstants.REAL_MAP;
+					tofMap = AimingConstants.REAL_TOF_MAP;
 					break;
 				case FERRY_LEFT:
-					map = withConstantVelocity ? AimingConstants.REAL_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.REAL_FERRY_MAP;
-					break;
 				case FERRY_RIGHT:
-					map = withConstantVelocity ? AimingConstants.REAL_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.REAL_FERRY_MAP;
+					map = AimingConstants.REAL_FERRY_MAP;
+					tofMap = AimingConstants.REAL_FERRY_TOF_MAP;
 					break;
 				default:
 					map = AimingConstants.REAL_MAP;
+					tofMap = AimingConstants.REAL_TOF_MAP;
 			}
 
 			Angle robotRelativeTurretAngle;
@@ -84,7 +85,7 @@ public class Aiming {
 
 			Translation2d virtualTarget = targetLocation;
 			double virtualDistance = realDistanceToTarget;
-			double estimatedTOF = map.get(realDistanceToTarget).timeOfFlight().in(Seconds);
+			double estimatedTOF = tofMap.get(realDistanceToTarget);
 
 			if(whileMoving) {
 				for(int i = 0; i < 3; i++) {
@@ -95,7 +96,7 @@ public class Aiming {
 
 					virtualTarget = targetLocation.minus(robotDisplacementDuringShot);
 					virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
-					double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
+					double newTOF = tofMap.get(virtualDistance);
 
 					if (Math.abs(newTOF - estimatedTOF) < 0.02) break;
 					estimatedTOF = newTOF;
@@ -104,8 +105,9 @@ public class Aiming {
 
 			Translation2d aimingVector = virtualTarget.minus(futureTurretPosition);
 			robotRelativeTurretAngle = Turret.toRobotRelativeAngle(Rotations.of(aimingVector.getAngle().getRotations()));
-			hoodAngle = map.get(virtualDistance).angle();
-			flywheelVelocity = map.get(virtualDistance).flywheelVelocity();
+			ShotSettings finalShotSettings = map.get(virtualDistance);
+			hoodAngle = finalShotSettings.angle();
+			flywheelVelocity = finalShotSettings.flywheelVelocity();
 
 			cachedShot = new ShootingParameters(robotRelativeTurretAngle, hoodAngle, flywheelVelocity, Timer.getFPGATimestamp() + AimingConstants.LATENCY);
 		}
@@ -113,28 +115,30 @@ public class Aiming {
 		return cachedShot;
 	}
 
-	public SimShootingParameters calculateSimShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
+	public static SimShootingParameters calculateSimShot(TargetLocation target, boolean withConstantVelocity, boolean whileMoving) {
 
 		loopCounter++;
 
-		if(loopCounter%3 == 0 || cachedSimShot == null) {
+		if(loopCounter % LOOPS_PER_CALCULATION == 0 || cachedSimShot == null) {
 
 			Shooter.targetLocation = target;
 			Translation2d targetLocation = target.getLocation();
 			InterpolatingTreeMap<Double, SimShotSettings> map;
+			InterpolatingDoubleTreeMap tofMap;
 
 			switch(target) {
 				case HUB:
-					map = withConstantVelocity ? AimingConstants.SIM_CONSTANT_VELOCITY_MAP : AimingConstants.SIM_MAP;
+					map = AimingConstants.SIM_MAP;
+					tofMap = AimingConstants.SIM_TOF_MAP;
 					break;
 				case FERRY_LEFT:
-					map = withConstantVelocity ? AimingConstants.SIM_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.SIM_FERRY_MAP;
-					break;
 				case FERRY_RIGHT:
-					map = withConstantVelocity ? AimingConstants.SIM_CONSTANT_VELOCITY_FERRY_MAP : AimingConstants.SIM_FERRY_MAP;
+					map = AimingConstants.SIM_FERRY_MAP;
+					tofMap = AimingConstants.SIM_FERRY_TOF_MAP;
 					break;
 				default:
 					map = AimingConstants.SIM_MAP;
+					tofMap = AimingConstants.SIM_TOF_MAP;
 			}
 
 			Angle robotRelativeTurretAngle;
@@ -160,7 +164,7 @@ public class Aiming {
 
 			Translation2d virtualTarget = targetLocation;
 			double virtualDistance = realDistanceToTarget;
-			double estimatedTOF = map.get(realDistanceToTarget).timeOfFlight().in(Seconds);
+			double estimatedTOF = tofMap.get(realDistanceToTarget);
 
 			if(whileMoving) {
 				for(int i = 0; i < 5; i++) {
@@ -171,7 +175,7 @@ public class Aiming {
 
 					virtualTarget = targetLocation.minus(robotDisplacementDuringShot);
 					virtualDistance = virtualTarget.minus(futureTurretPosition).getNorm();
-					double newTOF = map.get(virtualDistance).timeOfFlight().in(Seconds);
+					double newTOF = tofMap.get(virtualDistance);
 
 					if (Math.abs(newTOF - estimatedTOF) < 0.02) break;
 					estimatedTOF = newTOF;
@@ -180,8 +184,9 @@ public class Aiming {
 
 			Translation2d aimingVector = virtualTarget.minus(futureTurretPosition);
 			robotRelativeTurretAngle = Turret.toRobotRelativeAngle(Rotations.of(aimingVector.getAngle().getRotations()));
-			hoodAngle = map.get(virtualDistance).angle();
-			exitVelocity = map.get(virtualDistance).exitVelocity();
+			SimShotSettings finalShotSettings = map.get(virtualDistance);
+			hoodAngle = finalShotSettings.angle();
+			exitVelocity = finalShotSettings.exitVelocity();
 
 			cachedSimShot = new SimShootingParameters(robotRelativeTurretAngle, hoodAngle, exitVelocity);
 
