@@ -67,8 +67,8 @@ public class TunerConstants {
         .withSupplyCurrentLimitEnable(true);
 
     public static final CurrentLimitsConfigs precisionDriveCurrentLimitsConfig = new CurrentLimitsConfigs()
-        .withStatorCurrentLimit(Amps.of(50))
-        .withSupplyCurrentLimit(Amps.of(30))
+        .withStatorCurrentLimit(Amps.of(40))
+        .withSupplyCurrentLimit(Amps.of(20))
         .withStatorCurrentLimitEnable(true)
         .withSupplyCurrentLimitEnable(true);
 
@@ -83,7 +83,7 @@ public class TunerConstants {
         .withCurrentLimits(precisionDriveCurrentLimitsConfig)
         .withClosedLoopRamps(
             new ClosedLoopRampsConfigs()
-                .withVoltageClosedLoopRampPeriod(0.05)
+                .withVoltageClosedLoopRampPeriod(0.1)
         );
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
