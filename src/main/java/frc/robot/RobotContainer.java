@@ -99,7 +99,7 @@ public class RobotContainer {
 	public static Rollers rollers;
 	public static Intake intake;
 
-	public static Superstructure superstructure;
+	public static ShooterCooridinator shooterCooridinator;
 
 	public static Auto auto;
 
@@ -179,7 +179,7 @@ public class RobotContainer {
 					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
 				);
 
-				superstructure = new Superstructure(drivetrain, intake, shooter, vision);
+				shooterCooridinator = new ShooterCooridinator(drivetrain, intake, shooter, vision);
 
 				break;
 
@@ -227,7 +227,7 @@ public class RobotContainer {
 				fuelSim.spawnStartingFuel();
 
 				auto = new Auto();
-				superstructure = new Superstructure(drivetrain, intake, shooter, vision);
+				shooterCooridinator = new ShooterCooridinator(drivetrain, intake, shooter, vision);
 
 				break;
 

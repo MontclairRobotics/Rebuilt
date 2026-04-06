@@ -41,8 +41,8 @@ import frc.robot.util.tunables.LoggedTunableNumber;
 
 public class Turret extends SubsystemBase {
 
-    private final TurretIO io;
-    private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+  private final TurretIO io;
+  private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 	private final TurretVisualization visualization = new TurretVisualization();
 
 	/** tracks both the turret setpoint and time for that specific setpoint */
@@ -64,7 +64,7 @@ public class Turret extends SubsystemBase {
     public Turret(TurretIO io) {
         this.io = io;
 		loopsPerLog = RobotContainer.TURRET_DEBUG ? 1 : 5; // faster logging during debug mode, slower otherwise
-    }
+	}
 
 	@Override
 	public void periodic() {
