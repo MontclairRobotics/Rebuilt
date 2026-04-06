@@ -272,7 +272,9 @@ public class RobotContainer {
 			.onFalse(drivetrain.setMaxSpeedsCommand(TunerConstants.kSpeedAt12Volts, RotationsPerSecond.of(1.624)));
 
 		driverController.triangle()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
+			.onTrue(spindexer.jiggleCommand());
+		// driverController.triangle()
+		// 	.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
 		driverController.square()
 			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(90)), false));
 		driverController.cross()
@@ -288,7 +290,7 @@ public class RobotContainer {
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
 
 		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(() -> intakeVoltage.get()))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
-		operatorController.L2().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
+		// operatorController.L2().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
 		operatorController.povUp().onTrue(Commands.runOnce(() -> flywheel.increaseFudge()));
 		operatorController.povDown().onTrue(Commands.runOnce(() -> flywheel.decreaseFudge()));
@@ -309,11 +311,15 @@ public class RobotContainer {
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 
+		// driverController.triangle().whileTrue(
+		// 	indexer.setVelocityCommand(() -> RotationsPerSecond.of(indexerVelocity.getAsDouble()))
+		// 	.alongWith(serializer.setVelocityCommand(() -> RotationsPerSecond.of(serializerVelocity.getAsDouble())))
+		// ).onFalse(
+		// 	spindexer.spinDownCommand()
+		// );
+
 		driverController.triangle().whileTrue(
-			indexer.setVelocityCommand(() -> RotationsPerSecond.of(indexerVelocity.getAsDouble()))
-			.alongWith(serializer.setVelocityCommand(() -> RotationsPerSecond.of(serializerVelocity.getAsDouble())))
-		).onFalse(
-			spindexer.spinDownCommand()
+			spindexer.jiggleCommand()
 		);
 
 		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());

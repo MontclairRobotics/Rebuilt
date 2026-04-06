@@ -25,12 +25,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.constants.HoodConstants;
+import frc.robot.constants.IndexerConstants;
 import frc.robot.constants.TurretConstants;
 import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.turret.Turret;
+import frc.robot.util.tunables.LoggedTunableNumber;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 
@@ -48,9 +50,13 @@ public class Shooter extends SubsystemBase {
     private final int FIRE_RATE = 6;
     public int hopperCount;
 
+    public int timer = 0;
+
     private double lastSimShotTime = 0.0;
 
     public static TargetLocation targetLocation;
+
+    public static LoggedTunableNumber isJiggling = new LoggedTunableNumber("Spindexer/isJiggling", 0);
 
     public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean withConstantVelocity, boolean whileMoving) {
         this.hood = hood;
@@ -65,11 +71,20 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
+        timer += 1;
         Logger.recordOutput("Shooter/At Setpoint", atSetpoint());
         // Logger.recordOutput("Fuel/Hopper Count", hopperCount);
         // Logger.recordOutput("Fuel/Blue Score", Hub.BLUE_HUB.getScore());
         // Logger.recordOutput("Fuel/Red Score", Hub.RED_HUB.getScore());
         // Logger.recordOutput("Hub/Match Time", HubTracker.getMatchTime());
+
+        if(timer > IndexerConstants.jiggleFrequency * 60) {
+            timer = 1;
+        }
+    }
+
+    public void setJiggleLog(int val) {
+        Logger.recordOutput("Spindexer/isJiggling", val);
     }
 
     public int getHopperCount() {
@@ -117,6 +132,14 @@ public class Shooter extends SubsystemBase {
 
     public boolean atSetpoint() {
         return turret.atSetpoint() && hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation());
+    }
+
+    public Command resetJigglingCommand() {
+        return Commands.run(() -> this.setJiggleLog(0));
+    }
+
+    public Command setJigglingCommand() {
+        return Commands.run(() -> this.setJiggleLog(1));
     }
 
     public Command setParameters(Supplier<ShootingParameters> paramsSupplier) {
@@ -192,7 +215,7 @@ public class Shooter extends SubsystemBase {
             if (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto) {
                 flywheel.setVelocity(flywheelVelocitySupplier, () -> Timer.getFPGATimestamp());
             }
-        }).alongWith(spindexer.jiggleCommand()).onlyWhile(() -> this.atSetpoint() && !Turret.isSpinningAround && (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto));
+        }).alongWith(spindexer.jiggleCommand()).onlyWhile(() -> this.atSetpoint() && timer == (int) (IndexerConstants.jiggleFrequency * 60) && !Turret.isSpinningAround && (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto));
     }
 
     public Command stowCommand(){

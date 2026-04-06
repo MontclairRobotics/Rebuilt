@@ -5,6 +5,7 @@ import static frc.robot.constants.SerializerConstants.SPIN_VELOCITY;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.shooter.spindexer.indexer.Indexer;
 import frc.robot.subsystems.shooter.spindexer.serializer.Serializer;
 import frc.robot.util.tunables.LoggedTunableNumber;
@@ -48,15 +49,18 @@ public class Spindexer {
     }
 
     public Command jiggleCommand() {
-        return Commands.parallel(
-            indexer.spinUpCommand(),
-            Commands.repeatingSequence(
-                spinUpCommand().withTimeout(1),
-                Commands.run(() -> {
-                    indexer.setVelocity(SPIN_VELOCITY);
-                    serializer.setVelocity(SPIN_VELOCITY.unaryMinus());
-                }).withTimeout(1)
-            )
+        return Commands.sequence(
+            RobotContainer.shooter.setJigglingCommand(),
+            Commands.parallel(
+                Commands.repeatingSequence(
+                    spinUpCommand().withTimeout(1),
+                    Commands.run(() -> {
+                        indexer.setVelocity(SPIN_VELOCITY);
+                        serializer.setVelocity(SPIN_VELOCITY.unaryMinus());
+                    }).withTimeout(1)
+                )
+            ),
+            RobotContainer.shooter.resetJigglingCommand()
         );
     }
 

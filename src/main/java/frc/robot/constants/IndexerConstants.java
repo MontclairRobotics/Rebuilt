@@ -32,6 +32,8 @@ public class IndexerConstants {
     public static final double GEARING = 1;
     public static final double MOMENT_OF_INERTIA = 0.02;
 
+	public static final double jiggleFrequency = 1.0 / 60.0;
+
     public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKD(kD)
 		.withKS(kS).withKV(kV);
