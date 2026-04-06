@@ -16,7 +16,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 public class RollersConstants {
 
 	public static final int CAN_ID = 41;
-    public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the CANivore
+    public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(1); // TODO: set
 	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(30);

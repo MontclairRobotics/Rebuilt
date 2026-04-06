@@ -31,7 +31,7 @@ public class PivotConstants {
 	public static final int CAN_ID = 40;
 	public static final int ENCODER_ID = 39;
 
-	public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the canivore
+	public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
 	public static final double ROTOR_TO_SENSOR_RATIO = (72.0 / 46) * 9 * 5;
 	public static final double SENSOR_TO_MECHANISM_RATIO = 1; // CANcoder is on the mechanism
