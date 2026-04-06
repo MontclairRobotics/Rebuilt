@@ -13,6 +13,7 @@ import frc.robot.constants.Constants.Mode;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -101,13 +102,13 @@ public class Pivot extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// logCounter++;
+		logCounter++;
 
 		io.updateInputs(inputs); // need to update inputs every frame
 
-		// if(logCounter % loopsPerLog == 0) {
-		// 	Logger.processInputs("Pivot", inputs);
-		// }
+		if(logCounter % loopsPerLog == 0) {
+			Logger.processInputs("Pivot", inputs);
+		}
 
 		if(RobotContainer.PIVOT_DEBUG || Constants.CURRENT_MODE == Mode.SIM) {
 			visualization.update();

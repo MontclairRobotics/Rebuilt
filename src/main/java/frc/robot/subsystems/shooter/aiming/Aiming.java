@@ -26,7 +26,7 @@ import frc.robot.util.PoseUtils;
 public class Aiming {
 
 	private static double loopCounter;
-	private static final double LOOPS_PER_CALCULATION = 3;
+	private static final double LOOPS_PER_CALCULATION = 4;
 	private static ShootingParameters cachedShot;
 	private static SimShootingParameters cachedSimShot;
 
@@ -88,7 +88,7 @@ public class Aiming {
 			double estimatedTOF = tofMap.get(realDistanceToTarget);
 
 			if(whileMoving) {
-				for(int i = 0; i < 3; i++) {
+				for(int i = 0; i < 4; i++) {
 					Translation2d robotDisplacementDuringShot = new Translation2d(
 						fieldRelativeSpeeds.vxMetersPerSecond * estimatedTOF,
 						fieldRelativeSpeeds.vyMetersPerSecond * estimatedTOF

@@ -13,6 +13,8 @@ import static frc.robot.constants.RollersConstants.*;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 
 public class Rollers extends SubsystemBase {
 
@@ -33,13 +35,13 @@ public class Rollers extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// logCounter++;
+		logCounter++;
 
 		io.updateInputs(inputs);
 
-		// if(logCounter % loopsPerLog == 0) {
-		// 	Logger.processInputs("Rollers", inputs);
-		// }
+		if(logCounter % loopsPerLog == 0) {
+			Logger.processInputs("Rollers", inputs);
+		}
 	}
 
 	public void setVelocity(AngularVelocity velocity) {
