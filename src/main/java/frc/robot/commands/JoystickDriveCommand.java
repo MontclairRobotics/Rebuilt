@@ -89,11 +89,11 @@ public class JoystickDriveCommand extends Command {
 	}
 
 	private boolean shouldTrenchLock() {
-		return RobotContainer.superstructure.inTrenchZone() && drivingBiasedForwards() && RobotContainer.superstructure.movingIntoObstacle();
+		return RobotContainer.superstructure.isInTrenchZone() && drivingBiasedForwards() && RobotContainer.superstructure.movingIntoObstacle();
 	}
 
 	private boolean shouldBumpLock() {
-		return RobotContainer.superstructure.inBumpZone() && drivingBiasedForwards()
+		return RobotContainer.superstructure.isInBumpZone() && drivingBiasedForwards()
 			&& RobotContainer.superstructure.movingIntoObstacle() && Math.abs(omegaVelocitySupplier.getAsDouble()) < 1;
 	}
 
