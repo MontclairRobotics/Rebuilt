@@ -38,6 +38,7 @@ import frc.robot.subsystems.intake.rollers.Rollers;
 import frc.robot.subsystems.intake.rollers.RollersIOSim;
 import frc.robot.subsystems.intake.rollers.RollersIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterCoordinator;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
@@ -100,6 +101,7 @@ public class RobotContainer {
 	public static Intake intake;
 
 	public static Superstructure superstructure;
+	public static ShooterCoordinator shooterCoordinator;
 
 	public static Auto auto;
 
@@ -180,6 +182,7 @@ public class RobotContainer {
 				);
 
 				superstructure = new Superstructure();
+				shooterCoordinator = new ShooterCoordinator(shooter);
 
 				break;
 
@@ -228,6 +231,7 @@ public class RobotContainer {
 
 				auto = new Auto();
 				superstructure = new Superstructure();
+				shooterCoordinator = new ShooterCoordinator(shooter);
 
 				break;
 

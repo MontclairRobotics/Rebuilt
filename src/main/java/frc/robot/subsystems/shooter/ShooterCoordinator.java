@@ -1,11 +1,28 @@
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import frc.robot.RobotContainer;
+import frc.robot.Superstructure;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 
-public class ShooterCoordinator {
-    
-    private Shooter shooter;
+public class ShooterCoordinator extends SubsystemBase{
+    public ShooterGoal shooterGoal;
+		private Shooter shooter;
+
+		@Override
+		public void periodic(){
+			shooterGoal = calculateGoal(
+				Superstructure.isInScoringZone(),
+				Superstructure.isInLeftFerryZone(),
+				Superstructure.isInRightFerryZone(),
+				Superstructure.isInTrenchZone(),
+				operatorWantsScoring(),
+				operatorWantsFerrying(),
+				operatorWantsFiring()
+			);
+		}
 
     public enum ShooterIntent{
 
@@ -21,7 +38,7 @@ public class ShooterCoordinator {
 			true, 
 			false
 		),
-		SHOOTING(
+		FIRING(
 			true, 
 			true, 
 			true, 
@@ -29,7 +46,7 @@ public class ShooterCoordinator {
 		);
 
 		private boolean allowFlywheel;
-		private boolean allowTurret;
+		boolean allowTurret;
 		private boolean allowHood;
 		private boolean allowSpindexer;
 		
@@ -63,7 +80,6 @@ public class ShooterCoordinator {
 		public Translation2d pointOfInterest() {
             return pointOfInterest;
         }
-
 	}
 
     public record ShooterGoal(ShooterMode mode, ShooterIntent intent) {
@@ -75,8 +91,21 @@ public class ShooterCoordinator {
 
     public ShooterCoordinator(Shooter shooter) {
         this.shooter = shooter;
+				shooterGoal = new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);
     }
- 
+
+	public boolean operatorWantsFiring(){
+		return RobotContainer.operatorController.circle().getAsBoolean();
+	}
+	
+	public boolean operatorWantsScoring(){
+		return RobotContainer.operatorController.square().getAsBoolean();
+	}
+
+	public boolean operatorWantsFerrying(){
+		return RobotContainer.operatorController.triangle().getAsBoolean();
+	}
+
     public ShooterGoal calculateGoal(
 		boolean isInScoringZone, 
 		boolean isInLeftFerryZone, 
@@ -86,18 +115,34 @@ public class ShooterCoordinator {
 		boolean operatorWantsFerrying,
 		boolean operatorWantsFiring
 	) {
-        // to be replaced with actual logic
 		if(isInTrenchZone) {
 			return new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);
 		}
 
+		if(RobotContainer.shouldShootAuto){
+			return new ShooterGoal(ShooterMode.SCORING, ShooterIntent.FIRING);
+		}
+
 		if(operatorWantsScoring) {
 			if(operatorWantsFiring) {
-				return new ShooterGoal(ShooterMode.SCORING, ShooterIntent.SHOOTING)
+				return new ShooterGoal(ShooterMode.SCORING, ShooterIntent.FIRING);
 			}
 		}
-		
-        return new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE); 
-    }
 
+		if(operatorWantsFerrying){
+			if(operatorWantsFiring){
+				if(isInLeftFerryZone){
+					return new ShooterGoal(ShooterMode.FERRYING_LEFT, ShooterIntent.FIRING);
+				}
+				else if (isInRightFerryZone){
+					return new ShooterGoal(ShooterMode.FERRYING_RIGHT, ShooterIntent.FIRING);
+				}
+				else{
+					return new ShooterGoal(ShooterMode.FERRYING_LEFT, ShooterIntent.FIRING);
+				}
+			}
+			return new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);
+			}
+		return new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);		
+	}
 }

@@ -1,6 +1,8 @@
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -11,6 +13,8 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -26,16 +30,19 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.constants.HoodConstants;
 import frc.robot.constants.TurretConstants;
+import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.turret.Turret;
+import frc.robot.util.FieldConstants;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 
 public class Shooter extends SubsystemBase {
 
+    public static TargetLocation targetLocation;
     public Hood hood;
     public Flywheel flywheel;
     public Turret turret;
@@ -49,8 +56,6 @@ public class Shooter extends SubsystemBase {
     public int hopperCount;
 
     private double lastSimShotTime = 0.0;
-
-    public static TargetLocation targetLocation;
 
     public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean withConstantVelocity, boolean whileMoving) {
         this.hood = hood;
@@ -117,6 +122,61 @@ public class Shooter extends SubsystemBase {
 
     public boolean atSetpoint() {
         return turret.atSetpoint() && hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation());
+    }
+
+    public ShootingParameters getShootingParameters(ShooterCoordinator.ShooterGoal goal) {
+        TargetLocation target = null;
+        switch (goal.mode()) {
+            case SCORING:
+                target = TargetLocation.HUB;
+                break;
+            case FERRYING_LEFT:
+                target = TargetLocation.FERRY_LEFT;
+                break;
+            case FERRYING_RIGHT:
+                target = TargetLocation.FERRY_RIGHT;
+                break;
+            case IDLE:
+                break;
+        };
+
+        if (target == null) {
+            return null;
+        };
+
+        return Aiming.calculateShot(
+            target,
+            withConstantVelocity,
+            whileMoving
+        );
+    }
+
+    public Command setShooterGoal(ShooterCoordinator.ShooterGoal goal, Supplier<ShootingParameters> paramsSupplier){
+        List<Command> shooterActionsCommands = new ArrayList<>();
+        if (goal.intent().isTurretAllowed()){
+            shooterActionsCommands.add(turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation), () -> paramsSupplier.get().timeSecondsForSetpoint()));
+        }
+        else{
+            shooterActionsCommands.add(turret.stopCommand());
+        }
+
+        if(goal.intent().isHoodAllowed()){
+            shooterActionsCommands.add(hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle(), () -> paramsSupplier.get().timeSecondsForSetpoint()));
+        }
+        else{
+            shooterActionsCommands.add(hood.stopCommand());
+        }
+        if(goal.intent().isFlywheelAllowed()){
+            shooterActionsCommands.add(Commands.sequence(
+                flywheel.setVelocityCommand(
+                    () -> paramsSupplier.get().flywheelVelocity(), () -> paramsSupplier.get().timeSecondsForSetpoint()),
+                Commands.waitSeconds(1),
+                indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())));
+        }
+        else{
+            shooterActionsCommands.add(flywheel.stopCommand());
+        }
+        return Commands.parallel(shooterActionsCommands.toArray(new Command[0]));
     }
 
     public Command setParameters(Supplier<ShootingParameters> paramsSupplier) {

@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.HoodConstants;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LeftTrench;
@@ -17,10 +18,11 @@ import frc.robot.util.PoseUtils;
 
 public class Superstructure extends SubsystemBase {
 
-  	private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.8);
+  private final Distance TRENCH_ZONE_OFFSET = Meters.of(0.8);
 
 	private int logCounter;
 	private int loopsPerLog;
+	private Shooter shooter;
 
 	@Override
 	public void periodic() {
@@ -96,7 +98,7 @@ public class Superstructure extends SubsystemBase {
 		};
 	}
 
-	public boolean isInScoringZone() {
+	public static boolean isInScoringZone() {
 		Translation2d pos = RobotContainer.turret.getFieldRelativePosition();
 		return
 		(AllianceManager.isRed() ?
@@ -105,8 +107,46 @@ public class Superstructure extends SubsystemBase {
 			pos.getX() <= FieldConstants.LinesVertical.HUB_CENTER.in(Meters)
 		);
 	}
+
+	public static boolean isInLeftFerryZone() {
+		if(!AllianceManager.isAllianceKnown()) return false;
+        Translation2d pos = RobotContainer.shooter.turret.getFieldRelativePosition();
+
+        return
+			(
+			AllianceManager.isRed() ?
+				(
+					pos.getY() <= PoseUtils.flipTranslationAlliance(new Translation2d(0, FieldConstants.LinesHorizontal.CENTER.in(Meters))).getY()
+					&& pos.getX() <= PoseUtils.flipTranslationAlliance(new Translation2d(FieldConstants.LinesVertical.NEUTRAL_ZONE_NEAR.in(Meters), 0)).getX()
+				)
+				:
+				(
+					pos.getY() >= FieldConstants.LinesHorizontal.CENTER.in(Meters)
+					&& pos.getX() >= FieldConstants.LinesVertical.NEUTRAL_ZONE_NEAR.in(Meters)
+				)
+        	);
+    }
+
+  public static boolean isInRightFerryZone() {
+		if(!AllianceManager.isAllianceKnown()) return false;
+        Translation2d pos = RobotContainer.shooter.turret.getFieldRelativePosition();
+
+        return
+			(AllianceManager.isRed() ?
+        		(
+					pos.getY() >= PoseUtils.flipTranslationAlliance(new Translation2d(0, FieldConstants.LinesHorizontal.CENTER.in(Meters))).getY()
+        			&& pos.getX() <= PoseUtils.flipTranslationAlliance(new Translation2d(FieldConstants.LinesVertical.NEUTRAL_ZONE_NEAR.in(Meters), 0)).getX()
+				)
+        		:
+				(
+					pos.getY() <= FieldConstants.LinesHorizontal.CENTER.in(Meters)
+        			&& pos.getX() >= FieldConstants.LinesVertical.NEUTRAL_ZONE_NEAR.in(Meters)
+				)
+        	);
+    }
+
 	
-	public boolean isInTrenchZone() {
+	public static boolean isInTrenchZone() {
 		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
 		for (Translation2d[] zone : FieldConstants.Zones.TRENCH_ZONES) {
 			if (robotPose.getX() >= zone[0].getX()
@@ -174,5 +214,6 @@ public class Superstructure extends SubsystemBase {
 		if(AllianceManager.isRed()) return !movingIntoObstacleOnBlue;
 		return movingIntoObstacleOnBlue;
 	}
-	
 }
+
+
