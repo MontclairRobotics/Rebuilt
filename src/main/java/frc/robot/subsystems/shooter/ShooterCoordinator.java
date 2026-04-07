@@ -77,8 +77,26 @@ public class ShooterCoordinator {
         this.shooter = shooter;
     }
  
-    public ShooterGoal calculateGoal() {
+    public ShooterGoal calculateGoal(
+		boolean isInScoringZone, 
+		boolean isInLeftFerryZone, 
+		boolean isInRightFerryZone,
+		boolean isInTrenchZone,
+		boolean operatorWantsScoring,
+		boolean operatorWantsFerrying,
+		boolean operatorWantsFiring
+	) {
         // to be replaced with actual logic
+		if(isInTrenchZone) {
+			return new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);
+		}
+
+		if(operatorWantsScoring) {
+			if(operatorWantsFiring) {
+				return new ShooterGoal(ShooterMode.SCORING, ShooterIntent.SHOOTING)
+			}
+		}
+		
         return new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE); 
     }
 
