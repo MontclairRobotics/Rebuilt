@@ -71,6 +71,7 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         Logger.recordOutput("Shooter/At Setpoint", atSetpoint());
+        setShooterGoal(ShooterCoordinator.shooterGoal, (() -> getShootingParameters(ShooterCoordinator.shooterGoal))).schedule();
         // Logger.recordOutput("Fuel/Hopper Count", hopperCount);
         // Logger.recordOutput("Fuel/Blue Score", Hub.BLUE_HUB.getScore());
         // Logger.recordOutput("Fuel/Red Score", Hub.RED_HUB.getScore());
@@ -140,10 +141,6 @@ public class Shooter extends SubsystemBase {
                 break;
         };
 
-        if (target == null) {
-            return null;
-        };
-
         return Aiming.calculateShot(
             target,
             withConstantVelocity,
@@ -152,47 +149,40 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command setShooterGoal(ShooterCoordinator.ShooterGoal goal, Supplier<ShootingParameters> paramsSupplier){
-        List<Command> shooterActionsCommands = new ArrayList<>();
+        Command turretCommand;
         if (goal.intent().isTurretAllowed()){
-            shooterActionsCommands.add(turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation), () -> paramsSupplier.get().timeSecondsForSetpoint()));
+            turretCommand = turret.setRobotRelativeAngleCommand(
+                () -> paramsSupplier.get().robotRelativeTurretAngle(), 
+                () -> turret.calculateTargetVelocity(targetLocation), 
+                () -> paramsSupplier.get().timeSecondsForSetpoint());
         }
         else{
-            shooterActionsCommands.add(turret.stopCommand());
+            turretCommand = turret.stopCommand();
         }
 
+        Command hoodCommand;
         if(goal.intent().isHoodAllowed()){
-            shooterActionsCommands.add(hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle(), () -> paramsSupplier.get().timeSecondsForSetpoint()));
+            hoodCommand = hood.setAngleCommand(
+                () -> paramsSupplier.get().hoodAngle(), 
+                () -> paramsSupplier.get().timeSecondsForSetpoint());
         }
         else{
-            shooterActionsCommands.add(hood.stopCommand());
+            hoodCommand = hood.stopCommand();
         }
+
+        Command flywheelCommand;
         if(goal.intent().isFlywheelAllowed()){
-            shooterActionsCommands.add(Commands.sequence(
+            flywheelCommand = Commands.sequence(
                 flywheel.setVelocityCommand(
                     () -> paramsSupplier.get().flywheelVelocity(), () -> paramsSupplier.get().timeSecondsForSetpoint()),
                 Commands.waitSeconds(1),
-                indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())));
+                indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity()));
         }
         else{
-            shooterActionsCommands.add(flywheel.stopCommand());
-        }
-        return Commands.parallel(shooterActionsCommands.toArray(new Command[0]));
-    }
+            flywheelCommand = flywheel.stopCommand();
+        };
 
-    public Command setParameters(Supplier<ShootingParameters> paramsSupplier) {
-        return Commands.parallel(
-            turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation), () -> paramsSupplier.get().timeSecondsForSetpoint()),
-            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle(), () -> paramsSupplier.get().timeSecondsForSetpoint()),
-            flywheel.setVelocityCommand(() -> paramsSupplier.get().flywheelVelocity(), () -> paramsSupplier.get().timeSecondsForSetpoint()),
-            Commands.waitSeconds(1).andThen(indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity()))
-        );
-    }
-
-    public Command setParametersNoTurret(Supplier<ShootingParameters> paramsSupplier) {
-        return Commands.parallel(
-            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle(), () -> paramsSupplier.get().timeSecondsForSetpoint()),
-            indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
-        );
+        return Commands.parallel(turretCommand, hoodCommand, flywheelCommand);
     }
 
     public Command setConstantShotParameters() {
@@ -203,22 +193,6 @@ public class Shooter extends SubsystemBase {
             indexAndShootCommand(() -> params.flywheelVelocity())
         );
     }
-
-    public Command setSimParameters(Supplier<SimShootingParameters> paramsSupplier) {
-        return Commands.parallel(
-            Commands.run(() -> {
-                SimShootingParameters params = paramsSupplier.get();
-                Logger.recordOutput("launchFuel()/At Setpoint", atSetpoint());
-                launchFuel(() -> params.exitVelocity(), FIRE_RATE);
-                Logger.recordOutput("setSimParameters()/Robot Relative Turret Angle", params.robotRelativeTurretAngle().in(Rotations));
-                Logger.recordOutput("setSimParameters()/Hood Angle", params.hoodAngle().in(Rotations));
-                Logger.recordOutput("setSimParameters()/Exit Velocity", params.exitVelocity().in(MetersPerSecond));
-                turret.setRobotRelativeAngle(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation), () -> Timer.getFPGATimestamp());
-                hood.setAngle(() -> params.hoodAngle(), () -> Timer.getFPGATimestamp());
-            })
-        );
-    }
-
 
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
         if (RobotContainer.shooter.atSetpoint() && !Turret.isSpinningAround && (RobotContainer.shootButtonTrigger.getAsBoolean() || RobotContainer.shouldShootAuto)) {

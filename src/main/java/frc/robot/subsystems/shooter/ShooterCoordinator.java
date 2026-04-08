@@ -8,7 +8,7 @@ import frc.robot.Superstructure;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 
 public class ShooterCoordinator extends SubsystemBase{
-    public ShooterGoal shooterGoal;
+    public static ShooterGoal shooterGoal;
 		private Shooter shooter;
 
 		@Override
