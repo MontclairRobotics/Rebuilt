@@ -20,7 +20,6 @@ import frc.robot.util.tunables.LoggedTunableNumber;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
 
@@ -41,7 +40,7 @@ public class TurretIOTalonFX implements TurretIO {
     private final PositionVoltage request = new PositionVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
 
-    public LoggedTunableNumber kV = new LoggedTunableNumber("Turret/kV FUDGE", 7.05);
+    public LoggedTunableNumber kV = new LoggedTunableNumber("Turret/kV FUDGE", 3);
 
     public TurretIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
@@ -118,8 +117,7 @@ public class TurretIOTalonFX implements TurretIO {
 
     @Override
     public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity) {
-        double velocityFeedforward = velocity.in(RotationsPerSecond) * kV.getAsDouble(); // 5.05 volts per rotation/s, equivalent to "kV"
-        motor.setControl(request.withPosition(angle).withFeedForward(velocityFeedforward));
+        motor.setControl(request.withPosition(angle).withVelocity(velocity));
     }
 
     @Override

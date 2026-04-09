@@ -58,9 +58,10 @@ public class TurretConstants {
 	public static final Angle ENCODER_OFFSET = Rotations.of(-0.343323);
 
 	// pid + ff gains
-	public static final double kP = 40;
-	public static final double kD = 0;
-	public static final double kS = 20;
+	public static final double kP = 25;
+	public static final double kD = 0.04;
+	public static final double kS = 0.5;
+	public static final double kV = 3;
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(4);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(80);
@@ -75,7 +76,7 @@ public class TurretConstants {
 		.withMotionMagicJerk(MOTION_MAGIC_JERK);
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
-		.withKP(kP).withKD(kD).withKS(kS);
+		.withKP(kP).withKD(kD).withKS(kS).withKV(kV);
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
 		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)

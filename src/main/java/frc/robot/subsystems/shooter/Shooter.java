@@ -210,6 +210,7 @@ public class Shooter extends SubsystemBase {
 
             if(goal.intent().isToFeedBalls() && this.atSetpoint()) {
                 spindexer.spinUp();
+                // spindexer.setCurrent(80, 80);
             } else {
                 spindexer.stop();
             }

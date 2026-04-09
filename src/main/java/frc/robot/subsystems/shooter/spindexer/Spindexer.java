@@ -37,11 +37,20 @@ public class Spindexer extends SubsystemBase {
         indexer.stop();
     }
 
+    public void setCurrent(double serializerCurrent, double indexerCurrent) {
+        serializer.setCurrent(serializerCurrent);
+        indexer.setCurrent(indexerCurrent);
+    }
+
     public Command setVoltageCommand(double voltage) {
         return Commands.run(() -> {
             serializer.setVoltage(voltage);
             indexer.setVoltage(voltage);
         }, serializer, indexer);
+    }
+
+    public Command setCurrentCommand(double serializerCurrent, double indexerCurrent) {
+        return Commands.run(() -> setCurrent(serializerCurrent, indexerCurrent), this);
     }
 
     public Command spinUpCommand() {
