@@ -1,10 +1,8 @@
 package frc.robot.subsystems.shooter.hood;
 
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.constants.HoodConstants.*;
 
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -14,7 +12,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
@@ -22,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.shooter.aiming.AimingConstants;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.tunables.LoggedTunableNumber;
 
@@ -31,8 +27,6 @@ public class Hood extends SubsystemBase {
     private final HoodIO io;
     private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
     private final HoodVisualization visualization = new HoodVisualization();
-
-	private static final TimeInterpolatableBuffer<Angle> setpointBuffer = TimeInterpolatableBuffer.createBuffer(Hood::interpolate, AimingConstants.LATENCY * 2);
 
     private ArmFeedforward feedforward;
 
@@ -61,9 +55,6 @@ public class Hood extends SubsystemBase {
 
 		io.updateInputs(inputs); // need to update inputs every frame
 
-		// Logger.recordOutput("Hood/At Time Adjusted Setpoint", atTimeAdjustedSetpoint());
-		// Logger.recordOutput("Hood/Time Adjusted Setpoint", getSetpointForTime(Timer.getFPGATimestamp()));
-
 		if(logCounter % loopsPerLog == 0) {
 			Logger.processInputs("Hood", inputs);
 		}
@@ -72,28 +63,12 @@ public class Hood extends SubsystemBase {
 			visualization.update();
 			visualization.log();
 		}
+
 		// if(RobotContainer.HOOD_DEBUG || RobotBase.isSimulation()) {
 		// 	updateTunables();
 		// }
 	}
 
-	public static Angle interpolate(Angle startValue, Angle endValue, double t) {
-        return Rotations.of(
-            MathUtil.interpolate(startValue.in(Rotations), endValue.in(Rotations), t)
-        );
-    }
-
-	public boolean atTimeAdjustedSetpoint() {
-        return io.isAtTimeAdjustedSetpoint();
-    }
-
-    public static void recordSetpoint(Angle setpoint, double timeSecondsForSetpoint) {
-        setpointBuffer.addSample(timeSecondsForSetpoint, setpoint);
-    }
-
-    public static Angle getSetpointForTime(double timeSeconds) {
-        return setpointBuffer.getSample(timeSeconds).orElseGet(() -> Rotations.zero());
-    }
 
     public Angle getAngle() {
         return inputs.hoodAngle;
@@ -112,12 +87,16 @@ public class Hood extends SubsystemBase {
 		io.setVoltage(voltage + ffVoltage);
 	}
 
-    public void setAngle(Supplier<Angle> angleSupplier, DoubleSupplier timeSecondsForSetpoint) {
-		io.setAngle(angleSupplier.get(), timeSecondsForSetpoint.getAsDouble());
+    public void setAngle(Supplier<Angle> angleSupplier) {
+		io.setAngle(angleSupplier.get());
 	}
 
-    public void setAngle(Angle angle, DoubleSupplier timeSecondsForSetpoint) {
-		io.setAngle(angle, timeSecondsForSetpoint.getAsDouble());
+    public void setAngle(Angle angle) {
+		io.setAngle(angle);
+	}
+
+	public void stop() {
+		io.stop();
 	}
 
     public boolean atSetpoint() {
@@ -155,12 +134,12 @@ public class Hood extends SubsystemBase {
 		return Commands.run(() -> io.setVoltage(voltage), this);
 	}
 
-	public Command setAngleCommand(Supplier<Angle> angleSupplier, DoubleSupplier timeSecondsForSetpoint) {
-		return Commands.run(() -> setAngle(angleSupplier, timeSecondsForSetpoint), this);
+	public Command setAngleCommand(Supplier<Angle> angleSupplier) {
+		return Commands.run(() -> setAngle(angleSupplier), this);
 	}
 
-	public Command setAngleCommand(Angle angle, DoubleSupplier timeSecondsForSetpoint) {
-		return Commands.run(() -> setAngle(angle, timeSecondsForSetpoint), this).until(() -> atSetpoint());
+	public Command setAngleCommand(Angle angle) {
+		return Commands.run(() -> setAngle(angle), this).until(() -> atSetpoint());
 	}
 
 	public Command joystickControlCommand() {

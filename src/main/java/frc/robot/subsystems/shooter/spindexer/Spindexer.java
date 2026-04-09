@@ -4,11 +4,12 @@ package frc.robot.subsystems.shooter.spindexer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.shooter.spindexer.indexer.Indexer;
 import frc.robot.subsystems.shooter.spindexer.serializer.Serializer;
 import frc.robot.util.tunables.LoggedTunableNumber;
 
-public class Spindexer {
+public class Spindexer extends SubsystemBase {
 
     private Serializer serializer;
     private Indexer indexer;
@@ -31,6 +32,11 @@ public class Spindexer {
         indexer.spinDown();
     }
 
+    public void stop() {
+        serializer.stop();
+        indexer.stop();
+    }
+
     public Command setVoltageCommand(double voltage) {
         return Commands.run(() -> {
             serializer.setVoltage(voltage);
@@ -46,36 +52,9 @@ public class Spindexer {
         return Commands.run(() -> spinDown(), serializer, indexer);
     }
 
-    // public Command jiggleCommand() {
-    //     return Commands.parallel(
-    //         indexer.spinUpCommand(),
-    //         Commands.repeatingSequence(
-    //             spinUpCommand().withTimeout(1),
-    //             Commands.run(() -> {
-    //                 indexer.setVelocity(SPIN_VELOCITY);
-    //                 serializer.setVelocity(SPIN_VELOCITY.unaryMinus());
-    //             }).withTimeout(1)
-    //         )
-    //     );
-    // }
-
-    // public Command jiggleFoReal() {
-    //     return Commands.parallel(
-    //         indexer.spinUpCommand(),
-    //         Commands.repeatingSequence(
-    //             Commands.startEnd(
-    //                 () -> serializer.spinUp(),
-    //                 () -> serializer.stop(),
-    //                 serializer
-    //             ).withTimeout(spinUpTime.getAsDouble()),
-    //             Commands.startEnd(
-    //                 () -> serializer.setVelocity(SPIN_VELOCITY.unaryMinus()),
-    //                 () -> serializer.stop(),
-    //                 serializer
-    //             ).withTimeout(spinDownTime.getAsDouble())
-    //         )
-    //     );
-    // }
+    public Command stopCommand() {
+        return Commands.runOnce(() -> stop(), serializer, indexer);
+    }
 
     public Command jiggleSerializerCommand() {
         return new SequentialCommandGroup(

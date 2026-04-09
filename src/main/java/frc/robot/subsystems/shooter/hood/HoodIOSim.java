@@ -14,10 +14,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import frc.robot.RobotContainer;
-import frc.robot.subsystems.shooter.turret.Turret;
 
 public class HoodIOSim implements HoodIO {
 
@@ -65,7 +62,7 @@ public class HoodIOSim implements HoodIO {
     }
 
     @Override
-    public void setAngle(Angle angle, double timeSecondsForSetpoint) {
+    public void setAngle(Angle angle) {
         pidController.setSetpoint(angle.in(Rotations));
         double pidOutput = pidController.calculate(Radians.of(sim.getAngleRads()).in(Rotations));
         double ffOutput = feedforward.calculate(sim.getAngleRads(), 0);
@@ -90,14 +87,6 @@ public class HoodIOSim implements HoodIO {
     @Override
     public void resetEncoderPosition() {
 
-    }
-
-    @Override
-    public boolean isAtTimeAdjustedSetpoint() {
-        double error =
-            Turret.getSetpointForTime(Timer.getFPGATimestamp()).in(Rotations)
-            - RobotContainer.hood.getAngle().in(Rotations);
-        return Math.abs(error) < TOLERANCE.in(Rotations);
     }
 
     @Override

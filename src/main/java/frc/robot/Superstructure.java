@@ -145,7 +145,7 @@ public class Superstructure extends SubsystemBase {
         	);
     }
 
-	
+
 	public static boolean isInTrenchZone() {
 		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
 		for (Translation2d[] zone : FieldConstants.Zones.TRENCH_ZONES) {
@@ -159,7 +159,7 @@ public class Superstructure extends SubsystemBase {
 		return false;
 	}
 
-	public boolean isInTrenchDangerZone() {
+	public static boolean isInTrenchDangerZone() {
 		Translation2d turretPose = RobotContainer.turret.getFieldRelativePosition();
 		for (Translation2d[] zone : FieldConstants.Zones.TRENCH_DANGER_ZONES) {
 			if (
@@ -190,7 +190,7 @@ public class Superstructure extends SubsystemBase {
 		}
 		return false;
 	}
-	
+
 	// are we moving INTO the trench?
 	public boolean movingIntoObstacle() {
 		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
@@ -215,5 +215,3 @@ public class Superstructure extends SubsystemBase {
 		return movingIntoObstacleOnBlue;
 	}
 }
-
-

@@ -29,7 +29,7 @@ public interface HoodIO {
 
     public void updateInputs(HoodIOInputs inputs);
 
-    public void setAngle(Angle angle, double timeSecondsForSetpoint);
+    public void setAngle(Angle angle);
 
     public void setVoltage(double voltage);
 
@@ -38,8 +38,6 @@ public interface HoodIO {
     public boolean isAtSetpoint();
 
     public void resetEncoderPosition();
-
-    public boolean isAtTimeAdjustedSetpoint();
 
     public void setGains(double kP, double kD, double kS, double kG);
 

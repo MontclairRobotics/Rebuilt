@@ -7,9 +7,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import frc.robot.RobotContainer;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
@@ -65,7 +63,7 @@ public class FlywheelIOSim implements FlywheelIO {
     }
 
     @Override
-    public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {
+    public void setVelocity(AngularVelocity targetVelocity) {
         double pidOutput = pidController.calculate(
             RadiansPerSecond.of(sim.getAngularVelocityRadPerSec()).in(RotationsPerSecond),
             targetVelocity.in(RotationsPerSecond)
@@ -96,14 +94,6 @@ public class FlywheelIOSim implements FlywheelIO {
         pidController.setD(kD);
         feedforward.setKs(kS);
         feedforward.setKv(kV);
-    }
-
-    @Override
-    public boolean isAtTimeAdjustedSetpoint() {
-        double error =
-            Flywheel.getSetpointForTime(Timer.getFPGATimestamp()).in(RotationsPerSecond)
-            - RobotContainer.flywheel.getVelocity().in(RotationsPerSecond);
-        return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
     }
 
 }

@@ -17,7 +17,7 @@
           "incKey": 68
         },
         {
-          "decKey": 39,
+          "decKey": 87,
           "incKey": 83
         },
         {
@@ -29,12 +29,12 @@
       "axisCount": 3,
       "buttonCount": 8,
       "buttonKeys": [
-        49,
-        50,
         -1,
-        52,
-        53,
-        54,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
         340,
         342
       ],
@@ -64,12 +64,16 @@
         }
       ],
       "axisCount": 2,
-      "buttonCount": 4,
+      "buttonCount": 8,
       "buttonKeys": [
-        77,
-        44,
+        49,
+        50,
         51,
-        47
+        52,
+        53,
+        54,
+        55,
+        56
       ],
       "povCount": 0
     },

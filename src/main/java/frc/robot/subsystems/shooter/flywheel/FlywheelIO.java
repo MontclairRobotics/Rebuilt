@@ -28,15 +28,13 @@ public interface FlywheelIO {
 
     public void updateInputs(FlywheelIOInputs inputs);
 
-    public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint);
+    public void setVelocity(AngularVelocity targetVelocity);
 
     public void setVoltage(double voltage);
 
     public void stop();
 
     public boolean isAtSetpoint();
-
-    public boolean isAtTimeAdjustedSetpoint();
 
     public void setGains(double kP, double kD, double kS, double kV);
 

@@ -18,9 +18,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import frc.robot.RobotContainer;
 
 public class TurretIOSim implements TurretIO {
 
@@ -78,8 +76,7 @@ public class TurretIOSim implements TurretIO {
     }
 
     @Override
-    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, double timeSecondsForSetpoint) {
-        Turret.recordSetpoint(angle, timeSecondsForSetpoint);
+    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity) {
         pidController.setGoal(new State(angle.in(Rotations), velocity.in(RotationsPerSecond)));
         double pidOutput = pidController.calculate(Radians.of(sim.getAngleRads()).in(Rotations));
         appliedVoltage = MathUtil.clamp(pidOutput, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
@@ -98,14 +95,6 @@ public class TurretIOSim implements TurretIO {
     @Override
     public boolean isAtSetpoint() {
        return pidController.atSetpoint();
-    }
-
-    @Override
-    public boolean isAtTimeAdjustedSetpoint() {
-        double error =
-            Turret.getSetpointForTime(Timer.getFPGATimestamp()).in(Rotations)
-            - RobotContainer.turret.getRobotRelativeAngle().in(Rotations);
-        return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations);
     }
 
     @Override

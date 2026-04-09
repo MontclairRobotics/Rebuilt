@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.Timer;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -72,8 +71,6 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 
 
-import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
-
 public class RobotContainer {
 
 	// Controllers
@@ -105,8 +102,6 @@ public class RobotContainer {
 
 	public static Auto auto;
 
-	public static SimShootingParameters simShootingParameters = new SimShootingParameters(Degrees.zero(), Degrees.zero(), MetersPerSecond.zero());
-
 	private SwerveDriveSimulation driveSimulation;
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
 	public static FuelSim fuelSim = new FuelSim("fuel");
@@ -130,12 +125,14 @@ public class RobotContainer {
 
 	public static boolean shouldShootAuto = false;
 
-	public static Trigger shootButtonTrigger = operatorController.circle();
-
 	public static Trigger robotRelativeTrigger = driverController.L1();
 	public static Trigger xModeTrigger = driverController.R1();
 	public static Trigger turboTrigger = driverController.L2();
 	public static Trigger precisionTrigger = driverController.R2();
+
+	public static Trigger operatorWantsToFireTrigger = operatorController.L2();
+	public static Trigger operatorWantsToTrackHubTrigger = operatorController.circle();
+	public static Trigger operatorWantsToTrackFerryPointTrigger = operatorController.triangle();
 
 	public LoggedTunableNumber indexerCurrent = new LoggedTunableNumber("Spindexer/Index Current", 0);
 	public LoggedTunableNumber serializerCurrent = new LoggedTunableNumber("Spindexer/Serializer Current", 0);
@@ -177,12 +174,12 @@ public class RobotContainer {
 				vision = new Vision(
 					drivetrain::addVisionMeasurement,
 					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
-					// new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
+					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
 					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
 				);
 
 				superstructure = new Superstructure();
-				shooterCoordinator = new ShooterCoordinator(shooter);
+				shooterCoordinator = new ShooterCoordinator();
 
 				break;
 
@@ -231,7 +228,7 @@ public class RobotContainer {
 
 				auto = new Auto();
 				superstructure = new Superstructure();
-				shooterCoordinator = new ShooterCoordinator(shooter);
+				shooterCoordinator = new ShooterCoordinator();
 
 				break;
 
@@ -255,7 +252,7 @@ public class RobotContainer {
 				spindexer.spinUpCommand()
 					.alongWith(
 						flywheel.setVelocityCommand(
-							RotationsPerSecond.of(20), () -> Timer.getFPGATimestamp()
+							RotationsPerSecond.of(20)
 						)
 					)
 			)
@@ -270,6 +267,8 @@ public class RobotContainer {
 
 	private void configureCompetitionBindings() {
 
+		shooter.setDefaultCommand(shooter.getDefaultCommand());
+
 		driverController.povRight().whileTrue(new WheelRadiusCharacterization(Direction.CLOCKWISE, drivetrain));
 		driverController.povLeft().whileTrue(new WheelRadiusCharacterization(Direction.COUNTER_CLOCKWISE, drivetrain));
 
@@ -277,6 +276,7 @@ public class RobotContainer {
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 		driverController.PS().onTrue(drivetrain.resetPoseCommand(new Pose2d(3.6, 4.035, new Rotation2d())));
+
 		precisionTrigger
 			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(2), RotationsPerSecond.of(0.75)))
 			.onFalse(drivetrain.setMaxSpeedsCommand(TunerConstants.kSpeedAt12Volts, RotationsPerSecond.of(1.624)));
@@ -295,13 +295,10 @@ public class RobotContainer {
 		operatorController.touchpad().whileTrue(spindexer.setVoltageCommand(-12)).onFalse(spindexer.spinDownCommand());
 		operatorController.PS().whileTrue(rollers.setVoltageCommand(-12)).onFalse(serializer.stopCommand());
 
-		operatorController.circle().onFalse(shooter.stowCommand());
-
 		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
 
 		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(() -> intakeVoltage.get()))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
-		operatorController.L2().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
 		operatorController.povUp().onTrue(Commands.runOnce(() -> flywheel.increaseFudge()));
 		operatorController.povDown().onTrue(Commands.runOnce(() -> flywheel.decreaseFudge()));
@@ -318,7 +315,6 @@ public class RobotContainer {
 		driverController.povRight().whileTrue(new WheelRadiusCharacterization(Direction.CLOCKWISE, drivetrain));
 		driverController.povLeft().whileTrue(new WheelRadiusCharacterization(Direction.COUNTER_CLOCKWISE, drivetrain));
 
-		operatorController.circle().onFalse(shooter.stowCommand());
 		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 
@@ -337,11 +333,11 @@ public class RobotContainer {
 		driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 
 		driverController.square()
-			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get()), () -> Timer.getFPGATimestamp()))
+			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))
 			.onFalse(hood.stopCommand());
 
 		driverController.circle()
-			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get()), () -> Timer.getFPGATimestamp()))
+			.whileTrue(flywheel.setVelocityCommand(() -> RotationsPerSecond.of(flywheel.tuningFlywheelSpeed.get())))
 			.onFalse(flywheel.stopCommand());
 
 		if(Constants.CURRENT_MODE == Mode.SIM) driverController.PS().whileTrue(Commands.runOnce(() -> fuelSim.clearFuel()));

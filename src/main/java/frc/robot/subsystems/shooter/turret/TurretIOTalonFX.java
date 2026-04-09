@@ -15,8 +15,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Timer;
-import frc.robot.RobotContainer;
 import frc.robot.util.PhoenixUtil;
 import frc.robot.util.tunables.LoggedTunableNumber;
 
@@ -119,9 +117,8 @@ public class TurretIOTalonFX implements TurretIO {
     }
 
     @Override
-    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity, double timeSecondsForSetpoint) {
+    public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity) {
         double velocityFeedforward = velocity.in(RotationsPerSecond) * kV.getAsDouble(); // 5.05 volts per rotation/s, equivalent to "kV"
-        Turret.recordSetpoint(angle, timeSecondsForSetpoint);
         motor.setControl(request.withPosition(angle).withFeedForward(velocityFeedforward));
     }
 
@@ -144,14 +141,6 @@ public class TurretIOTalonFX implements TurretIO {
     @Override
     public void disable() {
         motor.disable();
-    }
-
-    @Override
-    public boolean isAtTimeAdjustedSetpoint() {
-        double error =
-            Turret.getSetpointForTime(Timer.getFPGATimestamp()).in(Rotations)
-            - RobotContainer.turret.getRobotRelativeAngle().in(Rotations);
-        return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations);
     }
 
     @Override

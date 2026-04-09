@@ -1,66 +1,54 @@
 package frc.robot.subsystems.shooter;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.RobotContainer;
 import frc.robot.Superstructure;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 
 public class ShooterCoordinator extends SubsystemBase{
-    public static ShooterGoal shooterGoal;
-		private Shooter shooter;
 
-		@Override
-		public void periodic(){
-			shooterGoal = calculateGoal(
-				Superstructure.isInScoringZone(),
-				Superstructure.isInLeftFerryZone(),
-				Superstructure.isInRightFerryZone(),
-				Superstructure.isInTrenchZone(),
-				operatorWantsScoring(),
-				operatorWantsFerrying(),
-				operatorWantsFiring()
-			);
-		}
+	public static ShooterGoal currentGoal;
 
     public enum ShooterIntent{
 
 		INACTIVE(
-			false, 
-			false, 
-			false, 
+			false,
+			false,
+			false,
 			false
 		),
 		ARMED(
-			true, 
-			true, 
-			true, 
+			true,
+			true,
+			false,
 			false
 		),
 		FIRING(
-			true, 
-			true, 
-			true, 
+			true,
+			true,
+			true,
 			true
 		);
 
-		private boolean allowFlywheel;
-		boolean allowTurret;
-		private boolean allowHood;
-		private boolean allowSpindexer;
-		
-		ShooterIntent(boolean allowFlywheel, boolean allowTurret, boolean allowHood, boolean allowSpindexer) {
-			this.allowFlywheel = allowFlywheel;
-			this.allowTurret = allowTurret;
-			this.allowHood = allowHood;
-			this.allowSpindexer = allowSpindexer;
+		private boolean spinFlywheel;
+		private boolean useTurretAngle;
+		private boolean useHoodAngle;
+		private boolean feedBalls;
+
+		ShooterIntent(boolean spinFlywheel, boolean useTurretAngle, boolean useHoodAngle, boolean feedBalls) {
+			this.spinFlywheel = spinFlywheel;
+			this.useTurretAngle = useTurretAngle;
+			this.useHoodAngle = useHoodAngle;
+			this.feedBalls = feedBalls;
 		}
 
-		public boolean isFlywheelAllowed() {return allowFlywheel;}
-		public boolean isTurretAllowed() {return allowTurret;}
-		public boolean isHoodAllowed() {return allowHood;}
-		public boolean isSpindexerAllowed() {return allowSpindexer;}
+		public boolean isToSpinFlywheel() {return spinFlywheel;}
+		public boolean isToUseTurretAngle() {return useTurretAngle;}
+		public boolean isToUseHoodAngle() {return useHoodAngle;}
+		public boolean isToFeedBalls() {return feedBalls;}
 
 	}
 
@@ -89,60 +77,100 @@ public class ShooterCoordinator extends SubsystemBase{
         }
     }
 
-    public ShooterCoordinator(Shooter shooter) {
-        this.shooter = shooter;
-				shooterGoal = new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);
+    public ShooterCoordinator() {
+		currentGoal = new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);
     }
 
-	public boolean operatorWantsFiring(){
-		return RobotContainer.operatorController.circle().getAsBoolean();
-	}
-	
-	public boolean operatorWantsScoring(){
-		return RobotContainer.operatorController.square().getAsBoolean();
+	/**
+	 * @return whether or not the operator wants to be actively firing
+	 */
+	public boolean operatorWantsToFire(){
+		return RobotContainer.operatorWantsToFireTrigger.getAsBoolean();
 	}
 
-	public boolean operatorWantsFerrying(){
-		return RobotContainer.operatorController.triangle().getAsBoolean();
+	/**
+	 * @return whether or not the operator wants to track the hub
+	 */
+	public boolean operatorWantsToTrackHub(){
+		return RobotContainer.operatorWantsToTrackHubTrigger.getAsBoolean();
+	}
+
+	/**
+	 * @return whether or not the operator wants to track a ferry point
+	 */
+	public boolean operatorWantsToTrackFerryPoint(){
+		return RobotContainer.operatorWantsToTrackFerryPointTrigger.getAsBoolean();
 	}
 
     public ShooterGoal calculateGoal(
-		boolean isInScoringZone, 
-		boolean isInLeftFerryZone, 
+		boolean isInScoringZone,
+		boolean isInLeftFerryZone,
 		boolean isInRightFerryZone,
 		boolean isInTrenchZone,
-		boolean operatorWantsScoring,
-		boolean operatorWantsFerrying,
-		boolean operatorWantsFiring
+		boolean operatorWantsToTrackHub,
+		boolean operatorWantsToTrackFerryPoint,
+		boolean operatorWantsToFire
 	) {
+
 		if(isInTrenchZone) {
-			return new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);
+			// we keep the mode to remain tracking the desired goal
+			// we force the intent to ARMED which lowers the hood and stops all firing
+			return new ShooterGoal(currentGoal.mode, ShooterIntent.ARMED);
 		}
 
-		if(RobotContainer.shouldShootAuto){
-			return new ShooterGoal(ShooterMode.SCORING, ShooterIntent.FIRING);
-		}
-
-		if(operatorWantsScoring) {
-			if(operatorWantsFiring) {
+		// if we're in auto, we force scoring but only FIRE while in the alliance zone
+		if(RobotContainer.shouldShootAuto) {
+			if(isInScoringZone) {
 				return new ShooterGoal(ShooterMode.SCORING, ShooterIntent.FIRING);
+			} else {
+				return new ShooterGoal(ShooterMode.SCORING, ShooterIntent.ARMED);
 			}
 		}
 
-		if(operatorWantsFerrying){
-			if(operatorWantsFiring){
-				if(isInLeftFerryZone){
+		// when the operator wants to track the hub
+		if(operatorWantsToTrackHub) {
+			if(operatorWantsToFire && isInScoringZone) {
+				return new ShooterGoal(ShooterMode.SCORING, ShooterIntent.FIRING);
+			} else {
+				return new ShooterGoal(ShooterMode.SCORING, ShooterIntent.ARMED);
+			}
+		}
+
+		// when the operator wants to ferry
+		if(operatorWantsToTrackFerryPoint){
+			if(isInLeftFerryZone) {
+				if(operatorWantsToFire) {
 					return new ShooterGoal(ShooterMode.FERRYING_LEFT, ShooterIntent.FIRING);
+				} else {
+					return new ShooterGoal(ShooterMode.FERRYING_LEFT, ShooterIntent.ARMED);
 				}
-				else if (isInRightFerryZone){
+			} else if(isInRightFerryZone) {
+				if(operatorWantsToFire) {
 					return new ShooterGoal(ShooterMode.FERRYING_RIGHT, ShooterIntent.FIRING);
+				} else {
+					return new ShooterGoal(ShooterMode.FERRYING_RIGHT, ShooterIntent.ARMED);
 				}
-				else{
-					return new ShooterGoal(ShooterMode.FERRYING_LEFT, ShooterIntent.FIRING);
-				}
+			} else {
+				return new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);
 			}
-			return new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);
-			}
-		return new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);		
+		}
+
+		return new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);
+	}
+
+	@Override
+	public void periodic(){
+		currentGoal = calculateGoal(
+			Superstructure.isInScoringZone(),
+			Superstructure.isInLeftFerryZone(),
+			Superstructure.isInRightFerryZone(),
+			Superstructure.isInTrenchDangerZone(),
+			operatorWantsToTrackHub(),
+			operatorWantsToTrackFerryPoint(),
+			operatorWantsToFire()
+		);
+
+		Logger.recordOutput("Shooter/GoalMode", currentGoal.mode().toString());
+		Logger.recordOutput("Shooter/GoalIntent", currentGoal.intent().toString());
 	}
 }

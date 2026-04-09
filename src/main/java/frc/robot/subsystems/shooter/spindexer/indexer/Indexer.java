@@ -71,6 +71,10 @@ public class Indexer extends SubsystemBase {
 		setVelocity(RotationsPerSecond.zero());
 	}
 
+	public void stop() {
+		io.stop();
+	}
+
 	public void applyJoystickInput() {
         double input = -MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
         double voltage = input * 12;
