@@ -163,6 +163,7 @@ public class JoystickDriveCommand extends Command {
 		switch (currentDriveMode) {
 			case NORMAL:
 
+				drivetrain.isLimitingAcceleration = false;
 				drivetrain.swapConfigurationModeTo(ConfigurationMode.NORMAL);
 				drivetrain.drive(
 					xVelocitySupplier.getAsDouble(),
@@ -175,6 +176,7 @@ public class JoystickDriveCommand extends Command {
 
 			case TRENCH_LOCK:
 
+				drivetrain.isLimitingAcceleration = false;
 				drivetrain.swapConfigurationModeTo(ConfigurationMode.NORMAL);
 
 				// reverses PID contribution direction for red alliance
@@ -201,6 +203,7 @@ public class JoystickDriveCommand extends Command {
 
 			case BUMP_LOCK:
 
+				drivetrain.isLimitingAcceleration = false;
 				drivetrain.swapConfigurationModeTo(ConfigurationMode.NORMAL);
 
 				// bump lock only changes angle of robot
@@ -219,6 +222,7 @@ public class JoystickDriveCommand extends Command {
 
 			case TURBO:
 
+				drivetrain.isLimitingAcceleration = false;
 				drivetrain.swapConfigurationModeTo(ConfigurationMode.TURBO);
 				drivetrain.drive(
 					xVelocitySupplier.getAsDouble(),
@@ -231,6 +235,7 @@ public class JoystickDriveCommand extends Command {
 
 			case PRECISION:
 
+				drivetrain.isLimitingAcceleration = true;
 				drivetrain.swapConfigurationModeTo(ConfigurationMode.PRECISION);
 				drivetrain.drive(
 					xVelocitySupplier.getAsDouble(),
@@ -243,6 +248,7 @@ public class JoystickDriveCommand extends Command {
 
 			case XMODE:
 
+				drivetrain.isLimitingAcceleration = false;
 				drivetrain.swapConfigurationModeTo(ConfigurationMode.NORMAL);
 				drivetrain.enableXMode();
 

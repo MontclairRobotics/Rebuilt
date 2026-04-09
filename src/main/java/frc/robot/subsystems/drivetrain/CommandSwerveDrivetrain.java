@@ -66,6 +66,7 @@ import static frc.robot.constants.DriveConstants.ROTATION_kD;
 import static frc.robot.constants.DriveConstants.ROTATION_kI;
 import static frc.robot.constants.DriveConstants.ROTATION_kP;
 
+import frc.robot.util.DynamicSlewRateLimiter;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.TunerConstants;
@@ -175,6 +176,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 	private int logCounter = 0;
 	private final int loopsPerLog;
+
+	public boolean isLimitingAcceleration = false;
+	private DynamicSlewRateLimiter forwardRateLimiter = new DynamicSlewRateLimiter(4.5);
+	private DynamicSlewRateLimiter strafeRateLimiter = new DynamicSlewRateLimiter(4.5);
+	private DynamicSlewRateLimiter rotationRateLimiter = new DynamicSlewRateLimiter(6);
 
 	public enum ConfigurationMode {
 		TURBO(TunerConstants.turboDriveConfiguration),
@@ -403,6 +409,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		double ySpeed,
 		double thetaSpeed,
 		boolean fieldRelative) {
+
+		if(isLimitingAcceleration) {
+			xSpeed = forwardRateLimiter.calculate(xSpeed);
+			ySpeed = strafeRateLimiter.calculate(ySpeed);
+			thetaSpeed = rotationRateLimiter.calculate(thetaSpeed);
+		}
+
+		double targetSpeed = Math.hypot(xSpeed, ySpeed);
+		double maxSpeed = MAX_SPEED.in(MetersPerSecond);
+
+		if(targetSpeed > maxSpeed) {
+			double scale = maxSpeed / targetSpeed;
+			xSpeed *= scale;
+			ySpeed *= scale;
+		}
+
+		thetaSpeed = MathUtil.clamp(thetaSpeed, -MAX_ANGULAR_SPEED.in(RadiansPerSecond), MAX_ANGULAR_SPEED.in(RadiansPerSecond));
 
 		ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed);
 

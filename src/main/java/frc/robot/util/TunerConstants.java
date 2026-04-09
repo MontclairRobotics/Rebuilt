@@ -83,7 +83,7 @@ public class TunerConstants {
         .withCurrentLimits(precisionDriveCurrentLimitsConfig)
         .withClosedLoopRamps(
             new ClosedLoopRampsConfigs()
-                .withVoltageClosedLoopRampPeriod(2)
+                .withVoltageClosedLoopRampPeriod(0.01)
         );
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
