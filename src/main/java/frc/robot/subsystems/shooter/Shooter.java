@@ -56,7 +56,7 @@ public class Shooter extends SubsystemBase {
 
     private double lastSimShotTime = 0.0;
 
-    private Debouncer setpointDebouncer = new Debouncer(0.2, DebounceType.kFalling);
+    private Debouncer setpointDebouncer = new Debouncer(0.5, DebounceType.kFalling);
 
     public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean withConstantVelocity, boolean whileMoving) {
         this.hood = hood;
