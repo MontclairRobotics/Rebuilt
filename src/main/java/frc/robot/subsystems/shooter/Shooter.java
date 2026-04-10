@@ -183,7 +183,7 @@ public class Shooter extends SubsystemBase {
         }
     }
 
-    public Command getShooterGoalCommand(Supplier<ShooterGoal> goalSupplier) {
+    public Command applyShooterGoalCommand(Supplier<ShooterGoal> goalSupplier) {
         return Commands.runEnd(() -> {
 
             ShooterGoal goal = goalSupplier.get();
@@ -210,7 +210,6 @@ public class Shooter extends SubsystemBase {
 
             if(goal.intent().isToFeedBalls() && this.atSetpoint()) {
                 spindexer.spinUp();
-                // spindexer.setCurrent(80, 80);
             } else {
                 spindexer.stop();
             }
@@ -225,7 +224,7 @@ public class Shooter extends SubsystemBase {
         this, flywheel, turret, hood, spindexer);
     }
 
-    public Command getSimShooterGoalCommand(Supplier<ShooterGoal> goalSupplier) {
+    public Command applySimShooterGoalCommand(Supplier<ShooterGoal> goalSupplier) {
         return Commands.runEnd(() -> {
 
             ShooterGoal goal = goalSupplier.get();
@@ -289,9 +288,9 @@ public class Shooter extends SubsystemBase {
 
     public Command getDefaultCommand() {
         if(RobotBase.isReal()) {
-            return getShooterGoalCommand(() -> ShooterCoordinator.currentGoal);
+            return applyShooterGoalCommand(() -> ShooterCoordinator.currentGoal);
         } else {
-            return getSimShooterGoalCommand(() -> ShooterCoordinator.currentGoal);
+            return applySimShooterGoalCommand(() -> ShooterCoordinator.currentGoal);
         }
     }
 

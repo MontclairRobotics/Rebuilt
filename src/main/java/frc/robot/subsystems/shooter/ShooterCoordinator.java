@@ -12,6 +12,9 @@ public class ShooterCoordinator extends SubsystemBase{
 
 	public static ShooterGoal currentGoal;
 
+	private int loopCounter;
+	private final int LOOPS_PER_CALCULATION = 3;
+
     public enum ShooterIntent{
 
 		INACTIVE(
@@ -78,7 +81,8 @@ public class ShooterCoordinator extends SubsystemBase{
     }
 
     public ShooterCoordinator() {
-		currentGoal = new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);
+		currentGoal = null;
+		loopCounter = 0;
     }
 
 	/**
@@ -160,17 +164,21 @@ public class ShooterCoordinator extends SubsystemBase{
 
 	@Override
 	public void periodic(){
-		currentGoal = calculateGoal(
-			Superstructure.isInScoringZone(),
-			Superstructure.isInLeftFerryZone(),
-			Superstructure.isInRightFerryZone(),
-			Superstructure.isInTrenchDangerZone(),
-			operatorWantsToTrackHub(),
-			operatorWantsToTrackFerryPoint(),
-			operatorWantsToFire()
-		);
+		loopCounter++;
 
-		Logger.recordOutput("Shooter/GoalMode", currentGoal.mode().toString());
-		Logger.recordOutput("Shooter/GoalIntent", currentGoal.intent().toString());
+		if(loopCounter % LOOPS_PER_CALCULATION == 0 || currentGoal == null) {
+			currentGoal = calculateGoal(
+				Superstructure.isInScoringZone(),
+				Superstructure.isInLeftFerryZone(),
+				Superstructure.isInRightFerryZone(),
+				Superstructure.isInTrenchDangerZone(),
+				operatorWantsToTrackHub(),
+				operatorWantsToTrackFerryPoint(),
+				operatorWantsToFire()
+			);
+
+			Logger.recordOutput("Shooter/GoalMode", currentGoal.mode().toString());
+			Logger.recordOutput("Shooter/GoalIntent", currentGoal.intent().toString());
+		}
 	}
 }

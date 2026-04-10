@@ -74,11 +74,7 @@ public class Turret extends SubsystemBase {
 
 		if(logCounter % loopsPerLog == 0) {
 			Logger.processInputs("Turret", inputs);
-			// Logger.recordOutput("Turret/AngleToHub", getAngleToHub());
 			Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
-			// Logger.recordOutput("Turret/At Time Adjusted Setpoint", atTimeAdjustedSetpoint());
-			// Logger.recordOutput("Turret/Time Adjusted Setpoint", getSetpointForTime(Timer.getFPGATimestamp()));
-			// Logger.recordOutput("Turret/Target Velocity", calculateTargetVelocity(TargetLocation.HUB).in(RotationsPerSecond));
 		}
 
 		/** only visualize when in debug mode */
