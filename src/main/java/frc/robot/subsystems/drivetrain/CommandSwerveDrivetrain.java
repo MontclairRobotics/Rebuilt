@@ -178,8 +178,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	private final int loopsPerLog;
 
 	public boolean isLimitingAcceleration = false;
-	private DynamicSlewRateLimiter forwardRateLimiter = new DynamicSlewRateLimiter(4.5);
-	private DynamicSlewRateLimiter strafeRateLimiter = new DynamicSlewRateLimiter(4.5);
+	private DynamicSlewRateLimiter forwardRateLimiter = new DynamicSlewRateLimiter(6);
+	private DynamicSlewRateLimiter strafeRateLimiter = new DynamicSlewRateLimiter(6);
 	private DynamicSlewRateLimiter rotationRateLimiter = new DynamicSlewRateLimiter(6);
 
 	public enum ConfigurationMode {
@@ -600,15 +600,24 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		logCounter++;
 
 		odometryHeading = this.getState().Pose.getRotation();
-		fieldRelative = !RobotContainer.robotRelativeTrigger.getAsBoolean();
+
+		if(logCounter % loopsPerLog == 0) {
+			fieldRelative = !RobotContainer.robotRelativeTrigger.getAsBoolean();
+		}
+
 		isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
-		Logger.recordOutput("Drive/FieldRelative", fieldRelative);
-		Logger.recordOutput("Drive/odometryHeading", odometryHeading);
 		Logger.recordOutput("Drive/odometryPose", getRobotPose());
-		Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
-		Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
-		Logger.recordOutput("Drive/Speed", getFieldRelativeLinearVelocity().in(MetersPerSecond));
+
+		if(logCounter % loopsPerLog == 0) {
+			Logger.recordOutput("Drive/FieldRelative", fieldRelative);
+			Logger.recordOutput("Drive/odometryHeading", odometryHeading);
+			Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
+			Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
+			Logger.recordOutput("Drive/Speed", getFieldRelativeLinearVelocity().in(MetersPerSecond));
+		}
+
+		
 
 		/*
 		* Periodically try to apply the operator perspective.
