@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -53,6 +55,8 @@ public class Shooter extends SubsystemBase {
     public int hopperCount;
 
     private double lastSimShotTime = 0.0;
+
+    private Debouncer setpointDebouncer = new Debouncer(0.2, DebounceType.kFalling);
 
     public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean withConstantVelocity, boolean whileMoving) {
         this.hood = hood;
@@ -112,7 +116,9 @@ public class Shooter extends SubsystemBase {
 	}
 
     public boolean atSetpoint() {
-        return turret.atSetpoint() && hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation());
+        return setpointDebouncer.calculate(
+            turret.atSetpoint() && hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation())
+        );
     }
 
     public TargetLocation getTargetFromGoal(ShooterGoal goal) {
