@@ -75,9 +75,11 @@ public class TurretIOTalonFX implements TurretIO {
             setpointPositionSignal,
             velocitySignal,
             appliedVoltageSignal,
-            currentDrawAmpsSignal,
-            tempCelsiusSignal
+            currentDrawAmpsSignal
         );
+
+        // not necessary to run this fast
+		tempCelsiusSignal.setUpdateFrequency(4);
 
         motor.optimizeBusUtilization();
     }
@@ -132,7 +134,7 @@ public class TurretIOTalonFX implements TurretIO {
 
     @Override
     public boolean isAtSetpoint() {
-        double error = motor.getClosedLoopError().getValueAsDouble();
+        double error = positionSignal.getValueAsDouble() - setpointPositionSignal.getValueAsDouble();
         return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations);
     }
 

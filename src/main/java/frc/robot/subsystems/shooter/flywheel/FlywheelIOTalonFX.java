@@ -71,9 +71,11 @@ public class FlywheelIOTalonFX implements FlywheelIO{
             setpointVelocitySignal,
             setpointAccelerationSignal,
             appliedVoltageSignal,
-            currentDrawAmpsSignal,
-            tempCelciusSignal
+            currentDrawAmpsSignal
         );
+
+        // not necessary to run this fast
+		tempCelciusSignal.setUpdateFrequency(4);
 
         leftMotor.optimizeBusUtilization();
         rightMotor.optimizeBusUtilization();
@@ -132,7 +134,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
 
     @Override
     public boolean isAtSetpoint() {
-        double error = leftMotor.getClosedLoopError().getValueAsDouble();
+        double error = velocitySignal.getValueAsDouble() - setpointVelocitySignal.getValueAsDouble();
         return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
     }
 

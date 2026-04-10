@@ -70,9 +70,11 @@ public class HoodIOTalonFX implements HoodIO {
             setpointPositionSignal,
             velocitySignal,
             appliedVoltageSignal,
-            currentDrawAmpsSignal,
-            tempCelsiusSignal
+            currentDrawAmpsSignal
         );
+
+        // not necessary to run this fast
+		tempCelsiusSignal.setUpdateFrequency(4);
 
         motor.optimizeBusUtilization();
     }
@@ -126,10 +128,8 @@ public class HoodIOTalonFX implements HoodIO {
 
     @Override
     public boolean isAtSetpoint() {
-        double error = motor.getClosedLoopError().getValueAsDouble();
-        return Math.abs(error) < TOLERANCE.in(Rotations)
-            // && Math.abs(velocitySignal.getValueAsDouble()) < VELOCITY_TOLERANCE.in(RotationsPerSecond)
-        ;
+        double error = positionSignal.getValueAsDouble() - setpointPositionSignal.getValueAsDouble();
+        return Math.abs(error) < TOLERANCE.in(Rotations);
     }
 
     @Override

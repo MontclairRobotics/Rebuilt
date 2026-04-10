@@ -53,9 +53,11 @@ public class RollersIOTalonFX implements RollersIO {
 			velocitySignal,
 			setpointVelocitySignal,
 			appliedVoltageSignal,
-			currentDrawAmpsSignal,
-			tempCelciusSignal
+			currentDrawAmpsSignal
 		);
+
+		// not necessary to run this fast
+		tempCelciusSignal.setUpdateFrequency(4);
 
 		motor.optimizeBusUtilization();
 	}
@@ -105,7 +107,7 @@ public class RollersIOTalonFX implements RollersIO {
 
 	@Override
 	public boolean isAtSetpoint() {
-		double error = motor.getClosedLoopError().getValueAsDouble();
+		double error = velocitySignal.getValueAsDouble() - setpointVelocitySignal.getValueAsDouble();
         return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
 	}
 }

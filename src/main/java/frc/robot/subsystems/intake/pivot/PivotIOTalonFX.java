@@ -71,9 +71,11 @@ public class PivotIOTalonFX implements PivotIO {
             setpointPositionSignal,
             velocitySignal,
             appliedVoltageSignal,
-            currentDrawAmpsSignal,
-            tempCelsiusSignal
+            currentDrawAmpsSignal
         );
+
+        // not necessary to run this fast
+        tempCelsiusSignal.setUpdateFrequency(4);
 
         motor.optimizeBusUtilization();
 	}
@@ -158,9 +160,8 @@ public class PivotIOTalonFX implements PivotIO {
 
 	@Override
 	public boolean isAtSetpoint() {
-        double error = motor.getClosedLoopError().getValueAsDouble();
-        return Math.abs(error) < TOLERANCE.in(Rotations)
-            && Math.abs(motor.getVelocity().getValueAsDouble()) < MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond);
+        double error = positionSignal.getValueAsDouble() - setpointPositionSignal.getValueAsDouble();
+        return Math.abs(error) < TOLERANCE.in(Rotations);
 	}
 
     @Override

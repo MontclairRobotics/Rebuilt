@@ -24,7 +24,7 @@ public class IndexerIOTalonFX implements IndexerIO {
     private final StatusSignal<Double> setpointVelocitySignal;
     private final StatusSignal<Voltage> appliedVoltageSignal;
     private final StatusSignal<Current> currentDrawAmpsSignal;
-    private final StatusSignal<Temperature> tempCelciuSignal;
+    private final StatusSignal<Temperature> tempCelciusSignal;
 
 	private VelocityTorqueCurrentFOC request = new VelocityTorqueCurrentFOC(0);
 	private TorqueCurrentFOC torqueRequest = new TorqueCurrentFOC(0);
@@ -45,16 +45,18 @@ public class IndexerIOTalonFX implements IndexerIO {
         setpointVelocitySignal = motor.getClosedLoopReference();
         appliedVoltageSignal = motor.getMotorVoltage();
         currentDrawAmpsSignal = motor.getTorqueCurrent();
-        tempCelciuSignal = motor.getDeviceTemp();
+        tempCelciusSignal = motor.getDeviceTemp();
 
 		PhoenixUtil.registerStatusSignals(
 			Hertz.of(50),
 			velocitySignal,
 			setpointVelocitySignal,
 			appliedVoltageSignal,
-			currentDrawAmpsSignal,
-			tempCelciuSignal
+			currentDrawAmpsSignal
 		);
+
+		// not necessary to run this fast
+		tempCelciusSignal.setUpdateFrequency(4);
 
 		motor.optimizeBusUtilization();
 	}
@@ -67,7 +69,7 @@ public class IndexerIOTalonFX implements IndexerIO {
 			setpointVelocitySignal,
 			appliedVoltageSignal,
 			currentDrawAmpsSignal,
-			tempCelciuSignal
+			tempCelciusSignal
         );
 
 		inputs.motorConnected = BaseStatusSignal.isAllGood(
@@ -75,7 +77,7 @@ public class IndexerIOTalonFX implements IndexerIO {
 			setpointVelocitySignal,
 			appliedVoltageSignal,
 			currentDrawAmpsSignal,
-			tempCelciuSignal
+			tempCelciusSignal
 		);
 
 		inputs.velocity = velocitySignal.getValue();
@@ -83,7 +85,7 @@ public class IndexerIOTalonFX implements IndexerIO {
 
 		inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
 		inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
-		inputs.tempCelsius = tempCelciuSignal.getValueAsDouble();
+		inputs.tempCelsius = tempCelciusSignal.getValueAsDouble();
 		inputs.isAtSetpoint = isAtSetpoint();
 	}
 
@@ -104,7 +106,7 @@ public class IndexerIOTalonFX implements IndexerIO {
 
 	@Override
 	public boolean isAtSetpoint() {
-		double error = motor.getClosedLoopError().getValueAsDouble();
+		double error = velocitySignal.getValueAsDouble() - setpointVelocitySignal.getValueAsDouble();
         return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
 	}
 
