@@ -23,8 +23,8 @@ public class Spindexer extends SubsystemBase {
     }
 
     public void spinUp() {
-        serializer.spinUp();
-        indexer.spinUp();
+        serializer.setVoltage(12);
+        indexer.setVoltage(12);
     }
 
     public void spinDown() {
