@@ -143,11 +143,6 @@ public class RobotContainer {
 	public LoggedTunableNumber intakeVoltage = new LoggedTunableNumber("Intake/Intake Voltage", RollersConstants.SPIN_VOLTAGE);
 
 	public RobotContainer() {
-
-		Tunable turretFudgeTunable = new Tunable("Turret Fudge", turretFudge, (value) -> TurretConstants.ANGLE_OFFSET = Rotations.of(0.375).plus(Degrees.of(value)));
-
-		System.out.println("Constants.CURRENT_MODE: " + Constants.CURRENT_MODE);
-
 		switch (Constants.CURRENT_MODE) {
 			case REAL:
 				drivetrain = TunerConstants.createDrivetrain();
@@ -273,12 +268,12 @@ public class RobotContainer {
 		driverController.povLeft().whileTrue(new WheelRadiusCharacterization(Direction.COUNTER_CLOCKWISE, drivetrain));
 
 		// driver
-		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
+		drivetrain.setDefaultCommand(new JoystickDriveCommand());
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 		driverController.PS().onTrue(drivetrain.resetPoseCommand(new Pose2d(3.6, 4.035, new Rotation2d())));
 
 		precisionTrigger
-			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(1.5), RotationsPerSecond.of(0.3)))
+			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(1.5), RotationsPerSecond.of(0.25)))
 			.onFalse(drivetrain.setMaxSpeedsCommand(TunerConstants.kSpeedAt12Volts, RotationsPerSecond.of(1.624)));
 
 		driverController.triangle()
@@ -315,7 +310,7 @@ public class RobotContainer {
 		driverController.povRight().whileTrue(new WheelRadiusCharacterization(Direction.CLOCKWISE, drivetrain));
 		driverController.povLeft().whileTrue(new WheelRadiusCharacterization(Direction.COUNTER_CLOCKWISE, drivetrain));
 
-		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
+		drivetrain.setDefaultCommand(new JoystickDriveCommand());
 		driverController.touchpad().onTrue(drivetrain.zeroGyroCommand());
 
 		driverController.triangle().whileTrue(

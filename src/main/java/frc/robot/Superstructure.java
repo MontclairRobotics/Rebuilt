@@ -22,25 +22,35 @@ public class Superstructure extends SubsystemBase {
 
 	private int logCounter;
 	private int loopsPerLog;
+	private boolean hasRecentlyResetTrenchZones;
 	private Shooter shooter;
+
 
 	@Override
 	public void periodic() {
 		logCounter++;
 
-		if(movingIntoObstacle()) {
+		// this runs every 0.1 seconds
+		if(logCounter % loopsPerLog == 0 && isInTrenchZone() && movingIntoObstacle()) {
 			updateTrenchZonesVeloBased();
+			hasRecentlyResetTrenchZones = false;
 		} else {
-			resetTrenchZones();
+			// we only want to reset the zones after we have updated them
+			if(!hasRecentlyResetTrenchZones) resetTrenchDangerZones();
+			hasRecentlyResetTrenchZones = true;
 		}
 
 	};
 
 	public Superstructure() {
-		loopsPerLog = RobotContainer.SUPERSTRUCTURE_DEBUG ? 1 : 10;
+		loopsPerLog = RobotContainer.SUPERSTRUCTURE_DEBUG ? 1 : 5;
+		hasRecentlyResetTrenchZones = false;
 	}
 
-	public void resetTrenchZones() {
+	/**
+	 * resets the trench danger zones to their non-velocity adjusted values
+	 */
+	public void resetTrenchDangerZones() {
 		FieldConstants.Zones.TRENCH_DANGER_ZONES = new Translation2d[][]{
 		// near right trench
 		new Translation2d[] {
@@ -167,24 +177,6 @@ public class Superstructure extends SubsystemBase {
 					&& turretPose.getX() <= zone[1].getX()
 					&& turretPose.getY() >= zone[0].getY()
 					&& turretPose.getY() <= zone[1].getY()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public double turretToTrenchDistance() {
-		return Math.abs(FieldConstants.LinesVertical.HUB_CENTER.in(Meters) - RobotContainer.turret.getFieldRelativePosition().getX());
-	}
-
-	// whether we are in the zone to apply bump lock
-	public boolean isInBumpZone() {
-		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
-		for (Translation2d[] zone : FieldConstants.Zones.BUMP_ZONES) {
-			if (robotPose.getX() >= zone[0].getX()
-					&& robotPose.getX() <= zone[1].getX()
-					&& robotPose.getY() >= zone[0].getY()
-					&& robotPose.getY() <= zone[1].getY()) {
 				return true;
 			}
 		}
