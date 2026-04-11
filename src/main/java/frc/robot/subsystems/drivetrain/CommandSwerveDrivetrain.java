@@ -2,7 +2,6 @@ package frc.robot.subsystems.drivetrain;
 
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -31,7 +30,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -75,8 +73,6 @@ import frc.robot.util.sim.MapleSimSwerveDrivetrain;
 
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
 
-	public TimeInterpolatableBuffer<Pose2d> poseBuffer = TimeInterpolatableBuffer.createBuffer(3);
-
 	private static final double kSimLoopPeriod = 0.002; // 2 ms
 	private Notifier m_simNotifier = null;
 
@@ -108,6 +104,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		new SwerveRequest.SysIdSwerveRotation();
 
 	/* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
+	@SuppressWarnings("unused")
 	private final SysIdRoutine m_sysIdRoutineTranslation =
 		new SysIdRoutine(
 			new SysIdRoutine.Config(
@@ -136,6 +133,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	* This is used to find PID gains for the FieldCentricFacingAngle HeadingController.
 	* See the documentation of SwerveRequest.SysIdSwerveRotation for info on importing the log to SysId.
 	*/
+	@SuppressWarnings("unused")
 	private final SysIdRoutine m_sysIdRoutineRotation =
 		new SysIdRoutine(
 			new SysIdRoutine.Config(
@@ -165,8 +163,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	/* Heading PID Controller for things like automatic alignment buttons */
 	public PIDController thetaController;
 
-	/* variable to store our heading */
-	public Rotation2d odometryHeading = new Rotation2d();
+	// cached values
+	private Rotation2d wrappedOdometryHeading = new Rotation2d();
+	private Pose2d robotPose = new Pose2d();
+	private ChassisSpeeds fieldRelativeSpeeds = new ChassisSpeeds();
+	private Translation2d fieldRelativeVelocity = new Translation2d();
 
 	private boolean isRobotAtAngleSetPoint; // for angle turning
 	public boolean fieldRelative; //whether or not to drive field relative
@@ -232,7 +233,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		thetaController = new PIDController(ROTATION_kP, ROTATION_kI, ROTATION_kD);
 		thetaController.setTolerance(ROTATION_TOLERANCE.in(Radians));
 		thetaController.enableContinuousInput(-Math.PI, Math.PI);
-		odometryHeading = Rotation2d.fromRotations(0);
+		wrappedOdometryHeading = Rotation2d.fromRotations(0);
 
 		if (Utils.isSimulation()) {
 			startSimThread();
@@ -303,21 +304,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	public void swapConfigurationModeTo(ConfigurationMode configMode) {
 
 		if(currentConfigurationMode == configMode) return; // no need to reapply
-
-		switch (configMode) {
-			case TURBO:
-				applyDriveConfig(configMode.getConfiguration());
-				break;
-
-			case PRECISION:
-				applyDriveConfig(configMode.getConfiguration());
-				break;
-
-			case NORMAL:
-				applyDriveConfig(configMode.getConfiguration());
-				break;
-		}
-
+		applyDriveConfig(configMode.getConfiguration());
 		currentConfigurationMode = configMode;
 	}
 
@@ -334,20 +321,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		return Rotation2d.fromDegrees(angle - 180);
 	}
 
-	public Rotation2d getWrappedHeading() {
-		return wrapAngle(odometryHeading);
-	}
-
-	public ChassisSpeeds getFieldRelativeSpeeds() {
-		return ChassisSpeeds.fromRobotRelativeSpeeds(this.getState().Speeds, getWrappedHeading());
-	}
-
-	public Translation2d getFieldRelativeVelocity() {
-		return new Translation2d(
-			getFieldRelativeSpeeds().vxMetersPerSecond,
-			getFieldRelativeSpeeds().vyMetersPerSecond
-		);
-	}
+	public Rotation2d getWrappedHeading() { return wrappedOdometryHeading; }
+	public Pose2d getRobotPose() { return robotPose; }
+	public ChassisSpeeds getFieldRelativeSpeeds() { return fieldRelativeSpeeds; }
+	public Translation2d getFieldRelativeVelocity() { return fieldRelativeVelocity; }
 
 	public LinearVelocity getFieldRelativeLinearVelocity() {
 		return MetersPerSecond.of(getFieldRelativeVelocity().getNorm());
@@ -492,40 +469,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		fieldRelative = true;
 	}
 
-	@AutoLogOutput
-	public Pose2d getRobotPose() {
+	private Pose2d clampPoseToFieldBoundaries(Pose2d pose) {
+		double x = MathUtil.clamp(pose.getX(), 
+			FieldConstants.FieldBoundaries.NEAR_WALL_BOUNDARY,
+			FieldConstants.FieldBoundaries.FAR_WALL_BOUNDARY
+		);
+		double y = MathUtil.clamp(pose.getY(),
+			FieldConstants.FieldBoundaries.RIGHT_WALL_BOUNDARY,
+			FieldConstants.FieldBoundaries.LEFT_WALL_BOUNDARY
+		);
+    	return new Pose2d(x, y, pose.getRotation());
+	}
+
+	public Pose2d computeRobotPose() {
 		if (Utils.isSimulation() && mapleSimSwerveDrivetrain != null) {
 			Pose2d pose = mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose();
-
-			if(pose.getX() > FieldConstants.FieldBoundaries.FAR_WALL_BOUNDARY) {
-				pose = new Pose2d(FieldConstants.FieldBoundaries.FAR_WALL_BOUNDARY, pose.getY(), pose.getRotation());
-			} else if(pose.getX() < FieldConstants.FieldBoundaries.NEAR_WALL_BOUNDARY) {
-				pose = new Pose2d(FieldConstants.FieldBoundaries.NEAR_WALL_BOUNDARY, pose.getY(), pose.getRotation());
-			}
-
-			if(pose.getY() > FieldConstants.FieldBoundaries.LEFT_WALL_BOUNDARY) {
-				pose = new Pose2d(pose.getX(), FieldConstants.FieldBoundaries.LEFT_WALL_BOUNDARY, pose.getRotation());
-			} else if (pose.getY() < FieldConstants.FieldBoundaries.RIGHT_WALL_BOUNDARY) {
-				pose = new Pose2d(pose.getX(), FieldConstants.FieldBoundaries.RIGHT_WALL_BOUNDARY, pose.getRotation());
-			}
-
-			return pose;
+			return clampPoseToFieldBoundaries(pose);
 		} else {
 			Pose2d pose = this.getState().Pose;
-
-			if(pose.getX() > FieldConstants.FieldBoundaries.FAR_WALL_BOUNDARY) {
-				pose = new Pose2d(FieldConstants.FieldBoundaries.FAR_WALL_BOUNDARY, pose.getY(), pose.getRotation());
-			} else if(pose.getX() < FieldConstants.FieldBoundaries.NEAR_WALL_BOUNDARY) {
-				pose = new Pose2d(FieldConstants.FieldBoundaries.NEAR_WALL_BOUNDARY, pose.getY(), pose.getRotation());
-			}
-
-			if(pose.getY() > FieldConstants.FieldBoundaries.LEFT_WALL_BOUNDARY) {
-				pose = new Pose2d(pose.getX(), FieldConstants.FieldBoundaries.LEFT_WALL_BOUNDARY, pose.getRotation());
-			} else if (pose.getY() < FieldConstants.FieldBoundaries.RIGHT_WALL_BOUNDARY) {
-				pose = new Pose2d(pose.getX(), FieldConstants.FieldBoundaries.RIGHT_WALL_BOUNDARY, pose.getRotation());
-			}
-
-			return pose;
+			return clampPoseToFieldBoundaries(pose);
 		}
 	}
 
@@ -586,9 +548,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		);
 	}
 
-	public Command alignToAngleFieldRelativeContinuousCommand(
-		Supplier<Rotation2d> angle, boolean lockDrive) {
-		return alignToAngleFieldRelativeCommand(angle.get(), lockDrive);
+	public Command alignToAngleFieldRelativeContinuousCommand(Supplier<Rotation2d> angle, boolean lockDrive) {
+		return Commands.run(() -> {
+			setFieldRelativeAngle(angle.get());
+			alignToAngleFieldRelative(lockDrive);
+		}, this);
 	}
 
 	public Command stopCommand() {
@@ -599,11 +563,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	public void periodic() {
 		logCounter++;
 
-		odometryHeading = this.getState().Pose.getRotation();
+		wrappedOdometryHeading = wrapAngle(this.getState().Pose.getRotation());
+		robotPose = computeRobotPose();
+		fieldRelativeSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(this.getState().Speeds, getWrappedHeading());
+		fieldRelativeVelocity = new Translation2d(
+			fieldRelativeSpeeds.vxMetersPerSecond,
+			fieldRelativeSpeeds.vyMetersPerSecond
+		);
 
-		if(logCounter % loopsPerLog == 0) {
-			fieldRelative = !RobotContainer.robotRelativeTrigger.getAsBoolean();
-		}
+		fieldRelative = !RobotContainer.robotRelativeTrigger.getAsBoolean();
 
 		isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
@@ -611,7 +579,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 		if(logCounter % loopsPerLog == 0) {
 			Logger.recordOutput("Drive/FieldRelative", fieldRelative);
-			Logger.recordOutput("Drive/odometryHeading", odometryHeading);
+			Logger.recordOutput("Drive/odometryHeading", wrappedOdometryHeading);
 			Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
 			Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
 			Logger.recordOutput("Drive/Speed", getFieldRelativeLinearVelocity().in(MetersPerSecond));

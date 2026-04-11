@@ -165,9 +165,9 @@ public class RobotContainer {
 
 				vision = new Vision(
 					drivetrain::addVisionMeasurement,
-					new VisionIOLimelight(camera0Name, () -> drivetrain.odometryHeading),
-					new VisionIOLimelight(camera1Name, () -> drivetrain.odometryHeading),
-					new VisionIOLimelight(camera2Name, () -> drivetrain.odometryHeading)
+					new VisionIOLimelight(camera0Name, () -> drivetrain.getWrappedHeading()),
+					new VisionIOLimelight(camera1Name, () -> drivetrain.getWrappedHeading()),
+					new VisionIOLimelight(camera2Name, () -> drivetrain.getWrappedHeading())
 				);
 
 				superstructure = new Superstructure();
@@ -303,9 +303,6 @@ public class RobotContainer {
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
 
 		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(() -> intakeVoltage.get()))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
-
-		operatorController.povUp().onTrue(Commands.runOnce(() -> flywheel.increaseFudge()));
-		operatorController.povDown().onTrue(Commands.runOnce(() -> flywheel.decreaseFudge()));
 
 		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
 		operatorController.R2()

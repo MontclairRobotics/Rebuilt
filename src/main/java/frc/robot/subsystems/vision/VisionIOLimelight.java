@@ -64,8 +64,8 @@ public class VisionIOLimelight implements VisionIO {
 		inputs.latestTargetObservation = new TargetObservation(Rotation2d.fromDegrees(txSubscriber.get()), Rotation2d.fromDegrees(tySubscriber.get()));
 
 		// Update orientation for MegaTag 2
-		orientationPublisher.accept(new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
-
+		// orientationPublisher.accept(new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
+		LimelightHelpers.SetRobotOrientation_NoFlush(name, rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
 
 		// Read new pose observations from NetworkTables
 		Set<Integer> tagIds = new HashSet<>();

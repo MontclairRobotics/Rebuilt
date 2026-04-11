@@ -108,19 +108,16 @@ public class Vision extends SubsystemBase {
 		for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
 
 			io[cameraIndex].updateInputs(inputs[cameraIndex]);
-
-			if (logCounter % loopsPerLog == 0) {
-				Logger.processInputs("Vision/Camera" + Integer.toString(cameraIndex), inputs[cameraIndex]);
-			}
+			Logger.processInputs("Vision/Camera" + Integer.toString(cameraIndex), inputs[cameraIndex]);
 
 			// Update disconnected alert
 			disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
-			// clear camera-specific arrays every time
-			robotPoses.clear();
-			tagPoses.clear();
-			robotPosesAccepted.clear();
-			robotPosesRejected.clear();
+			// // clear camera-specific arrays every time
+			// robotPoses.clear();
+			// tagPoses.clear();
+			// robotPosesAccepted.clear();
+			// robotPosesRejected.clear();
 
 			// Add tag poses
 			if (logCounter % loopsPerLog == 0) {
@@ -149,11 +146,11 @@ public class Vision extends SubsystemBase {
 						observation.pose().getRotation().toRotation2d()
 						.minus(
 							PoseUtils.wrapRotation(RobotContainer.drivetrain.getRobotPose().getRotation())
-						).getDegrees()) > 3
+						).getDegrees()) > 15
 					// max angular rate
 					|| RobotContainer.drivetrain.getAngularSpeed().in(DegreesPerSecond) > 360
 					// max tag distance
-					|| observation.averageTagDistance() > 4;
+					|| observation.averageTagDistance() > 5.5;
 
 				// Add pose to log
 				if (logCounter % loopsPerLog == 0) {
@@ -185,8 +182,6 @@ public class Vision extends SubsystemBase {
 					linearStdDev *= cameraStdDevFactors[cameraIndex];
 					angularStdDev *= cameraStdDevFactors[cameraIndex];
 				}
-
-				linearStdDev = 0;
 
 				Logger.recordOutput("Vision/linearStdDev", linearStdDev);
 				Logger.recordOutput("Vision/angularStdDev", angularStdDev);

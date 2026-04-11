@@ -18,7 +18,6 @@ import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.ShotSettings;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShotSettings;
-import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 
