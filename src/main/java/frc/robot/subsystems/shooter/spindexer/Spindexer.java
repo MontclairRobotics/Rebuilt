@@ -22,7 +22,7 @@ public class Spindexer extends SubsystemBase {
 
     public void spinUp() {
         serializer.spinUp();
-        indexer.spinDown();
+        indexer.spinUp();
     }
 
     public void spinDown() {
