@@ -124,7 +124,7 @@ public class Aiming {
 			ShotSettings finalShotSettings = map.get(finalGeometry.virtualDistance());
 			hoodAngle = finalShotSettings.angle();
 			flywheelVelocity = finalShotSettings.flywheelVelocity();
-			robotRelativeTurretAngle = Turret.toRobotRelativeAngle(Rotations.of(finalGeometry.aimingAngle().getRotations()));
+			robotRelativeTurretAngle = RobotContainer.turret.toRobotRelativeAngle(Rotations.of(finalGeometry.aimingAngle().getRotations()));
 
 			cachedShot = new ShootingParameters(robotRelativeTurretAngle, hoodAngle, flywheelVelocity, Timer.getFPGATimestamp() + AimingConstants.getLatency());
 		}
@@ -165,7 +165,7 @@ public class Aiming {
 			SimShotSettings finalShotSettings = map.get(finalGeometry.virtualDistance());
 			hoodAngle = finalShotSettings.angle();
 			exitVelocity = finalShotSettings.exitVelocity();
-			robotRelativeTurretAngle = Turret.toRobotRelativeAngle(Rotations.of(finalGeometry.aimingAngle().getRotations()));
+			robotRelativeTurretAngle = RobotContainer.turret.toRobotRelativeAngle(Rotations.of(finalGeometry.aimingAngle().getRotations()));
 
 			cachedSimShot = new SimShootingParameters(robotRelativeTurretAngle, hoodAngle, exitVelocity);
 

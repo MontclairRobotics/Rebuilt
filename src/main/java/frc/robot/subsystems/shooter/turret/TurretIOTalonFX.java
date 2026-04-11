@@ -16,7 +16,6 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.util.PhoenixUtil;
-import frc.robot.util.tunables.LoggedTunableNumber;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
@@ -39,8 +38,7 @@ public class TurretIOTalonFX implements TurretIO {
 
     private final PositionVoltage request = new PositionVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
-
-    public LoggedTunableNumber kV = new LoggedTunableNumber("Turret/kV FUDGE", 3);
+    private final VoltageOut voltageOut = new VoltageOut(0);
 
     public TurretIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
@@ -50,8 +48,7 @@ public class TurretIOTalonFX implements TurretIO {
             .withSlot0(SLOT0_CONFIGS)
             .withCurrentLimits(CURRENT_LIMITS_CONFIGS)
             .withMotorOutput(MOTOR_OUTPUT_CONFIGS)
-            .withFeedback(FEEDBACK_CONFIGS)
-            .withMotionMagic(MOTION_MAGIC_CONFIGS);
+            .withFeedback(FEEDBACK_CONFIGS);
 
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
@@ -111,10 +108,10 @@ public class TurretIOTalonFX implements TurretIO {
 
         inputs.velocity = velocitySignal.getValue();
         inputs.robotRelativeAngle = positionSignal.getValue();
-        inputs.fieldRelativeAngle = Turret.toFieldRelativeAngle(inputs.robotRelativeAngle);
         inputs.robotRelativeAngleSetpoint = Rotations.of(setpointPositionSignal.getValueAsDouble());
 
-        inputs.isAtSetpoint = isAtSetpoint();
+        inputs.isAtSetpoint = 
+            Math.abs(positionSignal.getValueAsDouble() - setpointPositionSignal.getValueAsDouble()) < ANGLE_TOLERANCE.in(Rotations);
     }
 
     @Override
@@ -124,7 +121,7 @@ public class TurretIOTalonFX implements TurretIO {
 
     @Override
     public void setVoltage(double voltage) {
-        motor.setControl(new VoltageOut(voltage));
+        motor.setControl(voltageOut.withOutput(voltage));
     }
 
     @Override
@@ -133,32 +130,8 @@ public class TurretIOTalonFX implements TurretIO {
     }
 
     @Override
-    public boolean isAtSetpoint() {
-        double error = positionSignal.getValueAsDouble() - setpointPositionSignal.getValueAsDouble();
-        return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations);
-    }
-
-    @Override
     public void disable() {
         motor.disable();
-    }
-
-    @Override
-    public void setGains(double kP, double kD, double kS) {
-        config.Slot0.kP = kP;
-        config.Slot0.kD = kD;
-        config.Slot0.kS = kS;
-
-        motor.getConfigurator().apply(config.Slot0);
-    }
-
-    @Override
-    public void setMotionMagic(double velocity, double acceleration, double jerk) {
-        config.MotionMagic.MotionMagicCruiseVelocity = velocity;
-        config.MotionMagic.MotionMagicAcceleration = acceleration;
-        config.MotionMagic.MotionMagicJerk = jerk;
-
-        motor.getConfigurator().apply(config.MotionMagic);
     }
 
     @Override

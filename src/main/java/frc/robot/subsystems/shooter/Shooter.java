@@ -216,7 +216,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
-        if (this.atSetpoint() && !Turret.isSpinningAround) {
+        if (this.atSetpoint() && !RobotContainer.turret.isSpinningAround()) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
 

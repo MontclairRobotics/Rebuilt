@@ -14,7 +14,6 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -43,7 +42,7 @@ public class TurretConstants {
 	public static final Angle MIN_ANGLE = Rotations.of(-0.51);
 	public static final Angle MAX_ANGLE = Rotations.of(0.51);
 
-	public static final Angle ANGLE_TOLERANCE = Degrees.of(5);
+	public static final Angle ANGLE_TOLERANCE = Degrees.of(3);
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.25); // TODO: tune
 
 	// physical properties
@@ -54,7 +53,7 @@ public class TurretConstants {
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
 
 	// the angle between the zero of the gyro and the robot relative zero of the turret
-	public static Angle ANGLE_OFFSET = Rotations.of(0.5);
+	public static final Angle ANGLE_OFFSET = Rotations.of(0.5);
 	public static final Angle ENCODER_OFFSET = Rotations.of(-0.343323);
 
 	// pid + ff gains
@@ -65,15 +64,9 @@ public class TurretConstants {
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(4);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(80);
-	public static final double MOTION_MAGIC_JERK = 200; // Rotations Per Second Per Second Per Second
 
 	public static final double STATOR_CURRENT_LIMIT = 40; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 20; // Amps
-
-	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
-		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)
-		.withMotionMagicAcceleration(MOTION_MAGIC_ACCELERATION)
-		.withMotionMagicJerk(MOTION_MAGIC_JERK);
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKD(kD).withKS(kS).withKV(kV);
