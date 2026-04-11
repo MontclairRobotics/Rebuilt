@@ -17,15 +17,11 @@ import frc.robot.util.tunables.Tunable;
 
 public class AimingConstants {
 
-	public static double LATENCY = 0.08; // seconds it takes to reach desired state once state is set
-	public static Tunable latencyTunable = new Tunable("latency", LATENCY, (input)->LATENCY=input);
+	private static double latency = 0.08; // seconds it takes to reach desired state once state is set
+	public static double getLatency() { return latency; }
+	public static Tunable latencyTunable = new Tunable("latency", latency, (input) -> latency = input);
 
 	public record ShotSettings(Angle angle, AngularVelocity flywheelVelocity) implements Interpolatable<ShotSettings> {
-		public ShotSettings(Angle angle, AngularVelocity flywheelVelocity) {
-			this.angle = angle;
-			this.flywheelVelocity = flywheelVelocity;
-		}
-
 		@Override
 		public ShotSettings interpolate(ShotSettings endValue, double t) {
 			return new ShotSettings(
@@ -36,11 +32,6 @@ public class AimingConstants {
     }
 
 	public record SimShotSettings(Angle angle, LinearVelocity exitVelocity) implements Interpolatable<SimShotSettings> {
-		public SimShotSettings(Angle angle, LinearVelocity exitVelocity) {
-			this.angle = angle;
-			this.exitVelocity = exitVelocity;
-		}
-
 		@Override
 		public SimShotSettings interpolate(SimShotSettings endValue, double t) {
 			return new SimShotSettings(
@@ -77,7 +68,6 @@ public class AimingConstants {
 
 	public static final InterpolatingDoubleTreeMap SIM_FERRY_TOF_MAP =
 		new InterpolatingDoubleTreeMap();
-
 
 	static {
 
@@ -137,28 +127,22 @@ public class AimingConstants {
 		SIM_FERRY_MAP.put(5.147707889525594, new SimShotSettings(Degrees.of(40), MetersPerSecond.of(7.5)));//
 
 		SIM_FERRY_TOF_MAP.put(9.59, 1.8);
-		SIM_FERRY_TOF_MAP.put(3.6669131055202966, 1.06);//
-		SIM_FERRY_TOF_MAP.put(8.666543502404746, 1.78);//
-		SIM_FERRY_TOF_MAP.put(6.628582671689323, 1.38);//
-		SIM_FERRY_TOF_MAP.put(5.147707889525594, 1.22);//
+		SIM_FERRY_TOF_MAP.put(3.6669131055202966, 1.06);
+		SIM_FERRY_TOF_MAP.put(8.666543502404746, 1.78);
+		SIM_FERRY_TOF_MAP.put(6.628582671689323, 1.38);
+		SIM_FERRY_TOF_MAP.put(5.147707889525594, 1.22);
 
 	}
 
-	public record ShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity, double timeSecondsForSetpoint) {
-		public ShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, AngularVelocity flywheelVelocity, double timeSecondsForSetpoint) {
-			this.robotRelativeTurretAngle = robotRelativeTurretAngle;
-			this.hoodAngle = hoodAngle;
-			this.flywheelVelocity = flywheelVelocity;
-			this.timeSecondsForSetpoint = timeSecondsForSetpoint;
-		}
-	}
+	public record ShootingParameters(
+		Angle robotRelativeTurretAngle,
+		Angle hoodAngle,
+		AngularVelocity flywheelVelocity,
+		double timeSecondsForSetpoint) {}
 
-	public record SimShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, LinearVelocity exitVelocity) {
-		public SimShootingParameters(Angle robotRelativeTurretAngle, Angle hoodAngle, LinearVelocity exitVelocity) {
-			this.robotRelativeTurretAngle = robotRelativeTurretAngle;
-			this.hoodAngle = hoodAngle;
-			this.exitVelocity = exitVelocity;
-		}
-	}
+	public record SimShootingParameters(
+		Angle robotRelativeTurretAngle,
+		Angle hoodAngle,
+		LinearVelocity exitVelocity) {}
 
 }

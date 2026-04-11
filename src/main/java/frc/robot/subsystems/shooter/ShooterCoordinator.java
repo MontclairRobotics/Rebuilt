@@ -1,21 +1,25 @@
 package frc.robot.subsystems.shooter;
 
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 import frc.robot.Superstructure;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 
 public class ShooterCoordinator extends SubsystemBase{
 
-	public static ShooterGoal currentGoal;
+	private ShooterGoal currentGoal;
 
-	private int loopCounter;
-	private final int LOOPS_PER_CALCULATION = 3;
+	private BooleanSupplier wantsToFire;
+	private BooleanSupplier wantsToTrackHub;
+	private BooleanSupplier wantsToTrackFerry;
 
-    public enum ShooterIntent{
+	private BooleanSupplier shouldShootAuto;
+
+    public enum ShooterIntent {
 
 		INACTIVE(
 			false,
@@ -55,7 +59,7 @@ public class ShooterCoordinator extends SubsystemBase{
 
 	}
 
-	public enum ShooterMode{
+	public enum ShooterMode {
 
 		IDLE(Translation2d.kZero),
 		SCORING(Aiming.TargetLocation.HUB.getLocation()),
@@ -80,51 +84,48 @@ public class ShooterCoordinator extends SubsystemBase{
         }
     }
 
-    public ShooterCoordinator() {
-		currentGoal = null;
-		loopCounter = 0;
+    public ShooterCoordinator(
+		BooleanSupplier wantsToFire,
+		BooleanSupplier wantsToTrackHub,
+		BooleanSupplier wantsToTrackFerry,
+		BooleanSupplier shouldShootAuto
+	) {
+		currentGoal = new ShooterGoal(ShooterMode.IDLE, ShooterIntent.INACTIVE);
+		this.wantsToFire = wantsToFire;
+		this.wantsToTrackHub = wantsToTrackHub;
+		this.wantsToTrackFerry = wantsToTrackFerry;
+		this.shouldShootAuto = shouldShootAuto;
     }
 
-	/**
-	 * @return whether or not the operator wants to be actively firing
-	 */
-	public boolean operatorWantsToFire(){
-		return RobotContainer.operatorWantsToFireTrigger.getAsBoolean();
-	}
-
-	/**
-	 * @return whether or not the operator wants to track the hub
-	 */
-	public boolean operatorWantsToTrackHub(){
-		return RobotContainer.operatorWantsToTrackHubTrigger.getAsBoolean();
-	}
-
-	/**
-	 * @return whether or not the operator wants to track a ferry point
-	 */
-	public boolean operatorWantsToTrackFerryPoint(){
-		return RobotContainer.operatorWantsToTrackFerryPointTrigger.getAsBoolean();
-	}
+	public ShooterGoal getCurrentGoal() {return currentGoal;}
+	public ShooterMode getCurrentMode() {return currentGoal.mode();}
+	public ShooterIntent getCurrentIntent() {return currentGoal.intent();}
 
     public ShooterGoal calculateGoal(
-		boolean isInScoringZone,
-		boolean isInLeftFerryZone,
-		boolean isInRightFerryZone,
-		boolean isInTrenchZone,
+		boolean inScoringZone,
+		boolean inLeftFerryZone,
+		boolean inRightFerryZone,
+		boolean inTrenchDangerZone,
 		boolean operatorWantsToTrackHub,
 		boolean operatorWantsToTrackFerryPoint,
-		boolean operatorWantsToFire
+		boolean operatorWantsToFire,
+		boolean shouldShootAuto
 	) {
 
-		if(isInTrenchZone) {
-			// we keep the mode to remain tracking the desired goal
-			// we force the intent to ARMED which lowers the hood and stops all firing
-			return new ShooterGoal(currentGoal.mode, ShooterIntent.ARMED);
+		if(inTrenchDangerZone) {
+			// Only preserve mode if we were actually tracking something
+    		ShooterMode safeMode = currentGoal.mode() == ShooterMode.IDLE
+        		? ShooterMode.IDLE
+        		: currentGoal.mode();
+    		ShooterIntent safeIntent = currentGoal.mode() == ShooterMode.IDLE
+        		? ShooterIntent.INACTIVE
+        		: ShooterIntent.ARMED;
+			return new ShooterGoal(safeMode, safeIntent);
 		}
 
 		// if we're in auto, we force scoring but only FIRE while in the alliance zone
-		if(RobotContainer.shouldShootAuto) {
-			if(isInScoringZone) {
+		if(shouldShootAuto) {
+			if(inScoringZone) {
 				return new ShooterGoal(ShooterMode.SCORING, ShooterIntent.FIRING);
 			} else {
 				return new ShooterGoal(ShooterMode.SCORING, ShooterIntent.ARMED);
@@ -133,7 +134,7 @@ public class ShooterCoordinator extends SubsystemBase{
 
 		// when the operator wants to track the hub
 		if(operatorWantsToTrackHub) {
-			if(operatorWantsToFire && isInScoringZone) {
+			if(operatorWantsToFire && inScoringZone) {
 				return new ShooterGoal(ShooterMode.SCORING, ShooterIntent.FIRING);
 			} else {
 				return new ShooterGoal(ShooterMode.SCORING, ShooterIntent.ARMED);
@@ -142,13 +143,13 @@ public class ShooterCoordinator extends SubsystemBase{
 
 		// when the operator wants to ferry
 		if(operatorWantsToTrackFerryPoint){
-			if(isInLeftFerryZone) {
+			if(inLeftFerryZone) {
 				if(operatorWantsToFire) {
 					return new ShooterGoal(ShooterMode.FERRYING_LEFT, ShooterIntent.FIRING);
 				} else {
 					return new ShooterGoal(ShooterMode.FERRYING_LEFT, ShooterIntent.ARMED);
 				}
-			} else if(isInRightFerryZone) {
+			} else if(inRightFerryZone) {
 				if(operatorWantsToFire) {
 					return new ShooterGoal(ShooterMode.FERRYING_RIGHT, ShooterIntent.FIRING);
 				} else {
@@ -164,21 +165,20 @@ public class ShooterCoordinator extends SubsystemBase{
 
 	@Override
 	public void periodic(){
-		loopCounter++;
 
-		if(loopCounter % LOOPS_PER_CALCULATION == 0 || currentGoal == null) {
-			currentGoal = calculateGoal(
-				Superstructure.isInScoringZone(),
-				Superstructure.isInLeftFerryZone(),
-				Superstructure.isInRightFerryZone(),
-				Superstructure.isInTrenchDangerZone(),
-				operatorWantsToTrackHub(),
-				operatorWantsToTrackFerryPoint(),
-				operatorWantsToFire()
-			);
+		currentGoal = calculateGoal(
+			Superstructure.inScoringZone(),
+			Superstructure.inLeftFerryZone(),
+			Superstructure.inRightFerryZone(),
+			Superstructure.inTrenchDangerZone(),
+			wantsToTrackHub.getAsBoolean(),
+			wantsToTrackFerry.getAsBoolean(),
+			wantsToFire.getAsBoolean(),
+			shouldShootAuto.getAsBoolean()
+		);
 
-			Logger.recordOutput("Shooter/GoalMode", currentGoal.mode().toString());
-			Logger.recordOutput("Shooter/GoalIntent", currentGoal.intent().toString());
-		}
+		Logger.recordOutput("Shooter/GoalMode", currentGoal.mode().toString());
+		Logger.recordOutput("Shooter/GoalIntent", currentGoal.intent().toString());
+
 	}
 }

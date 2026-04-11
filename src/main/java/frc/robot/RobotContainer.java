@@ -5,7 +5,6 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,7 +25,6 @@ import frc.robot.commands.WheelRadiusCharacterization.Direction;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RollersConstants;
-import frc.robot.constants.TurretConstants;
 import frc.robot.constants.Constants.Mode;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
@@ -62,7 +60,6 @@ import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.sim.FuelSim;
 import frc.robot.util.tunables.LoggedTunableNumber;
-import frc.robot.util.tunables.Tunable;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
@@ -157,7 +154,7 @@ public class RobotContainer {
 
 				shooter = new Shooter(
 					hood, flywheel, turret, spindexer,
-					useConstantVelocityMap, shootWhileMoving
+					shootWhileMoving
 				);
 
 				pivot = new Pivot(new PivotIOTalonFX());
@@ -174,7 +171,13 @@ public class RobotContainer {
 				);
 
 				superstructure = new Superstructure();
-				shooterCoordinator = new ShooterCoordinator();
+
+				shooterCoordinator = new ShooterCoordinator(
+					operatorWantsToFireTrigger,
+					operatorWantsToTrackHubTrigger,
+					operatorWantsToTrackFerryPointTrigger,
+					() -> shouldShootAuto
+				);
 
 				break;
 
@@ -192,7 +195,7 @@ public class RobotContainer {
 
 				shooter = new Shooter(
 					hood, flywheel, turret, spindexer,
-					useConstantVelocityMap, shootWhileMoving
+					shootWhileMoving
 				);
 
 				pivot = new Pivot(new PivotIOSim());
@@ -215,15 +218,21 @@ public class RobotContainer {
 					Inches.of(22),
 					Inches.of(-15),
 					Inches.of(15),
-					shooter::shouldIntake,
-					shooter::addBall
+					() -> true,
+					() -> {}
 				);
 
 				fuelSim.spawnStartingFuel();
 
 				auto = new Auto();
 				superstructure = new Superstructure();
-				shooterCoordinator = new ShooterCoordinator();
+
+				shooterCoordinator = new ShooterCoordinator(
+					operatorWantsToFireTrigger,
+					operatorWantsToTrackHubTrigger,
+					operatorWantsToTrackFerryPointTrigger,
+					() -> shouldShootAuto
+				);
 
 				break;
 
