@@ -11,6 +11,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.robot.util.PhoenixUtil;
@@ -26,9 +27,10 @@ public class IndexerIOTalonFX implements IndexerIO {
     private final StatusSignal<Current> currentDrawAmpsSignal;
     private final StatusSignal<Temperature> tempCelciusSignal;
 
-	private VelocityTorqueCurrentFOC request = new VelocityTorqueCurrentFOC(0);
-	private TorqueCurrentFOC torqueRequest = new TorqueCurrentFOC(0);
+	private final VelocityTorqueCurrentFOC request = new VelocityTorqueCurrentFOC(0);
+	private final TorqueCurrentFOC torqueRequest = new TorqueCurrentFOC(0);
 	private final NeutralOut neutralOut = new NeutralOut();
+	private final VoltageOut voltageOut = new VoltageOut(0);
 
 	public IndexerIOTalonFX() {
 		motor = new TalonFX(CAN_ID, CAN_BUS);
@@ -86,7 +88,8 @@ public class IndexerIOTalonFX implements IndexerIO {
 		inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
 		inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
 		inputs.tempCelsius = tempCelciusSignal.getValueAsDouble();
-		inputs.isAtSetpoint = isAtSetpoint();
+		inputs.isAtSetpoint = 
+			Math.abs(velocitySignal.getValueAsDouble() - setpointVelocitySignal.getValueAsDouble()) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
 	}
 
 	@Override
@@ -96,18 +99,12 @@ public class IndexerIOTalonFX implements IndexerIO {
 
 	@Override
 	public void setVoltage(double voltage) {
-		motor.setVoltage(voltage);
+		motor.setControl(voltageOut.withOutput(voltage));
 	}
 
 	@Override
 	public void stop() {
 		motor.setControl(neutralOut);
-	}
-
-	@Override
-	public boolean isAtSetpoint() {
-		double error = velocitySignal.getValueAsDouble() - setpointVelocitySignal.getValueAsDouble();
-        return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
 	}
 
 	@Override

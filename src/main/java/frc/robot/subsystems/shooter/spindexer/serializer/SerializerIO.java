@@ -31,6 +31,4 @@ public interface SerializerIO {
 
 	public void stop();
 
-	public boolean isAtSetpoint();
-
 }

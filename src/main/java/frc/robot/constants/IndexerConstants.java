@@ -38,9 +38,9 @@ public class IndexerConstants {
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
 		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)
-		.withStatorCurrentLimitEnable(false)
+		.withStatorCurrentLimitEnable(true)
 		.withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
-		.withSupplyCurrentLimitEnable(false);
+		.withSupplyCurrentLimitEnable(true);
 
 	public static final MotorOutputConfigs MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
 		.withInverted(InvertedValue.Clockwise_Positive)

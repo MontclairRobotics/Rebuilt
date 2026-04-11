@@ -1,9 +1,7 @@
 package frc.robot.subsystems.shooter.spindexer;
 
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.shooter.spindexer.indexer.Indexer;
 import frc.robot.subsystems.shooter.spindexer.serializer.Serializer;
@@ -23,8 +21,8 @@ public class Spindexer extends SubsystemBase {
     }
 
     public void spinUp() {
-        serializer.setVoltage(12);
-        indexer.setVoltage(12);
+        serializer.spinUp();
+        indexer.spinDown();
     }
 
     public void spinDown() {
@@ -50,7 +48,7 @@ public class Spindexer extends SubsystemBase {
     }
 
     public Command setCurrentCommand(double serializerCurrent, double indexerCurrent) {
-        return Commands.run(() -> setCurrent(serializerCurrent, indexerCurrent), this);
+        return Commands.run(() -> setCurrent(serializerCurrent, indexerCurrent), serializer, indexer);
     }
 
     public Command spinUpCommand() {
@@ -65,10 +63,13 @@ public class Spindexer extends SubsystemBase {
         return Commands.runOnce(() -> stop(), serializer, indexer);
     }
 
-    public Command jiggleSerializerCommand() {
-        return new SequentialCommandGroup(
-            serializer.spinUpCommand().withTimeout(1),
-            serializer.reverseCommand().withTimeout(1)
-        ).repeatedly();
+    public Command jiggleCommand() {
+        return Commands.parallel(
+            indexer.spinUpCommand(),
+            Commands.sequence(
+                serializer.spinUpCommand().withTimeout(1),
+                serializer.spinDownCommand().withTimeout(1)
+            ).repeatedly()
+        );
     }
 }

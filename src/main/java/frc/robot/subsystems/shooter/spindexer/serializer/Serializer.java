@@ -32,8 +32,8 @@ public class Serializer extends SubsystemBase {
 		loopsPerLog = RobotContainer.SERIALIZER_DEBUG ? 1 : 5;
 	}
 
-	public boolean atSetpoint() {
-		return io.isAtSetpoint();
+	public boolean isAtSetpoint() {
+		return inputs.isAtSetpoint;
 	}
 
 	@Override
@@ -41,9 +41,10 @@ public class Serializer extends SubsystemBase {
 		logCounter++;
 
 		io.updateInputs(inputs);
+		Logger.processInputs("Serializer", inputs);
 
 		if(logCounter % loopsPerLog == 0) {
-			Logger.processInputs("Serializer", inputs);
+			// any expensive, derived logging here
 		}
 	}
 
@@ -94,12 +95,12 @@ public class Serializer extends SubsystemBase {
     }
 
 	public Command reverseCommand() {
-		return Commands.run(() -> io.setVelocity(SPIN_VELOCITY.unaryMinus()));
+		return Commands.run(() -> io.setVelocity(SPIN_VELOCITY.unaryMinus()), this);
 	}
 
     public Command spinUpCommand() {
 		return Commands.run(() -> spinUp(), this)
-			.finallyDo(() -> setVoltage(0));
+			.finallyDo(() -> stop());
 	}
 
 	public Command setCurrentCommand(DoubleSupplier currentSupplier) {
@@ -107,7 +108,7 @@ public class Serializer extends SubsystemBase {
 	}
 
 	public Command setVelocityCommand(Supplier<AngularVelocity> velocitySupplier) {
-		return Commands.run(() -> setVelocity(velocitySupplier));
+		return Commands.run(() -> setVelocity(velocitySupplier), this);
 	}
 
     public Command joystickControlCommand() {

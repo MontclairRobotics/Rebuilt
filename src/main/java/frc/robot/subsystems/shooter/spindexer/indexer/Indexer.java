@@ -32,8 +32,8 @@ public class Indexer extends SubsystemBase {
 		loopsPerLog = RobotContainer.INDEXER_DEBUG ? 1 : 5;
 	}
 
-	public boolean atSetpoint() {
-		return io.isAtSetpoint();
+	public boolean isAtSetpoint() {
+		return inputs.isAtSetpoint;
 	}
 
 	@Override
@@ -41,9 +41,10 @@ public class Indexer extends SubsystemBase {
 		logCounter++;
 
 		io.updateInputs(inputs);
+		Logger.processInputs("Indexer", inputs);
 
 		if(logCounter % loopsPerLog == 0) {
-			Logger.processInputs("Indexer", inputs);
+			// any expensive, derived logging here
 		}
 	}
 
