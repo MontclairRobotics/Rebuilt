@@ -114,10 +114,10 @@ public class Vision extends SubsystemBase {
 			disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
 			// // clear camera-specific arrays every time
-			// robotPoses.clear();
-			// tagPoses.clear();
-			// robotPosesAccepted.clear();
-			// robotPosesRejected.clear();
+			robotPoses.clear();
+			tagPoses.clear();
+			robotPosesAccepted.clear();
+			robotPosesRejected.clear();
 
 			// Add tag poses
 			if (logCounter % loopsPerLog == 0) {
@@ -170,7 +170,7 @@ public class Vision extends SubsystemBase {
 				// Calculate standard deviations
 				double d = observation.averageTagDistance();
 				double stdDevFactor = (d * d * d) / observation.tagCount();
-				double linearStdDev = 0.5 + linearStdDevBaseline * stdDevFactor;
+				double linearStdDev = 0.5 + Math.abs(linearStdDevBaseline * stdDevFactor);
 				// double angularStdDev = angularStdDevBaseline * stdDevFactor;
 				double angularStdDev = Double.POSITIVE_INFINITY;
 
