@@ -281,7 +281,7 @@ public class RobotContainer {
 		driverController.PS().onTrue(drivetrain.resetPoseCommand(new Pose2d(3.6, 4.035, new Rotation2d())));
 
 		precisionTrigger
-			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(1.5), RotationsPerSecond.of(0.25)))
+			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(1), RotationsPerSecond.of(0.20)))
 			.onFalse(drivetrain.setMaxSpeedsCommand(TunerConstants.kSpeedAt12Volts, RotationsPerSecond.of(1.624)));
 
 		driverController.triangle()
@@ -302,11 +302,11 @@ public class RobotContainer {
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
 
 		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(() -> intakeVoltage.get()))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
+		operatorController.L2().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
 
-		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
-		operatorController.R2()
-			.whileTrue(intake.jiggleCommand())
-			.onFalse(pivot.deployCommand());
+		// operatorController.R2()
+		// 	.whileTrue(intake.jiggleCommand())
+		// 	.onFalse(pivot.deployCommand());
 
 	}
 
@@ -325,10 +325,12 @@ public class RobotContainer {
 			spindexer.spinDownCommand()
 		);
 
-		operatorController.R1().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
+		//intake stuff being on the left side
+		operatorController.L2().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
 		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.spinUpCommand())).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
 
 		operatorController.cross().onTrue(turret.lockForever());
+		//scary scary scary
 
 		driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
 

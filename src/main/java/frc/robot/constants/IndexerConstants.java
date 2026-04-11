@@ -17,7 +17,7 @@ public class IndexerConstants {
     public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
     public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.5);
-	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(85);
+	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(90);
 	public static final double SPIN_VOLTAGE = 12;
 
 	// tuned 3/4
