@@ -126,7 +126,7 @@ public class RobotContainer {
 	public static Trigger turboTrigger = driverController.L2();
 	public static Trigger precisionTrigger = driverController.R2();
 
-	public static Trigger operatorWantsToFireTrigger = operatorController.L2();
+	public static Trigger operatorWantsToFireTrigger = operatorController.R1();
 	public static Trigger operatorWantsToTrackHubTrigger = operatorController.circle();
 	public static Trigger operatorWantsToTrackFerryPointTrigger = operatorController.triangle();
 
@@ -301,12 +301,12 @@ public class RobotContainer {
 		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
 
-		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(() -> intakeVoltage.get()))).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
-		operatorController.L2().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
+		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(RollersConstants.SPIN_VOLTAGE))).onFalse(pivot.stopCommand().alongWith(rollers.stopCommand()));
+		operatorController.R2().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
 
-		// operatorController.R2()
-		// 	.whileTrue(intake.jiggleCommand())
-		// 	.onFalse(pivot.deployCommand());
+		operatorController.L2()
+			.whileTrue(intake.jiggleCommand())
+			.onFalse(pivot.deployCommand().alongWith(rollers.stopCommand()));
 
 	}
 
@@ -326,8 +326,11 @@ public class RobotContainer {
 		);
 
 		//intake stuff being on the left side
-		operatorController.L2().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
-		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.spinUpCommand())).onFalse(pivot.stopCommand().alongWith(rollers.setVoltageCommand(() -> 0)));
+		operatorController.R2().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
+		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(RollersConstants.SPIN_VOLTAGE))).onFalse(pivot.stopCommand().alongWith(rollers.stopCommand()));
+		operatorController.L2()
+			.whileTrue(intake.jiggleCommand())
+			.onFalse(pivot.deployCommand().alongWith(rollers.stopCommand()));
 
 		operatorController.cross().onTrue(turret.lockForever());
 		//scary scary scary
