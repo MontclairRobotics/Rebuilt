@@ -103,7 +103,6 @@ public class RobotContainer {
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
 	public static FuelSim fuelSim = new FuelSim("fuel");
 
-	private boolean useConstantVelocityMap = false;
 	private boolean shootWhileMoving = true;
 
 	// debug, set to true to increase logging, set to false to increase performance and reduce loop overruns
@@ -297,7 +296,7 @@ public class RobotContainer {
 		// operator
 
 		operatorController.touchpad().whileTrue(spindexer.setVoltageCommand(-12)).onFalse(spindexer.spinDownCommand());
-		operatorController.PS().whileTrue(rollers.setVoltageCommand(-12)).onFalse(serializer.stopCommand());
+		operatorController.PS().whileTrue(rollers.setVoltageCommand(-12)).onFalse(rollers.stopCommand());
 
 		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());

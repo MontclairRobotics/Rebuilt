@@ -108,7 +108,7 @@ public class Robot extends LoggedRobot {
 		}
 
 		// this should only run once
-		if(!hasAppliedTargetLocation && AllianceManager.allianceKnown && AllianceManager.isRed()) {
+		if(!hasAppliedTargetLocation && AllianceManager.allianceKnown) {
 			hasAppliedTargetLocation = true;
 			Aiming.initializeTargetLocations();
 		}

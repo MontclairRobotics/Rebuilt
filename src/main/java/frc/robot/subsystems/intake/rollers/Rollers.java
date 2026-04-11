@@ -60,6 +60,9 @@ public class Rollers extends SubsystemBase {
         io.setVoltage(voltage);
     }
 
+	public Command stopCommand() {
+		return Commands.runOnce(() -> io.stop(), this);
+	}
     public Command spinDownCommand() {
         return setVoltageCommand(0);
     }
