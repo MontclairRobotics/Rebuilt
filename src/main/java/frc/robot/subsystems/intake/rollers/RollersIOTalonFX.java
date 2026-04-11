@@ -87,7 +87,8 @@ public class RollersIOTalonFX implements RollersIO {
 		inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
 		inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
 		inputs.tempCelsius = tempCelciusSignal.getValueAsDouble();
-		inputs.isAtSetpoint = isAtSetpoint();
+		inputs.isAtSetpoint = 
+			Math.abs(velocitySignal.getValueAsDouble() - setpointVelocitySignal.getValueAsDouble()) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
 	}
 
 	@Override
@@ -103,11 +104,5 @@ public class RollersIOTalonFX implements RollersIO {
 	@Override
 	public void stop() {
 		motor.setControl(neutralOut);
-	}
-
-	@Override
-	public boolean isAtSetpoint() {
-		double error = velocitySignal.getValueAsDouble() - setpointVelocitySignal.getValueAsDouble();
-        return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
 	}
 }

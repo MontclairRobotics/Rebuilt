@@ -12,8 +12,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
@@ -48,10 +46,10 @@ public class PivotIOSim implements PivotIO {
 		inputs.angleSetpoint = Rotations.of(pidController.getSetpoint());
 		inputs.appliedVoltage = appliedVoltage;
 		inputs.currentDrawAmps = sim.getCurrentDrawAmps();
-		inputs.angle = getAngle();
+		inputs.angle = Radians.of(sim.getAngleRads());
 		inputs.tempCelcius = 0;
 
-		inputs.isAtSetpoint = isAtSetpoint();
+		inputs.isAtSetpoint = pidController.atSetpoint();
 	}
 
 	@Override
@@ -64,11 +62,6 @@ public class PivotIOSim implements PivotIO {
 		setVoltage(0);
 	}
 
-    @Override
-    public Angle getAngle() {
-        return Radians.of(sim.getAngleRads());
-    }
-
 	@Override
 	public void setAngle(Angle angle) {
 		pidController.setSetpoint(angle.in(Rotations));
@@ -76,24 +69,6 @@ public class PivotIOSim implements PivotIO {
         double ffOutput = feedforward.calculate(sim.getAngleRads(), 0);
         appliedVoltage = MathUtil.clamp(pidOutput + ffOutput, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
 	}
-
-	@Override
-	public boolean isAtSetpoint() {
-		return pidController.atSetpoint();
-	}
-
-    @Override
-    public void setGains(double kP, double kD, double kS, double kG) {
-        pidController.setP(kP);
-        pidController.setD(kD);
-        feedforward.setKs(kS);
-        feedforward.setKg(kG);
-    }
-
-    @Override
-    public void setMotionMagic(AngularVelocity velocity, AngularAcceleration acceleration, double jerk) {
-        // does nothing, not necessary
-    }
 
     @Override
     public void resetEncoderPosition() {
@@ -105,8 +80,4 @@ public class PivotIOSim implements PivotIO {
 		// does nothing, not necessary
 	}
 
-	@Override
-	public void applyFeedforward() {
-		appliedVoltage = feedforward.calculate(sim.getAngleRads(), 0);
-	}
 }

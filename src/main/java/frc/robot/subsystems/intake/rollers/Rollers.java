@@ -30,7 +30,7 @@ public class Rollers extends SubsystemBase {
 	}
 
 	public boolean atSetpoint() {
-		return io.isAtSetpoint();
+		return inputs.isAtSetpoint;
 	}
 
 	@Override
@@ -38,9 +38,10 @@ public class Rollers extends SubsystemBase {
 		logCounter++;
 
 		io.updateInputs(inputs);
+		Logger.processInputs("Rollers", inputs);
 
 		if(logCounter % loopsPerLog == 0) {
-			Logger.processInputs("Rollers", inputs);
+			// any expensive, derived logging here
 		}
 	}
 
