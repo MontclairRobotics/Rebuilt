@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
@@ -35,8 +36,11 @@ public class FlywheelIOTalonFX implements FlywheelIO{
     private final StatusSignal<Current> currentDrawAmpsSignal;
     private final StatusSignal<Temperature> tempCelciusSignal;
 
+    private final StatusSignal<AngularVelocity> rightVelocitySignal;
+
     private final VelocityTorqueCurrentFOC request = new VelocityTorqueCurrentFOC(0);
     private final NeutralOut neutralOut = new NeutralOut();
+    private final VoltageOut voltageOut = new VoltageOut(0);
 
     public FlywheelIOTalonFX() {
         leftMotor = new TalonFX(LEFT_CAN_ID);
@@ -64,6 +68,8 @@ public class FlywheelIOTalonFX implements FlywheelIO{
         currentDrawAmpsSignal = leftMotor.getTorqueCurrent();
         tempCelciusSignal = leftMotor.getDeviceTemp();
 
+        rightVelocitySignal = rightMotor.getVelocity();
+
         PhoenixUtil.registerStatusSignals(
             Hertz.of(50),
             velocitySignal,
@@ -74,7 +80,8 @@ public class FlywheelIOTalonFX implements FlywheelIO{
             currentDrawAmpsSignal
         );
 
-        // not necessary to run this fast
+        // can run these slower
+        rightVelocitySignal.setUpdateFrequency(4);
 		tempCelciusSignal.setUpdateFrequency(4);
 
         leftMotor.optimizeBusUtilization();
@@ -104,7 +111,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
             tempCelciusSignal
         );
 
-        inputs.rightMotorConnected = inputs.leftMotorConnected;
+        inputs.rightMotorConnected = BaseStatusSignal.isAllGood(rightVelocitySignal);
 
         inputs.velocity = velocitySignal.getValue();
         inputs.acceleration = accelerationSignal.getValue();
@@ -114,7 +121,8 @@ public class FlywheelIOTalonFX implements FlywheelIO{
         inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
         inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
         inputs.tempCelsius = tempCelciusSignal.getValueAsDouble();
-        inputs.isAtSetpoint = isAtSetpoint();
+        inputs.isAtSetpoint = 
+            Math.abs(velocitySignal.getValueAsDouble() - setpointVelocitySignal.getValueAsDouble()) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
     }
 
     @Override
@@ -124,18 +132,12 @@ public class FlywheelIOTalonFX implements FlywheelIO{
 
     @Override
     public void setVoltage(double voltage) {
-        leftMotor.setVoltage(voltage);
+        leftMotor.setControl(voltageOut.withOutput(voltage));
     }
 
     @Override
     public void stop() {
         leftMotor.setControl(neutralOut);
-    }
-
-    @Override
-    public boolean isAtSetpoint() {
-        double error = velocitySignal.getValueAsDouble() - setpointVelocitySignal.getValueAsDouble();
-        return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
     }
 
     @Override

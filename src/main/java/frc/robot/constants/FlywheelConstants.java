@@ -5,7 +5,6 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -53,10 +52,6 @@ public class FlywheelConstants {
 		.withNeutralMode(NeutralModeValue.Coast)
 		.withPeakForwardDutyCycle(1)
 		.withPeakReverseDutyCycle(0);
-
-	public static final TorqueCurrentConfigs TORQUE_CURRENT_CONFIGS = new TorqueCurrentConfigs()
-		.withPeakForwardTorqueCurrent(90)
-		.withPeakReverseTorqueCurrent(0);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()
 		.withVelocityFilterTimeConstant(Seconds.of(0.01))
