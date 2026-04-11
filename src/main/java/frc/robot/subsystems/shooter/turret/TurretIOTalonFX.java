@@ -110,7 +110,7 @@ public class TurretIOTalonFX implements TurretIO {
         inputs.robotRelativeAngle = positionSignal.getValue();
         inputs.robotRelativeAngleSetpoint = Rotations.of(setpointPositionSignal.getValueAsDouble());
 
-        inputs.isAtSetpoint = 
+        inputs.isAtSetpoint =
             Math.abs(positionSignal.getValueAsDouble() - setpointPositionSignal.getValueAsDouble()) < ANGLE_TOLERANCE.in(Rotations);
     }
 

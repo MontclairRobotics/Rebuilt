@@ -71,7 +71,7 @@ public class Turret extends SubsystemBase {
 		hasRecentlyConstrainedAngle = false;
 
 		// needs to happen every loop
-		io.updateInputs(inputs); 
+		io.updateInputs(inputs);
 		inputs.fieldRelativeAngle = RobotContainer.turret.toFieldRelativeAngle(inputs.robotRelativeAngle);
 		Logger.processInputs("Turret", inputs);
 

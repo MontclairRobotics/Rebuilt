@@ -121,7 +121,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
         inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
         inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
         inputs.tempCelsius = tempCelciusSignal.getValueAsDouble();
-        inputs.isAtSetpoint = 
+        inputs.isAtSetpoint =
             Math.abs(velocitySignal.getValueAsDouble() - setpointVelocitySignal.getValueAsDouble()) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
     }
 

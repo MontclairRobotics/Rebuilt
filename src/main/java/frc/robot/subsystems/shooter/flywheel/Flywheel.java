@@ -37,7 +37,7 @@ public class Flywheel extends SubsystemBase {
         logCounter++;
 
         // need to update this every frame
-        io.updateInputs(inputs); 
+        io.updateInputs(inputs);
         Logger.processInputs("Flywheel", inputs);
 
         if(logCounter % loopsPerLog == 0) {

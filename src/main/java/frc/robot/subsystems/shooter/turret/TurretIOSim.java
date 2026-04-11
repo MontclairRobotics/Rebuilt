@@ -73,7 +73,7 @@ public class TurretIOSim implements TurretIO {
 
     @Override
     public void disable() {
-        
+
     }
 
     @Override

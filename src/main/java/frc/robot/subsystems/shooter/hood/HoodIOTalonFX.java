@@ -110,7 +110,7 @@ public class HoodIOTalonFX implements HoodIO {
         inputs.hoodAngleSetpoint = Rotations.of(setpointPositionSignal.getValue());
         inputs.hoodVelocity = velocitySignal.getValue();
 
-        inputs.isAtSetpoint = 
+        inputs.isAtSetpoint =
             Math.abs(positionSignal.getValueAsDouble() - setpointPositionSignal.getValueAsDouble()) < TOLERANCE.in(Rotations);
     }
 

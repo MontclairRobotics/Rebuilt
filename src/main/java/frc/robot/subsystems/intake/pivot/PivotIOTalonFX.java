@@ -108,7 +108,7 @@ public class PivotIOTalonFX implements PivotIO {
         inputs.angleSetpoint = Rotations.of(setpointPositionSignal.getValue());
         inputs.velocity = velocitySignal.getValue();
 
-        inputs.isAtSetpoint = 
+        inputs.isAtSetpoint =
             Math.abs(positionSignal.getValueAsDouble() - setpointPositionSignal.getValueAsDouble()) < TOLERANCE.in(Rotations);
 	}
 
@@ -139,7 +139,7 @@ public class PivotIOTalonFX implements PivotIO {
 			return motor.getPosition().getValue();
 		}
 	}
-	
+
     @Override
 	public void setNeutralMode(NeutralModeValue value) {
 		motor.setNeutralMode(value);

@@ -470,7 +470,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	}
 
 	private Pose2d clampPoseToFieldBoundaries(Pose2d pose) {
-		double x = MathUtil.clamp(pose.getX(), 
+		double x = MathUtil.clamp(pose.getX(),
 			FieldConstants.FieldBoundaries.NEAR_WALL_BOUNDARY,
 			FieldConstants.FieldBoundaries.FAR_WALL_BOUNDARY
 		);
@@ -585,7 +585,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 			Logger.recordOutput("Drive/Speed", getFieldRelativeLinearVelocity().in(MetersPerSecond));
 		}
 
-		
+
 
 		/*
 		* Periodically try to apply the operator perspective.

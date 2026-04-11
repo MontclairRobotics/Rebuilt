@@ -30,7 +30,7 @@ public class Pivot extends SubsystemBase {
 	public Pivot(PivotIO io) {
 		this.io = io;
 		this.visualization = new PivotVisualization();
-		
+
 		loopsPerLog = RobotContainer.PIVOT_DEBUG ? 1 : 5;
 	}
 
@@ -103,7 +103,7 @@ public class Pivot extends SubsystemBase {
 		logCounter++;
 
 		// need to update this every frame
-		io.updateInputs(inputs); 
+		io.updateInputs(inputs);
 		Logger.processInputs("Pivot", inputs);
 
 		if(logCounter % loopsPerLog == 0) {
