@@ -1,20 +1,15 @@
 package frc.robot.subsystems.shooter.hood;
 
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.constants.HoodConstants.*;
-
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,17 +23,6 @@ public class Hood extends SubsystemBase {
     private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
     private final HoodVisualization visualization = new HoodVisualization();
 
-    private ArmFeedforward feedforward;
-
-	// private final LoggedTunableNumber tunableKP = new LoggedTunableNumber("Hood/kP", SLOT0_CONFIGS.kP);
-    // private final LoggedTunableNumber tunableKD = new LoggedTunableNumber("Hood/kD", SLOT0_CONFIGS.kD);
-    // private final LoggedTunableNumber tunableKS = new LoggedTunableNumber("Hood/kS", SLOT0_CONFIGS.kS);
-    // private final LoggedTunableNumber tunableKG = new LoggedTunableNumber("Hood/kG", SLOT0_CONFIGS.kG);
-
-	// private final LoggedTunableNumber tunableMotionMagicCruiseVelocity = new LoggedTunableNumber("Hood/Motion Magic Cruise Velocity", MOTION_MAGIC_CONFIGS.MotionMagicCruiseVelocity);
-	// private final LoggedTunableNumber tunableMotionMagicAcceleration = new LoggedTunableNumber("Hood/Motion Magic Acceleration", MOTION_MAGIC_CONFIGS.MotionMagicAcceleration);
-	// private final LoggedTunableNumber tunableMotionMagicJerk = new LoggedTunableNumber("Hood/Motion Magic Jerk", MOTION_MAGIC_CONFIGS.MotionMagicJerk);
-
 	public final LoggedTunableNumber tunableHoodAngle = new LoggedTunableNumber("Hood/Tunable Hood Angle", 0);
 
 	private int logCounter;
@@ -46,17 +30,18 @@ public class Hood extends SubsystemBase {
 
     public Hood(HoodIO io) {
         this.io = io;
-        feedforward = new ArmFeedforward(kS, kG, 0);
 		loopsPerLog = RobotContainer.HOOD_DEBUG ? 1 : 5;
     }
 
 	public void periodic() {
 		logCounter++;
 
-		io.updateInputs(inputs); // need to update inputs every frame
+		// need to update this every frame
+		io.updateInputs(inputs); 
+		Logger.processInputs("Hood", inputs);
 
 		if(logCounter % loopsPerLog == 0) {
-			Logger.processInputs("Hood", inputs);
+			// any expensive, derived logging here
 		}
 
 		if(RobotBase.isSimulation()) {
@@ -64,11 +49,7 @@ public class Hood extends SubsystemBase {
 			visualization.log();
 		}
 
-		// if(RobotContainer.HOOD_DEBUG || RobotBase.isSimulation()) {
-		// 	updateTunables();
-		// }
 	}
-
 
     public Angle getAngle() {
         return inputs.hoodAngle;
@@ -78,13 +59,6 @@ public class Hood extends SubsystemBase {
 		Translation2d location = PoseUtils.flipTranslationAlliance(point);
 		double distance = location.minus(RobotContainer.drivetrain.getRobotPose().getTranslation()).getNorm();
 		return Radians.of(Math.PI/2).minus(Radians.of(Math.atan(heightMeters/distance)));
-	}
-
-    public void applyJoystickInput() {
-		double voltage = -Math.pow(MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.04), 3) * RobotController.getBatteryVoltage();
-		double ffVoltage = feedforward.calculate(getAngle().in(Radians), 0);
-		// Logger.recordOutput("Hood/Feedforward Voltage", ffVoltage);
-		io.setVoltage(voltage + ffVoltage);
 	}
 
     public void setAngle(Supplier<Angle> angleSupplier) {
@@ -100,27 +74,8 @@ public class Hood extends SubsystemBase {
 	}
 
     public boolean atSetpoint() {
-		return io.isAtSetpoint();
+		return inputs.isAtSetpoint;
 	}
-
-    public void updateTunables() {
-		// if(tunableKP.hasChanged(hashCode())
-        //         || tunableKD.hasChanged(hashCode())
-        //         || tunableKS.hasChanged(hashCode())
-        //         || tunableKG.hasChanged(hashCode())) {
-        //     io.setGains(tunableKP.get(), tunableKD.get(), tunableKS.get(), tunableKG.get());
-        // }
-
-		// if(tunableMotionMagicAcceleration.hasChanged(hashCode())
-		// 		|| tunableMotionMagicCruiseVelocity.hasChanged(hashCode())
-		// 		|| tunableMotionMagicJerk.hasChanged(hashCode())) {
-		// 	io.setMotionMagic(
-		// 		tunableMotionMagicCruiseVelocity.get(),
-		// 		tunableMotionMagicAcceleration.get(),
-		// 		tunableMotionMagicJerk.get()
-		// 	);
-		// }
-    }
 
 	public void setNeutralMode(NeutralModeValue value) {
 		io.setNeutralMode(value);
@@ -140,10 +95,6 @@ public class Hood extends SubsystemBase {
 
 	public Command setAngleCommand(Angle angle) {
 		return Commands.run(() -> setAngle(angle), this).until(() -> atSetpoint());
-	}
-
-	public Command joystickControlCommand() {
-		return Commands.run(() -> applyJoystickInput(), this);
 	}
 
 }
