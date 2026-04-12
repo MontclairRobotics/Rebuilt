@@ -50,7 +50,7 @@ public class Shooter extends SubsystemBase {
     private Debouncer setpointDebouncer = new Debouncer(0.04, DebounceType.kRising);
 
     // lets the spindexer keep running through the RPM dip after a shot
-    private Debouncer feedThroughDebouncer = new Debouncer(0.2, DebounceType.kFalling);
+    private Debouncer feedThroughDebouncer = new Debouncer(0.5, DebounceType.kFalling);
 
     public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean whileMoving) {
         this.hood = hood;
