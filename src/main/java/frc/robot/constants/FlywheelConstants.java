@@ -26,8 +26,8 @@ public class FlywheelConstants {
 	public static final double kS = 5;
 	public static final double kV = 0.75;
 
-	public static final double STATOR_CURRENT_LIMIT = 130; // Amps
-	public static final double SUPPLY_CURRENT_LIMIT = 70; // Amps
+	public static final double STATOR_CURRENT_LIMIT = 140; // Amps
+	public static final double SUPPLY_CURRENT_LIMIT = 100; // Amps
 
 	public static final double MOMENT_OF_INERTIA = 0.00233846427; // From CAD on 2026.02.11, probably wrong
 	public static final double GEARING = 1.10526315785; // to the big flywheel, from Max Pearson on 2026.02.20
@@ -44,14 +44,10 @@ public class FlywheelConstants {
 
 	public static final MotorOutputConfigs LEFT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
 		.withInverted(InvertedValue.Clockwise_Positive)
-		.withNeutralMode(NeutralModeValue.Coast)
-		.withPeakForwardDutyCycle(1)
-		.withPeakReverseDutyCycle(0);
+		.withNeutralMode(NeutralModeValue.Coast);
 
 	public static final MotorOutputConfigs RIGHT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
-		.withNeutralMode(NeutralModeValue.Coast)
-		.withPeakForwardDutyCycle(1)
-		.withPeakReverseDutyCycle(0);
+		.withNeutralMode(NeutralModeValue.Coast);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()
 		.withVelocityFilterTimeConstant(Seconds.of(0.01))
