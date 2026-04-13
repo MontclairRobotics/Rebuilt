@@ -283,7 +283,7 @@ public class RobotContainer {
 		driverController.PS().onTrue(drivetrain.resetPoseCommand(new Pose2d(3.6, 4.035, new Rotation2d())));
 
 		precisionTrigger
-			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(1), RotationsPerSecond.of(0.20)))
+			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(1.5), RotationsPerSecond.of(0.25)))
 			.onFalse(drivetrain.setMaxSpeedsCommand(TunerConstants.kSpeedAt12Volts, RotationsPerSecond.of(1.624)));
 
 		driverController.triangle()

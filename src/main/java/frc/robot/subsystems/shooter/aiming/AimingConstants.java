@@ -96,6 +96,10 @@ public class AimingConstants {
 		REAL_MAP.put(1.50, new ShotSettings(Degrees.of(0), RotationsPerSecond.of(20)));
 		REAL_MAP.put(0.00, new ShotSettings(Degrees.of(0.0), RotationsPerSecond.of(19.5)));
 
+		REAL_TOF_MAP.put(0.00, 0.8);
+		REAL_TOF_MAP.put(1.50, 0.81);
+		REAL_TOF_MAP.put(2.50, 0.86);
+		REAL_TOF_MAP.put(3.45, 0.98);
 		REAL_TOF_MAP.put(4.52, 1.1);
 		REAL_TOF_MAP.put(5.11, 1.14);
 		REAL_TOF_MAP.put(7.00, 1.2);

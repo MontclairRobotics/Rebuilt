@@ -178,9 +178,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	private final int loopsPerLog;
 
 	public boolean isLimitingAcceleration = false;
-	private DynamicSlewRateLimiter forwardRateLimiter = new DynamicSlewRateLimiter(6);
-	private DynamicSlewRateLimiter strafeRateLimiter = new DynamicSlewRateLimiter(6);
-	private DynamicSlewRateLimiter rotationRateLimiter = new DynamicSlewRateLimiter(6);
+	private DynamicSlewRateLimiter forwardRateLimiter = new DynamicSlewRateLimiter(4);
+	private DynamicSlewRateLimiter strafeRateLimiter = new DynamicSlewRateLimiter(4);
+	private DynamicSlewRateLimiter rotationRateLimiter = new DynamicSlewRateLimiter(4);
 
 	public enum ConfigurationMode {
 		TURBO(TunerConstants.turboDriveConfiguration),
