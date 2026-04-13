@@ -65,11 +65,11 @@ public class Serializer extends SubsystemBase {
 	}
 
 	public void spinUp() {
-		setVelocity(SPIN_VELOCITY);
+		setVoltage(SPIN_VOLTAGE);;
 	}
 
 	public void spinDown() {
-		setVelocity(RotationsPerSecond.zero());
+		stop();
 	}
 
 	public void stop() {
