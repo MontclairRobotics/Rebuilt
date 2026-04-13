@@ -26,6 +26,7 @@ import frc.robot.commands.WheelRadiusCharacterization.Direction;
 import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RollersConstants;
+import frc.robot.leds.LEDs;
 import frc.robot.constants.Constants.Mode;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.intake.Intake;
@@ -103,7 +104,7 @@ public class RobotContainer {
 	private SwerveDriveSimulation driveSimulation;
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
 	public static FuelSim fuelSim = new FuelSim("fuel");
-
+	public static LEDs leds = new LEDs();
 	private boolean shootWhileMoving = true;
 
 	// debug, set to true to increase logging, set to false to increase performance and reduce loop overruns
@@ -327,6 +328,7 @@ public class RobotContainer {
 			spindexer.spinDownCommand()
 		);
 
+		leds.setDefaultCommand(leds.getDefaultCommand());
 		//intake stuff being on the left side
 		operatorController.R2().whileTrue(pivot.stowCommand()).onFalse(pivot.stopCommand());
 		operatorController.L1().whileTrue(pivot.deployCommand().alongWith(rollers.setVoltageCommand(RollersConstants.SPIN_VOLTAGE))).onFalse(pivot.stopCommand().alongWith(rollers.stopCommand()));
