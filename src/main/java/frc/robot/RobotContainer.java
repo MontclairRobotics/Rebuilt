@@ -240,8 +240,8 @@ public class RobotContainer {
 					vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 		}
 
-		// configureBindings();
-		configureCompetitionBindings();
+		configureBindings();
+		// configureCompetitionBindings();
 		// configureTestingBindingsForMax();
 
     	drivetrain.registerTelemetry(logger::telemeterize);
@@ -337,7 +337,7 @@ public class RobotContainer {
 		operatorController.cross().onTrue(turret.lockForever());
 		//scary scary scary
 
-		driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.spinDownCommand());
+		driverController.R1().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.stopCommand());
 
 		driverController.square()
 			.whileTrue(hood.setAngleCommand(() -> Degrees.of(hood.tunableHoodAngle.get())))

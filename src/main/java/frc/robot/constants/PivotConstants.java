@@ -35,8 +35,8 @@ public class PivotConstants {
 
 	public static final double ROTOR_TO_SENSOR_RATIO = (72.0 / 46) * 9 * 5;
 	public static final double SENSOR_TO_MECHANISM_RATIO = 1; // CANcoder is on the mechanism
-	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; 
-	
+	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO;
+
 	public static final double ENCODER_OFFSET = -0.457764;
 
 	public static final Angle MIN_ANGLE = Degrees.of(-5);
@@ -57,12 +57,12 @@ public class PivotConstants {
 
 	public static final Angle TOLERANCE = Degrees.of(1);
 
-	public static final double STATOR_CURRENT_LIMIT = 40; 
-	public static final double SUPPLY_CURRENT_LIMIT = 20; 
+	public static final double STATOR_CURRENT_LIMIT = 40;
+	public static final double SUPPLY_CURRENT_LIMIT = 20;
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(8);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(80);
-	public static final double MOTION_MAGIC_JERK = 400; 
+	public static final double MOTION_MAGIC_JERK = 400;
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKD(kD)

@@ -20,7 +20,6 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
-// import dev.doglog.DogLog;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -170,7 +169,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	private Translation2d fieldRelativeVelocity = new Translation2d();
 
 	private boolean isRobotAtAngleSetPoint; // for angle turning
-	public boolean fieldRelative; //whether or not to drive field relative
+	public boolean fieldRelative; // whether or not to drive field relative
 
 	public RobotConfig config;
 	public ConfigurationMode currentConfigurationMode;
@@ -197,7 +196,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		public TalonFXConfiguration getConfiguration() {
 			return config;
 		}
-
 	}
 
 	/**
@@ -302,7 +300,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	}
 
 	public void swapConfigurationModeTo(ConfigurationMode configMode) {
-
 		if(currentConfigurationMode == configMode) return; // no need to reapply
 		applyDriveConfig(configMode.getConfiguration());
 		currentConfigurationMode = configMode;

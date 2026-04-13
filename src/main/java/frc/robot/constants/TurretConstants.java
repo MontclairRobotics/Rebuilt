@@ -44,9 +44,9 @@ public class TurretConstants {
 
 	public static final double MOMENT_OF_INERTIA = 0.154244; //From CAD on 2/12/26
 	public static final Distance LENGTH = Meters.of(0.3);
-	
+
 	public static final double ROTOR_TO_SENSOR_RATIO = 3;
-	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 18; 
+	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 18;
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO;
 
 	public static final Angle ANGLE_OFFSET = Rotations.of(0.5);
