@@ -21,10 +21,10 @@ public class SerializerConstants {
 	public static final double SPIN_VOLTAGE = 12;
 
 	// Tuned 4/12/26
-    public static final double kP = 10;
+    public static final double kP = 15;
 	public static final double kD = 0;
 	public static final double kS = 8;
-	public static final double kV = 0.5;
+	public static final double kV = 0.67;
 
     public static final double STATOR_CURRENT_LIMIT = 60;
     public static final double SUPPLY_CURRENT_LIMIT = 20;

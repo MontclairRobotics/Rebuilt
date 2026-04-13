@@ -21,7 +21,7 @@ public class IndexerConstants {
 	public static final double SPIN_VOLTAGE = 12;
 
 	// Tuned 4/12/26
-    public static final double kP = 10;
+    public static final double kP = 5;
 	public static final double kD = 0;
 	public static final double kS = 5;
 	public static final double kV = 0.15;

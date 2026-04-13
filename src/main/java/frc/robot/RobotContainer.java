@@ -127,7 +127,7 @@ public class RobotContainer {
 	public static Trigger turboTrigger = driverController.L2();
 	public static Trigger precisionTrigger = driverController.R2();
 
-	public static Trigger operatorWantsToFireTrigger = driverController.R2();
+	public static Trigger operatorWantsToFireTrigger = operatorController.R1();
 	public static Trigger operatorWantsToTrackHubTrigger = operatorController.circle();
 	public static Trigger operatorWantsToTrackFerryPointTrigger = operatorController.triangle();
 
@@ -240,8 +240,8 @@ public class RobotContainer {
 					vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 		}
 
-		configureBindings();
-		// configureCompetitionBindings();
+		// configureBindings();
+		configureCompetitionBindings();
 		// configureTestingBindingsForMax();
 
     	drivetrain.registerTelemetry(logger::telemeterize);

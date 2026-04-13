@@ -70,7 +70,7 @@ public class AimingConstants {
 		new InterpolatingDoubleTreeMap();
 
 	static {
-
+		/*
 		REAL_MAP.put(0.00, new ShotSettings(Degrees.of(0.0), RotationsPerSecond.of(19.5)));
 		REAL_MAP.put(1.50, new ShotSettings(Degrees.of(0), RotationsPerSecond.of(20)));
 		REAL_MAP.put(2.49, new ShotSettings(Degrees.of(9.5), RotationsPerSecond.of(22)));
@@ -80,22 +80,22 @@ public class AimingConstants {
 		REAL_MAP.put(4.74, new ShotSettings(Degrees.of(13), RotationsPerSecond.of(26.3)));
 		REAL_MAP.put(5.07, new ShotSettings(Degrees.of(15), RotationsPerSecond.of(26.3)));
 		REAL_MAP.put(5.73, new ShotSettings(Degrees.of(18), RotationsPerSecond.of(28.5)));
-		REAL_MAP.put(7.00, new ShotSettings(Degrees.of(23), RotationsPerSecond.of(27)));
+		REAL_MAP.put(7.00, new ShotSettings(Degrees.of(18), RotationsPerSecond.of(30)));
+		*/
 
+		//double x = 0.0;
 
-		double x = 0.0;
+		REAL_MAP.put(7.00, new ShotSettings(Degrees.of(20), RotationsPerSecond.of(29)));
+		REAL_MAP.put(5.56895, new ShotSettings(Degrees.of(20), RotationsPerSecond.of(27.84)));
+		REAL_MAP.put(5.08635, new ShotSettings(Degrees.of(20), RotationsPerSecond.of(26.37)));
+		REAL_MAP.put(4.70535, new ShotSettings(Degrees.of(19), RotationsPerSecond.of(25.8)));
+		REAL_MAP.put(4.2164, new ShotSettings(Degrees.of(18), RotationsPerSecond.of(24.99)));
+		REAL_MAP.put(3.58648, new ShotSettings(Degrees.of(17), RotationsPerSecond.of(24.36)));
+		REAL_MAP.put(2.92862, new ShotSettings(Degrees.of(11), RotationsPerSecond.of(23.15)));
+		REAL_MAP.put(2.49, new ShotSettings(Degrees.of(9.5), RotationsPerSecond.of(22)));
+		REAL_MAP.put(1.50, new ShotSettings(Degrees.of(0), RotationsPerSecond.of(20)));
+		REAL_MAP.put(0.00, new ShotSettings(Degrees.of(0.0), RotationsPerSecond.of(19.5)));
 
-		REAL_MAP.put(5.4865, new ShotSettings(Degrees.of(20), RotationsPerSecond.of(28.25)));
-		REAL_MAP.put(x, new ShotSettings(Degrees.of(x), RotationsPerSecond.of(x)));
-		REAL_MAP.put(x, new ShotSettings(Degrees.of(x), RotationsPerSecond.of(x)));
-		REAL_MAP.put(x, new ShotSettings(Degrees.of(x), RotationsPerSecond.of(x)));
-		REAL_MAP.put(x, new ShotSettings(Degrees.of(x), RotationsPerSecond.of(x)));
-
-
-		REAL_TOF_MAP.put(0.00, 0.8);
-		REAL_TOF_MAP.put(1.50, 0.81);
-		REAL_TOF_MAP.put(2.50, 0.86);
-		REAL_TOF_MAP.put(3.45, 0.98);
 		REAL_TOF_MAP.put(4.52, 1.1);
 		REAL_TOF_MAP.put(5.11, 1.14);
 		REAL_TOF_MAP.put(7.00, 1.2);

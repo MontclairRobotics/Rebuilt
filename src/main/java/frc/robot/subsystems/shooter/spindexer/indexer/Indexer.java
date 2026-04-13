@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter.spindexer.indexer;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.IndexerConstants.*;
 
 import java.util.function.DoubleSupplier;
@@ -65,7 +64,8 @@ public class Indexer extends SubsystemBase {
 	}
 
 	public void spinUp() {
-		setVoltage(SPIN_VOLTAGE);
+		// setVoltage(SPIN_VOLTAGE);
+		setVelocity(SPIN_VELOCITY);
 	}
 
 	public void spinDown() {

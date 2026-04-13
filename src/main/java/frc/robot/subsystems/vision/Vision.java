@@ -7,6 +7,7 @@ package frc.robot.subsystems.vision;
 // at the root directory of this project.
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
@@ -169,7 +170,7 @@ public class Vision extends SubsystemBase {
 
 				// Calculate standard deviations
 				double d = observation.averageTagDistance();
-				double stdDevFactor = (d * d * d) / observation.tagCount();
+				double stdDevFactor = ((d * d * d) / observation.tagCount()) * (1 + RobotContainer.drivetrain.getAngularSpeed().in(RotationsPerSecond));
 				double linearStdDev = 0.5 + Math.abs(linearStdDevBaseline * stdDevFactor);
 				// double angularStdDev = angularStdDevBaseline * stdDevFactor;
 				double angularStdDev = Double.POSITIVE_INFINITY;
