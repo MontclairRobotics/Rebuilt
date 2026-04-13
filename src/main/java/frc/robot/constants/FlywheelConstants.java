@@ -20,7 +20,7 @@ public class FlywheelConstants {
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.5);
 
-	// tuned 3/18
+	// tuned 4/12/26
 	public static final double kP = 30;
 	public static final double kD = 0;
 	public static final double kS = 7.5;
@@ -29,8 +29,8 @@ public class FlywheelConstants {
 	public static final double STATOR_CURRENT_LIMIT = 140; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 100; // Amps
 
-	public static final double MOMENT_OF_INERTIA = 0.00233846427; // From CAD on 2026.02.11, probably wrong
-	public static final double GEARING = 1.10526315785; // to the big flywheel, from Max Pearson on 2026.02.20
+	public static final double MOMENT_OF_INERTIA = 0.00233846427;
+	public static final double GEARING = 1.10526315785; // to the big flywheel, from Max Pearson on 2/20/26
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKD(kD)

@@ -28,35 +28,30 @@ import edu.wpi.first.units.measure.Distance;
 
 public class TurretConstants {
 
-	// CAD transformations
 	public static final Translation3d ORIGIN_TO_TURRET = new Translation3d(-0.1651, 0.1651, 0.3582);
 	public static final Translation2d TURRET_OFFSET = ORIGIN_TO_TURRET.toTranslation2d();
 
-	// ports
 	public static final int CAN_ID = 30;
 	public static final int ENCODER_ID = 29;
 
 	public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
-	// constraints
 	public static final Angle MIN_ANGLE = Rotations.of(-0.51);
 	public static final Angle MAX_ANGLE = Rotations.of(0.51);
 
 	public static final Angle ANGLE_TOLERANCE = Degrees.of(3);
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.25); // TODO: tune
 
-	// physical properties
-	public static final double MOMENT_OF_INERTIA = 0.154244; //From CAD on 2026.02.12
+	public static final double MOMENT_OF_INERTIA = 0.154244; //From CAD on 2/12/26
 	public static final Distance LENGTH = Meters.of(0.3);
+	
 	public static final double ROTOR_TO_SENSOR_RATIO = 3;
-	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 18; //128.0 / 16.0
-	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
+	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 18; 
+	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO;
 
-	// the angle between the zero of the gyro and the robot relative zero of the turret
 	public static final Angle ANGLE_OFFSET = Rotations.of(0.5);
 	public static final Angle ENCODER_OFFSET = Rotations.of(0.274414);
 
-	// pid + ff gains
 	public static final double kP = 80;
 	public static final double kD = 5;
 	public static final double kI = 4;

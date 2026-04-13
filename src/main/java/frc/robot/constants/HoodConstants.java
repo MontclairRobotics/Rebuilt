@@ -3,6 +3,7 @@ package frc.robot.constants;
 import edu.wpi.first.math.geometry.Translation3d;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
@@ -28,46 +29,41 @@ import edu.wpi.first.units.measure.Distance;
 
 public class HoodConstants {
 
-	// CAD values
 	public static final Translation3d ORIGIN_TO_HOOD = new Translation3d(-0.1651, 0.2782, 0.4395);
 	public static final Translation3d TURRET_TO_HOOD = new Translation3d(-0.12, 0, 0.08128);
 
-	// CAN
 	public static final int CAN_ID = 33;
 	public static final int ENCODER_ID = 34;
 	public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
-	// Constraints
-	public static final Angle MIN_ANGLE = Degrees.of(0);
+	public static final Angle MIN_ANGLE = Rotation.of(0);
 	public static final Angle MAX_ANGLE = Rotations.of(0.71);
 
-	// Physical properties
-	public static final double SENSOR_TO_MECHANISM_RATIO = 176.0 / 10;
 	public static final double ROTOR_TO_SENSOR_RATIO = 5;
-	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
+	public static final double SENSOR_TO_MECHANISM_RATIO = 176.0 / 10;
+	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO;
 
 	public static final double MOMENT_OF_INERTIA = 0.03038161694; // from CAD on 3/3/2026
-	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.452); // absolute encoder
+	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.452); 
+	
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
 	public static final double HOOD_LOWER_TIME = 1.2;
 
-	// Gains (Tuned 2/22)
+	// Tuned 3/24/26
 	public static final double kP = 250;
 	public static final double kD = 0;
 	public static final double kS = 0;
 	public static final double kG = 0.36;
 
-	public static final Angle TOLERANCE = Degrees.of(1);
+	public static final Angle TOLERANCE = Degrees.of(0.5);
 
-	public static final double STATOR_CURRENT_LIMIT = 15; // Amps
-	public static final double SUPPLY_CURRENT_LIMIT = 10; // Amps
+	public static final double STATOR_CURRENT_LIMIT = 15;
+	public static final double SUPPLY_CURRENT_LIMIT = 10; 
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(3);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(30);
-	public static final double MOTION_MAGIC_JERK = 100; // Rotations Per Second Per Second Per Second
-	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.05);
+	public static final double MOTION_MAGIC_JERK = 100; 
 
-	// Configs
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKD(kD)
 		.withKS(kS).withKG(kG)

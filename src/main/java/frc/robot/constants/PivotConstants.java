@@ -35,48 +35,39 @@ public class PivotConstants {
 
 	public static final double ROTOR_TO_SENSOR_RATIO = (72.0 / 46) * 9 * 5;
 	public static final double SENSOR_TO_MECHANISM_RATIO = 1; // CANcoder is on the mechanism
+	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; 
+	
 	public static final double ENCODER_OFFSET = -0.457764;
 
-	// constraints
 	public static final Angle MIN_ANGLE = Degrees.of(-5);
 	public static final Angle MAX_ANGLE = Rotations.of(0.3);
 	public static final Angle STOW_ANGLE = Degrees.of(90);
 	public static final Angle JIGGLE_ANGLE = Degrees.of(60);
 
-	// physical properties
-	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // rotations of the motor shaft per rotations of the intake pivot
 	public static final Distance ARM_LENGTH = Meters.of(0.5);
-	public static final double MOMENT_OF_INERTIA = 1; // TODO: set
+	public static final double MOMENT_OF_INERTIA = 1;
 
-	// pid gains
+	// Tuned 3/26/26
 	public static final double kP = 100;
 	public static final double kI = 0;
 	public static final double kD = 0;
-
-	// ff gains
 	public static final double kS = 0;
 	public static final double kG = 0.4;
 	public static final double kV = 0;
 
 	public static final Angle TOLERANCE = Degrees.of(1);
 
-	public static final double STATOR_CURRENT_LIMIT = 40; // Amps
-	public static final double SUPPLY_CURRENT_LIMIT = 20; // Amps
+	public static final double STATOR_CURRENT_LIMIT = 40; 
+	public static final double SUPPLY_CURRENT_LIMIT = 20; 
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(8);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(80);
-	public static final double MOTION_MAGIC_JERK = 400; // Rotations Per Second Per Second Per Second
-	public static final AngularVelocity MAX_VELOCITY_AT_SETPOINT = RotationsPerSecond.of(0.05);
+	public static final double MOTION_MAGIC_JERK = 400; 
 
-	// Configs
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKD(kD)
 		.withKS(kS).withKG(kG)
 		.withGravityType(GravityTypeValue.Arm_Cosine);
-
-	public static final Slot0Configs SIM_SLOT0_CONFIGS = new Slot0Configs()
-		.withKP(0).withKD(0)
-		.withKS(0).withKG(0); //TODO: SET THESE
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
 		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)

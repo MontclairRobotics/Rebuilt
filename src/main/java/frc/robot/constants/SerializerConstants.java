@@ -17,10 +17,10 @@ public class SerializerConstants {
     public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
     public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.1);
-	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(4.5);
+	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(4.6);
 	public static final double SPIN_VOLTAGE = 12;
 
-	// tuned 3/4
+	// Tuned 4/12/26
     public static final double kP = 200;
 	public static final double kD = 0;
 	public static final double kS = 9.5;
