@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.RobotController;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -125,7 +126,7 @@ public class RobotContainer {
 	public static Trigger turboTrigger = driverController.L2();
 	public static Trigger precisionTrigger = driverController.R2();
 
-	public static Trigger operatorWantsToFireTrigger = operatorController.R1();
+	public static Trigger operatorWantsToFireTrigger = driverController.R2();
 	public static Trigger operatorWantsToTrackHubTrigger = operatorController.circle();
 	public static Trigger operatorWantsToTrackFerryPointTrigger = operatorController.triangle();
 
@@ -243,6 +244,7 @@ public class RobotContainer {
 		// configureTestingBindingsForMax();
 
     	drivetrain.registerTelemetry(logger::telemeterize);
+		RobotController.setBrownoutVoltage(5.3);
 	}
 
 	private void configureTestingBindingsForMax() {

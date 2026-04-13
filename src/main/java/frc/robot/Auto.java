@@ -467,33 +467,22 @@ public class Auto extends SubsystemBase {
 
 		if(RobotBase.isReal()) {
 			pivotCommandGroup.addCommands(
-				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE).withTimeout(1)
+				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE)
 			);
 		} else {
 			pivotCommandGroup.addCommands(
 				Commands.none()
 			);
 		}
-		if(AllianceManager.getAlliance() == DriverStation.Alliance.Blue) {
-			autoCommand.addCommands(
-				pivotCommandGroup,
-				Commands.parallel(
-					Commands.waitSeconds(3).andThen(RobotContainer.shooter.startShootingInAuto()),
-					followPathCommands,
-					RobotContainer.rollers.spinUpCommand()
-				)
-			);
 
-		} else {
-			autoCommand.addCommands(
+		autoCommand.addCommands(
+			Commands.parallel(
 				pivotCommandGroup,
-				Commands.parallel(
-					Commands.waitSeconds(3).andThen(RobotContainer.shooter.startShootingInAuto()),
-					followPathCommands,
-					RobotContainer.rollers.spinUpCommand()
-				)
-			);
-		}
+				Commands.waitSeconds(1).andThen(RobotContainer.shooter.startShootingInAuto()),
+				followPathCommands,
+				RobotContainer.rollers.spinUpCommand()
+			)
+		);
 
 		return autoCommand;
 	}
