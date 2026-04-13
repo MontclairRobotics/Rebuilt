@@ -49,6 +49,7 @@ import frc.robot.subsystems.shooter.spindexer.serializer.SerializerIOSim;
 import frc.robot.subsystems.shooter.spindexer.serializer.SerializerIOTalonFX;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
+import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
@@ -145,7 +146,7 @@ public class RobotContainer {
 
 				hood = new Hood(new HoodIOTalonFX());
 				flywheel = new Flywheel(new FlywheelIOTalonFX());
-				turret = new Turret(new TurretIOSim());
+				turret = new Turret(new TurretIOTalonFX());
 
 				serializer = new Serializer(new SerializerIOTalonFX());
 				indexer = new Indexer(new IndexerIOTalonFX());

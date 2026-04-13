@@ -23,8 +23,8 @@ public class FlywheelConstants {
 	// tuned 3/18
 	public static final double kP = 30;
 	public static final double kD = 0;
-	public static final double kS = 5;
-	public static final double kV = 0.75;
+	public static final double kS = 7.5;
+	public static final double kV = 0.5;
 
 	public static final double STATOR_CURRENT_LIMIT = 140; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 100; // Amps

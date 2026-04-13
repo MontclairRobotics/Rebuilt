@@ -21,10 +21,10 @@ public class IndexerConstants {
 	public static final double SPIN_VOLTAGE = 12;
 
 	// tuned 3/4
-    public static final double kP = 10;
+    public static final double kP = 60;
 	public static final double kD = 0;
-	public static final double kS = 5;
-	public static final double kV = 0.11;
+	public static final double kS = 6;
+	public static final double kV = 0.125;
 
     public static final double STATOR_CURRENT_LIMIT = 60;
     public static final double SUPPLY_CURRENT_LIMIT = 20;
