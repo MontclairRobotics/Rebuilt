@@ -1,15 +1,12 @@
 package frc.robot;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -39,6 +36,18 @@ import frc.robot.util.Elastic;
 import frc.robot.util.Elastic.Notification;
 import frc.robot.util.Elastic.Notification.NotificationLevel;
 import frc.robot.util.PoseUtils;
+
+//Auto naming scheme: 
+//The first path has a length of 3
+//All other paths have a length of 2
+//L - Left trench
+//R - Right trench
+//C - Center trench
+//O - Outpost
+//D - Depot
+//The first path is formated like: SEV where S is some starting position(L, R, C, O, D), E is some ending position(L, R, C, O, D), and V is the path's variation
+//The later paths is formated like: EV
+//The end of one path is the start of the next path
 
 public class Auto extends SubsystemBase {
 	private char currentPos;
@@ -86,33 +95,9 @@ public class Auto extends SubsystemBase {
 		SmartDashboard.putData("Field", field);
 	}
 
-	public static void drawAuto(String auto) {
-		int maxObjs = 0;
-		Field2d field = new Field2d();
-		for(int i = 0; i <= maxObjs; i++) {
-		field.getObject("obj" + i).setPoses(new Pose2d());
-		}
-		//maxObjs = 0;
-		if(AllianceManager.isAllianceKnown()){
-		try{
-			for(int i = 0; i < PathPlannerAuto.getPathGroupFromAutoFile(auto).size(); i++) {
-				PathPlannerPath path = PathPlannerAuto.getPathGroupFromAutoFile(auto).get(i);
-				path = AllianceManager.isRed() ? path.flipPath() : path;
-				field.getObject("obj" + i).setPoses(path.getPathPoses());
-				if(i > maxObjs) {
-					maxObjs = i;
-				}
-			}
-		} catch (IOException | ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		}
-		SmartDashboard.putData("Static field",field);
-	}
-
+	/* Draws inputed auto path to the field map */
 	public void drawPaths() {
-		if(!prevPaths.equals(allPaths)) {
+		if(!prevPaths.equals(allPaths)) { //Do we re-use the previous auto
 			for(int i = 0; i <= maxObjs; i++) {
 				field.getObject("obj" + i).setPoses(new Pose2d());
 			}
@@ -124,7 +109,7 @@ public class Auto extends SubsystemBase {
 				PathPlannerPath path = allPaths.get(i);
 				path = AllianceManager.isRed() ? path.flipPath() : path;
 
-				field.getObject("obj" + i).setPoses(path.getPathPoses().toArray(new Pose2d[0]));
+				field.getObject("obj" + i).setPoses(path.getPathPoses().toArray(new Pose2d[0])); //Takes a path, converts it into an array of points that gets displayed on the field map
 
 				if(i > maxObjs) {
 					maxObjs = i;
@@ -135,9 +120,8 @@ public class Auto extends SubsystemBase {
 		prevPaths = allPaths;
 	}
 
+	/* Checks if the inputed auto string is valid */
 	public boolean isAutoStringValid(String autoString) {
-
-
 		if(autoString.length() == 1) {
 			if(autoString.charAt(0) == 'L' || autoString.charAt(0) == 'C' || autoString.charAt(0) == 'R') {
 				setFeedback("Valid stationary auto!", NotificationLevel.INFO);
@@ -153,7 +137,7 @@ public class Auto extends SubsystemBase {
 			return false;
 		}
 
-		if(autoString.length() % 2 == 0) {
+		if(autoString.length() % 2 == 0) { //Auto strings all must be odd in length (ex: LL1 or LL1L2)
 			setFeedback("One of the paths has an invalid length", NotificationLevel.ERROR);;
 			return false;
 		}
@@ -162,7 +146,7 @@ public class Auto extends SubsystemBase {
 			return true;
 		}
 
-		String currentAutoString = autoString.substring(0,3);
+		String currentAutoString = autoString.substring(0,3); //The first three characters represent the first path
 		String currentPos = autoString.substring(1,2);
 
 		try {
@@ -172,10 +156,11 @@ public class Auto extends SubsystemBase {
 			return false;
 		}
 
-		for(int i = 3; i < autoString.length(); i += 2) {
+		//Goes through all inputed paths and checks if they exist
+		for(int i = 3; i < autoString.length(); i += 2) { 
 			currentAutoString = currentPos + autoString.substring(i, i + 2);
 			try {
-				AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentAutoString));
+				AutoBuilder.followPath(PathPlannerPath.fromPathFile(currentAutoString)); 
 			} catch(Exception e) {
 				setFeedback("Path " + currentAutoString + " doesn\'t exist", NotificationLevel.ERROR);
 				return false;
@@ -187,12 +172,13 @@ public class Auto extends SubsystemBase {
 		return true;
 	}
 
+	/* Checks if the inputed auto is a valid yeet auto */
 	public boolean isYeetAutoStringValid(String autoString) {
-		if(autoString.equals("0") || 
-			autoString.equals("1") || 
-			autoString.equals("2") || 
-			autoString.equals("3") || 
-			autoString.equals("4")) 
+		if(autoString.equals("0") ||
+			autoString.equals("1") ||
+			autoString.equals("2") ||
+			autoString.equals("3") ||
+			autoString.equals("4"))
 		{
 			setFeedback("Yeet Auto String Valid!", NotificationLevel.INFO);
 			return true;
@@ -203,6 +189,7 @@ public class Auto extends SubsystemBase {
 		}
 	}
 
+	/* Builds a yeet auto from the auto string */
 	public Command buildYeetAuto(String autoString) {
 		if(autoString.equals("0")) {
 			Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
@@ -239,6 +226,7 @@ public class Auto extends SubsystemBase {
 		}
 	}
 
+	/* Builds a normal auto from the auto string */
 	public Command buildAuto(String autoString) {
 
 		allPaths = new ArrayList<PathPlannerPath>();
@@ -253,6 +241,7 @@ public class Auto extends SubsystemBase {
 			}
 		}
 
+		//If no full auto is provided, an auto from the same starting point is ran
 		if(autoString.length() < 2) {
 			if(autoString.charAt(0) == 'L') {
 				try {
@@ -321,6 +310,7 @@ public class Auto extends SubsystemBase {
 
 		currentPos = autoString.charAt(1);
 
+		//Builds the first part of the auto string (the first 3 characters)
 		try {
 			String pathString = autoString.substring(0, 3);
 			PathPlannerPath firstPath = PathPlannerPath.fromPathFile(pathString);
@@ -341,10 +331,12 @@ public class Auto extends SubsystemBase {
 			setFeedback("Unknown error with the first path", NotificationLevel.ERROR);
 		}
 
+		//Builds all paths after the first path
 		for (int i = 3; i < autoString.length(); i += 2) {
 
 			String pathString = currentPos + autoString.substring(i, i + 2);
 
+			//Checks if we need to wait at trench to shoot
 			if(
 				(currentPos == 'L' || currentPos == 'R')
 				&& currentPos == autoString.charAt(i)
@@ -353,6 +345,8 @@ public class Auto extends SubsystemBase {
 				followPathCommands.addCommands(Commands.waitSeconds(timeToEmptyFuel));
 
 			}
+
+			//Checks if the next path is valid (redundancy)
 			try {
 				PathPlannerPath path = PathPlannerPath.fromPathFile(pathString);
 				followPathCommands.addCommands(
@@ -370,6 +364,7 @@ public class Auto extends SubsystemBase {
 
 		SequentialCommandGroup pivotCommandGroup = new SequentialCommandGroup();
 
+		//When we aren't simulating, we want to lower the pivot to not hit the trench
 		if(RobotBase.isReal()) {
 			pivotCommandGroup.addCommands(
 				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
@@ -380,6 +375,8 @@ public class Auto extends SubsystemBase {
 				Commands.none()
 			);
 		}
+
+
 		if(AllianceManager.getAlliance() == DriverStation.Alliance.Blue) {
 			autoCommand.addCommands(
 				pivotCommandGroup,
@@ -449,6 +446,7 @@ public class Auto extends SubsystemBase {
                 }
             }
 
+			//Decides whether we should use the previous auto used
 			if(!autoString.equals(prevAutoString) || yeet != prevYeet) {
 				prevAutoString = autoString;
 				prevYeet = yeet;
