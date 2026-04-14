@@ -188,11 +188,11 @@ public class Auto extends SubsystemBase {
 	}
 
 	public boolean isYeetAutoStringValid(String autoString) {
-		if(autoString.equals("0") || 
-			autoString.equals("1") || 
-			autoString.equals("2") || 
-			autoString.equals("3") || 
-			autoString.equals("4")) 
+		if(autoString.equals("0") ||
+			autoString.equals("1") ||
+			autoString.equals("2") ||
+			autoString.equals("3") ||
+			autoString.equals("4"))
 		{
 			setFeedback("Yeet Auto String Valid!", NotificationLevel.INFO);
 			return true;
