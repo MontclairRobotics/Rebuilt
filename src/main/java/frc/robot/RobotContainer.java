@@ -107,7 +107,7 @@ public class RobotContainer {
 	private boolean shootWhileMoving = true;
 
 	// debug, set to true to increase logging, set to false to increase performance and reduce loop overruns
-	public static boolean VISION_DEBUG = false;
+	public static boolean VISION_DEBUG = true;
 	public static boolean TURRET_DEBUG = false;
 	public static boolean FLYWHEEL_DEBUG = false;
 	public static boolean HOOD_DEBUG  = false;

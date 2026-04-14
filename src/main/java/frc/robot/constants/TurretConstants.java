@@ -50,7 +50,7 @@ public class TurretConstants {
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO;
 
 	public static final Angle ANGLE_OFFSET = Rotations.of(0.5);
-	public static final Angle ENCODER_OFFSET = Rotations.of(0.274414);
+	public static final Angle ENCODER_OFFSET = Rotations.of(-0.397);
 
 	public static final double kP = 80;
 	public static final double kD = 5;

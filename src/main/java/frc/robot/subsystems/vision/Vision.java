@@ -163,6 +163,31 @@ public class Vision extends SubsystemBase {
 					}
 				}
 
+				 if (!rejectPose) {
+                    for (var tagId : inputs[cameraIndex].tagIds) {
+                        Double lessThanX = xLessThanTags.get(tagId);
+                        if (lessThanX != null && observation.pose().getX() > lessThanX) {
+                            rejectPose = true;
+                            break;
+                        }
+                        Double greaterThanX = xGreaterThanTags.get(tagId);
+                        if (greaterThanX != null && observation.pose().getX() < greaterThanX) {
+                            rejectPose = true;
+                            break;
+                        }
+                        Double lessThanY = yLessThanTags.get(tagId);
+                        if (lessThanY != null && observation.pose().getY() > lessThanY) {
+                            rejectPose = true;
+                            break;
+                        }
+                        Double greaterThanY = yGreaterThanTags.get(tagId);
+                        if (greaterThanY != null && observation.pose().getY() < greaterThanY) {
+                            rejectPose = true;
+                            break;
+                        }
+                    }
+                }
+
 				// Skip if rejected
 				if (rejectPose) {
 					continue;
