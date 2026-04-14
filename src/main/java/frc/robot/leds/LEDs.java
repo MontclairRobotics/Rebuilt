@@ -75,8 +75,9 @@ public class LEDs extends SubsystemBase {
         return Commands.run(() -> {
             if(RobotContainer.flywheel.isShooting()){
                 gasFireFlames();
-            } else if(RobotContainer.vision.acceptedPose){
-            //    acceptedCameraBlinks();
+            } 
+            else if(RobotContainer.vision.hasAcceptedPose()){
+                // acceptedCameraBlinks();
             }
             else {
                 cXAnimate.leds.SetAnimation(Animation.RainbowRoll)
@@ -99,6 +100,7 @@ public class LEDs extends SubsystemBase {
             int blue = ledBuffer.getBlue(i);
             ledBuffer.setRGB(i, green, red, blue); //RGB -> GBR
         }
+        
         led.setData(ledBuffer);
     }
 }

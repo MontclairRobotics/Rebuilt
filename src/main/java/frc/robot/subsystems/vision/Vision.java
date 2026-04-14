@@ -11,6 +11,8 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -50,7 +52,12 @@ public class Vision extends SubsystemBase {
 	private final List<Pose3d> robotPosesAccepted = new ArrayList<>();
 	private final List<Pose3d> robotPosesRejected = new ArrayList<>();
 
-	public boolean acceptedPose = false;
+	private boolean hasAcceptedPose = false;
+	public boolean hasAcceptedPose() { return hasAcceptedPose; }
+
+	private Debouncer acceptedPoseLEDDebouncer = new Debouncer(0.5, DebounceType.kFalling);
+	private int acceptedPoseCounter = 0;
+	
 	private int logCounter = 0;
 	private final int loopsPerLog;
 
@@ -130,6 +137,8 @@ public class Vision extends SubsystemBase {
 				}
 			}
 
+			acceptedPoseCounter = 0; // resets counter 
+
 			// Loop over pose observations
 			for (var observation : inputs[cameraIndex].poseObservations) {
 				// Check whether to reject pose
@@ -167,7 +176,9 @@ public class Vision extends SubsystemBase {
 				if (rejectPose) {
 					continue;
 				}
-				acceptedPose = true;
+				
+				acceptedPoseCounter++; // we've accepted a pose, increase the counter
+
 				// Calculate standard deviations
 				double d = observation.averageTagDistance();
 				double stdDevFactor = (d * d * d) / observation.tagCount();
@@ -186,6 +197,7 @@ public class Vision extends SubsystemBase {
 
 				Logger.recordOutput("Vision/linearStdDev", linearStdDev);
 				Logger.recordOutput("Vision/angularStdDev", angularStdDev);
+				
 				// Send vision observation
 				consumer.accept(
 					observation.pose().toPose2d(),
@@ -193,6 +205,8 @@ public class Vision extends SubsystemBase {
 					VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
 
 			}
+
+			hasAcceptedPose = acceptedPoseLEDDebouncer.calculate(acceptedPoseCounter > 0); // we've accepted at least 1 pose
 
 			if(logCounter % loopsPerLog == 0) {
 				Logger.recordOutput(
