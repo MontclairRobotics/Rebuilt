@@ -153,6 +153,28 @@ public class Vision extends SubsystemBase {
 					// max tag distance
 					|| observation.averageTagDistance() > 5.5;
 
+
+				if (!rejectPose) {
+					for (var tagId : inputs[cameraIndex].tagIds) {
+						Double lessThanX = xLessThanTags.get(tagId);
+						if (lessThanX != null && observation.pose().getX() > lessThanX) {
+							rejectPose = true;
+						}
+						Double greaterThanX = xGreaterThanTags.get(tagId);
+						if (greaterThanX != null && observation.pose().getX() < greaterThanX) {
+							rejectPose = true;
+						}
+						Double lessThanY = yLessThanTags.get(tagId);
+						if (lessThanY != null && observation.pose().getY() > lessThanY) {
+							rejectPose = true;
+						}
+						Double greaterThanY = yGreaterThanTags.get(tagId);
+						if (greaterThanY != null && observation.pose().getY() < greaterThanY) {
+							rejectPose = true;
+						}
+					}
+				}
+
 				// Add pose to log
 				if (logCounter % loopsPerLog == 0) {
 					robotPoses.add(observation.pose());
@@ -171,6 +193,7 @@ public class Vision extends SubsystemBase {
 				// Calculate standard deviations
 				double d = observation.averageTagDistance();
 				double stdDevFactor = ((d * d * d) / observation.tagCount()) * (1 + RobotContainer.drivetrain.getAngularSpeed().in(RotationsPerSecond));
+				double stdDevFactor2 = Math.pow(0.5, observation.tagCount()) * 2 * d;
 				double linearStdDev = 0.5 + Math.abs(linearStdDevBaseline * stdDevFactor);
 				// double angularStdDev = angularStdDevBaseline * stdDevFactor;
 				double angularStdDev = Double.POSITIVE_INFINITY;
