@@ -16,6 +16,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.lumynlabs.connection.usb.USBPort;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
+import frc.robot.leds.LEDs;
 import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.util.AllianceManager;
 
@@ -93,6 +95,10 @@ public class Robot extends LoggedRobot {
 		// 		.withNtPublish(true)
 		// 		.withCaptureNt(true));
 		// DogLog.setPdh(new PowerDistribution(50, ModuleType.kRev));
+
+		LEDs.cx.Connect(USBPort.kUSB1);
+		LEDs.cx.ApplyConfiguration(LEDs.cfg);
+
 		if (isSimulation()) {
 			// Do not spam the logs with "Button x on port y not available" log messages.
 			DriverStation.silenceJoystickConnectionWarning(true);

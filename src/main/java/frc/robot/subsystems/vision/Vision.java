@@ -50,6 +50,7 @@ public class Vision extends SubsystemBase {
 	private final List<Pose3d> robotPosesAccepted = new ArrayList<>();
 	private final List<Pose3d> robotPosesRejected = new ArrayList<>();
 
+	public boolean acceptedPose = false;
 	private int logCounter = 0;
 	private final int loopsPerLog;
 
@@ -166,7 +167,7 @@ public class Vision extends SubsystemBase {
 				if (rejectPose) {
 					continue;
 				}
-
+				acceptedPose = true;
 				// Calculate standard deviations
 				double d = observation.averageTagDistance();
 				double stdDevFactor = (d * d * d) / observation.tagCount();
@@ -190,6 +191,7 @@ public class Vision extends SubsystemBase {
 					observation.pose().toPose2d(),
 					Utils.fpgaToCurrentTime(observation.timestamp()),
 					VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+
 			}
 
 			if(logCounter % loopsPerLog == 0) {
