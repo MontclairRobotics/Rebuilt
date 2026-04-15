@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.lumynlabs.devices.ConnectorXAnimate;
-import com.lumynlabs.domain.led.Animation;
 
 
 public class LEDs extends SubsystemBase {
@@ -53,7 +52,7 @@ public class LEDs extends SubsystemBase {
     //         .WithDelay(Milliseconds.of(0))
     //         .RunOnce(false);
     // }
-    
+
     // Usually Returns Blinking Synched with RSL, Currently Not For Testing Purposes
     public static LEDPattern blink(Color color) {
         LEDPattern object = LEDPattern.solid(color);
@@ -185,12 +184,12 @@ public class LEDs extends SubsystemBase {
                 disabledAlliancePattern = disabledAlliancePattern();
             }
         }
-        for (int i = 0; i < ledBuffer.getLength(); i++) {
-            int red = ledBuffer.getRed(i);
-            int green = ledBuffer.getGreen(i);
-            int blue = ledBuffer.getBlue(i);
-            ledBuffer.setRGB(i, green, red, blue); //RGB -> GBR
-        }
+        // for (int i = 0; i < ledBuffer.getLength(); i++) {
+        //     int red = ledBuffer.getRed(i);
+        //     int green = ledBuffer.getGreen(i);
+        //     int blue = ledBuffer.getBlue(i);
+        //     ledBuffer.setRGB(i, green, red, blue); //RGB -> GBR
+        // }
         led.setData(ledBuffer);
     }
 }
