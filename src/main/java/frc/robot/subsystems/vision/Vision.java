@@ -156,7 +156,7 @@ public class Vision extends SubsystemBase {
 					|| observation.pose().getX() > aprilTagLayout.getFieldLength()
 					|| observation.pose().getY() < 0.0
 					|| observation.pose().getY() > aprilTagLayout.getFieldWidth()
-					
+
 					// max angle error
 					|| Math.abs(
 						observation.pose().getRotation().toRotation2d()
@@ -166,7 +166,7 @@ public class Vision extends SubsystemBase {
 
 					// max angular rate
 					|| RobotContainer.drivetrain.getAngularSpeed().in(DegreesPerSecond) > 360
-					
+
 					// max tag distance
 					|| observation.averageTagDistance() > 5.5;
 
@@ -221,7 +221,7 @@ public class Vision extends SubsystemBase {
 				// Calculate standard deviations
 				double d = observation.averageTagDistance();
 				double stdDevFactor = ((d * d) / observation.tagCount()) * (1 + RobotContainer.drivetrain.getAngularSpeed().in(RotationsPerSecond));
-				
+
 				double linearStdDev = linearStdDevFloor + Math.abs(linearStdDevBaseline * stdDevFactor);
 				double angularStdDev = angularStdDevFloor + angularStdDevBaseline * stdDevFactor;
 
@@ -245,7 +245,7 @@ public class Vision extends SubsystemBase {
 
 				Logger.recordOutput("Vision/linearStdDev", linearStdDev);
 				Logger.recordOutput("Vision/angularStdDev", angularStdDev);
-				
+
 				// Send vision observation
 				consumer.accept(
 					observation.pose().toPose2d(),

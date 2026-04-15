@@ -118,7 +118,7 @@ public class RobotContainer {
 	public static boolean DRIVETRAIN_DEBUG = false;
 	public static boolean SUPERSTRUCTURE_DEBUG = false;
 
-	public static boolean isUsingMegaTag2 = false;
+	public static boolean isUsingMegaTag2 = true;
 	public static boolean isUsingMegaTag1 = true;
 	public static boolean isSeedingGyro = true;
 
@@ -246,12 +246,12 @@ public class RobotContainer {
 
 				default:
 					vision = new Vision(
-						drivetrain::addVisionMeasurement, 
+						drivetrain::addVisionMeasurement,
 						(rotation) -> {
 							Pose2d current = drivetrain.getRobotPose();
 							drivetrain.resetPose(new Pose2d(current.getTranslation(), rotation));
 						},
-						new VisionIO() {}, 
+						new VisionIO() {},
 						new VisionIO() {},
 						new VisionIO() {}
 					);

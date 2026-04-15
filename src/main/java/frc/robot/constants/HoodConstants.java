@@ -50,10 +50,11 @@ public class HoodConstants {
 	public static final double HOOD_LOWER_TIME = 1.2;
 
 	// Tuned 3/24/26
-	public static final double kP = 250;
+	public static final double kP = 300;
 	public static final double kD = 0;
+	public static final double kI = 20;
 	public static final double kS = 0;
-	public static final double kG = 0.36;
+	public static final double kG = 0.4;
 
 	public static final Angle TOLERANCE = Degrees.of(0.5);
 
@@ -65,7 +66,7 @@ public class HoodConstants {
 	public static final double MOTION_MAGIC_JERK = 100;
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
-		.withKP(kP).withKD(kD)
+		.withKP(kP).withKI(kI).withKD(kD)
 		.withKS(kS).withKG(kG)
 		.withGravityType(GravityTypeValue.Arm_Cosine);
 

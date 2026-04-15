@@ -64,7 +64,7 @@ public class VisionIOLimelight implements VisionIO {
 		inputs.connected = ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
 
 		// Update target observation
-		inputs.latestTargetObservation = 
+		inputs.latestTargetObservation =
 			new TargetObservation(
 				Rotation2d.fromDegrees(txSubscriber.get()), Rotation2d.fromDegrees(tySubscriber.get()));
 
@@ -80,8 +80,8 @@ public class VisionIOLimelight implements VisionIO {
 				if (rawSample.value.length == 0) continue;
 				for (int i = 11; i < rawSample.value.length; i += 7) {
 					tagIds.add((int) rawSample.value[i]);
-				}	
-		
+				}
+
 			poseObservations.add(
 					new PoseObservation(
 					// Timestamp, based on server timestamp of publish and latency
@@ -132,7 +132,7 @@ public class VisionIOLimelight implements VisionIO {
 						PoseObservationType.MEGATAG_2));
 			}
 		}
-		
+
 		// Save pose observations to inputs object
 		inputs.poseObservations = new PoseObservation[poseObservations.size()];
 		for (int i = 0; i < poseObservations.size(); i++) {
