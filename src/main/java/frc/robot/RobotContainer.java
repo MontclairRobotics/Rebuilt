@@ -118,6 +118,10 @@ public class RobotContainer {
 	public static boolean DRIVETRAIN_DEBUG = false;
 	public static boolean SUPERSTRUCTURE_DEBUG = false;
 
+	public static boolean isUsingMegaTag2 = false;
+	public static boolean isUsingMegaTag1 = true;
+	public static boolean isSeedingGyro = true;
+
 	public double turretFudge = 0;
 
 	public static boolean shouldShootAuto = false;
@@ -165,6 +169,12 @@ public class RobotContainer {
 
 				vision = new Vision(
 					drivetrain::addVisionMeasurement,
+					(rotation) -> {
+						if (!RobotContainer.isUsingMegaTag2) {
+							Pose2d current = drivetrain.getRobotPose();
+							drivetrain.resetPose(new Pose2d(current.getTranslation(), rotation));
+						}
+					},
 					new VisionIOLimelight(camera0Name, () -> drivetrain.getWrappedHeading()),
 					new VisionIOLimelight(camera1Name, () -> drivetrain.getWrappedHeading()),
 					new VisionIOLimelight(camera2Name, () -> drivetrain.getWrappedHeading())
@@ -237,7 +247,18 @@ public class RobotContainer {
 				break;
 
 				default:
-					vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+					vision = new Vision(
+						drivetrain::addVisionMeasurement, 
+						(rotation) -> {
+						if (!RobotContainer.isUsingMegaTag2) {
+							Pose2d current = drivetrain.getRobotPose();
+							drivetrain.resetPose(new Pose2d(current.getTranslation(), rotation));
+						}
+						},
+						new VisionIO() {}, 
+						new VisionIO() {},
+						new VisionIO() {}
+					);
 		}
 
 		// configureBindings();
