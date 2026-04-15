@@ -170,10 +170,8 @@ public class RobotContainer {
 				vision = new Vision(
 					drivetrain::addVisionMeasurement,
 					(rotation) -> {
-						if (!RobotContainer.isUsingMegaTag2) {
-							Pose2d current = drivetrain.getRobotPose();
-							drivetrain.resetPose(new Pose2d(current.getTranslation(), rotation));
-						}
+						Pose2d current = drivetrain.getRobotPose();
+						drivetrain.resetPose(new Pose2d(current.getTranslation(), rotation));
 					},
 					new VisionIOLimelight(camera0Name, () -> drivetrain.getWrappedHeading()),
 					new VisionIOLimelight(camera1Name, () -> drivetrain.getWrappedHeading()),
@@ -250,10 +248,8 @@ public class RobotContainer {
 					vision = new Vision(
 						drivetrain::addVisionMeasurement, 
 						(rotation) -> {
-						if (!RobotContainer.isUsingMegaTag2) {
 							Pose2d current = drivetrain.getRobotPose();
 							drivetrain.resetPose(new Pose2d(current.getTranslation(), rotation));
-						}
 						},
 						new VisionIO() {}, 
 						new VisionIO() {},
