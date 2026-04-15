@@ -53,6 +53,8 @@ public class VisionIOLimelight implements VisionIO {
 		tySubscriber = table.getDoubleTopic("ty").subscribe(0.0);
 		megatag1Subscriber = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
 		megatag2Subscriber = table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
+
+		LimelightHelpers.SetIMUMode(name, 0);
 	}
 
 	@Override
@@ -67,8 +69,8 @@ public class VisionIOLimelight implements VisionIO {
 				Rotation2d.fromDegrees(txSubscriber.get()), Rotation2d.fromDegrees(tySubscriber.get()));
 
 		// Update orientation for MegaTag 2
-		orientationPublisher.accept(
-			new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
+		// orientationPublisher.accept(new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
+		LimelightHelpers.SetRobotOrientation_NoFlush(name, rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
 
 		// Read new pose observations from NetworkTables
 		Set<Integer> tagIds = new HashSet<>();
@@ -80,7 +82,8 @@ public class VisionIOLimelight implements VisionIO {
       		for (int i = 11; i < rawSample.value.length; i += 7) {
         		tagIds.add((int) rawSample.value[i]);
       		}	
-      		poseObservations.add(
+      
+		poseObservations.add(
           		new PoseObservation(
 				// Timestamp, based on server timestamp of publish and latency
 				rawSample.timestamp * 1.0e-6 - rawSample.value[6] * 1.0e-3,

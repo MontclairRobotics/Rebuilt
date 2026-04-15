@@ -24,10 +24,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
-import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
+import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.util.AllianceManager;
-import frc.robot.util.FieldConstants;
-import frc.robot.util.PoseUtils;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -110,11 +108,9 @@ public class Robot extends LoggedRobot {
 		}
 
 		// this should only run once
-		if(!hasAppliedTargetLocation && AllianceManager.allianceKnown && AllianceManager.isRed()) {
+		if(!hasAppliedTargetLocation && AllianceManager.allianceKnown) {
 			hasAppliedTargetLocation = true;
-			TargetLocation.HUB.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION));
-			TargetLocation.FERRY_LEFT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.LEFT_FERRYING_POINT));
-			TargetLocation.FERRY_RIGHT.setLocation(PoseUtils.flipTranslationAlliance(FieldConstants.FerryWaypoints.RIGHT_FERRYING_POINT));
+			Aiming.initializeTargetLocations();
 		}
 
 		// PhoenixUtil.refreshAll();

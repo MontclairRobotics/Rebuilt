@@ -17,14 +17,14 @@ public class SerializerConstants {
     public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
     public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.1);
-	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(4.5);
+	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(4.6);
 	public static final double SPIN_VOLTAGE = 12;
 
-	// tuned 3/4
-    public static final double kP = 15.000555 ;
+	// Tuned 4/12/26
+    public static final double kP = 15;
 	public static final double kD = 0;
-	public static final double kS = 4.000555;
-	public static final double kV = 1.5000555;
+	public static final double kS = 8;
+	public static final double kV = 0.67;
 
     public static final double STATOR_CURRENT_LIMIT = 60;
     public static final double SUPPLY_CURRENT_LIMIT = 20;
@@ -38,9 +38,9 @@ public class SerializerConstants {
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
 		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)
-		.withStatorCurrentLimitEnable(false)
+		.withStatorCurrentLimitEnable(true)
 		.withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
-		.withSupplyCurrentLimitEnable(false);
+		.withSupplyCurrentLimitEnable(true);
 
 	public static final MotorOutputConfigs MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
 		.withInverted(InvertedValue.CounterClockwise_Positive)

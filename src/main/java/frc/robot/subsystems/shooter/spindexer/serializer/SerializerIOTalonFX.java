@@ -11,6 +11,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.robot.util.PhoenixUtil;
@@ -24,11 +25,12 @@ public class SerializerIOTalonFX implements SerializerIO {
     private final StatusSignal<Double> setpointVelocitySignal;
     private final StatusSignal<Voltage> appliedVoltageSignal;
     private final StatusSignal<Current> currentDrawAmpsSignal;
-    private final StatusSignal<Temperature> tempCelciuSignal;
+    private final StatusSignal<Temperature> tempCelciusSignal;
 
-	private VelocityTorqueCurrentFOC request = new VelocityTorqueCurrentFOC(0);
-	private TorqueCurrentFOC torqueRequest = new TorqueCurrentFOC(0);
+	private final VelocityTorqueCurrentFOC request = new VelocityTorqueCurrentFOC(0);
+	private final TorqueCurrentFOC torqueRequest = new TorqueCurrentFOC(0);
 	private final NeutralOut neutralOut = new NeutralOut();
+	private final VoltageOut voltageOut = new VoltageOut(0);
 
 	public SerializerIOTalonFX() {
 		motor = new TalonFX(CAN_ID, CAN_BUS);
@@ -45,16 +47,18 @@ public class SerializerIOTalonFX implements SerializerIO {
         setpointVelocitySignal = motor.getClosedLoopReference();
         appliedVoltageSignal = motor.getMotorVoltage();
         currentDrawAmpsSignal = motor.getTorqueCurrent();
-        tempCelciuSignal = motor.getDeviceTemp();
+        tempCelciusSignal = motor.getDeviceTemp();
 
 		PhoenixUtil.registerStatusSignals(
 			Hertz.of(50),
 			velocitySignal,
 			setpointVelocitySignal,
 			appliedVoltageSignal,
-			currentDrawAmpsSignal,
-			tempCelciuSignal
+			currentDrawAmpsSignal
 		);
+
+		// not necessary to run this fast
+		tempCelciusSignal.setUpdateFrequency(4);
 
 		motor.optimizeBusUtilization();
 	}
@@ -67,7 +71,7 @@ public class SerializerIOTalonFX implements SerializerIO {
 			setpointVelocitySignal,
 			appliedVoltageSignal,
 			currentDrawAmpsSignal,
-			tempCelciuSignal
+			tempCelciusSignal
         );
 
 		inputs.motorConnected = BaseStatusSignal.isAllGood(
@@ -75,7 +79,7 @@ public class SerializerIOTalonFX implements SerializerIO {
 			setpointVelocitySignal,
 			appliedVoltageSignal,
 			currentDrawAmpsSignal,
-			tempCelciuSignal
+			tempCelciusSignal
 		);
 
 		inputs.velocity = velocitySignal.getValue();
@@ -83,8 +87,9 @@ public class SerializerIOTalonFX implements SerializerIO {
 
 		inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
 		inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
-		inputs.tempCelsius = tempCelciuSignal.getValueAsDouble();
-		inputs.isAtSetpoint = isAtSetpoint();
+		inputs.tempCelsius = tempCelciusSignal.getValueAsDouble();
+		inputs.isAtSetpoint =
+			Math.abs(velocitySignal.getValueAsDouble() - setpointVelocitySignal.getValueAsDouble()) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
 	}
 
 	@Override
@@ -94,18 +99,12 @@ public class SerializerIOTalonFX implements SerializerIO {
 
 	@Override
 	public void setVoltage(double voltage) {
-		motor.setVoltage(voltage);
+		motor.setControl(voltageOut.withOutput(voltage));
 	}
 
 	@Override
 	public void stop() {
 		motor.setControl(neutralOut);
-	}
-
-	@Override
-	public boolean isAtSetpoint() {
-		double error = motor.getClosedLoopError().getValueAsDouble();
-        return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
 	}
 
 	@Override

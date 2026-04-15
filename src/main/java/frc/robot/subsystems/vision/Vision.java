@@ -7,6 +7,7 @@ package frc.robot.subsystems.vision;
 // at the root directory of this project.
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
@@ -108,15 +109,12 @@ public class Vision extends SubsystemBase {
 		for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
 
 			io[cameraIndex].updateInputs(inputs[cameraIndex]);
-
-			if (logCounter % loopsPerLog == 0) {
-				Logger.processInputs("Vision/Camera" + Integer.toString(cameraIndex), inputs[cameraIndex]);
-			}
+			Logger.processInputs("Vision/Camera" + Integer.toString(cameraIndex), inputs[cameraIndex]);
 
 			// Update disconnected alert
 			disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
-			// clear camera-specific arrays every time
+			// // clear camera-specific arrays every time
 			robotPoses.clear();
 			tagPoses.clear();
 			robotPosesAccepted.clear();
@@ -149,11 +147,11 @@ public class Vision extends SubsystemBase {
 						observation.pose().getRotation().toRotation2d()
 						.minus(
 							PoseUtils.wrapRotation(RobotContainer.drivetrain.getRobotPose().getRotation())
-						).getDegrees()) > 3
+						).getDegrees()) > 15
 					// max angular rate
 					|| RobotContainer.drivetrain.getAngularSpeed().in(DegreesPerSecond) > 360
 					// max tag distance
-					|| observation.averageTagDistance() > 4;
+					|| observation.averageTagDistance() > 5.5;
 
 				// Add pose to log
 				if (logCounter % loopsPerLog == 0) {
@@ -165,6 +163,31 @@ public class Vision extends SubsystemBase {
 					}
 				}
 
+				 if (!rejectPose) {
+                    for (var tagId : inputs[cameraIndex].tagIds) {
+                        Double lessThanX = xLessThanTags.get(tagId);
+                        if (lessThanX != null && observation.pose().getX() > lessThanX) {
+                            rejectPose = true;
+                            break;
+                        }
+                        Double greaterThanX = xGreaterThanTags.get(tagId);
+                        if (greaterThanX != null && observation.pose().getX() < greaterThanX) {
+                            rejectPose = true;
+                            break;
+                        }
+                        Double lessThanY = yLessThanTags.get(tagId);
+                        if (lessThanY != null && observation.pose().getY() > lessThanY) {
+                            rejectPose = true;
+                            break;
+                        }
+                        Double greaterThanY = yGreaterThanTags.get(tagId);
+                        if (greaterThanY != null && observation.pose().getY() < greaterThanY) {
+                            rejectPose = true;
+                            break;
+                        }
+                    }
+                }
+
 				// Skip if rejected
 				if (rejectPose) {
 					continue;
@@ -172,8 +195,8 @@ public class Vision extends SubsystemBase {
 
 				// Calculate standard deviations
 				double d = observation.averageTagDistance();
-				double stdDevFactor = (d * d * d) / observation.tagCount();
-				double linearStdDev = 0.5 + linearStdDevBaseline * stdDevFactor;
+				double stdDevFactor = ((d * d * d) / observation.tagCount()) * (1 + RobotContainer.drivetrain.getAngularSpeed().in(RotationsPerSecond));
+				double linearStdDev = 0.5 + Math.abs(linearStdDevBaseline * stdDevFactor);
 				// double angularStdDev = angularStdDevBaseline * stdDevFactor;
 				double angularStdDev = Double.POSITIVE_INFINITY;
 
@@ -185,8 +208,6 @@ public class Vision extends SubsystemBase {
 					linearStdDev *= cameraStdDevFactors[cameraIndex];
 					angularStdDev *= cameraStdDevFactors[cameraIndex];
 				}
-
-				linearStdDev = 0;
 
 				Logger.recordOutput("Vision/linearStdDev", linearStdDev);
 				Logger.recordOutput("Vision/angularStdDev", angularStdDev);

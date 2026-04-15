@@ -9,6 +9,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -36,6 +37,7 @@ public class HoodIOTalonFX implements HoodIO {
 
     private final MotionMagicVoltage request = new MotionMagicVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
+    private final VoltageOut voltageOut = new VoltageOut(0);
 
     public HoodIOTalonFX() {
         motor = new TalonFX(CAN_ID);
@@ -70,9 +72,11 @@ public class HoodIOTalonFX implements HoodIO {
             setpointPositionSignal,
             velocitySignal,
             appliedVoltageSignal,
-            currentDrawAmpsSignal,
-            tempCelsiusSignal
+            currentDrawAmpsSignal
         );
+
+        // not necessary to run this fast
+		tempCelsiusSignal.setUpdateFrequency(4);
 
         motor.optimizeBusUtilization();
     }
@@ -106,7 +110,8 @@ public class HoodIOTalonFX implements HoodIO {
         inputs.hoodAngleSetpoint = Rotations.of(setpointPositionSignal.getValue());
         inputs.hoodVelocity = velocitySignal.getValue();
 
-        inputs.isAtSetpoint = isAtSetpoint();
+        inputs.isAtSetpoint =
+            Math.abs(positionSignal.getValueAsDouble() - setpointPositionSignal.getValueAsDouble()) < TOLERANCE.in(Rotations);
     }
 
     @Override
@@ -116,7 +121,7 @@ public class HoodIOTalonFX implements HoodIO {
 
     @Override
     public void setVoltage(double voltage) {
-        motor.setVoltage(voltage);
+        motor.setControl(voltageOut.withOutput(voltage));
     }
 
     @Override
@@ -125,35 +130,8 @@ public class HoodIOTalonFX implements HoodIO {
     }
 
     @Override
-    public boolean isAtSetpoint() {
-        double error = motor.getClosedLoopError().getValueAsDouble();
-        return Math.abs(error) < TOLERANCE.in(Rotations)
-            // && Math.abs(velocitySignal.getValueAsDouble()) < VELOCITY_TOLERANCE.in(RotationsPerSecond)
-        ;
-    }
-
-    @Override
     public void resetEncoderPosition() {
         encoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
-    }
-
-    @Override
-    public void setGains(double kP, double kD, double kS, double kG) {
-        config.Slot0.kP = kP;
-        config.Slot0.kD = kD;
-        config.Slot0.kS = kS;
-        config.Slot0.kG = kG;
-
-        motor.getConfigurator().apply(config.Slot0);
-    }
-
-    @Override
-    public void setMotionMagic(double velocity, double acceleration, double jerk) {
-        config.MotionMagic.MotionMagicCruiseVelocity = velocity;
-        config.MotionMagic.MotionMagicAcceleration = acceleration;
-        config.MotionMagic.MotionMagicJerk = jerk;
-
-        motor.getConfigurator().apply(config.MotionMagic);
     }
 
     @Override

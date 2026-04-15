@@ -14,7 +14,6 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -29,53 +28,44 @@ import edu.wpi.first.units.measure.Distance;
 
 public class TurretConstants {
 
-	// CAD transformations
 	public static final Translation3d ORIGIN_TO_TURRET = new Translation3d(-0.1651, 0.1651, 0.3582);
 	public static final Translation2d TURRET_OFFSET = ORIGIN_TO_TURRET.toTranslation2d();
 
-	// ports
 	public static final int CAN_ID = 30;
 	public static final int ENCODER_ID = 29;
 
 	public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
-	// constraints
 	public static final Angle MIN_ANGLE = Rotations.of(-0.51);
 	public static final Angle MAX_ANGLE = Rotations.of(0.51);
 
-	public static final Angle ANGLE_TOLERANCE = Degrees.of(5);
+	public static final Angle ANGLE_TOLERANCE = Degrees.of(3);
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.25); // TODO: tune
 
-	// physical properties
-	public static final double MOMENT_OF_INERTIA = 0.154244; //From CAD on 2026.02.12
+	public static final double MOMENT_OF_INERTIA = 0.154244; //From CAD on 2/12/26
 	public static final Distance LENGTH = Meters.of(0.3);
+
 	public static final double ROTOR_TO_SENSOR_RATIO = 3;
-	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 18; //128.0 / 16.0
-	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO; // from Max Pearson on 2026.02.20
+	public static final double SENSOR_TO_MECHANISM_RATIO = 128.0 / 18;
+	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO;
 
-	// the angle between the zero of the gyro and the robot relative zero of the turret
-	public static Angle ANGLE_OFFSET = Rotations.of(0.5);
-	public static final Angle ENCODER_OFFSET = Rotations.of(-0.343323);
+	public static final Angle ANGLE_OFFSET = Rotations.of(0.5);
+	public static final Angle ENCODER_OFFSET = Rotations.of(-0.397);
 
-	// pid + ff gains
-	public static final double kP = 40;
-	public static final double kD = 0;
-	public static final double kS = 20;
+	public static final double kP = 80;
+	public static final double kD = 5;
+	public static final double kI = 4;
+	public static final double kS = 0.5;
+	public static final double kV = 3;
 
 	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(4);
 	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(80);
-	public static final double MOTION_MAGIC_JERK = 200; // Rotations Per Second Per Second Per Second
 
 	public static final double STATOR_CURRENT_LIMIT = 40; // Amps
 	public static final double SUPPLY_CURRENT_LIMIT = 20; // Amps
 
-	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
-		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)
-		.withMotionMagicAcceleration(MOTION_MAGIC_ACCELERATION)
-		.withMotionMagicJerk(MOTION_MAGIC_JERK);
-
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
-		.withKP(kP).withKD(kD).withKS(kS);
+		.withKP(kP).withKI(kI).withKD(kD).withKS(kS).withKV(kV);
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
 		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)

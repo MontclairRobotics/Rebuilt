@@ -14,7 +14,6 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,7 +24,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -34,15 +32,12 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
-import frc.robot.util.tunables.LoggedTunableNumber;
 
 public class Turret extends SubsystemBase {
 
 	private final TurretIO io;
 	private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 	private final TurretVisualization visualization = new TurretVisualization();
-
-	public final LoggedTunableNumber tunableRobotRelativeTurretAngle = new LoggedTunableNumber("Turret/Tunable Robot Relative Angle", 0);
 
 	/** for fudging the turret angle mid-match should it get off */
 	private Angle fudgeFactor = Degrees.of(0);
@@ -51,9 +46,12 @@ public class Turret extends SubsystemBase {
 	private int logCounter;
 	private final int loopsPerLog;
 
-	public static boolean isSpinningAround;
-	private static boolean hasRecentlyConstrainedAngle;
-	Debouncer spinningAroundDebouncer = new Debouncer(1, DebounceType.kFalling);
+	private boolean isSpinningAround;
+	private boolean hasRecentlyConstrainedAngle;
+	private Debouncer spinningAroundDebouncer = new Debouncer(1, DebounceType.kFalling);
+
+	private Translation2d fieldRelativePosition = new Translation2d();
+	private Translation2d fieldRelativeVelocity = new Translation2d();
 
     public Turret(TurretIO io) {
         this.io = io;
@@ -64,21 +62,23 @@ public class Turret extends SubsystemBase {
 	public void periodic() {
 		logCounter++;
 
-		if(hasRecentlyConstrainedAngle) {
-			hasRecentlyConstrainedAngle = false;
-		}
+		fieldRelativePosition = computeFieldRelativePosition(RobotContainer.drivetrain.getRobotPose());
+		fieldRelativeVelocity = computeFieldRelativeVelocity(
+			RobotContainer.drivetrain.getRobotPose(),
+			RobotContainer.drivetrain.getFieldRelativeSpeeds()
+		);
+
+		hasRecentlyConstrainedAngle = false;
+
+		// needs to happen every loop
+		io.updateInputs(inputs);
+		inputs.fieldRelativeAngle = RobotContainer.turret.toFieldRelativeAngle(inputs.robotRelativeAngle);
+		Logger.processInputs("Turret", inputs);
 
 		isSpinningAround = spinningAroundDebouncer.calculate(hasRecentlyConstrainedAngle);
 
-		io.updateInputs(inputs); // THIS HAS TO BE EVERY LOOP
-
 		if(logCounter % loopsPerLog == 0) {
-			Logger.processInputs("Turret", inputs);
-			// Logger.recordOutput("Turret/AngleToHub", getAngleToHub());
 			Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
-			// Logger.recordOutput("Turret/At Time Adjusted Setpoint", atTimeAdjustedSetpoint());
-			// Logger.recordOutput("Turret/Time Adjusted Setpoint", getSetpointForTime(Timer.getFPGATimestamp()));
-			// Logger.recordOutput("Turret/Target Velocity", calculateTargetVelocity(TargetLocation.HUB).in(RotationsPerSecond));
 		}
 
 		/** only visualize when in debug mode */
@@ -87,6 +87,10 @@ public class Turret extends SubsystemBase {
 			visualization.log();
 		}
 	}
+
+	public Translation2d getFieldRelativePosition() { return fieldRelativePosition; }
+	public Translation2d getFieldRelativeVelocity() { return fieldRelativeVelocity; }
+	public boolean isSpinningAround() { return isSpinningAround; }
 
 	public boolean hasJoystickInput() {
 		return Math.hypot(RobotContainer.operatorController.getLeftX(), RobotContainer.operatorController.getLeftY()) > 0.2;
@@ -97,8 +101,8 @@ public class Turret extends SubsystemBase {
 	}
 
 	public Angle calculateRobotRelativeAngleManualJoystickAim() {
-		double x = RobotContainer.operatorController.getLeftX();
-		double y = RobotContainer.operatorController.getLeftY();
+		double y = RobotContainer.operatorController.getLeftX();
+		double x = RobotContainer.operatorController.getLeftY();
 
 		// deadband
 		if (Math.hypot(x, y) < 0.2) {
@@ -106,7 +110,7 @@ public class Turret extends SubsystemBase {
 		}
 
 		double fieldAngleRad = Math.atan2(y, x);
-		return Turret.toRobotRelativeAngle(Radians.of(fieldAngleRad));
+		return toRobotRelativeAngle(Radians.of(fieldAngleRad));
 	}
 
 	public void increaseFudgeFactor() {
@@ -132,7 +136,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	public boolean atSetpoint() {
-		return io.isAtSetpoint();
+		return inputs.isAtSetpoint;
 	}
 
     /**
@@ -140,7 +144,7 @@ public class Turret extends SubsystemBase {
 	 * @param angle the angle to be constrained to a possible turret angle, in rotations
 	 * @return the new angle, constrained between our min and max angles
 	 */
-	public static Angle constrainAngle(Angle angle) {
+	public Angle constrainAngle(Angle angle) {
 
 		while (angle.in(Rotations) > MAX_ANGLE.in(Rotations)) {
     		angle = angle.minus(Rotations.of(1));
@@ -159,7 +163,7 @@ public class Turret extends SubsystemBase {
 	 * @param fieldRelativeAngle target field relative angle of the turret
 	 * @return the corresponding target robot relative angle needed to achieve the stated field relative angle
 	 */
-	public static Angle toRobotRelativeAngle(Angle fieldRelativeAngle) {
+	public Angle toRobotRelativeAngle(Angle fieldRelativeAngle) {
 		return constrainAngle(fieldRelativeAngle
 			.minus(Rotations.of(RobotContainer.drivetrain.getWrappedHeading().getRotations()))
 			.minus(ANGLE_OFFSET));
@@ -169,7 +173,7 @@ public class Turret extends SubsystemBase {
 	 * @param robotRelativeAngle target robot relative angle of the turret
 	 * @return the corresponding field relative angle the turret would point at the specified robot relative angle
 	 */
-	public static Angle toFieldRelativeAngle(Angle robotRelativeAngle) {
+	public Angle toFieldRelativeAngle(Angle robotRelativeAngle) {
 		return constrainAngle(robotRelativeAngle
 			.plus(Rotations.of(RobotContainer.drivetrain.getWrappedHeading().getRotations()))
 			.plus(ANGLE_OFFSET));
@@ -177,12 +181,6 @@ public class Turret extends SubsystemBase {
 
 	public void setNeutralMode(NeutralModeValue value) {
 		io.setNeutralMode(value);
-	}
-
-	public void applyJoystickInput() {
-		double input = MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightX(), 0.1), 1.5);
-		double voltage = input * RobotController.getBatteryVoltage();
-		io.setVoltage(voltage);
 	}
 
     public Angle getRobotRelativeAngle() {
@@ -197,8 +195,7 @@ public class Turret extends SubsystemBase {
 	 *
 	 * @return the field relative pose of the center of the turret
 	 */
-	public Translation2d getFieldRelativePosition() {
-		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+	public Translation2d computeFieldRelativePosition(Pose2d robotPose) {
 		Rotation2d robotHeading = robotPose.getRotation();
 		Translation2d fieldRelativeOffset = TURRET_OFFSET.rotateBy(robotHeading);
 		return robotPose.getTranslation().plus(fieldRelativeOffset);
@@ -208,9 +205,7 @@ public class Turret extends SubsystemBase {
 	 *
 	 * @return the field relative velocity of the center of the turret
 	 */
-	public Translation2d getFieldRelativeVelocity() {
-		ChassisSpeeds fieldSpeeds = RobotContainer.drivetrain.getFieldRelativeSpeeds();
-		Pose2d robotPose = RobotContainer.drivetrain.getRobotPose();
+	public Translation2d computeFieldRelativeVelocity(Pose2d robotPose, ChassisSpeeds fieldSpeeds) {
 		Rotation2d robotHeading = robotPose.getRotation();
 		Translation2d fieldRelativeOffset = TURRET_OFFSET.rotateBy(robotHeading);
 
@@ -233,7 +228,7 @@ public class Turret extends SubsystemBase {
 	 */
 	public Distance getDistanceToHub() {
 		Translation2d hublocation = PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION);
-      	return Meters.of(getFieldRelativePosition().getDistance(hublocation));
+      	return Meters.of(fieldRelativePosition.getDistance(hublocation));
 	}
 
 	/**
@@ -242,7 +237,7 @@ public class Turret extends SubsystemBase {
 	 * @return the distance from the center of the turret to the specified location
 	 */
 	public Distance getDistanceToPoint(Translation2d location) {
-      	return Meters.of(getFieldRelativePosition().getDistance(location));
+      	return Meters.of(fieldRelativePosition.getDistance(location));
   	}
 
 	/**
@@ -250,7 +245,7 @@ public class Turret extends SubsystemBase {
 	 */
 	public Angle getAngleToHub() {
 		Translation2d hublocation = PoseUtils.flipTranslationAlliance(FieldConstants.Hub.HUB_LOCATION);
-		Translation2d robotToHub = hublocation.minus(getFieldRelativePosition());
+		Translation2d robotToHub = hublocation.minus(fieldRelativePosition);
 		return robotToHub.getAngle().getMeasure();
 	}
 
@@ -260,9 +255,8 @@ public class Turret extends SubsystemBase {
 	 * @return the field relative angle to align the turret to in order to point at the specific location
 	 */
 	public Angle getAngleToPoint(Translation2d point) {
-		Translation2d robotPose = getFieldRelativePosition();
-		Translation2d robotToPoint = point.minus(robotPose);
-		return robotToPoint.getAngle().getMeasure();
+		Translation2d turretToPoint = point.minus(fieldRelativePosition);
+		return turretToPoint.getAngle().getMeasure();
 	}
 
 	/**
@@ -271,13 +265,11 @@ public class Turret extends SubsystemBase {
 	 * @return the robot relative velocity the turret should maintain in order to have a field relative velocity of zero
 	 */
 	public AngularVelocity calculateTargetVelocity(TargetLocation target) {
-		Translation2d turretPos = getFieldRelativePosition();
-		Translation2d turretVel = getFieldRelativeVelocity();
-    	Translation2d r = target.getLocation().minus(turretPos);
+    	Translation2d r = target.getLocation().minus(fieldRelativePosition);
     	double distance = r.getNorm();
     	Translation2d rHat = r.div(distance); // unit vector towards target
     	Translation2d rHatPerp = new Translation2d(-rHat.getY(), rHat.getX()); // perpendicular unit vector
-    	double tangentialVelocity = turretVel.dot(rHatPerp);
+    	double tangentialVelocity = fieldRelativeVelocity.dot(rHatPerp);
     	double omega = ((tangentialVelocity / distance) + RobotContainer.drivetrain.getAngularVelocity().in(RadiansPerSecond));
 
     	return RadiansPerSecond.of(-omega);
@@ -293,10 +285,6 @@ public class Turret extends SubsystemBase {
 
 	public void setRobotRelativeAngle(Supplier<Angle> angleSupplier, Supplier<AngularVelocity> angularVelocitySupplier) {
 		setRobotRelativeAngle(angleSupplier.get(), angularVelocitySupplier.get());
-	}
-
-	public Command joystickControlCommand() {
-		return Commands.run(() -> applyJoystickInput(), this);
 	}
 
 	public Command stopCommand() {

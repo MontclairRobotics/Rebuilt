@@ -38,13 +38,7 @@ public interface TurretIO {
 
     public void applyFudgeFactor(Angle angle);
 
-    public boolean isAtSetpoint();
-
     public void disable();
-
-    public void setGains(double kP, double kD, double kS);
-
-    public void setMotionMagic(double velocity, double acceleration, double jerk);
 
     public void setNeutralMode(NeutralModeValue value);
 

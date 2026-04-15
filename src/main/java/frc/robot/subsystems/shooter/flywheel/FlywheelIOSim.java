@@ -59,7 +59,7 @@ public class FlywheelIOSim implements FlywheelIO {
         inputs.appliedVoltage = appliedVoltage;
         inputs.currentDrawAmps = sim.getCurrentDrawAmps();
         inputs.tempCelsius = 0;
-        inputs.isAtSetpoint = isAtSetpoint();
+        inputs.isAtSetpoint = pidController.atSetpoint();
     }
 
     @Override
@@ -81,11 +81,6 @@ public class FlywheelIOSim implements FlywheelIO {
     @Override
     public void stop() {
         appliedVoltage = 0;
-    }
-
-    @Override
-    public boolean isAtSetpoint() {
-        return pidController.atSetpoint();
     }
 
     @Override

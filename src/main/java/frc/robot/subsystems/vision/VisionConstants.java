@@ -7,6 +7,10 @@
 
 package frc.robot.subsystems.vision;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 
@@ -24,12 +28,13 @@ public class VisionConstants {
 
 	// Basic filtering thresholds
 	public static double maxAmbiguity = 0.3;
-	public static double maxZError = 20;
+	public static double maxZError = 0.75;
 
 	// Standard deviation baselines, for 1 meter distance and 1 tag
 	// (Adjusted automatically based on distance and # of tags)
-	public static double linearStdDevBaseline = 0.04; // Meters
-	public static double angularStdDevBaseline = 0.06; // Radians
+	public static double linearStdDevBaseline = 0.08; // Meters
+	public static double angularStdDevBaseline = 0.12
+	; // Radians
 
 	// Standard deviation multipliers for each camera
 	// (Adjust to trust some cameras more than others)
@@ -43,7 +48,23 @@ public class VisionConstants {
 		};
 
 	// Multipliers to apply for MegaTag 2 observations
-	public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
+	public static double linearStdDevMegatag2Factor = 1; // More stable than full 3D solve
 	public static double angularStdDevMegatag2Factor =
 		Double.POSITIVE_INFINITY; // No rotation data available
+
+	// Tags where the x position of the robot must be less than the tag's x position
+    public static int[] xLessThanTagIds = new int[] {1, 3, 4, 6, 23, 25, 26, 28};
+    // Tags where the x position of the robot must be greater than the tag's x position
+    public static int[] xGreaterThanTagIds = new int[] {7, 9, 10, 12, 17, 19, 20, 22};
+    // Tags where the y position of the robot must be less than the tag's y position
+    public static int[] yLessThanTagIds = new int[] {5, 8, 18, 27};
+    // Tags where the y position of the robot must be greater than the tag's y position
+    public static int[] yGreaterThanTagIds = new int[] {2, 11, 21, 24};
+
+    // Maps from tag ID to the relevant coordinate of the tag's position, for quick lookup during filtering
+    public static Map<Integer, Double> xLessThanTags = Arrays.stream(xLessThanTagIds).boxed().collect(Collectors.toMap(tagId -> tagId, tagId -> aprilTagLayout.getTagPose(tagId).get().getX()));
+    public static Map<Integer, Double> xGreaterThanTags = Arrays.stream(xGreaterThanTagIds).boxed().collect(Collectors.toMap(tagId -> tagId, tagId -> aprilTagLayout.getTagPose(tagId).get().getX()));
+    public static Map<Integer, Double> yLessThanTags = Arrays.stream(yLessThanTagIds).boxed().collect(Collectors.toMap(tagId -> tagId, tagId -> aprilTagLayout.getTagPose(tagId).get().getY()));
+    public static Map<Integer, Double> yGreaterThanTags = Arrays.stream(yGreaterThanTagIds).boxed().collect(Collectors.toMap(tagId -> tagId, tagId -> aprilTagLayout.getTagPose(tagId).get().getY()));
+
 }

@@ -29,6 +29,4 @@ public interface RollersIO {
 	public void setVoltage(double voltage);
 
 	public void stop();
-
-	public boolean isAtSetpoint();
 }

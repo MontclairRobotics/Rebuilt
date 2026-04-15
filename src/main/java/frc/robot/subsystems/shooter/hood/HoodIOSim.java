@@ -58,7 +58,7 @@ public class HoodIOSim implements HoodIO {
         inputs.hoodAngleSetpoint = Rotations.of(pidController.getSetpoint());
         inputs.hoodVelocity = RadiansPerSecond.of(sim.getVelocityRadPerSec());
 
-        inputs.isAtSetpoint = isAtSetpoint();
+        inputs.isAtSetpoint = pidController.atSetpoint();
     }
 
     @Override
@@ -80,28 +80,9 @@ public class HoodIOSim implements HoodIO {
     }
 
     @Override
-    public boolean isAtSetpoint() {
-       return pidController.atSetpoint();
-    }
-
-    @Override
     public void resetEncoderPosition() {
 
     }
-
-    @Override
-    public void setGains(double kP, double kD, double kS, double kG) {
-        pidController.setP(kP);
-        pidController.setD(kD);
-        feedforward.setKs(kS);
-        feedforward.setKg(kG);
-    }
-
-    @Override
-    public void setMotionMagic(double velocity, double acceleration, double jerk) {
-        // does nothing, not necessary
-    }
-
 
     @Override
     public void setNeutralMode(NeutralModeValue value) {

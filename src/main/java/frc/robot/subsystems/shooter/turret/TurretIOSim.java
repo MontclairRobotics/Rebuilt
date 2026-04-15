@@ -19,6 +19,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.RobotContainer;
 
 public class TurretIOSim implements TurretIO {
 
@@ -64,10 +65,10 @@ public class TurretIOSim implements TurretIO {
 
        inputs.velocity = RadiansPerSecond.of(sim.getVelocityRadPerSec());
        inputs.robotRelativeAngle = Radians.of(sim.getAngleRads());
-       inputs.fieldRelativeAngle = Turret.toFieldRelativeAngle(inputs.robotRelativeAngle);
+       inputs.fieldRelativeAngle = RobotContainer.turret.toFieldRelativeAngle(inputs.robotRelativeAngle);
        inputs.robotRelativeAngleSetpoint = Rotations.of(pidController.getGoal().position);
 
-       inputs.isAtSetpoint = isAtSetpoint();
+       inputs.isAtSetpoint = pidController.atSetpoint();
     }
 
     @Override
@@ -90,23 +91,6 @@ public class TurretIOSim implements TurretIO {
     @Override
     public void stop() {
         appliedVoltage = 0;
-    }
-
-    @Override
-    public boolean isAtSetpoint() {
-       return pidController.atSetpoint();
-    }
-
-    @Override
-    public void setGains(double kP, double kD, double kS) {
-        // pidController.setP(kP);
-        // pidController.setD(kD);
-        // feedforward.setKs(kS);
-    }
-
-    @Override
-    public void setMotionMagic(double velocity, double acceleration, double jerk) {
-        // does nothing
     }
 
     @Override

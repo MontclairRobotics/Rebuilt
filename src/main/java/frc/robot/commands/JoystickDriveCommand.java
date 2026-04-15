@@ -2,31 +2,12 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
-
-import static frc.robot.constants.DriveConstants.SIGNIFICANT_VELOCITY;
-import static frc.robot.constants.DriveConstants.TRENCH_TRANSLATION_kD;
-import static frc.robot.constants.DriveConstants.TRENCH_TRANSLATION_kI;
-import static frc.robot.constants.DriveConstants.TRENCH_TRANSLATION_kP;
 
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain.ConfigurationMode;
-import frc.robot.util.AllianceManager;
-import frc.robot.util.FieldConstants;
-import frc.robot.util.FieldConstants.LeftTrench;
 
 public class JoystickDriveCommand extends Command {
 
@@ -36,42 +17,13 @@ public class JoystickDriveCommand extends Command {
 	private final DoubleSupplier yVelocitySupplier; // strafe velocity input, left/right relative to driver
 	private final DoubleSupplier omegaVelocitySupplier; // angular velocity input
 
-	private boolean shouldAimAssist;
-
-	@AutoLogOutput
-	private final Trigger shouldTrenchLockTrigger = new Trigger(this::shouldTrenchLock)
-		.and(() -> DriverStation.isEnabled()) // resets value when disabled
-		.and(() -> shouldAimAssist)
-		.debounce(0.1); // accounts for flickering
-
-	@AutoLogOutput
-	private final Trigger shouldBumpLockTrigger = new Trigger(this::shouldBumpLock)
-		.and(() -> DriverStation.isEnabled()) // resets value when disabled
-		.and(() -> shouldAimAssist)
-		.debounce(0.1); // accounts for flicker
-
-	private final PIDController thetaController =
-		RobotContainer.drivetrain.thetaController;
-
-	private final PIDController trenchYController =
-		new PIDController(TRENCH_TRANSLATION_kP, TRENCH_TRANSLATION_kI, TRENCH_TRANSLATION_kD);
-
 	private DriveMode currentDriveMode = DriveMode.NORMAL;
 
-	public JoystickDriveCommand(boolean shouldAimAssist) {
+	public JoystickDriveCommand() {
 		this.drivetrain = RobotContainer.drivetrain;
 		this.xVelocitySupplier = () -> drivetrain.getForwardVelocityFromController();
 		this.yVelocitySupplier = () -> drivetrain.getStrafeVelocityFromController();
 		this.omegaVelocitySupplier = () -> drivetrain.getOmegaVelocityFromController();
-		this.shouldAimAssist = shouldAimAssist;
-
-		// shouldTrenchLockTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK))
-		// 	.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.R1().getAsBoolean()))
-		// 	.onFalse(updateDriveMode(DriveMode.XMODE).onlyIf(() -> RobotContainer.driverController.R1().getAsBoolean()));
-
-		// shouldBumpLockTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK))
-		// 	.onFalse(updateDriveMode(DriveMode.NORMAL).onlyIf(() -> !RobotContainer.driverController.R1().getAsBoolean()))
-		// 	.onFalse(updateDriveMode(DriveMode.XMODE).onlyIf(() -> RobotContainer.driverController.R1().getAsBoolean()));
 
 		RobotContainer.xModeTrigger
 			.onTrue(updateDriveMode(DriveMode.XMODE))
@@ -86,69 +38,6 @@ public class JoystickDriveCommand extends Command {
 			.onFalse(updateDriveMode(DriveMode.NORMAL));
 
 		addRequirements(drivetrain);
-	}
-
-	private boolean shouldTrenchLock() {
-		return RobotContainer.superstructure.isInTrenchZone() && drivingBiasedForwards() && RobotContainer.superstructure.movingIntoObstacle();
-	}
-
-	private boolean shouldBumpLock() {
-		return RobotContainer.superstructure.isInBumpZone() && drivingBiasedForwards()
-			&& RobotContainer.superstructure.movingIntoObstacle() && Math.abs(omegaVelocitySupplier.getAsDouble()) < 1;
-	}
-
-	private boolean drivingBiasedForwards() {
-		return Math.abs(xVelocitySupplier.getAsDouble()) > SIGNIFICANT_VELOCITY.in(MetersPerSecond)
-			&& Math.abs(yVelocitySupplier.getAsDouble()) < Math.abs(xVelocitySupplier.getAsDouble());
-	}
-
-	/**
-	 * @return Distance to the midline of the nearest trench, using for PID
-	 */
-	private Distance getTrenchY() {
-		Pose2d robotPose = drivetrain.getRobotPose();
-		Distance trenchY;
-
-		// are we in the left side of the field
-		if(robotPose.getMeasureY().gte(FieldConstants.FIELD_WIDTH.div(2))) {
-			trenchY = FieldConstants.LinesHorizontal.LEFT_TRENCH_OPEN_END.plus(LeftTrench.OPENING_WIDTH.div(2.0));
-		} else {
-			trenchY = FieldConstants.RightTrench.OPENING_WIDTH.div(2.0);
-		}
-
-		return trenchY;
-	}
-
-	/**
-	 * Smoothly scales PID input to increase compensation the closer you are to the trench
-	 * @return the factor, from 0.2 to 1, to multiply the PID output by
-	 */
-	private double getTrenchYAdjustFactor() {
-		Pose2d robotPose = drivetrain.getRobotPose();
-		if(robotPose.getX() < FieldConstants.LinesVertical.CENTER.in(Meters)) {
-			return MathUtil.clamp(0.2 + (1 - (Math.abs(robotPose.getX() - FieldConstants.Hub.INNER_CENTER_POINT.getX())
-				/ FieldConstants.Zones.TRENCH_ZONE_EXTENSION.in(Meters))), 0, 1);
-		} else {
-			return MathUtil.clamp(0.2 + (1 - (Math.abs(robotPose.getX() - FieldConstants.Hub.OPP_TOP_CENTER_POINT.getX())
-				/ FieldConstants.Zones.TRENCH_ZONE_EXTENSION.in(Meters))), 0, 1);
-		}
-	}
-
-	private Rotation2d getTrenchLockAngle() {
-		if (Math.abs(drivetrain.getWrappedHeading().getDegrees()) < 90) {
-            return Rotation2d.kZero;
-        } else {
-            return Rotation2d.k180deg;
-        }
-	}
-
-	private Rotation2d getBumpLockAngle() {
-		for (int i = -135; i < 180; i += 90) {
-            if (Math.abs(MathUtil.inputModulus(drivetrain.getWrappedHeading().getDegrees() - i, -180, 180)) <= 45) {
-                return Rotation2d.fromDegrees(i);
-            }
-        }
-        return Rotation2d.kZero;
 	}
 
 	private Command updateDriveMode(DriveMode driveMode) {
@@ -169,52 +58,6 @@ public class JoystickDriveCommand extends Command {
 					xVelocitySupplier.getAsDouble(),
 					yVelocitySupplier.getAsDouble(),
 					omegaVelocitySupplier.getAsDouble(),
-					drivetrain.fieldRelative
-				);
-
-				break;
-
-			case TRENCH_LOCK:
-
-				drivetrain.isLimitingAcceleration = false;
-				drivetrain.swapConfigurationModeTo(ConfigurationMode.NORMAL);
-
-				// reverses PID contribution direction for red alliance
-				double pidContribution =
-					AllianceManager.isRed() ?
-					-(getTrenchYAdjustFactor() * trenchYController.calculate(drivetrain.getRobotPose().getY(), getTrenchY().in(Meters)))
-					: (getTrenchYAdjustFactor() * trenchYController.calculate(drivetrain.getRobotPose().getY(), getTrenchY().in(Meters)));
-
-				// reduce joystick input effect by a fudge factor and nudge the robot by adding the PID contribution
-				double yVelocity = (yVelocitySupplier.getAsDouble()) / 1.3 + pidContribution;
-
-				// rotational velocity based on what angle to auto align to
-				double rotVelocityTrenchLock = thetaController.calculate(
-					drivetrain.getWrappedHeading().getRadians(), getTrenchLockAngle().getRadians());
-
-				drivetrain.drive(
-					xVelocitySupplier.getAsDouble(),
-					yVelocity,
-					rotVelocityTrenchLock,
-					drivetrain.fieldRelative
-				);
-
-				break;
-
-			case BUMP_LOCK:
-
-				drivetrain.isLimitingAcceleration = false;
-				drivetrain.swapConfigurationModeTo(ConfigurationMode.NORMAL);
-
-				// bump lock only changes angle of robot
-				double rotVelocityBumpLock = thetaController.calculate(
-					drivetrain.getWrappedHeading().getRadians(), getBumpLockAngle().getRadians()
-				);
-
-				drivetrain.drive(
-					xVelocitySupplier.getAsDouble(),
-					yVelocitySupplier.getAsDouble(),
-					rotVelocityBumpLock,
 					drivetrain.fieldRelative
 				);
 
@@ -267,8 +110,6 @@ public class JoystickDriveCommand extends Command {
 
 	private enum DriveMode {
         NORMAL,
-        TRENCH_LOCK,
-        BUMP_LOCK,
 		PRECISION,
 		TURBO,
 		XMODE

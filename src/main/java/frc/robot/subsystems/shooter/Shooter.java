@@ -1,9 +1,7 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -38,30 +36,28 @@ import frc.robot.subsystems.shooter.spindexer.Spindexer;
 
 public class Shooter extends SubsystemBase {
 
-    public static TargetLocation targetLocation;
+    private Hood hood;
+    private Flywheel flywheel;
+    private Turret turret;
+    private Spindexer spindexer;
 
-    public Hood hood;
-    public Flywheel flywheel;
-    public Turret turret;
-    public Spindexer spindexer;
+    private boolean whileMoving;
 
-    public boolean withConstantVelocity;
-    public boolean whileMoving;
-
-    public final int HOPPER_CAPACITY = 40;
     private final int FIRE_RATE = 6;
-    public int hopperCount;
-
     private double lastSimShotTime = 0.0;
 
-    public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean withConstantVelocity, boolean whileMoving) {
+    // prevents feeding on a momentary false positive
+    private Debouncer setpointDebouncer = new Debouncer(0.04, DebounceType.kRising);
+
+    // lets the spindexer keep running through the RPM dip after a shot
+    private Debouncer feedThroughDebouncer = new Debouncer(1, DebounceType.kFalling);
+
+    public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean whileMoving) {
         this.hood = hood;
         this.flywheel = flywheel;
         this.turret = turret;
         this.spindexer = spindexer;
-        this.withConstantVelocity = withConstantVelocity;
         this.whileMoving = whileMoving;
-        this.hopperCount = 0;
     }
 
     @Override
@@ -69,50 +65,12 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/At Setpoint", atSetpoint());
     }
 
-    public int getHopperCount() {
-        return hopperCount;
-    }
-
-    public void addBall() {
-        if (hopperCount < HOPPER_CAPACITY) {
-            hopperCount++;
-        }
-    }
-
-    public void removeBall() {
-        if (hopperCount > 0) {
-            hopperCount--;
-        }
-    }
-
-    public boolean shouldIntake() {
-        double intakeProbability = Math.max(0, 1 - RobotContainer.drivetrain.getFieldRelativeLinearVelocity().in(MetersPerSecond) / 3);
-        return hopperCount < HOPPER_CAPACITY
-            && Math.random() < intakeProbability;
-    }
-
-    public boolean hasBalls() {
-        return hopperCount > 0;
-    }
-
-	public Pose3d getFieldRelativePosition() {
-		Translation2d turretTranslation2d = turret.getFieldRelativePosition();
-		return new Pose3d(
-			new Translation3d(
-				turretTranslation2d.getX(),
-				turretTranslation2d.getY(),
-				TurretConstants.ORIGIN_TO_TURRET.getZ()
-			),
-			new Rotation3d(
-				Rotations.zero(),
-				Rotations.zero(),
-				turret.getFieldRelativeAngle()
-			)
-		);
-	}
-
     public boolean atSetpoint() {
-        return turret.atSetpoint() && hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation());
+        return feedThroughDebouncer.calculate(
+            setpointDebouncer.calculate(
+                turret.atSetpoint() && hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation())
+            )
+        );
     }
 
     public TargetLocation getTargetFromGoal(ShooterGoal goal) {
@@ -151,7 +109,6 @@ public class Shooter extends SubsystemBase {
         if(target != null)  {
             return Aiming.calculateShot(
                 target,
-                withConstantVelocity,
                 whileMoving
             );
         } else {
@@ -171,7 +128,6 @@ public class Shooter extends SubsystemBase {
         if(target != null)  {
             return Aiming.calculateSimShot(
                 target,
-                withConstantVelocity,
                 whileMoving
             );
         } else {
@@ -183,7 +139,7 @@ public class Shooter extends SubsystemBase {
         }
     }
 
-    public Command getShooterGoalCommand(Supplier<ShooterGoal> goalSupplier) {
+    public Command applyShooterGoalCommand(Supplier<ShooterGoal> goalSupplier) {
         return Commands.runEnd(() -> {
 
             ShooterGoal goal = goalSupplier.get();
@@ -224,7 +180,7 @@ public class Shooter extends SubsystemBase {
         this, flywheel, turret, hood, spindexer);
     }
 
-    public Command getSimShooterGoalCommand(Supplier<ShooterGoal> goalSupplier) {
+    public Command applySimShooterGoalCommand(Supplier<ShooterGoal> goalSupplier) {
         return Commands.runEnd(() -> {
 
             ShooterGoal goal = goalSupplier.get();
@@ -260,21 +216,16 @@ public class Shooter extends SubsystemBase {
     }
 
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
-        if (RobotContainer.shooter.atSetpoint() && !Turret.isSpinningAround) {
+        if (this.atSetpoint() && !RobotContainer.turret.isSpinningAround()) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
 
             if(currentTime - lastSimShotTime >= interval) {
                 lastSimShotTime = currentTime;
-                removeBall();
 
                 LinearVelocity exitVelocity = velocitySupplier.get().times(1 + ((Math.random() * 0.05)-0.025));
                 Angle robotRelativeTurretAngle = turret.getRobotRelativeAngle();
                 Angle hoodAngle = hood.getAngle();
-
-                Logger.recordOutput("launchFuelCommand()/Robot Relative Turret Angle", robotRelativeTurretAngle.in(Rotations));
-                Logger.recordOutput("launchFuelCommand()/Hood Angle", hoodAngle.in(Rotations));
-                Logger.recordOutput("launchFuelCommand()/Exit Velocity", exitVelocity.in(MetersPerSecond));
 
                 RobotContainer.fuelSim.launchFuel(
                     exitVelocity,
@@ -288,9 +239,9 @@ public class Shooter extends SubsystemBase {
 
     public Command getDefaultCommand() {
         if(RobotBase.isReal()) {
-            return getShooterGoalCommand(() -> ShooterCoordinator.currentGoal);
+            return applyShooterGoalCommand(() -> RobotContainer.shooterCoordinator.getCurrentGoal());
         } else {
-            return getSimShooterGoalCommand(() -> ShooterCoordinator.currentGoal);
+            return applySimShooterGoalCommand(() -> RobotContainer.shooterCoordinator.getCurrentGoal());
         }
     }
 

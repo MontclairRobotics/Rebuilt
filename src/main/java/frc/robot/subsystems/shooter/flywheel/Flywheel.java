@@ -1,8 +1,5 @@
 package frc.robot.subsystems.shooter.flywheel;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.constants.FlywheelConstants.*;
-
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -21,49 +18,30 @@ public class Flywheel extends SubsystemBase {
     private final FlywheelIO io;
     private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
-    private LoggedTunableNumber tunableKP;
-    private LoggedTunableNumber tunableKS;
-    private LoggedTunableNumber tunableKV;
-
     public LoggedTunableNumber tuningFlywheelSpeed;
 
     private int logCounter;
     private final int loopsPerLog;
 
-    private int fudgeFactor = 0;
-
     public Flywheel(FlywheelIO io) {
         this.io = io;
         loopsPerLog = RobotContainer.FLYWHEEL_DEBUG ? 1 : 5;
-
-        if(RobotContainer.FLYWHEEL_DEBUG) {
-            tunableKP = new LoggedTunableNumber("Flywheel/kP", SLOT0_CONFIGS.kP);
-            tunableKS = new LoggedTunableNumber("Flywheel/kS", SLOT0_CONFIGS.kS);
-            tunableKV = new LoggedTunableNumber("Flywheel/kV", SLOT0_CONFIGS.kV);
-
-        }
         tuningFlywheelSpeed = new LoggedTunableNumber("Flywheel/TuningFlywheelRPS", 0);
     }
 
     public boolean atSetpoint() {
-        return io.isAtSetpoint();
-    }
-
-    public void increaseFudge() {
-        fudgeFactor++;
-    }
-
-    public void decreaseFudge() {
-        fudgeFactor--;
+        return inputs.isAtSetpoint;
     }
 
     public void periodic() {
         logCounter++;
 
-        io.updateInputs(inputs); // need to update inputs every frame
+        // need to update this every frame
+        io.updateInputs(inputs);
+        Logger.processInputs("Flywheel", inputs);
 
         if(logCounter % loopsPerLog == 0) {
-            Logger.processInputs("Flywheel", inputs);
+            // any expensive, derived logging here
         }
     }
 
@@ -72,7 +50,7 @@ public class Flywheel extends SubsystemBase {
     }
 
     public void setVelocity(AngularVelocity targetVelocity) {
-        io.setVelocity(targetVelocity.plus(RotationsPerSecond.of(fudgeFactor)));
+        io.setVelocity(targetVelocity);
     }
 
     public void setVelocity(Supplier<AngularVelocity> targetVelocitySupplier) {
