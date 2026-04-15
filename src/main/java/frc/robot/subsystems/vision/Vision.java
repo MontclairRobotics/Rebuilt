@@ -176,6 +176,8 @@ public class Vision extends SubsystemBase {
 				if (rejectPose) {
 					continue;
 				}
+				
+				acceptedPoseCounter++; // we've accepted a pose, increase the counter
 
 				acceptedPoseCounter++; // we've accepted a pose, increase the counter
 

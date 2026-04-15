@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter.spindexer.indexer;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.IndexerConstants.*;
 
 import java.util.function.DoubleSupplier;
