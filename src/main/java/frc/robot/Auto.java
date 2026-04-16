@@ -42,7 +42,7 @@ import frc.robot.util.PoseUtils;
 
 public class Auto extends SubsystemBase {
 	private char currentPos;
-	private double timeToEmptyFuel = 6.0; //TODO: get the actual value
+	private double timeToEmptyFuel = 5.0; //TODO: get the actual value
 	private Field2d field = new Field2d();
 
 	private ArrayList<PathPlannerPath> allPaths = new  ArrayList<PathPlannerPath>();
