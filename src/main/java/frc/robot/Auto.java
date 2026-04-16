@@ -347,7 +347,7 @@ public class Auto extends SubsystemBase {
 
 			if(
 				(currentPos == 'L' || currentPos == 'R')
-				&& currentPos == autoString.charAt(i)
+				// && currentPos == autoString.charAt(i)
 				|| ((autoString.charAt(i+1) == '0') && (currentPos == 'D' || currentPos == 'O'))) {
 
 				followPathCommands.addCommands(

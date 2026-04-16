@@ -331,6 +331,8 @@ public class RobotContainer {
 
 	private void configureBindings() {
 
+		shooter.setDefaultCommand(shooter.getCurrentCommand());
+
 		driverController.povRight().whileTrue(new WheelRadiusCharacterization(Direction.CLOCKWISE, drivetrain));
 		driverController.povLeft().whileTrue(new WheelRadiusCharacterization(Direction.COUNTER_CLOCKWISE, drivetrain));
 
