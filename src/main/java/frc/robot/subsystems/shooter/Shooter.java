@@ -139,6 +139,33 @@ public class Shooter extends SubsystemBase {
         }
     }
 
+    public Command shootStaticallyCommand() {
+        return Commands.runEnd(
+            () -> {
+
+                ShootingParameters params = new ShootingParameters(
+                    Rotations.zero(),
+                    Degrees.of(10),
+                    RotationsPerSecond.of(24),
+                    Timer.getFPGATimestamp()
+                );
+
+                turret.setRobotRelativeAngle(params.robotRelativeTurretAngle(), RotationsPerSecond.zero());
+                hood.setAngle(params.hoodAngle());
+                flywheel.setVelocity(params.flywheelVelocity());
+                spindexer.spinUp();
+
+            },
+            () -> {
+                flywheel.stop();
+                turret.stop();
+                hood.setAngle(HoodConstants.MIN_ANGLE);
+                spindexer.stop();
+            },
+            this, flywheel, turret, hood, spindexer
+        );
+    }
+
     public Command applyShooterGoalCommand(Supplier<ShooterGoal> goalSupplier) {
         return Commands.runEnd(() -> {
 

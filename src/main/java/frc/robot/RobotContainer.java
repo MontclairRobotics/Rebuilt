@@ -314,6 +314,8 @@ public class RobotContainer {
 
 		// operator
 
+		operatorController.square().whileTrue(shooter.shootStaticallyCommand());
+
 		operatorController.touchpad().whileTrue(spindexer.setVoltageCommand(-12)).onFalse(spindexer.spinDownCommand());
 		operatorController.PS().whileTrue(rollers.setVoltageCommand(-12)).onFalse(rollers.stopCommand());
 
