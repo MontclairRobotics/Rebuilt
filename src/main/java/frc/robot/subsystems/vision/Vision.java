@@ -67,7 +67,7 @@ public class Vision extends SubsystemBase {
 		// 5 hz logging normally, up to 10 hz when in debug
 		// 50 hz / 5 loops per log = 10 hz
 		// 50 hz / 10 loops per log = 5 hz
-		loopsPerLog = RobotContainer.VISION_DEBUG ? 5 : 10;
+		loopsPerLog = RobotContainer.VISION_DEBUG ? 2 : 5;
 
 		// Initialize inputs
 		this.inputs = new VisionIOInputsAutoLogged[io.length];
