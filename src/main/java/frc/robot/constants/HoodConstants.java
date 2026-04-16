@@ -56,7 +56,7 @@ public class HoodConstants {
 	public static final double kS = 0;
 	public static final double kG = 0.4;
 
-	public static final Angle TOLERANCE = Degrees.of(0.5);
+	public static final Angle TOLERANCE = Degrees.of(1);
 
 	public static final double STATOR_CURRENT_LIMIT = 15;
 	public static final double SUPPLY_CURRENT_LIMIT = 10;
