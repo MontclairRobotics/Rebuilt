@@ -5,11 +5,15 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -19,6 +23,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 
 public class HoodConstants {
@@ -38,7 +44,7 @@ public class HoodConstants {
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO;
 
 	public static final double MOMENT_OF_INERTIA = 0.03038161694; // from CAD on 3/3/2026
-	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.125977);
+	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.393555);
 
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
 	public static final double HOOD_LOWER_TIME = 1.2;
@@ -55,6 +61,10 @@ public class HoodConstants {
 	public static final double STATOR_CURRENT_LIMIT = 15;
 	public static final double SUPPLY_CURRENT_LIMIT = 10;
 
+	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(3);
+	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(30);
+	public static final double MOTION_MAGIC_JERK = 100;
+
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKI(kI).withKD(kD)
 		.withKS(kS).withKG(kG)
@@ -69,6 +79,11 @@ public class HoodConstants {
 		.withStatorCurrentLimitEnable(true)
 		.withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
 		.withSupplyCurrentLimitEnable(true);
+
+	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
+		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)
+		.withMotionMagicAcceleration(MOTION_MAGIC_ACCELERATION)
+		.withMotionMagicJerk(MOTION_MAGIC_JERK);
 
 	public static final MotorOutputConfigs MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
 		.withInverted(InvertedValue.Clockwise_Positive)

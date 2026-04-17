@@ -121,7 +121,7 @@ public class TurretIOTalonFX implements TurretIO {
 
     @Override
     public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity) {
-        motor.setControl(request.withPosition(angle).withVelocity(filter.calculate(velocity.in(RotationsPerSecond))));
+        motor.setControl(request.withPosition(angle).withVelocity(velocity.in(RotationsPerSecond)));
     }
 
     @Override
