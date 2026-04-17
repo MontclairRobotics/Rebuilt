@@ -71,16 +71,16 @@ public class AimingConstants {
 
 	static {
 
-		REAL_MAP.put(0.00, new ShotSettings(Degrees.of(0.0), RotationsPerSecond.of(19.5)));
-		REAL_MAP.put(1.50, new ShotSettings(Degrees.of(0), RotationsPerSecond.of(20)));
-		REAL_MAP.put(2.49, new ShotSettings(Degrees.of(9.5), RotationsPerSecond.of(22)));
-		REAL_MAP.put(3.49, new ShotSettings(Degrees.of(10), RotationsPerSecond.of(23.1)));
-		REAL_MAP.put(3.98, new ShotSettings(Degrees.of(10.8), RotationsPerSecond.of(23.75)));
-		REAL_MAP.put(4.28, new ShotSettings(Degrees.of(12.5), RotationsPerSecond.of(24.25)));
-		REAL_MAP.put(4.74, new ShotSettings(Degrees.of(13), RotationsPerSecond.of(25.15)));
-		REAL_MAP.put(5.07, new ShotSettings(Degrees.of(14.7), RotationsPerSecond.of(25.75)));
-		REAL_MAP.put(5.73, new ShotSettings(Degrees.of(16), RotationsPerSecond.of(26.85)));
-		REAL_MAP.put(7.00, new ShotSettings(Degrees.of(16), RotationsPerSecond.of(28.35)));
+		REAL_MAP.put(0.00, new ShotSettings(Degrees.of(0.0), RotationsPerSecond.of(19)));
+		REAL_MAP.put(1.50, new ShotSettings(Degrees.of(0), RotationsPerSecond.of(19.4)));
+		REAL_MAP.put(2.49, new ShotSettings(Degrees.of(9.5), RotationsPerSecond.of(21.3)));
+		REAL_MAP.put(3.49, new ShotSettings(Degrees.of(10), RotationsPerSecond.of(22.8)));
+		REAL_MAP.put(3.98, new ShotSettings(Degrees.of(10.8), RotationsPerSecond.of(23.4)));
+		REAL_MAP.put(4.28, new ShotSettings(Degrees.of(12.5), RotationsPerSecond.of(24)));
+		REAL_MAP.put(4.74, new ShotSettings(Degrees.of(13), RotationsPerSecond.of(25.1)));
+		REAL_MAP.put(5.07, new ShotSettings(Degrees.of(14.7), RotationsPerSecond.of(25.7)));
+		REAL_MAP.put(5.73, new ShotSettings(Degrees.of(16), RotationsPerSecond.of(26.7)));
+		REAL_MAP.put(7.00, new ShotSettings(Degrees.of(16), RotationsPerSecond.of(28.2)));
 
 		//double x = 0.0;
 
