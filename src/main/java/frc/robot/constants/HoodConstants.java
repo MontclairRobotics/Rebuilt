@@ -37,24 +37,24 @@ public class HoodConstants {
 	public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
 	public static final Angle MIN_ANGLE = Rotation.of(0);
-	public static final Angle MAX_ANGLE = Rotations.of(0.71);
+	public static final Angle MAX_ANGLE = Rotations.of(0.068);
 
-	public static final double ROTOR_TO_SENSOR_RATIO = 5;
+	public static final double ROTOR_TO_SENSOR_RATIO = 5 * (20 / 17);
 	public static final double SENSOR_TO_MECHANISM_RATIO = 176.0 / 10;
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO;
 
 	public static final double MOMENT_OF_INERTIA = 0.03038161694; // from CAD on 3/3/2026
-	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.393555);
+	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.467763671875);
 
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
 	public static final double HOOD_LOWER_TIME = 1.2;
 
 	// Tuned 3/24/26
-	public static final double kP = 500;
+	public static final double kP = 280;
 	public static final double kD = 0;
 	public static final double kI = 0;
 	public static final double kS = 0;
-	public static final double kG = 0.45;
+	public static final double kG = 0.6;
 
 	public static final Angle TOLERANCE = Degrees.of(1);
 
