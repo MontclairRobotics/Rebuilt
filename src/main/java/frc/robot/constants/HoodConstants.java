@@ -50,11 +50,11 @@ public class HoodConstants {
 	public static final double HOOD_LOWER_TIME = 1.2;
 
 	// Tuned 3/24/26
-	public static final double kP = 300;
+	public static final double kP = 500;
 	public static final double kD = 0;
-	public static final double kI = 20;
+	public static final double kI = 0;
 	public static final double kS = 0;
-	public static final double kG = 0.4;
+	public static final double kG = 0.45;
 
 	public static final Angle TOLERANCE = Degrees.of(1);
 
