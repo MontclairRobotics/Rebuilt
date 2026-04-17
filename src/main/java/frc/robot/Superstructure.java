@@ -45,13 +45,17 @@ public class Superstructure extends SubsystemBase {
 
 		// Trench danger zone update
 		logCounter++;
+		// Update danger zones only while logging?
 		if(logCounter % loopsPerLog == 0 && inTrenchZone && movingIntoObstacle(robotPose, velocityInput)) {
 			double fieldRelativeXVelocity = RobotContainer.drivetrain.getFieldRelativeVelocity().getX();
 			updateTrenchZonesVeloBased(fieldRelativeXVelocity);
+			// We just reset, why record we haven't? 
 			hasRecentlyResetTrenchZones = false;
 		} else {
 			if(!hasRecentlyResetTrenchZones) resetTrenchDangerZones();
+			// This should be inside the conditional, so we update only if we actually reset?
 			hasRecentlyResetTrenchZones = true;
+			// Should recency go false with time?
 		}
 
 	};
