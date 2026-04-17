@@ -43,8 +43,8 @@ public class FlywheelIOTalonFX implements FlywheelIO{
     private final VoltageOut voltageOut = new VoltageOut(0);
 
     public FlywheelIOTalonFX() {
-        leftMotor = new TalonFX(LEFT_CAN_ID);
-        rightMotor = new TalonFX(RIGHT_CAN_ID);
+        leftMotor = new TalonFX(RIGHT_CAN_ID);
+        rightMotor = new TalonFX(LEFT_CAN_ID);
         rightMotor.setControl(new Follower(LEFT_CAN_ID, MotorAlignmentValue.Opposed));
 
         leftMotorConfig = new TalonFXConfiguration()
