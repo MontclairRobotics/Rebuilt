@@ -319,6 +319,8 @@ public class RobotContainer {
 		operatorController.touchpad().whileTrue(spindexer.setVoltageCommand(-12)).onFalse(spindexer.spinDownCommand());
 		operatorController.PS().whileTrue(rollers.setVoltageCommand(-12)).onFalse(rollers.stopCommand());
 
+		operatorController.povUp().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.stopCommand());
+
 		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
 
