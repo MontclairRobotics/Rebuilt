@@ -27,7 +27,7 @@ public class Superstructure extends SubsystemBase {
 	private static boolean inTrenchZone = false;
 	private static boolean inTrenchDangerZone = false;
 
-	private Distance defaultWidth = Meters.of(0.8);
+	private Distance defaultWidth = Meters.of(0.4);
 	private Translation2d[][] currentTrenchDangerZones;
 
 	@Override
@@ -45,7 +45,7 @@ public class Superstructure extends SubsystemBase {
 
 		// Trench danger zone update
 		logCounter++;
-		if(logCounter % loopsPerLog == 0 && inTrenchZone && movingIntoObstacle(robotPose, velocityInput)) {
+		if(movingIntoObstacle(robotPose, velocityInput)) {
 			double fieldRelativeXVelocity = RobotContainer.drivetrain.getFieldRelativeVelocity().getX();
 			updateTrenchZonesVeloBased(fieldRelativeXVelocity);
 			hasRecentlyResetTrenchZones = false;
