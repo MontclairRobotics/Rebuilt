@@ -80,16 +80,16 @@
     },
     {
       "anchor": {
-        "x": 3.589750889679717,
-        "y": 7.44
+        "x": 3.3853262158956117,
+        "y": 7.655468564650059
       },
       "prevControl": {
-        "x": 4.983284121320279,
-        "y": 7.561918360015195
+        "x": 4.784021352313168,
+        "y": 7.676986951364176
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Left Trench (L)"
+      "linkedName": null
     }
   ],
   "rotationTargets": [

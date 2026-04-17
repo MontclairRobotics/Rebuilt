@@ -5,15 +5,11 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -23,8 +19,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 
 public class HoodConstants {
@@ -61,10 +55,6 @@ public class HoodConstants {
 	public static final double STATOR_CURRENT_LIMIT = 15;
 	public static final double SUPPLY_CURRENT_LIMIT = 10;
 
-	public static final AngularVelocity MOTION_MAGIC_CRUISE_VELOCITY = RotationsPerSecond.of(3);
-	public static final AngularAcceleration MOTION_MAGIC_ACCELERATION = RotationsPerSecondPerSecond.of(30);
-	public static final double MOTION_MAGIC_JERK = 100;
-
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKI(kI).withKD(kD)
 		.withKS(kS).withKG(kG)
@@ -94,11 +84,6 @@ public class HoodConstants {
 		.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
 		.withRotorToSensorRatio(1)
 		.withSensorToMechanismRatio(GEARING);
-
-	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
-		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)
-		.withMotionMagicAcceleration(MOTION_MAGIC_ACCELERATION)
-		.withMotionMagicJerk(MOTION_MAGIC_JERK);
 
 	public static final CANcoderConfiguration ENCODER_CONFIGS = new CANcoderConfiguration()
         .withMagnetSensor(

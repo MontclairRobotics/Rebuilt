@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -19,6 +20,7 @@ import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
 
 
@@ -39,6 +41,9 @@ public class TurretIOTalonFX implements TurretIO {
     private final PositionVoltage request = new PositionVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
     private final VoltageOut voltageOut = new VoltageOut(0);
+
+    private final double timeConstant = 0.05;
+    private final LinearFilter filter = LinearFilter.singlePoleIIR(timeConstant, 0.02);
 
     public TurretIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
@@ -116,7 +121,7 @@ public class TurretIOTalonFX implements TurretIO {
 
     @Override
     public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity) {
-        motor.setControl(request.withPosition(angle).withVelocity(velocity));
+        motor.setControl(request.withPosition(angle).withVelocity(filter.calculate(velocity.in(RotationsPerSecond))));
     }
 
     @Override
