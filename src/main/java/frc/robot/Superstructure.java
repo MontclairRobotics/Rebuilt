@@ -50,6 +50,7 @@ public class Superstructure extends SubsystemBase {
 			double fieldRelativeXVelocity = RobotContainer.drivetrain.getFieldRelativeVelocity().getX();
 			updateTrenchZonesVeloBased(fieldRelativeXVelocity);
 			// We just reset, why record we haven't? 
+			// Maybe because in danger zone and moving into, therefore should update again soon?
 			hasRecentlyResetTrenchZones = false;
 		} else {
 			if(!hasRecentlyResetTrenchZones) resetTrenchDangerZones();
