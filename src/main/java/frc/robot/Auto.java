@@ -86,6 +86,42 @@ public class Auto extends SubsystemBase {
 		SmartDashboard.putData("Field", field);
 	}
 
+	public Command followCybersonicsAutoCommand() {
+
+		Command zeroPoseCommand = Commands.none();
+		Command path1cmd = Commands.none();
+		Command path2cmd = Commands.none();
+
+		try {
+			PathPlannerPath path1 = PathPlannerPath.fromPathFile("JK");
+			path1cmd = AutoBuilder.followPath(path1);
+			PathPlannerPath path2 = PathPlannerPath.fromPathFile("KL");
+			path2cmd = AutoBuilder.followPath(path2);
+
+			Optional<Pose2d>  opPose = path1.getStartingHolonomicPose();
+			Pose2d pose = opPose.isPresent() ? PoseUtils.flipPoseAlliance(opPose.get()) : new Pose2d();
+
+			zeroPoseCommand = Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain);
+
+		} catch(Exception e) {}
+
+		return Commands.parallel(
+			RobotContainer.rollers.spinUpCommand(),
+			Commands.sequence(
+				zeroPoseCommand,
+				RobotContainer.shooter.startShootingInAuto(),
+				Commands.waitSeconds(4), // wait to shoot preloaded
+				RobotContainer.shooter.stopShootingInAuto(),
+				path1cmd, // exactly 3 seconds long
+				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+				Commands.waitSeconds(2), // wait 2 seconds to reach a total of 9 seconds passed, 11 seconds left
+				RobotContainer.shooter.startShootingInAuto(),
+				path2cmd
+			)
+	);
+
+	}
+
 	public static void drawAuto(String auto) {
 		int maxObjs = 0;
 		Field2d field = new Field2d();
