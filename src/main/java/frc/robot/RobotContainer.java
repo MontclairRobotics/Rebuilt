@@ -378,6 +378,7 @@ public class RobotContainer {
 		// System.out.println(auto.getAutoCommand());
 		return auto.getAutoCommand();
 		// return auto.followCybersonicsAutoCommand();
+		// return auto.depotAutoCommand();
 		// return Commands.none();
 	}
 

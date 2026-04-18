@@ -122,6 +122,35 @@ public class Auto extends SubsystemBase {
 
 	}
 
+	public Command depotAutoCommand() {
+
+		Command zeroPoseCommand = Commands.none();
+		Command pathcmd = Commands.none();
+
+		try {
+			PathPlannerPath path = PathPlannerPath.fromPathFile("CD");
+			pathcmd = AutoBuilder.followPath(path);
+
+			Optional<Pose2d>  opPose = path.getStartingHolonomicPose();
+			Pose2d pose = opPose.isPresent() ? PoseUtils.flipPoseAlliance(opPose.get()) : new Pose2d();
+
+			zeroPoseCommand = Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain);
+
+		} catch(Exception e) {}
+
+		return Commands.parallel(
+			RobotContainer.rollers.spinUpCommand(),
+			Commands.waitSeconds(1).andThen(RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE)),
+			Commands.sequence(
+				zeroPoseCommand,
+				pathcmd, // around 12 seconds long
+				Commands.waitSeconds(1), // wait 2 seconds to reach a total of 9 seconds passed, 11 seconds left
+				RobotContainer.shooter.startShootingInAuto()
+			)
+	);
+
+	}
+
 	public static void drawAuto(String auto) {
 		int maxObjs = 0;
 		Field2d field = new Field2d();
