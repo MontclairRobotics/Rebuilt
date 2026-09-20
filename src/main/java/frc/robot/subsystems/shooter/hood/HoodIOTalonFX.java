@@ -7,8 +7,8 @@ import static frc.robot.constants.HoodConstants.*;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -35,7 +35,7 @@ public class HoodIOTalonFX implements HoodIO {
     private final StatusSignal<Current> currentDrawAmpsSignal;
     private final StatusSignal<Temperature> tempCelsiusSignal;
 
-    private final MotionMagicVoltage request = new MotionMagicVoltage(0).withEnableFOC(true);
+    private final PositionVoltage request = new PositionVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
     private final VoltageOut voltageOut = new VoltageOut(0);
 

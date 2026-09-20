@@ -113,15 +113,15 @@
     {
       "anchor": {
         "x": 6.635,
-        "y": 0.63
+        "y": 0.27466192170818426
       },
       "prevControl": {
-        "x": 6.880103091064126,
-        "y": 0.6792389556226646
+        "x": 6.884978382549369,
+        "y": 0.27794951322817996
       },
       "nextControl": {
-        "x": 6.31244433215961,
-        "y": 0.5652015344005736
+        "x": 5.816903914590748,
+        "y": 0.2639027283511267
       },
       "isLocked": false,
       "linkedName": null
@@ -137,7 +137,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Right Trench (R)"
+      "linkedName": null
     }
   ],
   "rotationTargets": [

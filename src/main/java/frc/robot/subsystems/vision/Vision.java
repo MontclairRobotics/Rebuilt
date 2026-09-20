@@ -67,7 +67,7 @@ public class Vision extends SubsystemBase {
 		// 5 hz logging normally, up to 10 hz when in debug
 		// 50 hz / 5 loops per log = 10 hz
 		// 50 hz / 10 loops per log = 5 hz
-		loopsPerLog = RobotContainer.VISION_DEBUG ? 5 : 10;
+		loopsPerLog = RobotContainer.VISION_DEBUG ? 2 : 5;
 
 		// Initialize inputs
 		this.inputs = new VisionIOInputsAutoLogged[io.length];
@@ -144,6 +144,9 @@ public class Vision extends SubsystemBase {
 				boolean isMT1 = observation.type() == PoseObservationType.MEGATAG_1;
 				boolean isMT2 = observation.type() == PoseObservationType.MEGATAG_2;
 
+				double distanceTolerance = 4.5;
+				double angleTolerance = isMT2? 3 : 30;
+
 				// Check whether to reject pose
 				boolean rejectPose =
 					!(observation.tagCount() > 0) // Must have at least one tag
@@ -162,13 +165,13 @@ public class Vision extends SubsystemBase {
 						observation.pose().getRotation().toRotation2d()
 						.minus(
 							PoseUtils.wrapRotation(RobotContainer.drivetrain.getRobotPose().getRotation())
-						).getDegrees()) > 30
+						).getDegrees()) > angleTolerance
 
 					// max angular rate
 					|| RobotContainer.drivetrain.getAngularSpeed().in(DegreesPerSecond) > 360
 
 					// max tag distance
-					|| observation.averageTagDistance() > 5.5;
+					|| observation.averageTagDistance() > distanceTolerance;
 
 				// Add pose to log
 				if (logCounter % loopsPerLog == 0) {
