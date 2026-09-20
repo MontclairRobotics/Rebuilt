@@ -37,26 +37,26 @@ public class HoodConstants {
 	public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
 	public static final Angle MIN_ANGLE = Rotation.of(0);
-	public static final Angle MAX_ANGLE = Rotations.of(0.71);
+	public static final Angle MAX_ANGLE = Rotations.of(0.072);
 
-	public static final double ROTOR_TO_SENSOR_RATIO = 5;
+	public static final double ROTOR_TO_SENSOR_RATIO = 5 * (20 / 17);
 	public static final double SENSOR_TO_MECHANISM_RATIO = 176.0 / 10;
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO;
 
 	public static final double MOMENT_OF_INERTIA = 0.03038161694; // from CAD on 3/3/2026
-	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.125977);
+	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(-0.305176);
 
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
 	public static final double HOOD_LOWER_TIME = 1.2;
 
 	// Tuned 3/24/26
-	public static final double kP = 300;
+	public static final double kP = 310;
 	public static final double kD = 0;
-	public static final double kI = 20;
+	public static final double kI = 0;
 	public static final double kS = 0;
-	public static final double kG = 0.4;
+	public static final double kG = 0.6;
 
-	public static final Angle TOLERANCE = Degrees.of(0.5);
+	public static final Angle TOLERANCE = Degrees.of(1);
 
 	public static final double STATOR_CURRENT_LIMIT = 15;
 	public static final double SUPPLY_CURRENT_LIMIT = 10;
@@ -80,6 +80,11 @@ public class HoodConstants {
 		.withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
 		.withSupplyCurrentLimitEnable(true);
 
+	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
+		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)
+		.withMotionMagicAcceleration(MOTION_MAGIC_ACCELERATION)
+		.withMotionMagicJerk(MOTION_MAGIC_JERK);
+
 	public static final MotorOutputConfigs MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
 		.withInverted(InvertedValue.Clockwise_Positive)
 		.withNeutralMode(NeutralModeValue.Brake);
@@ -94,11 +99,6 @@ public class HoodConstants {
 		.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
 		.withRotorToSensorRatio(1)
 		.withSensorToMechanismRatio(GEARING);
-
-	public static final MotionMagicConfigs MOTION_MAGIC_CONFIGS = new MotionMagicConfigs()
-		.withMotionMagicCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY)
-		.withMotionMagicAcceleration(MOTION_MAGIC_ACCELERATION)
-		.withMotionMagicJerk(MOTION_MAGIC_JERK);
 
 	public static final CANcoderConfiguration ENCODER_CONFIGS = new CANcoderConfiguration()
         .withMagnetSensor(

@@ -39,7 +39,7 @@ public class TurretConstants {
 	public static final Angle MIN_ANGLE = Rotations.of(-0.51);
 	public static final Angle MAX_ANGLE = Rotations.of(0.51);
 
-	public static final Angle ANGLE_TOLERANCE = Degrees.of(3);
+	public static final Angle ANGLE_TOLERANCE = Degrees.of(4);
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.25); // TODO: tune
 
 	public static final double MOMENT_OF_INERTIA = 0.154244; //From CAD on 2/12/26
@@ -50,7 +50,7 @@ public class TurretConstants {
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO;
 
 	public static final Angle ANGLE_OFFSET = Rotations.of(0.5);
-	public static final Angle ENCODER_OFFSET = Rotations.of(-0.397);
+	public static final Angle ENCODER_OFFSET = Rotations.of(-0.445068);
 
 	public static final double kP = 80;
 	public static final double kD = 5;

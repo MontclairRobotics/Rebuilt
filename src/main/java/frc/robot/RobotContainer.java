@@ -314,8 +314,12 @@ public class RobotContainer {
 
 		// operator
 
+		operatorController.square().whileTrue(shooter.shootStaticallyCommand());
+
 		operatorController.touchpad().whileTrue(spindexer.setVoltageCommand(-12)).onFalse(spindexer.spinDownCommand());
 		operatorController.PS().whileTrue(rollers.setVoltageCommand(-12)).onFalse(rollers.stopCommand());
+
+		operatorController.povUp().whileTrue(spindexer.spinUpCommand()).onFalse(spindexer.stopCommand());
 
 		operatorController.povLeft().onTrue(turret.increaseFudgeFactorCommand());
 		operatorController.povRight().onTrue(turret.decreaseFudgeFactorCommand());
@@ -330,6 +334,8 @@ public class RobotContainer {
 	}
 
 	private void configureBindings() {
+
+		shooter.setDefaultCommand(shooter.getCurrentCommand());
 
 		driverController.povRight().whileTrue(new WheelRadiusCharacterization(Direction.CLOCKWISE, drivetrain));
 		driverController.povLeft().whileTrue(new WheelRadiusCharacterization(Direction.COUNTER_CLOCKWISE, drivetrain));
@@ -371,6 +377,8 @@ public class RobotContainer {
 	public Command getAutonomousCommand() {
 		// System.out.println(auto.getAutoCommand());
 		return auto.getAutoCommand();
+		// return auto.followCybersonicsAutoCommand();
+		// return auto.depotAutoCommand();
 		// return Commands.none();
 	}
 

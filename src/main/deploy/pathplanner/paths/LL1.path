@@ -64,32 +64,32 @@
     },
     {
       "anchor": {
-        "x": 6.43,
-        "y": 7.45
+        "x": 5.623238434163702,
+        "y": 7.827615658362989
       },
       "prevControl": {
-        "x": 7.804391531961538,
-        "y": 7.229292236492646
+        "x": 7.014701707712289,
+        "y": 7.788963900764416
       },
       "nextControl": {
-        "x": 5.442649761521884,
-        "y": 7.608554427807007
+        "x": 4.848576512455517,
+        "y": 7.849134045077106
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.589750889679717,
-        "y": 7.44
+        "x": 3.202419928825624,
+        "y": 7.827615658362989
       },
       "prevControl": {
-        "x": 4.983284121320279,
-        "y": 7.561918360015195
+        "x": 4.601115065243181,
+        "y": 7.849134045077106
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Left Trench (L)"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
@@ -106,7 +106,7 @@
       "rotationDegrees": -100.0
     },
     {
-      "waypointRelativePos": 4.46,
+      "waypointRelativePos": 3.93,
       "rotationDegrees": 0.0
     }
   ],
