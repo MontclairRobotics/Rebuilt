@@ -17,28 +17,29 @@ import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.constants.Constants.BUMPER_WIDTH;
 
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.constants.Constants;
 
 /**
  * credit to team 6328 for this wonderful class of tag-based constants.
  */
 public class FieldConstants {
-	public static final FieldType FIELD_TYPE = FieldType.WELDED;
+	// public static final FieldType FIELD_TYPE = FieldType.WELDED;
 
 	// AprilTag related constants
-	public static final int APRIL_TAG_COUNT = AprilTagLayoutType.OFFICIAL.getLayout().getTags().size();
+	public static final int APRIL_TAG_COUNT = AprilTagLayoutType.ROBOCON.getLayout().getTags().size();
 	public static final Distance APRIL_TAG_WIDTH = Inches.of(6.5);
-	public static final AprilTagLayoutType DEFAULT_APRIL_TAG_LAYOUT_TYPE = AprilTagLayoutType.OFFICIAL;
+	public static final AprilTagLayoutType DEFAULT_APRIL_TAG_LAYOUT_TYPE = AprilTagLayoutType.ROBOCON;
 
 	// Field dimensions
-	public static final Distance FIELD_LENGTH = Meters.of(AprilTagLayoutType.OFFICIAL.getLayout().getFieldLength());
-	public static final Distance FIELD_WIDTH = Meters.of(AprilTagLayoutType.OFFICIAL.getLayout().getFieldWidth());
+	public static final Distance FIELD_LENGTH = Meters.of(AprilTagLayoutType.ROBOCON.getLayout().getFieldLength());
+	public static final Distance FIELD_WIDTH = Meters.of(AprilTagLayoutType.ROBOCON.getLayout().getFieldWidth());
 
 	public static class Zones {
 
 		// space (along x axis) in front and behind the center of the TRENCH to count for the TRENCH zone
-        public static final Distance TRENCH_ZONE_EXTENSION = Inches.of(90);
-
+        public static final Distance TRENCH_ZONE_EXTENSION = Inches.of(95);
+		//TODO: FIGURE OUT WHETHER TO CHANGE OR NOT
 		public static final Distance TRENCH_DANGER_ZONE_EXTENSION = Inches.of(40);
 
 		// space (along x axis) in front and behind the center of the BUMP to count for the BUMP zone
@@ -134,13 +135,13 @@ public class FieldConstants {
 	 */
 	public static class LinesVertical {
 		public static final Distance CENTER = FIELD_LENGTH.div(2.0);
-		public static final Distance STARTING = AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(26).get().getMeasureX();
+		public static final Distance STARTING = AprilTagLayoutType.ROBOCON.getLayout().getTagPose(26).get().getMeasureX();
 		public static final Distance ALLIANCE_ZONE = STARTING;
-		public static final Distance HUB_CENTER = AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(26).get().getMeasureX().plus(Hub.WIDTH.div(2.0));
+		public static final Distance HUB_CENTER = AprilTagLayoutType.ROBOCON.getLayout().getTagPose(26).get().getMeasureX().plus(Hub.WIDTH.div(2.0));
 		public static final Distance NEUTRAL_ZONE_NEAR = CENTER.minus(Inches.of(120));
 		public static final Distance NEUTRAL_ZONE_FAR = CENTER.plus(Inches.of(120));
-		public static final Distance OPP_HUB_CENTER = AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(4).get().getMeasureX().plus(Hub.WIDTH.div(2.0));
-		public static final Distance OPP_ALLIANCE_ZONE = AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(10).get().getMeasureX();
+		public static final Distance OPP_HUB_CENTER = AprilTagLayoutType.ROBOCON.getLayout().getTagPose(4).get().getMeasureX().plus(Hub.WIDTH.div(2.0));
+		public static final Distance OPP_ALLIANCE_ZONE = AprilTagLayoutType.ROBOCON.getLayout().getTagPose(10).get().getMeasureX();
         public static double neutralZoneFar;
 	}
 
@@ -180,12 +181,12 @@ public class FieldConstants {
 		// Relevant reference points on alliance side
 		public static final Translation3d TOP_CENTER_POINT =
 			new Translation3d(
-				AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(26).get().getMeasureX().plus(WIDTH.div(2.0)),
+				AprilTagLayoutType.ROBOCON.getLayout().getTagPose(26).get().getMeasureX().plus(WIDTH.div(2.0)),
 				FIELD_WIDTH.div(2.0),
 				HEIGHT);
 		public static final Translation3d INNER_CENTER_POINT =
 			new Translation3d(
-				AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(26).get().getMeasureX().plus(WIDTH.div(2.0)),
+				AprilTagLayoutType.ROBOCON.getLayout().getTagPose(26).get().getMeasureX().plus(WIDTH.div(2.0)),
 				FIELD_WIDTH.div(2.0),
 				INNER_HEIGHT);
 
@@ -203,7 +204,7 @@ public class FieldConstants {
 		// Relevant reference points on the opposite side
 		public static final Translation3d OPP_TOP_CENTER_POINT =
 			new Translation3d(
-				AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(4).get().getMeasureX().plus(WIDTH.div(2.0)),
+				AprilTagLayoutType.ROBOCON.getLayout().getTagPose(4).get().getMeasureX().plus(WIDTH.div(2.0)),
 				FIELD_WIDTH.div(2.0),
 				HEIGHT);
 		public static final Translation2d OPP_NEAR_LEFT_CORNER =
@@ -217,13 +218,13 @@ public class FieldConstants {
 
 		// Hub faces
 		public static final Pose2d NEAR_FACE =
-			AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(26).get().toPose2d();
+			AprilTagLayoutType.ROBOCON.getLayout().getTagPose(26).get().toPose2d();
 		public static final Pose2d FAR_FACE =
-			AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(20).get().toPose2d();
+			AprilTagLayoutType.ROBOCON.getLayout().getTagPose(20).get().toPose2d();
 		public static final Pose2d RIGHT_FACE =
-			AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(18).get().toPose2d();
+			AprilTagLayoutType.ROBOCON.getLayout().getTagPose(18).get().toPose2d();
 		public static final Pose2d LEFT_FACE =
-			AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(21).get().toPose2d();
+			AprilTagLayoutType.ROBOCON.getLayout().getTagPose(21).get().toPose2d();
 	}
 
 	/** Left Bump related constants */
@@ -320,54 +321,54 @@ public class FieldConstants {
 	}
 
 	/** Tower related constants */
-	public static class Tower {
-		// Dimensions
-		public static final Distance WIDTH = Inches.of(49.25);
-		public static final Distance DEPTH = Inches.of(45.0);
-		public static final Distance HEIGHT = Inches.of(78.25);
-		public static final Distance INNER_OPENING_WIDTH = Inches.of(32.250);
-		public static final Distance FRONT_FACE_X = Inches.of(43.51);
+	// public static class Tower {
+	// 	// Dimensions
+	// 	public static final Distance WIDTH = Inches.of(49.25);
+	// 	public static final Distance DEPTH = Inches.of(45.0);
+	// 	public static final Distance HEIGHT = Inches.of(78.25);
+	// 	public static final Distance INNER_OPENING_WIDTH = Inches.of(32.250);
+	// 	public static final Distance FRONT_FACE_X = Inches.of(43.51);
 
-		public static final Distance UPRIGHT_HEIGHT = Inches.of(72.1);
+	// 	public static final Distance UPRIGHT_HEIGHT = Inches.of(72.1);
 
-		// Rung heights from the floor
-		public static final Distance LOW_RUNG_HEIGHT = Inches.of(27.0);
-		public static final Distance MID_RUNG_HEIGHT = Inches.of(45.0);
-		public static final Distance HIGH_RUNG_HEIGHT = Inches.of(63.0);
+	// 	// Rung heights from the floor
+	// 	public static final Distance LOW_RUNG_HEIGHT = Inches.of(27.0);
+	// 	public static final Distance MID_RUNG_HEIGHT = Inches.of(45.0);
+	// 	public static final Distance HIGH_RUNG_HEIGHT = Inches.of(63.0);
 
-		// Relevant reference points on alliance side
-		public static final Translation2d CENTER_POINT =
-			new Translation2d(
-				FRONT_FACE_X,
-				AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(31).get().getMeasureY());
-		public static final Translation2d LEFT_UPRIGHT =
-			new Translation2d(
-				FRONT_FACE_X,
-				AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(31).get().getMeasureY().plus(INNER_OPENING_WIDTH.div(2.0)).plus(Inches.of(0.75))
-			);
-		public static final Translation2d RIGHT_UPRIGHT =
-			new Translation2d(
-				FRONT_FACE_X,
-				AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(31).get().getMeasureY().minus(INNER_OPENING_WIDTH.div(2.0)).minus(Inches.of(0.75))
-			);
+	// 	// Relevant reference points on alliance side
+	// 	public static final Translation2d CENTER_POINT =
+	// 		new Translation2d(
+	// 			FRONT_FACE_X,
+	// 			AprilTagLayoutType.ROBOCON.getLayout().getTagPose(31).get().getMeasureY());
+	// 	public static final Translation2d LEFT_UPRIGHT =
+	// 		new Translation2d(
+	// 			FRONT_FACE_X,
+	// 			AprilTagLayoutType.ROBOCON.getLayout().getTagPose(31).get().getMeasureY().plus(INNER_OPENING_WIDTH.div(2.0)).plus(Inches.of(0.75))
+	// 		);
+	// 	public static final Translation2d RIGHT_UPRIGHT =
+	// 		new Translation2d(
+	// 			FRONT_FACE_X,
+	// 			AprilTagLayoutType.ROBOCON.getLayout().getTagPose(31).get().getMeasureY().minus(INNER_OPENING_WIDTH.div(2.0)).minus(Inches.of(0.75))
+	// 		);
 
-		// Relevant reference points on opposing side
-		public static final Translation2d OPP_CENTER_POINT =
-			new Translation2d(
-				FIELD_LENGTH.minus(FRONT_FACE_X),
-				AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(15).get().getMeasureY()
-			);
-		public static final Translation2d OPP_LEFT_UPRIGHT =
-			new Translation2d(
-				FIELD_LENGTH.minus(FRONT_FACE_X),
-				AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(15).get().getMeasureY().plus(INNER_OPENING_WIDTH.div(2.0)).plus(Inches.of(0.75))
-			);
-		public static final Translation2d OPP_RIGHT_UPRIGHT =
-			new Translation2d(
-				FIELD_LENGTH.minus(FRONT_FACE_X),
-				AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(15).get().getMeasureY().minus(INNER_OPENING_WIDTH.div(2.0)).minus(Inches.of(0.75))
-			);
-	}
+	// 	// Relevant reference points on opposing side
+	// 	public static final Translation2d OPP_CENTER_POINT =
+	// 		new Translation2d(
+	// 			FIELD_LENGTH.minus(FRONT_FACE_X),
+	// 			AprilTagLayoutType.ROBOCON.getLayout().getTagPose(15).get().getMeasureY()
+	// 		);
+	// 	public static final Translation2d OPP_LEFT_UPRIGHT =
+	// 		new Translation2d(
+	// 			FIELD_LENGTH.minus(FRONT_FACE_X),
+	// 			AprilTagLayoutType.ROBOCON.getLayout().getTagPose(15).get().getMeasureY().plus(INNER_OPENING_WIDTH.div(2.0)).plus(Inches.of(0.75))
+	// 		);
+	// 	public static final Translation2d OPP_RIGHT_UPRIGHT =
+	// 		new Translation2d(
+	// 			FIELD_LENGTH.minus(FRONT_FACE_X),
+	// 			AprilTagLayoutType.ROBOCON.getLayout().getTagPose(15).get().getMeasureY().minus(INNER_OPENING_WIDTH.div(2.0)).minus(Inches.of(0.75))
+	// 		);
+	// }
 
 	public static class Depot {
 		// Dimensions
@@ -393,7 +394,7 @@ public class FieldConstants {
 
 		// Relevant reference points on alliance side
 		public static final Translation2d CENTER_POINT =
-			new Translation2d(Meters.zero(), AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(29).get().getMeasureY());
+			new Translation2d(Meters.zero(), AprilTagLayoutType.ROBOCON.getLayout().getTagPose(29).get().getMeasureY());
 	}
 
 	public static class FerryWaypoints {
@@ -424,8 +425,9 @@ public class FieldConstants {
 	}
 
 	public enum AprilTagLayoutType {
-		OFFICIAL("2026-official"),
-		NONE("2026-none");
+		// OFFICIAL("2026-official"),
+		NONE("2026-none"),
+		ROBOCON("2026-robocon");
 
 		private final String name;
 		private volatile AprilTagFieldLayout layout;
@@ -436,7 +438,9 @@ public class FieldConstants {
 		}
 
 		public AprilTagFieldLayout getLayout() {
-			return AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+			try{return AprilTagFieldLayout.loadFromResource(Filesystem.getDeployDirectory().getAbsolutePath()+"2026-robocon-welded-photonvision-wpilib-apriltag-map.json");}
+			catch(Exception IOException) {System.out.println("Field Layout load Failed, loading official field");return AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);}
+			// return AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 		}
 
 		public String getLayoutString() {
