@@ -30,7 +30,7 @@ public class FlywheelConstants {
 	public static final double SUPPLY_CURRENT_LIMIT = 100; // Amps
 
 	public static final double MOMENT_OF_INERTIA = 0.00233846427;
-	public static final double GEARING = 1.10526315785; // to the big flywheel, from Max Pearson on 2/20/26
+	public static final double GEARING = 1.05; // to the big flywheel, from Max Pearson on 2/20/26
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKD(kD)

@@ -44,7 +44,7 @@ public class HoodConstants {
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO;
 
 	public static final double MOMENT_OF_INERTIA = 0.03038161694; // from CAD on 3/3/2026
-	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(-0.305176);
+	public static final Angle HOOD_ENCODER_OFFSET = Rotations.of(0.209);
 
 	public static final Distance HOOD_LENGTH = Meters.of(0.25);
 	public static final double HOOD_LOWER_TIME = 1.2;

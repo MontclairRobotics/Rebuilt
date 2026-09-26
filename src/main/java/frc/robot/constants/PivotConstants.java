@@ -37,7 +37,7 @@ public class PivotConstants {
 	public static final double SENSOR_TO_MECHANISM_RATIO = 1; // CANcoder is on the mechanism
 	public static final double GEARING = ROTOR_TO_SENSOR_RATIO * SENSOR_TO_MECHANISM_RATIO;
 
-	public static final double ENCODER_OFFSET = -0.457764;
+	public static final double ENCODER_OFFSET = 0.03;
 
 	public static final Angle MIN_ANGLE = Degrees.of(-5);
 	public static final Angle MAX_ANGLE = Rotations.of(0.3);
