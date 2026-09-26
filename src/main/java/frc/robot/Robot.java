@@ -16,6 +16,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -85,6 +86,9 @@ public class Robot extends LoggedRobot {
 
 	@Override
 	public void robotInit() {
+		FlippingUtil.fieldSizeX = 14.6812;		//ROBO_CON FIELD CHANGE
+		FlippingUtil.fieldSizeY = 8.0772;
+
 		RobotContainer.drivetrain.resetPose(new Pose2d());
 		// DogLog.setOptions(
 		// 	new DogLogOptions()
