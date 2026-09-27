@@ -283,7 +283,7 @@ public class Shooter extends SubsystemBase {
 
     public Command startShootingInAuto() {
         return Commands.runOnce(() -> {
-            RobotContainer.shouldShootAuto = true;
+            RobotContainer.shouldShootAuto = false;
         });
     }
 

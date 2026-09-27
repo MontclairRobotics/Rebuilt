@@ -190,7 +190,7 @@ public class FieldConstants {
 				FIELD_WIDTH.div(2.0),
 				INNER_HEIGHT);
 
-		public static final Translation2d HUB_LOCATION = new Translation2d(4.6256, 4.034);
+		public static final Translation2d HUB_LOCATION = new Translation2d(4, 4.049);
 
 		public static final Translation2d NEAR_LEFT_CORNER =
 			new Translation2d(TOP_CENTER_POINT.getMeasureX().minus(WIDTH.div(2.0)), FIELD_WIDTH.div(2.0).plus(WIDTH.div(2.0)));

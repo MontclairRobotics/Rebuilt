@@ -79,6 +79,7 @@ public class Turret extends SubsystemBase {
 
 		if(logCounter % loopsPerLog == 0) {
 			Logger.recordOutput("Turret/DistanceToHub", getDistanceToHub());
+			Logger.recordOutput("Turret/Hubposition", FieldConstants.Hub.HUB_LOCATION);
 		}
 
 		/** only visualize when in debug mode */

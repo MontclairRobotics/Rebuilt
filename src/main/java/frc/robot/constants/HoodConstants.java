@@ -50,8 +50,8 @@ public class HoodConstants {
 	public static final double HOOD_LOWER_TIME = 1.2;
 
 	// Tuned 3/24/26
-	public static final double kP = 310;
-	public static final double kD = 0;
+	public static final double kP = 230;
+	public static final double kD = 0.01;
 	public static final double kI = 0;
 	public static final double kS = 0;
 	public static final double kG = 0.6;
