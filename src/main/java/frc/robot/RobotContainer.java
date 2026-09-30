@@ -28,9 +28,10 @@ import frc.robot.subsystems.intake.pivot.PivotIOSim;
 import frc.robot.subsystems.intake.rollers.Rollers;
 import frc.robot.subsystems.intake.rollers.RollersIOSim;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.aiming.Aiming;
+import frc.robot.subsystems.shooter.ShooterCoordinator;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.Indexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.IndexerIOSim;
@@ -41,6 +42,7 @@ import frc.robot.subsystems.shooter.turret.TurretIOSim;
 import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
+import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.util.Telemetry;
@@ -54,11 +56,7 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 
 
-import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
-
 public class RobotContainer {
-
-	// private final SendableChooser<Command> autoChooser;
 
 	// Controllers
 	public static CommandPS5Controller controller = new CommandPS5Controller(0);
@@ -83,11 +81,9 @@ public class RobotContainer {
 	public static Intake intake;
 
 	public static Superstructure superstructure;
-	public static Aiming aiming;
+	public static ShooterCoordinator shooterCoordinator;
 
 	public static Auto auto;
-
-	public static SimShootingParameters simShootingParameters = new SimShootingParameters(Degrees.zero(), Degrees.zero(), MetersPerSecond.zero());
 
 	private SwerveDriveSimulation driveSimulation;
 	private final Telemetry logger = new Telemetry(DriveConstants.MAX_SPEED.in(MetersPerSecond));
@@ -97,7 +93,7 @@ public class RobotContainer {
 	private boolean shootWhileMoving = false;
 
 	// debug, set to true to increase logging, set to false to increase performance and reduce loop overruns
-	public static boolean VISION_DEBUG = false;
+	public static boolean VISION_DEBUG = true;
 	public static boolean TURRET_DEBUG = false;
 	public static boolean FLYWHEEL_DEBUG = false;
 	public static boolean HOOD_DEBUG  = false;
@@ -107,6 +103,10 @@ public class RobotContainer {
 	public static boolean PIVOT_DEBUG = false;
 	public static boolean DRIVETRAIN_DEBUG = false;
 	public static boolean SUPERSTRUCTURE_DEBUG = false;
+
+	public static boolean isUsingMegaTag2 = true;
+	public static boolean isUsingMegaTag1 = true;
+	public static boolean isSeedingGyro = true;
 
 	public double turretFudge = 0;
 
@@ -130,7 +130,7 @@ public class RobotContainer {
 
 				shooter = new Shooter(
 					hood, flywheel, turret, spindexer,
-					useConstantVelocityMap, shootWhileMoving
+					shootWhileMoving
 				);
 
 				superstructure = new Superstructure(shooter);
@@ -156,11 +156,8 @@ public class RobotContainer {
 
 				shooter = new Shooter(
 					hood, flywheel, turret, spindexer,
-					useConstantVelocityMap, shootWhileMoving
+					shootWhileMoving
 				);
-
-				superstructure = new Superstructure(shooter);
-				aiming = new Aiming(turret);
 
 				pivot = new Pivot(new PivotIOSim());
 				rollers = new Rollers(new RollersIOSim());
@@ -182,23 +179,41 @@ public class RobotContainer {
 					Inches.of(22),
 					Inches.of(-15),
 					Inches.of(15),
-					shooter::shouldIntake,
-					shooter::addBall
+					() -> true,
+					() -> {}
 				);
 
 				fuelSim.spawnStartingFuel();
 
 				auto = new Auto();
+				superstructure = new Superstructure();
+
+				shooterCoordinator = new ShooterCoordinator(
+					operatorWantsToFireTrigger,
+					operatorWantsToTrackHubTrigger,
+					operatorWantsToTrackFerryPointTrigger,
+					() -> shouldShootAuto
+				);
 
 				break;
 
 				default:
-					vision = new Vision(drivetrain::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+					vision = new Vision(
+						drivetrain::addVisionMeasurement,
+						(rotation) -> {
+							Pose2d current = drivetrain.getRobotPose();
+							drivetrain.resetPose(new Pose2d(current.getTranslation(), rotation));
+						},
+						new VisionIO() {},
+						new VisionIO() {},
+						new VisionIO() {}
+					);
 		}
 
 		configureBindings();
 
     	drivetrain.registerTelemetry(logger::telemeterize);
+		RobotController.setBrownoutVoltage(5.3);
 	}
 
 

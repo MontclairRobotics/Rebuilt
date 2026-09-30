@@ -59,11 +59,11 @@ public class FlywheelIOSim implements FlywheelIO {
         inputs.appliedVoltage = appliedVoltage;
         inputs.currentDrawAmps = sim.getCurrentDrawAmps();
         inputs.tempCelsius = 0;
-        inputs.isAtSetpoint = isAtSetpoint();
+        inputs.isAtSetpoint = pidController.atSetpoint();
     }
 
     @Override
-    public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {
+    public void setVelocity(AngularVelocity targetVelocity) {
         double pidOutput = pidController.calculate(
             RadiansPerSecond.of(sim.getAngularVelocityRadPerSec()).in(RotationsPerSecond),
             targetVelocity.in(RotationsPerSecond)
@@ -84,21 +84,11 @@ public class FlywheelIOSim implements FlywheelIO {
     }
 
     @Override
-    public boolean isAtSetpoint() {
-        return pidController.atSetpoint();
-    }
-
-    @Override
     public void setGains(double kP, double kD, double kS, double kV) {
         pidController.setP(kP);
         pidController.setD(kD);
         feedforward.setKs(kS);
         feedforward.setKv(kV);
-    }
-
-    @Override
-    public boolean isAtTimeAdjustedSetpoint() {
-        return false;
     }
 
 }

@@ -53,7 +53,7 @@ public class SerializerIOSim implements SerializerIO {
 		inputs.appliedVoltage = appliedVoltage;
 		inputs.currentDrawAmps = sim.getCurrentDrawAmps();
 		inputs.tempCelsius = 0;
-		inputs.isAtSetpoint = isAtSetpoint();
+		inputs.isAtSetpoint = pidController.atSetpoint();
 	}
 
 	@Override
@@ -78,13 +78,7 @@ public class SerializerIOSim implements SerializerIO {
 	}
 
 	@Override
-	public boolean isAtSetpoint() {
-		return pidController.atSetpoint();
-	}
-
-	@Override
 	public void setCurrent(double currentDrawAmps) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'setCurrent'");
+		//not necessary
 	}
 }

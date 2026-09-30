@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
@@ -14,7 +15,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.*;
@@ -36,8 +36,11 @@ public class FlywheelIOTalonFX implements FlywheelIO{
     private final StatusSignal<Current> currentDrawAmpsSignal;
     private final StatusSignal<Temperature> tempCelciusSignal;
 
+    private final StatusSignal<AngularVelocity> rightVelocitySignal;
+
     private final VelocityTorqueCurrentFOC request = new VelocityTorqueCurrentFOC(0);
     private final NeutralOut neutralOut = new NeutralOut();
+    private final VoltageOut voltageOut = new VoltageOut(0);
 
     public FlywheelIOTalonFX() {
         leftMotor = new TalonFX(LEFT_CAN_ID);
@@ -65,6 +68,8 @@ public class FlywheelIOTalonFX implements FlywheelIO{
         currentDrawAmpsSignal = leftMotor.getTorqueCurrent();
         tempCelciusSignal = leftMotor.getDeviceTemp();
 
+        rightVelocitySignal = rightMotor.getVelocity();
+
         PhoenixUtil.registerStatusSignals(
             Hertz.of(50),
             velocitySignal,
@@ -72,9 +77,12 @@ public class FlywheelIOTalonFX implements FlywheelIO{
             setpointVelocitySignal,
             setpointAccelerationSignal,
             appliedVoltageSignal,
-            currentDrawAmpsSignal,
-            tempCelciusSignal
+            currentDrawAmpsSignal
         );
+
+        // can run these slower
+        rightVelocitySignal.setUpdateFrequency(4);
+		tempCelciusSignal.setUpdateFrequency(4);
 
         leftMotor.optimizeBusUtilization();
         rightMotor.optimizeBusUtilization();
@@ -103,7 +111,7 @@ public class FlywheelIOTalonFX implements FlywheelIO{
             tempCelciusSignal
         );
 
-        inputs.rightMotorConnected = inputs.leftMotorConnected;
+        inputs.rightMotorConnected = BaseStatusSignal.isAllGood(rightVelocitySignal);
 
         inputs.velocity = velocitySignal.getValue();
         inputs.acceleration = accelerationSignal.getValue();
@@ -113,28 +121,23 @@ public class FlywheelIOTalonFX implements FlywheelIO{
         inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
         inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
         inputs.tempCelsius = tempCelciusSignal.getValueAsDouble();
-        inputs.isAtSetpoint = isAtSetpoint();
+        inputs.isAtSetpoint =
+            Math.abs(velocitySignal.getValueAsDouble() - setpointVelocitySignal.getValueAsDouble()) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
     }
 
     @Override
-    public void setVelocity(AngularVelocity targetVelocity, double timeSecondsForSetpoint) {
+    public void setVelocity(AngularVelocity targetVelocity) {
         leftMotor.setControl(request.withVelocity(targetVelocity));
     }
 
     @Override
     public void setVoltage(double voltage) {
-        leftMotor.setVoltage(voltage);
+        leftMotor.setControl(voltageOut.withOutput(voltage));
     }
 
     @Override
     public void stop() {
         leftMotor.setControl(neutralOut);
-    }
-
-    @Override
-    public boolean isAtSetpoint() {
-        double error = leftMotor.getClosedLoopError().getValueAsDouble();
-        return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
     }
 
     @Override
@@ -145,14 +148,6 @@ public class FlywheelIOTalonFX implements FlywheelIO{
         leftMotorConfig.Slot0.kS = kS;
 
         leftMotor.getConfigurator().apply(leftMotorConfig.Slot0);
-    }
-
-    @Override
-    public boolean isAtTimeAdjustedSetpoint() {
-        double error =
-            Flywheel.getSetpointForTime(Timer.getFPGATimestamp()).in(RotationsPerSecond)
-            - velocitySignal.getValue().in(RotationsPerSecond);
-        return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
     }
 
 }

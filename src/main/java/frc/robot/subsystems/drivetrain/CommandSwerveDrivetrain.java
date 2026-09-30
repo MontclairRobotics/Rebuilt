@@ -2,12 +2,16 @@ package frc.robot.subsystems.drivetrain;
 
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -16,7 +20,6 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
-// import dev.doglog.DogLog;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -26,7 +29,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -61,14 +63,14 @@ import static frc.robot.constants.DriveConstants.ROTATION_kD;
 import static frc.robot.constants.DriveConstants.ROTATION_kI;
 import static frc.robot.constants.DriveConstants.ROTATION_kP;
 
+import frc.robot.util.DynamicSlewRateLimiter;
+import frc.robot.util.FieldConstants;
 import frc.robot.util.PoseUtils;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.util.sim.MapleSimSwerveDrivetrain;
 
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
-
-	public TimeInterpolatableBuffer<Pose2d> poseBuffer = TimeInterpolatableBuffer.createBuffer(3);
 
 	private static final double kSimLoopPeriod = 0.002; // 2 ms
 	private Notifier m_simNotifier = null;
@@ -84,6 +86,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds =
 		new SwerveRequest.ApplyRobotSpeeds();
 
+	private final SwerveRequest.SwerveDriveBrake xModeRequest =
+		new SwerveRequest.SwerveDriveBrake();
+
 	private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric()
 		// .withDeadband(MAX_SPEED.times(0.05))
 		// .withRotationalDeadband(MAX_ANGULAR_SPEED.times(0.1))
@@ -98,6 +103,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		new SwerveRequest.SysIdSwerveRotation();
 
 	/* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
+	@SuppressWarnings("unused")
 	private final SysIdRoutine m_sysIdRoutineTranslation =
 		new SysIdRoutine(
 			new SysIdRoutine.Config(
@@ -126,6 +132,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	* This is used to find PID gains for the FieldCentricFacingAngle HeadingController.
 	* See the documentation of SwerveRequest.SysIdSwerveRotation for info on importing the log to SysId.
 	*/
+	@SuppressWarnings("unused")
 	private final SysIdRoutine m_sysIdRoutineRotation =
 		new SysIdRoutine(
 			new SysIdRoutine.Config(
@@ -155,16 +162,41 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	/* Heading PID Controller for things like automatic alignment buttons */
 	public PIDController thetaController;
 
-	/* variable to store our heading */
-	public Rotation2d odometryHeading = new Rotation2d();
+	// cached values
+	private Rotation2d wrappedOdometryHeading = new Rotation2d();
+	private Pose2d robotPose = new Pose2d();
+	private ChassisSpeeds fieldRelativeSpeeds = new ChassisSpeeds();
+	private Translation2d fieldRelativeVelocity = new Translation2d();
 
 	private boolean isRobotAtAngleSetPoint; // for angle turning
-	public boolean fieldRelative; //whether or not to drive field relative
+	public boolean fieldRelative; // whether or not to drive field relative
 
 	public RobotConfig config;
+	public ConfigurationMode currentConfigurationMode;
 
 	private int logCounter = 0;
 	private final int loopsPerLog;
+
+	public boolean isLimitingAcceleration = false;
+	private DynamicSlewRateLimiter forwardRateLimiter = new DynamicSlewRateLimiter(4);
+	private DynamicSlewRateLimiter strafeRateLimiter = new DynamicSlewRateLimiter(4);
+	private DynamicSlewRateLimiter rotationRateLimiter = new DynamicSlewRateLimiter(4);
+
+	public enum ConfigurationMode {
+		TURBO(TunerConstants.turboDriveConfiguration),
+		PRECISION(TunerConstants.precisionDriveConfiguration),
+		NORMAL(TunerConstants.driveInitialConfigs);
+
+		private TalonFXConfiguration config;
+
+		ConfigurationMode(TalonFXConfiguration config) {
+			this.config = config;
+		}
+
+		public TalonFXConfiguration getConfiguration() {
+			return config;
+		}
+	}
 
 	/**
 	 * Constructs a CTRE SwerveDrivetrain using the specified constants.
@@ -199,7 +231,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		thetaController = new PIDController(ROTATION_kP, ROTATION_kI, ROTATION_kD);
 		thetaController.setTolerance(ROTATION_TOLERANCE.in(Radians));
 		thetaController.enableContinuousInput(-Math.PI, Math.PI);
-		odometryHeading = Rotation2d.fromRotations(0);
+		wrappedOdometryHeading = Rotation2d.fromRotations(0);
 
 		if (Utils.isSimulation()) {
 			startSimThread();
@@ -215,6 +247,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 		loopsPerLog = RobotContainer.DRIVETRAIN_DEBUG ? 1 : 5;
 
+		currentConfigurationMode = ConfigurationMode.NORMAL;
 	}
 
 	private void configureAutoBuilder() {
@@ -232,9 +265,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 							.withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
 				new PPHolonomicDriveController(
 					// PID constants for translation
-					new PIDConstants(10, 0, 0),
+					new PIDConstants(7, 0, 0),
 					// PID constants for rotation
-					new PIDConstants(7, 0, 0.1)),
+					new PIDConstants(5, 0, 0.1)),
 				config,
 				// Assume the path needs to be flipped for Red vs Blue, this is normally the case
 				() -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
@@ -258,6 +291,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		return m_sysIdRoutineToApply.dynamic(direction);
 	}
 
+	public void applyDriveConfig(TalonFXConfiguration config) {
+		for(SwerveModule<TalonFX, TalonFX, CANcoder> module: getModules()) {
+			TalonFXConfigurator configurator = module.getDriveMotor().getConfigurator();
+			configurator.apply(config.CurrentLimits);
+			configurator.apply(config.ClosedLoopRamps);
+		}
+	}
+
+	public void swapConfigurationModeTo(ConfigurationMode configMode) {
+		if(currentConfigurationMode == configMode) return; // no need to reapply
+		applyDriveConfig(configMode.getConfiguration());
+		currentConfigurationMode = configMode;
+	}
+
 	/**
 	 * @param ang Rotation2d to be wrapped
 	 * @return a new Rotation2d object wrapped from -180 to 180 degrees
@@ -271,20 +318,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		return Rotation2d.fromDegrees(angle - 180);
 	}
 
-	public Rotation2d getWrappedHeading() {
-		return wrapAngle(odometryHeading);
-	}
-
-	public ChassisSpeeds getFieldRelativeSpeeds() {
-		return ChassisSpeeds.fromRobotRelativeSpeeds(this.getState().Speeds, getWrappedHeading());
-	}
-
-	public Translation2d getFieldRelativeVelocity() {
-		return new Translation2d(
-			getFieldRelativeSpeeds().vxMetersPerSecond,
-			getFieldRelativeSpeeds().vyMetersPerSecond
-		);
-	}
+	public Rotation2d getWrappedHeading() { return wrappedOdometryHeading; }
+	public Pose2d getRobotPose() { return robotPose; }
+	public ChassisSpeeds getFieldRelativeSpeeds() { return fieldRelativeSpeeds; }
+	public Translation2d getFieldRelativeVelocity() { return fieldRelativeVelocity; }
 
 	public LinearVelocity getFieldRelativeLinearVelocity() {
 		return MetersPerSecond.of(getFieldRelativeVelocity().getNorm());
@@ -292,6 +329,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 	public AngularVelocity getAngularSpeed() {
 		return RadiansPerSecond.of(Math.abs(getFieldRelativeSpeeds().omegaRadiansPerSecond));
+	}
+
+	public AngularVelocity getAngularVelocity() {
+		return RadiansPerSecond.of(getFieldRelativeSpeeds().omegaRadiansPerSecond);
 	}
 
 	public double getStrafeVelocityFromController() {
@@ -307,6 +348,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	public double getOmegaVelocityFromController() {
 		double rotInput = -MathUtil.applyDeadband(RobotContainer.controller.getRightX(), 0.2);
 		return MathUtil.copyDirectionPow(rotInput, JOYSTICK_INPUT_ROT_GAIN) * MAX_ANGULAR_SPEED.in(RadiansPerSecond);
+	}
+
+	public void enableXMode() {
+		setControl(xModeRequest);
 	}
 
 	public void driveJoystick() {
@@ -338,6 +383,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		double ySpeed,
 		double thetaSpeed,
 		boolean fieldRelative) {
+
+		if(isLimitingAcceleration) {
+			xSpeed = forwardRateLimiter.calculate(xSpeed);
+			ySpeed = strafeRateLimiter.calculate(ySpeed);
+			thetaSpeed = rotationRateLimiter.calculate(thetaSpeed);
+		}
+
+		double targetSpeed = Math.hypot(xSpeed, ySpeed);
+		double maxSpeed = MAX_SPEED.in(MetersPerSecond);
+
+		if(targetSpeed > maxSpeed) {
+			double scale = maxSpeed / targetSpeed;
+			xSpeed *= scale;
+			ySpeed *= scale;
+		}
+
+		thetaSpeed = MathUtil.clamp(thetaSpeed, -MAX_ANGULAR_SPEED.in(RadiansPerSecond), MAX_ANGULAR_SPEED.in(RadiansPerSecond));
 
 		ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed);
 
@@ -404,12 +466,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		fieldRelative = true;
 	}
 
-	@AutoLogOutput
-	public Pose2d getRobotPose() {
+	private Pose2d clampPoseToFieldBoundaries(Pose2d pose) {
+		double x = MathUtil.clamp(pose.getX(),
+			FieldConstants.FieldBoundaries.NEAR_WALL_BOUNDARY,
+			FieldConstants.FieldBoundaries.FAR_WALL_BOUNDARY
+		);
+		double y = MathUtil.clamp(pose.getY(),
+			FieldConstants.FieldBoundaries.RIGHT_WALL_BOUNDARY,
+			FieldConstants.FieldBoundaries.LEFT_WALL_BOUNDARY
+		);
+    	return new Pose2d(x, y, pose.getRotation());
+	}
+
+	public Pose2d computeRobotPose() {
 		if (Utils.isSimulation() && mapleSimSwerveDrivetrain != null) {
-			return mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose();
+			Pose2d pose = mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose();
+			return clampPoseToFieldBoundaries(pose);
 		} else {
-			return this.getState().Pose;
+			Pose2d pose = this.getState().Pose;
+			return clampPoseToFieldBoundaries(pose);
 		}
 	}
 
@@ -434,6 +509,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 	public Command zeroGyroCommand() {
 		return Commands.runOnce(() -> zeroGyro(), RobotContainer.drivetrain);
+	}
+
+	public Command resetPoseCommand(Pose2d pose) {
+		return Commands.runOnce(() -> resetPose(PoseUtils.flipPoseAlliance(pose)), this);
 	}
 
 	public Command toRobotRelativeCommand() {
@@ -466,9 +545,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		);
 	}
 
-	public Command alignToAngleFieldRelativeContinuousCommand(
-		Supplier<Rotation2d> angle, boolean lockDrive) {
-		return alignToAngleFieldRelativeCommand(angle.get(), lockDrive);
+	public Command alignToAngleFieldRelativeContinuousCommand(Supplier<Rotation2d> angle, boolean lockDrive) {
+		return Commands.run(() -> {
+			setFieldRelativeAngle(angle.get());
+			alignToAngleFieldRelative(lockDrive);
+		}, this);
 	}
 
 	public Command stopCommand() {
@@ -483,12 +564,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 		fieldRelative = !RobotContainer.controller.L2().getAsBoolean();
 		isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
-		Logger.recordOutput("Drive/FieldRelative", fieldRelative);
-		Logger.recordOutput("Drive/odometryHeading", odometryHeading);
 		Logger.recordOutput("Drive/odometryPose", getRobotPose());
-		Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
-		Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
-		Logger.recordOutput("Drive/Speed", getFieldRelativeLinearVelocity().in(MetersPerSecond));
+
+		if(logCounter % loopsPerLog == 0) {
+			Logger.recordOutput("Drive/FieldRelative", fieldRelative);
+			Logger.recordOutput("Drive/odometryHeading", wrappedOdometryHeading);
+			Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
+			Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
+			Logger.recordOutput("Drive/Speed", getFieldRelativeLinearVelocity().in(MetersPerSecond));
+		}
+
+
 
 		/*
 		* Periodically try to apply the operator perspective.

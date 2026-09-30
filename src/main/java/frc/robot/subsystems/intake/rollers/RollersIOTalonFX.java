@@ -8,6 +8,7 @@ import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import static frc.robot.constants.RollersConstants.*;
+
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -25,7 +26,7 @@ public class RollersIOTalonFX implements RollersIO {
     private final StatusSignal<Double> setpointVelocitySignal;
     private final StatusSignal<Voltage> appliedVoltageSignal;
     private final StatusSignal<Current> currentDrawAmpsSignal;
-    private final StatusSignal<Temperature> tempCelciuSignal;
+    private final StatusSignal<Temperature> tempCelciusSignal;
 
 	private VelocityTorqueCurrentFOC request = new VelocityTorqueCurrentFOC(0);
 	private final NeutralOut neutralOut = new NeutralOut();
@@ -45,16 +46,18 @@ public class RollersIOTalonFX implements RollersIO {
         setpointVelocitySignal = motor.getClosedLoopReference();
         appliedVoltageSignal = motor.getMotorVoltage();
         currentDrawAmpsSignal = motor.getTorqueCurrent();
-        tempCelciuSignal = motor.getDeviceTemp();
+        tempCelciusSignal = motor.getDeviceTemp();
 
 		PhoenixUtil.registerStatusSignals(
 			Hertz.of(50),
 			velocitySignal,
 			setpointVelocitySignal,
 			appliedVoltageSignal,
-			currentDrawAmpsSignal,
-			tempCelciuSignal
+			currentDrawAmpsSignal
 		);
+
+		// not necessary to run this fast
+		tempCelciusSignal.setUpdateFrequency(4);
 
 		motor.optimizeBusUtilization();
 	}
@@ -67,7 +70,7 @@ public class RollersIOTalonFX implements RollersIO {
 			setpointVelocitySignal,
 			appliedVoltageSignal,
 			currentDrawAmpsSignal,
-			tempCelciuSignal
+			tempCelciusSignal
         );
 
 		inputs.motorConnected = BaseStatusSignal.isAllGood(
@@ -75,7 +78,7 @@ public class RollersIOTalonFX implements RollersIO {
 			setpointVelocitySignal,
 			appliedVoltageSignal,
 			currentDrawAmpsSignal,
-			tempCelciuSignal
+			tempCelciusSignal
 		);
 
 		inputs.velocity = velocitySignal.getValue();
@@ -83,8 +86,9 @@ public class RollersIOTalonFX implements RollersIO {
 
 		inputs.appliedVoltage = appliedVoltageSignal.getValueAsDouble();
 		inputs.currentDrawAmps = currentDrawAmpsSignal.getValueAsDouble();
-		inputs.tempCelsius = tempCelciuSignal.getValueAsDouble();
-		inputs.isAtSetpoint = isAtSetpoint();
+		inputs.tempCelsius = tempCelciusSignal.getValueAsDouble();
+		inputs.isAtSetpoint =
+			Math.abs(velocitySignal.getValueAsDouble() - setpointVelocitySignal.getValueAsDouble()) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
 	}
 
 	@Override
@@ -100,11 +104,5 @@ public class RollersIOTalonFX implements RollersIO {
 	@Override
 	public void stop() {
 		motor.setControl(neutralOut);
-	}
-
-	@Override
-	public boolean isAtSetpoint() {
-		double error = motor.getClosedLoopError().getValueAsDouble();
-        return Math.abs(error) < VELOCITY_TOLERANCE.in(RotationsPerSecond);
 	}
 }

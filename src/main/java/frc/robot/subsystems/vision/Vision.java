@@ -7,6 +7,7 @@ package frc.robot.subsystems.vision;
 // at the root directory of this project.
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
@@ -25,6 +26,8 @@ import frc.robot.util.PoseUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.Utils;
@@ -32,10 +35,13 @@ import com.ctre.phoenix6.Utils;
 
 public class Vision extends SubsystemBase {
 	private final VisionConsumer consumer; // lamda expression that takes in values and records a vision measurement
+	private final Consumer<Rotation2d> gyroSeedConsumer;
 	private final VisionIO[] io;
 	private final VisionIOInputsAutoLogged[] inputs;
 	private final Alert[] disconnectedAlerts;
 
+	// only non-null with a good mt1 pose update
+	private Rotation2d gyroSeed = null;
 
 	// Initialize logging values
 	// only in debug mode
@@ -53,14 +59,15 @@ public class Vision extends SubsystemBase {
 	private int logCounter = 0;
 	private final int loopsPerLog;
 
-	public Vision(VisionConsumer consumer, VisionIO... io) {
+	public Vision(VisionConsumer consumer, Consumer<Rotation2d> gyroSeedConsumer, VisionIO... io) {
 		this.consumer = consumer;
+		this.gyroSeedConsumer = gyroSeedConsumer;
 		this.io = io;
 
 		// 5 hz logging normally, up to 10 hz when in debug
 		// 50 hz / 5 loops per log = 10 hz
 		// 50 hz / 10 loops per log = 5 hz
-		loopsPerLog = RobotContainer.VISION_DEBUG ? 5 : 10;
+		loopsPerLog = RobotContainer.VISION_DEBUG ? 2 : 5;
 
 		// Initialize inputs
 		this.inputs = new VisionIOInputsAutoLogged[io.length];
@@ -90,6 +97,8 @@ public class Vision extends SubsystemBase {
 	public void periodic() {
 		logCounter++;
 
+		gyroSeed = null; // clear gyro seed
+
 		// debug mode specific
 		if(RobotContainer.VISION_DEBUG) {
 			allRobotPoses.clear();
@@ -108,15 +117,12 @@ public class Vision extends SubsystemBase {
 		for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
 
 			io[cameraIndex].updateInputs(inputs[cameraIndex]);
-
-			if (logCounter % loopsPerLog == 0) {
-				Logger.processInputs("Vision/Camera" + Integer.toString(cameraIndex), inputs[cameraIndex]);
-			}
+			Logger.processInputs("Vision/Camera" + Integer.toString(cameraIndex), inputs[cameraIndex]);
 
 			// Update disconnected alert
 			disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
-			// clear camera-specific arrays every time
+			// // clear camera-specific arrays every time
 			robotPoses.clear();
 			tagPoses.clear();
 			robotPosesAccepted.clear();
@@ -134,10 +140,18 @@ public class Vision extends SubsystemBase {
 
 			// Loop over pose observations
 			for (var observation : inputs[cameraIndex].poseObservations) {
+
+				boolean isMT1 = observation.type() == PoseObservationType.MEGATAG_1;
+				boolean isMT2 = observation.type() == PoseObservationType.MEGATAG_2;
+
+				double distanceTolerance = 4.5;
+				double angleTolerance = isMT2? 3 : 30;
+
 				// Check whether to reject pose
 				boolean rejectPose =
-					observation.tagCount() == 0 // Must have at least one tag
-					|| (observation.tagCount() == 1 && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
+					!(observation.tagCount() > 0) // Must have at least one tag
+					|| (isMT1 && observation.tagCount() < 2) // if MegaTag 1, must have at least two tags
+					|| observation.ambiguity() > maxAmbiguity // Cannot be high ambiguity
 					|| Math.abs(observation.pose().getZ()) > maxZError // Must have realistic Z coordinate
 
 					// Must be within the field boundaries
@@ -145,15 +159,19 @@ public class Vision extends SubsystemBase {
 					|| observation.pose().getX() > aprilTagLayout.getFieldLength()
 					|| observation.pose().getY() < 0.0
 					|| observation.pose().getY() > aprilTagLayout.getFieldWidth()
+
+					// max angle error
 					|| Math.abs(
 						observation.pose().getRotation().toRotation2d()
 						.minus(
 							PoseUtils.wrapRotation(RobotContainer.drivetrain.getRobotPose().getRotation())
-						).getDegrees()) > 3
+						).getDegrees()) > angleTolerance
+
 					// max angular rate
 					|| RobotContainer.drivetrain.getAngularSpeed().in(DegreesPerSecond) > 360
+
 					// max tag distance
-					|| observation.averageTagDistance() > 3.0;
+					|| observation.averageTagDistance() > distanceTolerance;
 
 				// Add pose to log
 				if (logCounter % loopsPerLog == 0) {
@@ -165,17 +183,50 @@ public class Vision extends SubsystemBase {
 					}
 				}
 
+				 if (!rejectPose) {
+                    for (var tagId : inputs[cameraIndex].tagIds) {
+                        Double lessThanX = xLessThanTags.get(tagId);
+                        if (lessThanX != null && observation.pose().getX() > lessThanX) {
+                            rejectPose = true;
+                            break;
+                        }
+                        Double greaterThanX = xGreaterThanTags.get(tagId);
+                        if (greaterThanX != null && observation.pose().getX() < greaterThanX) {
+                            rejectPose = true;
+                            break;
+                        }
+                        Double lessThanY = yLessThanTags.get(tagId);
+                        if (lessThanY != null && observation.pose().getY() > lessThanY) {
+                            rejectPose = true;
+                            break;
+                        }
+                        Double greaterThanY = yGreaterThanTags.get(tagId);
+                        if (greaterThanY != null && observation.pose().getY() < greaterThanY) {
+                            rejectPose = true;
+                            break;
+                        }
+                    }
+                }
+
 				// Skip if rejected
 				if (rejectPose) {
 					continue;
 				}
 
+				if(isMT1
+					&& observation.tagCount() >= 2
+					&& observation.ambiguity() < maxAmbiguity/2
+					&& RobotContainer.drivetrain.getAngularSpeed().in(DegreesPerSecond) < 45
+				) {
+					gyroSeed = observation.pose().toPose2d().getRotation();
+				}
+
 				// Calculate standard deviations
 				double d = observation.averageTagDistance();
-				double stdDevFactor = (d * d) / observation.tagCount();
-				double linearStdDev = 0.3 + linearStdDevBaseline * stdDevFactor;
-				// double angularStdDev = angularStdDevBaseline * stdDevFactor;
-				double angularStdDev = Double.POSITIVE_INFINITY;
+				double stdDevFactor = ((d * d) / observation.tagCount()) * (1 + RobotContainer.drivetrain.getAngularSpeed().in(RotationsPerSecond));
+
+				double linearStdDev = linearStdDevFloor + Math.abs(linearStdDevBaseline * stdDevFactor);
+				double angularStdDev = angularStdDevFloor + angularStdDevBaseline * stdDevFactor;
 
 				if (observation.type() == PoseObservationType.MEGATAG_2) {
 					linearStdDev *= linearStdDevMegatag2Factor;
@@ -186,10 +237,18 @@ public class Vision extends SubsystemBase {
 					angularStdDev *= cameraStdDevFactors[cameraIndex];
 				}
 
-				linearStdDev = 0;
+				if (logCounter % loopsPerLog == 0) {
+                    Logger.recordOutput("Vision/Camera" + cameraIndex + "/PoseTimestamp",
+                        observation.timestamp());
+                    Logger.recordOutput("Vision/Camera" + cameraIndex + "/PoseEstimateYaw",
+                        observation.pose().toPose2d().getRotation().getDegrees());
+                    Logger.recordOutput("Vision/Camera" + cameraIndex + "/CurrentGyroYaw",
+                        RobotContainer.drivetrain.getRobotPose().getRotation().getDegrees());
+                }
 
 				Logger.recordOutput("Vision/linearStdDev", linearStdDev);
 				Logger.recordOutput("Vision/angularStdDev", angularStdDev);
+
 				// Send vision observation
 				consumer.accept(
 					observation.pose().toPose2d(),
@@ -231,7 +290,6 @@ public class Vision extends SubsystemBase {
 				"Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
 		}
 	}
-
 
 	@FunctionalInterface
 	public static interface VisionConsumer {

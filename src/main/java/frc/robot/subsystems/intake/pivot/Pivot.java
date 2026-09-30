@@ -30,18 +30,20 @@ public class Pivot extends SubsystemBase {
 	public Pivot(PivotIO io) {
 		this.io = io;
 		this.visualization = new PivotVisualization();
-		io.setGains(kP, kD, kS, kG);
-		io.setMotionMagic(MOTION_MAGIC_CRUISE_VELOCITY, MOTION_MAGIC_ACCELERATION, MOTION_MAGIC_JERK);
 
 		loopsPerLog = RobotContainer.PIVOT_DEBUG ? 1 : 5;
 	}
 
-	public boolean atSetpoint() {
-		return io.isAtSetpoint();
+	public Angle getAngle() {
+		return inputs.angle;
 	}
 
-	public Command testVoltageCommand() {
-		return Commands.run(() -> io.setVoltage(2));
+	public boolean isAtSetpoint() {
+		return inputs.isAtSetpoint;
+	}
+
+	public Command setVoltageCommand(double voltage) {
+		return Commands.run(() -> io.setVoltage(voltage));
 	}
 
 	public void setPivotAngle(Angle angle) {
@@ -63,7 +65,7 @@ public class Pivot extends SubsystemBase {
 
 	public Command goToAngleCommand(Angle angle) {
 		return Commands.run(() -> setPivotAngle(angle), RobotContainer.pivot)
-			.until(this::atSetpoint);
+			.until(this::isAtSetpoint);
 	}
 
 	public Command deployCommand() {
@@ -71,7 +73,11 @@ public class Pivot extends SubsystemBase {
 	}
 
 	public Command stowCommand() {
-		return Commands.run(() -> setPivotAngle(MAX_ANGLE), this);
+		return Commands.run(() -> setPivotAngle(STOW_ANGLE), this);
+	}
+
+	public Command setJiggleAngle() {
+		return Commands.run(() -> setPivotAngle(JIGGLE_ANGLE), this);
 	}
 
 	public Command goToAngleCommand(Supplier<Angle> angle) {
@@ -96,10 +102,12 @@ public class Pivot extends SubsystemBase {
 	public void periodic() {
 		logCounter++;
 
-		io.updateInputs(inputs); // need to update inputs every frame
+		// need to update this every frame
+		io.updateInputs(inputs);
+		Logger.processInputs("Pivot", inputs);
 
 		if(logCounter % loopsPerLog == 0) {
-			Logger.processInputs("Pivot", inputs);
+			// any expensive, derived logging here
 		}
 
 		if(RobotContainer.PIVOT_DEBUG || Constants.CURRENT_MODE == Mode.SIM) {

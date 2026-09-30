@@ -35,13 +35,7 @@ public interface HoodIO {
 
     public void stop();
 
-    public boolean isAtSetpoint();
-
     public void resetEncoderPosition();
-
-    public void setGains(double kP, double kD, double kS, double kG);
-
-    public void setMotionMagic(double velocity, double acceleration, double jerk);
 
     public void setNeutralMode(NeutralModeValue value);
 

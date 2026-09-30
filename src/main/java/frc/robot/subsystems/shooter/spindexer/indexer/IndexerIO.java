@@ -31,5 +31,4 @@ public interface IndexerIO {
 
 	public void stop();
 
-	public boolean isAtSetpoint();
 }

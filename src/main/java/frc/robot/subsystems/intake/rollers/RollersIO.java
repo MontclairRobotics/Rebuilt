@@ -10,6 +10,7 @@ public interface RollersIO {
 
 	@AutoLog
 	public static class RollersIOInputs {
+
 		public boolean motorConnected;
 
 		public AngularVelocity velocity = RotationsPerSecond.zero();
@@ -28,6 +29,4 @@ public interface RollersIO {
 	public void setVoltage(double voltage);
 
 	public void stop();
-
-	public boolean isAtSetpoint();
 }

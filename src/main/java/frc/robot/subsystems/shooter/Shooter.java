@@ -1,9 +1,7 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -26,6 +24,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.constants.HoodConstants;
 import frc.robot.constants.TurretConstants;
+import frc.robot.subsystems.shooter.ShooterCoordinator.ShooterGoal;
+import frc.robot.subsystems.shooter.aiming.Aiming;
 import frc.robot.subsystems.shooter.aiming.Aiming.TargetLocation;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.ShootingParameters;
 import frc.robot.subsystems.shooter.aiming.AimingConstants.SimShootingParameters;
@@ -41,166 +41,243 @@ public class Shooter extends SubsystemBase {
     private Turret turret;
     private Spindexer spindexer;
 
-    public boolean withConstantVelocity;
-    public boolean whileMoving;
+    private boolean whileMoving;
 
-    public final int HOPPER_CAPACITY = 40;
     private final int FIRE_RATE = 6;
-    public int hopperCount;
-
     private double lastSimShotTime = 0.0;
 
-    public static TargetLocation targetLocation;
+    // prevents feeding on a momentary false positive
+    private Debouncer setpointDebouncer = new Debouncer(0.04, DebounceType.kRising);
 
-    public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean withConstantVelocity, boolean whileMoving) {
+    // lets the spindexer keep running through the RPM dip after a shot
+    private Debouncer feedThroughDebouncer = new Debouncer(1, DebounceType.kFalling);
+
+    public Shooter(Hood hood, Flywheel flywheel, Turret turret, Spindexer spindexer, boolean whileMoving) {
         this.hood = hood;
         this.flywheel = flywheel;
         this.turret = turret;
         this.spindexer = spindexer;
-        this.withConstantVelocity = withConstantVelocity;
         this.whileMoving = whileMoving;
-        this.hopperCount = 0;
     }
-
 
     @Override
     public void periodic() {
-        // Logger.recordOutput("Fuel/Hopper Count", hopperCount);
-        // Logger.recordOutput("Fuel/Blue Score", Hub.BLUE_HUB.getScore());
-        // Logger.recordOutput("Fuel/Red Score", Hub.RED_HUB.getScore());
-        // Logger.recordOutput("Hub/Match Time", HubTracker.getMatchTime());
+        Logger.recordOutput("Shooter/At Setpoint", atSetpoint());
     }
-
-    public int getHopperCount() {
-        return hopperCount;
-    }
-
-
-    public void addBall() {
-        if (hopperCount < HOPPER_CAPACITY) {
-            hopperCount++;
-        }
-    }
-
-    public void removeBall() {
-        if (hopperCount > 0) {
-            hopperCount--;
-        }
-    }
-
-    public boolean shouldIntake() {
-        double intakeProbability = Math.max(0, 1 - RobotContainer.drivetrain.getFieldRelativeLinearVelocity().in(MetersPerSecond) / 3);
-        return hopperCount < HOPPER_CAPACITY
-            && Math.random() < intakeProbability;
-    }
-
-    public boolean hasBalls() {
-        return hopperCount > 0;
-    }
-
-	public Pose3d getFieldRelativePosition() {
-		Translation2d turretTranslation2d = turret.getFieldRelativePosition();
-		return new Pose3d(
-			new Translation3d(
-				turretTranslation2d.getX(),
-				turretTranslation2d.getY(),
-				TurretConstants.ORIGIN_TO_TURRET.getZ()
-			),
-			new Rotation3d(
-				Rotations.zero(),
-				Rotations.zero(),
-				turret.getFieldRelativeAngle()
-			)
-		);
-	}
 
     public boolean atSetpoint() {
-        return hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation());
-    }
-
-    public Command setParameters(Supplier<ShootingParameters> paramsSupplier) {
-        return Commands.parallel(
-            turret.setRobotRelativeAngleCommand(() -> paramsSupplier.get().robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation)),
-            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
-            indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
+        return feedThroughDebouncer.calculate(
+            setpointDebouncer.calculate(
+                turret.atSetpoint() && hood.atSetpoint() && (flywheel.atSetpoint() || RobotBase.isSimulation())
+            )
         );
     }
 
-    public Command setParametersNoTurret(Supplier<ShootingParameters> paramsSupplier) {
-        return Commands.parallel(
-            hood.setAngleCommand(() -> paramsSupplier.get().hoodAngle()),
-            indexAndShootCommand(() -> paramsSupplier.get().flywheelVelocity())
+    public TargetLocation getTargetFromGoal(ShooterGoal goal) {
+        TargetLocation target = null;
+
+        switch (goal.mode()) {
+            case SCORING:
+                target = TargetLocation.HUB;
+                break;
+            case FERRYING_LEFT:
+                target = TargetLocation.FERRY_LEFT;
+                break;
+            case FERRYING_RIGHT:
+                target = TargetLocation.FERRY_RIGHT;
+                break;
+            case IDLE:
+                break;
+        };
+
+        return target;
+    }
+
+    public AngularVelocity getTargetTurretVelocity(ShooterGoal goal) {
+        TargetLocation target = getTargetFromGoal(goal);
+
+        if(target != null) {
+            return turret.calculateTargetVelocity(target);
+        } else {
+            return RotationsPerSecond.zero();
+        }
+    }
+
+    public ShootingParameters getShootingParameters(ShooterGoal goal) {
+        TargetLocation target = getTargetFromGoal(goal);
+
+        if(target != null)  {
+            return Aiming.calculateShot(
+                target,
+                whileMoving
+            );
+        } else {
+            return new ShootingParameters(
+                Rotations.zero(),
+                Rotations.zero(),
+                RotationsPerSecond.zero(),
+                Timer.getFPGATimestamp()
+            );
+        }
+
+    }
+
+    public SimShootingParameters getSimShootingParameters(ShooterGoal goal) {
+        TargetLocation target = getTargetFromGoal(goal);
+
+        if(target != null)  {
+            return Aiming.calculateSimShot(
+                target,
+                whileMoving
+            );
+        } else {
+            return new SimShootingParameters(
+                Rotations.zero(),
+                Rotations.zero(),
+                MetersPerSecond.zero()
+            );
+        }
+    }
+
+    public Command shootStaticallyCommand() {
+        return Commands.runEnd(
+            () -> {
+
+                ShootingParameters params = new ShootingParameters(
+                    Rotations.zero(),
+                    Degrees.of(10),
+                    RotationsPerSecond.of(24),
+                    Timer.getFPGATimestamp()
+                );
+
+                turret.setRobotRelativeAngle(params.robotRelativeTurretAngle(), RotationsPerSecond.zero());
+                hood.setAngle(params.hoodAngle());
+                flywheel.setVelocity(params.flywheelVelocity());
+                spindexer.spinUp();
+
+            },
+            () -> {
+                flywheel.stop();
+                turret.stop();
+                hood.setAngle(HoodConstants.MIN_ANGLE);
+                spindexer.stop();
+            },
+            this, flywheel, turret, hood, spindexer
         );
     }
 
-    public Command setConstantShotParameters() {
-        ShootingParameters params = new ShootingParameters(Rotations.of(0.125), Degrees.of(19), RotationsPerSecond.of(24.5));
-        return Commands.parallel(
-            turret.setRobotRelativeAngleCommand(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(TargetLocation.HUB)),
-            hood.setAngleCommand(() -> params.hoodAngle()),
-            indexAndShootCommand(() -> params.flywheelVelocity())
-        );
+    public Command applyShooterGoalCommand(Supplier<ShooterGoal> goalSupplier) {
+        return Commands.runEnd(() -> {
+
+            ShooterGoal goal = goalSupplier.get();
+            ShootingParameters params = getShootingParameters(goal);
+            AngularVelocity targetTurretVelocity = getTargetTurretVelocity(goal);
+
+            if(goal.intent().isToSpinFlywheel()) {
+                flywheel.setVelocity(params.flywheelVelocity());
+            } else {
+                flywheel.stop();
+            }
+
+            if(goal.intent().isToUseTurretAngle()) {
+                turret.setRobotRelativeAngle(params.robotRelativeTurretAngle(), targetTurretVelocity);
+            } else {
+                turret.stop();
+            }
+
+            if(goal.intent().isToUseHoodAngle()) {
+                hood.setAngle(params.hoodAngle());
+            } else {
+                hood.setAngle(HoodConstants.MIN_ANGLE);
+            }
+
+            if(goal.intent().isToFeedBalls() && this.atSetpoint()) {
+                spindexer.spinUp();
+            } else {
+                spindexer.stop();
+            }
+
+        },
+        () -> {
+            flywheel.stop();
+            turret.stop();
+            hood.setAngle(HoodConstants.MIN_ANGLE);
+            spindexer.stop();
+        },
+        this, flywheel, turret, hood, spindexer);
     }
 
-    public Command setSimParameters(Supplier<SimShootingParameters> paramsSupplier) {
-        return Commands.parallel(
-            Commands.run(() -> {
-                SimShootingParameters params = paramsSupplier.get();
-                Logger.recordOutput("launchFuel()/At Setpoint", RobotContainer.shooter.atSetpoint());
+    public Command applySimShooterGoalCommand(Supplier<ShooterGoal> goalSupplier) {
+        return Commands.runEnd(() -> {
+
+            ShooterGoal goal = goalSupplier.get();
+            SimShootingParameters params = getSimShootingParameters(goal);
+            AngularVelocity targetTurretVelocity = getTargetTurretVelocity(goal);
+
+            if(goal.intent().isToUseTurretAngle()) {
+                turret.setRobotRelativeAngle(params.robotRelativeTurretAngle(), targetTurretVelocity);
+            } else {
+                turret.stop();
+            }
+
+            if(goal.intent().isToUseHoodAngle()) {
+                hood.setAngle(params.hoodAngle());
+            } else {
+                hood.setAngle(HoodConstants.MIN_ANGLE);
+            }
+
+            if(goal.intent().isToFeedBalls() && this.atSetpoint()) {
                 launchFuel(() -> params.exitVelocity(), FIRE_RATE);
-                Logger.recordOutput("setSimParameters()/Robot Relative Turret Angle", params.robotRelativeTurretAngle().in(Rotations));
-                Logger.recordOutput("setSimParameters()/Hood Angle", params.hoodAngle().in(Rotations));
-                Logger.recordOutput("setSimParameters()/Exit Velocity", params.exitVelocity().in(MetersPerSecond));
-                turret.setRobotRelativeAngle(() -> params.robotRelativeTurretAngle(), () -> turret.calculateTargetVelocity(targetLocation));
-                hood.setAngle(() -> params.hoodAngle());
-            })
-        );
-    }
+            } else {
+                // nothing needed
+            }
 
+        },
+        () -> {
+            flywheel.stop();
+            turret.stop();
+            hood.setAngle(HoodConstants.MIN_ANGLE);
+            spindexer.stop();
+        },
+        this, flywheel, turret, hood, spindexer);
+    }
 
     public void launchFuel(Supplier<LinearVelocity> velocitySupplier, double fireRate) {
-        Logger.recordOutput("Shooter/At Setpoint", RobotContainer.shooter.atSetpoint());
-        if (RobotContainer.shooter.atSetpoint() && RobotContainer.shootTrigger.getAsBoolean()) {
+        if (this.atSetpoint() && !RobotContainer.turret.isSpinningAround()) {
             double currentTime = Timer.getFPGATimestamp();
             double interval = 1.0 / fireRate;
 
             if(currentTime - lastSimShotTime >= interval) {
                 lastSimShotTime = currentTime;
-                removeBall();
 
-                LinearVelocity exitVelocity = velocitySupplier.get().times(1 + ((Math.random() * 0.1)-0.05));
-                Angle robotRelativeTurretAngle = RobotContainer.turret.getRobotRelativeAngle();
-                Angle hoodAngle = RobotContainer.hood.getAngle();
-
-                Logger.recordOutput("launchFuelCommand()/Robot Relative Turret Angle", robotRelativeTurretAngle.in(Rotations));
-                Logger.recordOutput("launchFuelCommand()/Hood Angle", hoodAngle.in(Rotations));
-                Logger.recordOutput("launchFuelCommand()/Exit Velocity", exitVelocity.in(MetersPerSecond));
+                LinearVelocity exitVelocity = velocitySupplier.get().times(1 + ((Math.random() * 0.05)-0.025));
+                Angle robotRelativeTurretAngle = turret.getRobotRelativeAngle();
+                Angle hoodAngle = hood.getAngle();
 
                 RobotContainer.fuelSim.launchFuel(
                     exitVelocity,
                     Degrees.of(90).plus(hoodAngle),
-                    robotRelativeTurretAngle.plus(Radians.of(RobotContainer.drivetrain.getWrappedHeading().getRadians())).minus(Rotations.of(0.125)),
+                    robotRelativeTurretAngle.plus(Radians.of(RobotContainer.drivetrain.getWrappedHeading().getRadians())).minus(Rotations.of(0)),
                     TurretConstants.ORIGIN_TO_TURRET.getMeasureZ()
                 );
             }
         }
     }
 
-    public Command indexAndShootCommand(Supplier<AngularVelocity> flywheelVelocitySupplier) {
-        return Commands.run(() -> {
-            if (RobotContainer.shootTrigger.getAsBoolean()) {
-                flywheel.setVelocity(flywheelVelocitySupplier, Timer.getFPGATimestamp());
-                if(this.atSetpoint()) spindexer.spinUp();
-            }
-        });
+    public Command getDefaultCommand() {
+        if(RobotBase.isReal()) {
+            return applyShooterGoalCommand(() -> RobotContainer.shooterCoordinator.getCurrentGoal());
+        } else {
+            return applySimShooterGoalCommand(() -> RobotContainer.shooterCoordinator.getCurrentGoal());
+        }
     }
 
     public Command stowCommand(){
         return Commands.parallel (
-			hood.setAngleCommand(() -> HoodConstants.MIN_ANGLE),
+			hood.setAngleCommand(HoodConstants.MIN_ANGLE),
 			turret.stopCommand(),
             flywheel.stopCommand(),
-            spindexer.spinDownCommand()
+            spindexer.stopCommand()
 		);
     }
 
@@ -215,4 +292,5 @@ public class Shooter extends SubsystemBase {
             RobotContainer.shouldShootAuto = false;
         });
     }
+
 }

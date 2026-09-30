@@ -14,23 +14,23 @@ import edu.wpi.first.units.measure.AngularVelocity;
 public class IndexerConstants {
 
     public static final int CAN_ID = 21;
-    public static final CANBus CAN_BUS = new CANBus("drivetrain"); // on the canivore
+    public static final CANBus CAN_BUS = new CANBus(""); // on the roborio canbus
 
-    public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.5);
+    public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(2);
 	public static final AngularVelocity SPIN_VELOCITY = RotationsPerSecond.of(85);
 	public static final double SPIN_VOLTAGE = 12;
 
-	// tuned 3/4
+	// Tuned 4/12/26
     public static final double kP = 10;
 	public static final double kD = 0;
-	public static final double kS = 7;
-	public static final double kV = 0.35;
+	public static final double kS = 6;
+	public static final double kV = 0.15;
 
-    public static final double STATOR_CURRENT_LIMIT = 80;
-    public static final double SUPPLY_CURRENT_LIMIT = 60;
+    public static final double STATOR_CURRENT_LIMIT = 60;
+    public static final double SUPPLY_CURRENT_LIMIT = 20;
 
     public static final double GEARING = 1;
-    public static final double MOMENT_OF_INERTIA = 0.02; //TODO: get
+    public static final double MOMENT_OF_INERTIA = 0.02;
 
     public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKD(kD)
@@ -38,9 +38,9 @@ public class IndexerConstants {
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
 		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)
-		.withStatorCurrentLimitEnable(false)
+		.withStatorCurrentLimitEnable(true)
 		.withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
-		.withSupplyCurrentLimitEnable(false);
+		.withSupplyCurrentLimitEnable(true);
 
 	public static final MotorOutputConfigs MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
 		.withInverted(InvertedValue.Clockwise_Positive)

@@ -53,15 +53,17 @@ public class RollersIOSim implements RollersIO {
 		inputs.appliedVoltage = appliedVoltage;
 		inputs.currentDrawAmps = sim.getCurrentDrawAmps();
 		inputs.tempCelsius = 0;
-		inputs.isAtSetpoint = isAtSetpoint();
+		inputs.isAtSetpoint = pidController.atSetpoint();
 	}
 
 	@Override
 	public void setVelocity(AngularVelocity targetVelocity) {
+
 		double pidOutput = pidController.calculate(
             RadiansPerSecond.of(sim.getAngularVelocityRadPerSec()).in(RotationsPerSecond),
             targetVelocity.in(RotationsPerSecond)
         );
+
 		double ffOutput = feedforward.calculate(targetVelocity.in(RotationsPerSecond));
 		double totalOutput = pidOutput + ffOutput;
         appliedVoltage = MathUtil.clamp(totalOutput, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
@@ -77,8 +79,4 @@ public class RollersIOSim implements RollersIO {
 		appliedVoltage = 0;
 	}
 
-	@Override
-	public boolean isAtSetpoint() {
-		return pidController.atSetpoint();
-	}
 }

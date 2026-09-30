@@ -1,5 +1,6 @@
 package frc.robot;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -41,7 +42,7 @@ import frc.robot.util.PoseUtils;
 
 public class Auto extends SubsystemBase {
 	private char currentPos;
-	private double timeToEmptyFuel = 6.0; //TODO: get the actual value
+	private double timeToEmptyFuel = 5.0; //TODO: get the actual value
 	private Field2d field = new Field2d();
 
 	private ArrayList<PathPlannerPath> allPaths = new  ArrayList<PathPlannerPath>();
@@ -85,35 +86,87 @@ public class Auto extends SubsystemBase {
 		SmartDashboard.putData("Field", field);
 	}
 
+	public Command followCybersonicsAutoCommand() {
+
+		Command zeroPoseCommand = Commands.none();
+		Command path1cmd = Commands.none();
+		Command path2cmd = Commands.none();
+
+		try {
+			PathPlannerPath path1 = PathPlannerPath.fromPathFile("JK");
+			path1cmd = AutoBuilder.followPath(path1);
+			PathPlannerPath path2 = PathPlannerPath.fromPathFile("KL");
+			path2cmd = AutoBuilder.followPath(path2);
+
+			Optional<Pose2d>  opPose = path1.getStartingHolonomicPose();
+			Pose2d pose = opPose.isPresent() ? PoseUtils.flipPoseAlliance(opPose.get()) : new Pose2d();
+
+			zeroPoseCommand = Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain);
+
+		} catch(Exception e) {}
+
+		return Commands.parallel(
+			RobotContainer.rollers.spinUpCommand(),
+			Commands.sequence(
+				zeroPoseCommand,
+				RobotContainer.shooter.startShootingInAuto(),
+				Commands.waitSeconds(4), // wait to shoot preloaded
+				RobotContainer.shooter.stopShootingInAuto(),
+				path1cmd, // exactly 3 seconds long
+				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
+				Commands.waitSeconds(2), // wait 2 seconds to reach a total of 9 seconds passed, 11 seconds left
+				RobotContainer.shooter.startShootingInAuto(),
+				path2cmd
+			)
+	);
+
+	}
+
+	public Command depotAutoCommand() {
+
+		Command zeroPoseCommand = Commands.none();
+		Command pathcmd = Commands.none();
+
+		try {
+			PathPlannerPath path = PathPlannerPath.fromPathFile("CD");
+			pathcmd = AutoBuilder.followPath(path);
+
+			Optional<Pose2d>  opPose = path.getStartingHolonomicPose();
+			Pose2d pose = opPose.isPresent() ? PoseUtils.flipPoseAlliance(opPose.get()) : new Pose2d();
+
+			zeroPoseCommand = Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain);
+
+		} catch(Exception e) {}
+
+		return Commands.parallel(
+			RobotContainer.rollers.spinUpCommand(),
+			Commands.waitSeconds(1).andThen(RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE)),
+			Commands.sequence(
+				zeroPoseCommand,
+				pathcmd, // around 12 seconds long
+				Commands.waitSeconds(1), // wait 2 seconds to reach a total of 9 seconds passed, 11 seconds left
+				RobotContainer.shooter.startShootingInAuto()
+			)
+	);
+
+	}
+
 	public static void drawAuto(String auto) {
 		int maxObjs = 0;
 		Field2d field = new Field2d();
 		for(int i = 0; i <= maxObjs; i++) {
 		field.getObject("obj" + i).setPoses(new Pose2d());
 		}
-		maxObjs = 0;
-
-		if(AllianceManager.getAlliance() == DriverStation.Alliance.Blue) {
-		try {
+		//maxObjs = 0;
+		if(AllianceManager.isAllianceKnown()){
+		try{
 			for(int i = 0; i < PathPlannerAuto.getPathGroupFromAutoFile(auto).size(); i++) {
-			field.getObject("obj" + i).setPoses(PathPlannerAuto.getPathGroupFromAutoFile(auto).get(i).getPathPoses());
-			if(i > maxObjs) {
-				maxObjs = i;
-			}
-			}
-		} catch (IOException | ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		}
-
-		if(AllianceManager.getAlliance() == DriverStation.Alliance.Red) {
-		try {
-			for(int i = 0; i < PathPlannerAuto.getPathGroupFromAutoFile(auto).size(); i++) {
-			field.getObject("obj" + i).setPoses(PathPlannerAuto.getPathGroupFromAutoFile(auto).get(i).flipPath().getPathPoses());
-			if(i > maxObjs) {
-				maxObjs = i;
-			}
+				PathPlannerPath path = PathPlannerAuto.getPathGroupFromAutoFile(auto).get(i);
+				path = AllianceManager.isRed() ? path.flipPath() : path;
+				field.getObject("obj" + i).setPoses(path.getPathPoses());
+				if(i > maxObjs) {
+					maxObjs = i;
+				}
 			}
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
@@ -131,18 +184,13 @@ public class Auto extends SubsystemBase {
 			maxObjs = 0;
 		}
 
-		if(AllianceManager.getAlliance() == DriverStation.Alliance.Blue) {
-			for(int i = 0; i < allPaths.size(); i++) {
-				field.getObject("obj" + i).setPoses(allPaths.get(i).getPathPoses().toArray(new Pose2d[0]));
-				if(i > maxObjs) {
-					maxObjs = i;
-				}
-			}
-		}
+		if(AllianceManager.isAllianceKnown()){
+			for(int i=0; i<allPaths.size(); i++){
+				PathPlannerPath path = allPaths.get(i);
+				path = AllianceManager.isRed() ? path.flipPath() : path;
 
-		if(AllianceManager.getAlliance() == DriverStation.Alliance.Red) {
-			for(int i = 0; i < allPaths.size(); i++) {
-				field.getObject("obj" + i).setPoses(allPaths.get(i).flipPath().getPathPoses().toArray(new Pose2d[0]));
+				field.getObject("obj" + i).setPoses(path.getPathPoses().toArray(new Pose2d[0]));
+
 				if(i > maxObjs) {
 					maxObjs = i;
 				}
@@ -205,7 +253,12 @@ public class Auto extends SubsystemBase {
 	}
 
 	public boolean isYeetAutoStringValid(String autoString) {
-		if(autoString.equals("0") || autoString.equals("1") || autoString.equals("2") || autoString.equals("3") || autoString.equals("4")) {
+		if(autoString.equals("0") ||
+			autoString.equals("1") ||
+			autoString.equals("2") ||
+			autoString.equals("3") ||
+			autoString.equals("4"))
+		{
 			setFeedback("Yeet Auto String Valid!", NotificationLevel.INFO);
 			return true;
 
@@ -220,120 +273,40 @@ public class Auto extends SubsystemBase {
 			Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
 
 			return new SequentialCommandGroup(
-				Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-				RobotContainer.shooter.startShootingInAuto()
+				Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain)
+				// RobotContainer.shooter.startShootingInAuto()
 			);
-		} else if(autoString.equals("1")) {
-			try {
-				PathPlannerPath path = PathPlannerPath.fromPathFile("1");
-
-				Optional<Pose2d>  opPose = path.getStartingHolonomicPose();
-				Pose2d pose = opPose.isPresent() ? PoseUtils.flipPoseAlliance(opPose.get()) : new Pose2d();
-
-				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					AutoBuilder.followPath(path),
-					Commands.run(
-						() -> RobotContainer.drivetrain.drive(0, 0, 6, false)
-					)
-				);
-			} catch(Exception e) {
-				setFeedback("Failed to load auto 1, returning default", NotificationLevel.ERROR);
-
-				Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
-
-				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					RobotContainer.shooter.startShootingInAuto()
-				);
-			}
-
-		} else if(autoString.equals("2")) {
-
-			try {
-				PathPlannerPath path = PathPlannerPath.fromPathFile("2");
-
-				Optional<Pose2d>  opPose = path.getStartingHolonomicPose();
-				Pose2d pose = opPose.isPresent() ? PoseUtils.flipPoseAlliance(opPose.get()) : new Pose2d();
-
-				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					AutoBuilder.followPath(path),
-					Commands.run(
-						() -> RobotContainer.drivetrain.drive(0, 0, 6, false)
-					)
-				);
-			} catch(Exception e) {
-				setFeedback("Failed to load auto 2, returning default", NotificationLevel.ERROR);
-
-				Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
-
-				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					RobotContainer.shooter.startShootingInAuto()
-				);
-			}
-
-		} else if(autoString.equals("3")) {
-
-			try {
-				PathPlannerPath path = PathPlannerPath.fromPathFile("3");
-
-				Optional<Pose2d>  opPose = path.getStartingHolonomicPose();
-				Pose2d pose = opPose.isPresent() ? PoseUtils.flipPoseAlliance(opPose.get()) : new Pose2d();
-
-				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					AutoBuilder.followPath(path),
-					Commands.run(
-						() -> RobotContainer.drivetrain.drive(0, 0, 6, false)
-					)
-				);
-			} catch(Exception e) {
-				setFeedback("Failed to load auto 3, returning default", NotificationLevel.ERROR);
-
-				Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
-
-				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					RobotContainer.shooter.startShootingInAuto()
-				);
-			}
-
-		} else if(autoString.equals("4")) {
-
-			try {
-				PathPlannerPath path = PathPlannerPath.fromPathFile("4");
-
-				Optional<Pose2d>  opPose = path.getStartingHolonomicPose();
-				Pose2d pose = opPose.isPresent() ? PoseUtils.flipPoseAlliance(opPose.get()) : new Pose2d();
-
-				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					AutoBuilder.followPath(path),
-					Commands.run(
-						() -> RobotContainer.drivetrain.drive(0, 0, 6, false)
-					)
-				);
-			} catch(Exception e) {
-				setFeedback("Failed to load auto 4, returning default", NotificationLevel.ERROR);
-
-				Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
-
-				return new SequentialCommandGroup(
-					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
-					RobotContainer.shooter.startShootingInAuto()
-				);
-			}
-
 		} else {
-			return Commands.none();
+			try {
+				PathPlannerPath path = PathPlannerPath.fromPathFile(autoString);
+
+				Optional<Pose2d>  opPose = path.getStartingHolonomicPose();
+				Pose2d pose = opPose.isPresent() ? PoseUtils.flipPoseAlliance(opPose.get()) : new Pose2d();
+
+				return new SequentialCommandGroup(
+					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain),
+					AutoBuilder.followPath(path),
+					Commands.run(
+						() -> RobotContainer.drivetrain.drive(0, 0, 6, false)
+					)
+				);
+			} catch(Exception e) {
+				setFeedback("Failed to load auto "+autoString+", returning default", NotificationLevel.ERROR);
+
+				Pose2d pose = PoseUtils.flipPoseAlliance(new Pose2d(3.59, 5.063, new Rotation2d()));
+
+				return new SequentialCommandGroup(
+					Commands.runOnce(() -> RobotContainer.drivetrain.resetPose(pose), RobotContainer.drivetrain)
+					// RobotContainer.shooter.startShootingInAuto()
+				);
+			}
+
 		}
 	}
 
 	public Command buildAuto(String autoString) {
 
-		allPaths = new ArrayList();
+		allPaths = new ArrayList<PathPlannerPath>();
 		SequentialCommandGroup autoCommand = new SequentialCommandGroup();
 
 		if (!isAutoStringValid(autoString)) {
@@ -439,17 +412,13 @@ public class Auto extends SubsystemBase {
 
 			if(
 				(currentPos == 'L' || currentPos == 'R')
-				&& currentPos == autoString.charAt(i)
+				// && currentPos == autoString.charAt(i)
 				|| ((autoString.charAt(i+1) == '0') && (currentPos == 'D' || currentPos == 'O'))) {
-				// followPathCommands.addCommands(
-				// 	Commands.deadline(
-				// 		Commands.waitSeconds(timeToEmptyFuel),
-				// 		RobotContainer.shooter.setParameters(() -> Aiming.calculateShot(TargetLocation.HUB, false, true))
-				// 	),
-				// 	RobotContainer.shooter.stowCommand().withTimeout(1)
-				// );
-				followPathCommands.addCommands(Commands.waitSeconds(timeToEmptyFuel));
-				// followPathCommands.addCommands(RobotContainer.hood.setAngleCommand(HoodConstants.MIN_ANGLE));
+
+				followPathCommands.addCommands(
+					Commands.waitSeconds(timeToEmptyFuel)
+				);
+
 			}
 			try {
 				PathPlannerPath path = PathPlannerPath.fromPathFile(pathString);
@@ -470,34 +439,22 @@ public class Auto extends SubsystemBase {
 
 		if(RobotBase.isReal()) {
 			pivotCommandGroup.addCommands(
-				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE),
-				Commands.waitUntil(() -> RobotContainer.pivot.atSetpoint())
+				RobotContainer.pivot.goToAngleCommand(PivotConstants.MIN_ANGLE)
 			);
 		} else {
 			pivotCommandGroup.addCommands(
 				Commands.none()
 			);
 		}
-		if(AllianceManager.getAlliance() == DriverStation.Alliance.Blue) {
-			autoCommand.addCommands(
-				pivotCommandGroup,
-				Commands.parallel(
-					Commands.waitSeconds(3).andThen(RobotContainer.shooter.startShootingInAuto()),
-					followPathCommands,
-					RobotContainer.rollers.spinUpCommand()
-				)
-			);
 
-		} else {
-			autoCommand.addCommands(
+		autoCommand.addCommands(
+			Commands.parallel(
 				pivotCommandGroup,
-				Commands.parallel(
-					Commands.waitSeconds(3).andThen(RobotContainer.shooter.startShootingInAuto()),
-					followPathCommands,
-					RobotContainer.rollers.spinUpCommand()
-				)
-			);
-		}
+				Commands.waitSeconds(1).andThen(RobotContainer.shooter.startShootingInAuto()),
+				followPathCommands,
+				RobotContainer.rollers.spinUpCommand()
+			)
+		);
 
 		return autoCommand;
 	}
@@ -531,6 +488,8 @@ public class Auto extends SubsystemBase {
     }
 
 	public void periodic() {
+		field.setRobotPose(RobotContainer.drivetrain.getRobotPose());
+
 		if(DriverStation.isDisabled()) {
 			String str = stringEnt.get();
 			SmartDashboard.putData(field);

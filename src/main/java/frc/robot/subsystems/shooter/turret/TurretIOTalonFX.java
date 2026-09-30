@@ -5,23 +5,24 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.PhoenixUtil;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.TurretConstants.*;
+
 
 public class TurretIOTalonFX implements TurretIO {
 
@@ -39,6 +40,10 @@ public class TurretIOTalonFX implements TurretIO {
 
     private final PositionVoltage request = new PositionVoltage(0).withEnableFOC(true);
     private final NeutralOut neutralOut = new NeutralOut();
+    private final VoltageOut voltageOut = new VoltageOut(0);
+
+    private final double timeConstant = 0.05;
+    private final LinearFilter filter = LinearFilter.singlePoleIIR(timeConstant, 0.02);
 
     public TurretIOTalonFX() {
         motor = new TalonFX(CAN_ID, CAN_BUS);
@@ -48,8 +53,7 @@ public class TurretIOTalonFX implements TurretIO {
             .withSlot0(SLOT0_CONFIGS)
             .withCurrentLimits(CURRENT_LIMITS_CONFIGS)
             .withMotorOutput(MOTOR_OUTPUT_CONFIGS)
-            .withFeedback(FEEDBACK_CONFIGS)
-            .withMotionMagic(MOTION_MAGIC_CONFIGS);
+            .withFeedback(FEEDBACK_CONFIGS);
 
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
@@ -73,15 +77,18 @@ public class TurretIOTalonFX implements TurretIO {
             setpointPositionSignal,
             velocitySignal,
             appliedVoltageSignal,
-            currentDrawAmpsSignal,
-            tempCelsiusSignal
+            currentDrawAmpsSignal
         );
+
+        // not necessary to run this fast
+		tempCelsiusSignal.setUpdateFrequency(4);
 
         motor.optimizeBusUtilization();
     }
 
     @Override
     public void updateInputs(TurretIOInputs inputs) {
+
         BaseStatusSignal.refreshAll(
             positionSignal,
             setpointPositionSignal,
@@ -106,20 +113,20 @@ public class TurretIOTalonFX implements TurretIO {
 
         inputs.velocity = velocitySignal.getValue();
         inputs.robotRelativeAngle = positionSignal.getValue();
-        inputs.fieldRelativeAngle = Turret.toFieldRelativeAngle(inputs.robotRelativeAngle);
         inputs.robotRelativeAngleSetpoint = Rotations.of(setpointPositionSignal.getValueAsDouble());
 
-        inputs.isAtSetpoint = isAtSetpoint();
+        inputs.isAtSetpoint =
+            Math.abs(positionSignal.getValueAsDouble() - setpointPositionSignal.getValueAsDouble()) < ANGLE_TOLERANCE.in(Rotations);
     }
 
     @Override
     public void setRobotRelativeAngle(Angle angle, AngularVelocity velocity) {
-        motor.setControl(request.withPosition(angle).withVelocity(velocity));
+        motor.setControl(request.withPosition(angle).withVelocity(velocity.in(RotationsPerSecond)));
     }
 
     @Override
     public void setVoltage(double voltage) {
-        motor.setControl(new VoltageOut(voltage));
+        motor.setControl(voltageOut.withOutput(voltage));
     }
 
     @Override
@@ -128,42 +135,8 @@ public class TurretIOTalonFX implements TurretIO {
     }
 
     @Override
-    public boolean isAtSetpoint() {
-        double error = motor.getClosedLoopError().getValueAsDouble();
-        return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations)
-            // && Math.abs(velocitySignal.getValueAsDouble()) < MAX_VELOCITY_AT_SETPOINT.in(RotationsPerSecond)
-        ;
-    }
-
-    @Override
     public void disable() {
         motor.disable();
-    }
-
-    @Override
-    public boolean isAtTimeAdjustedSetpoint() {
-        double error =
-            Turret.getSetpointForTime(Timer.getFPGATimestamp()).in(Rotations)
-            - positionSignal.getValue().in(Rotations);
-        return Math.abs(error) < ANGLE_TOLERANCE.in(Rotations);
-    }
-
-    @Override
-    public void setGains(double kP, double kD, double kS) {
-        config.Slot0.kP = kP;
-        config.Slot0.kD = kD;
-        config.Slot0.kS = kS;
-
-        motor.getConfigurator().apply(config.Slot0);
-    }
-
-    @Override
-    public void setMotionMagic(double velocity, double acceleration, double jerk) {
-        config.MotionMagic.MotionMagicCruiseVelocity = velocity;
-        config.MotionMagic.MotionMagicAcceleration = acceleration;
-        config.MotionMagic.MotionMagicJerk = jerk;
-
-        motor.getConfigurator().apply(config.MotionMagic);
     }
 
     @Override

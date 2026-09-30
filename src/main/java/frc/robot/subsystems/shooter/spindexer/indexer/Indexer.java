@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter.spindexer.indexer;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.constants.IndexerConstants.*;
 
 import java.util.function.DoubleSupplier;
@@ -10,7 +9,6 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,8 +31,8 @@ public class Indexer extends SubsystemBase {
 		loopsPerLog = RobotContainer.INDEXER_DEBUG ? 1 : 5;
 	}
 
-	public boolean atSetpoint() {
-		return io.isAtSetpoint();
+	public boolean isAtSetpoint() {
+		return inputs.isAtSetpoint;
 	}
 
 	@Override
@@ -42,9 +40,10 @@ public class Indexer extends SubsystemBase {
 		logCounter++;
 
 		io.updateInputs(inputs);
+		Logger.processInputs("Indexer", inputs);
 
 		if(logCounter % loopsPerLog == 0) {
-			Logger.processInputs("Indexer", inputs);
+			// any expensive, derived logging here
 		}
 	}
 
@@ -65,16 +64,21 @@ public class Indexer extends SubsystemBase {
 	}
 
 	public void spinUp() {
+		// setVoltage(SPIN_VOLTAGE);
 		setVelocity(SPIN_VELOCITY);
 	}
 
 	public void spinDown() {
-		setVelocity(RotationsPerSecond.zero());
+		stop();
+	}
+
+	public void stop() {
+		io.stop();
 	}
 
 	public void applyJoystickInput() {
-        double input = -MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.controller.getRightY(), 0.1), 1.5);
-        double voltage = input * RobotController.getBatteryVoltage();
+        double input = -MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
+        double voltage = input * 12;
         io.setVoltage(voltage);
     }
 

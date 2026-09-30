@@ -5,7 +5,6 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -21,42 +20,34 @@ public class FlywheelConstants {
 
 	public static final AngularVelocity VELOCITY_TOLERANCE = RotationsPerSecond.of(0.5);
 
-	// tuned 3/4
+	// tuned 4/12/26
 	public static final double kP = 30;
 	public static final double kD = 0;
-	public static final double kS = 21.5;
-	public static final double kV = 0.46;
+	public static final double kS = 5;
+	public static final double kV = 0.75;
 
-	public static final double STATOR_CURRENT_LIMIT = 100; // Amps
-	public static final double SUPPLY_CURRENT_LIMIT = 60; // Amps
+	public static final double STATOR_CURRENT_LIMIT = 140; // Amps
+	public static final double SUPPLY_CURRENT_LIMIT = 100; // Amps
 
-	public static final double MOMENT_OF_INERTIA = 0.00233846427; // From CAD on 2026.02.11, probably wrong
-	public static final double GEARING = 1.10526315785; // to the big flywheel, from Max Pearson on 2026.02.20
+	public static final double MOMENT_OF_INERTIA = 0.00233846427;
+	public static final double GEARING = 1.10526315785; // to the big flywheel, from Max Pearson on 2/20/26
 
 	public static final Slot0Configs SLOT0_CONFIGS = new Slot0Configs()
 		.withKP(kP).withKD(kD)
 		.withKS(kS).withKV(kV);
 
 	public static final CurrentLimitsConfigs CURRENT_LIMITS_CONFIGS = new CurrentLimitsConfigs()
-		// .withStatorCurrentLimit(STATOR_CURRENT_LIMIT)
-		.withStatorCurrentLimitEnable(false)
-		// .withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
-		.withSupplyCurrentLimitEnable(false);
+		.withStatorCurrentLimit(STATOR_CURRENT_LIMIT)
+		.withStatorCurrentLimitEnable(true)
+		.withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
+		.withSupplyCurrentLimitEnable(true);
 
 	public static final MotorOutputConfigs LEFT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
 		.withInverted(InvertedValue.Clockwise_Positive)
-		.withNeutralMode(NeutralModeValue.Coast)
-		.withPeakForwardDutyCycle(1)
-		.withPeakReverseDutyCycle(0);
+		.withNeutralMode(NeutralModeValue.Coast);
 
 	public static final MotorOutputConfigs RIGHT_MOTOR_OUTPUT_CONFIGS = new MotorOutputConfigs()
-		.withNeutralMode(NeutralModeValue.Coast)
-		.withPeakForwardDutyCycle(1)
-		.withPeakReverseDutyCycle(0);
-
-	public static final TorqueCurrentConfigs TORQUE_CURRENT_CONFIGS = new TorqueCurrentConfigs()
-		.withPeakForwardTorqueCurrent(90)
-		.withPeakReverseTorqueCurrent(0);
+		.withNeutralMode(NeutralModeValue.Coast);
 
 	public static final FeedbackConfigs FEEDBACK_CONFIGS = new FeedbackConfigs()
 		.withVelocityFilterTimeConstant(Seconds.of(0.01))

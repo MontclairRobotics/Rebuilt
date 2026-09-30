@@ -25,7 +25,7 @@ public class TunerConstants {
     // The steer motor uses any SwerveModule.SteerRequestType control request with the
     // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
     private static final Slot0Configs steerGains = new Slot0Configs()
-        .withKP(65).withKI(0).withKD(0.5)
+        .withKP(50).withKI(0).withKD(0.5)
         .withKS(0.1).withKV(2.66).withKA(0)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     // When using closed-loop control, the drive motor uses the control
@@ -52,15 +52,47 @@ public class TunerConstants {
 
     // The stator current at which the wheels start to slip;
     // This needs to be tuned to your individual robot
-    private static final Current kSlipCurrent = Amps.of(80);
+    private static final Current kSlipCurrent = Amps.of(70);
+
+    public static final CurrentLimitsConfigs defaultDriveCurrentLimitsConfig = new CurrentLimitsConfigs()
+        .withStatorCurrentLimit((kSlipCurrent))
+        .withSupplyCurrentLimit(Amps.of(50))
+        .withStatorCurrentLimitEnable(true)
+        .withSupplyCurrentLimitEnable(true);
+
+    public static final CurrentLimitsConfigs turboDriveCurrentLimitsConfig = new CurrentLimitsConfigs()
+        .withStatorCurrentLimit((Amps.of(100)))
+        .withSupplyCurrentLimit(Amps.of(80))
+        .withStatorCurrentLimitEnable(true)
+        .withSupplyCurrentLimitEnable(true);
+
+    public static final CurrentLimitsConfigs precisionDriveCurrentLimitsConfig = new CurrentLimitsConfigs()
+        .withStatorCurrentLimit(Amps.of(40))
+        .withSupplyCurrentLimit(Amps.of(20))
+        .withStatorCurrentLimitEnable(true)
+        .withSupplyCurrentLimitEnable(true);
+
+    public static final TalonFXConfiguration turboDriveConfiguration = new TalonFXConfiguration()
+        .withCurrentLimits(turboDriveCurrentLimitsConfig)
+        .withClosedLoopRamps(
+            new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(0)
+        );
+
+    public static final TalonFXConfiguration precisionDriveConfiguration = new TalonFXConfiguration()
+        .withCurrentLimits(precisionDriveCurrentLimitsConfig)
+        .withClosedLoopRamps(
+            new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(0.01)
+        );
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
     // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
-    private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration()
-        .withCurrentLimits(
-            new CurrentLimitsConfigs()
-                .withStatorCurrentLimit((kSlipCurrent))
-                .withStatorCurrentLimitEnable(true)
+    public static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration()
+        .withCurrentLimits(defaultDriveCurrentLimitsConfig)
+        .withClosedLoopRamps(
+            new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(0.01)
         );
 
     private static final TalonFXConfiguration steerInitialConfigs = new TalonFXConfiguration()
@@ -68,8 +100,10 @@ public class TunerConstants {
             new CurrentLimitsConfigs()
                 // Swerve azimuth does not require much torque output, so we can set a relatively low
                 // stator current limit to help avoid brownouts without impacting performance.
-                .withStatorCurrentLimit(Amps.of(60))
+                .withStatorCurrentLimit(Amps.of(40))
+                .withSupplyCurrentLimit(Amps.of(20))
                 .withStatorCurrentLimitEnable(true)
+                .withSupplyCurrentLimitEnable(true)
         );
 
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
@@ -91,7 +125,7 @@ public class TunerConstants {
 
     private static final double kDriveGearRatio = 6.122448979591837;
     private static final double kSteerGearRatio = 21.428571428571427;
-    private static final Distance kWheelRadius = Meters.of(0.04894);
+    private static final Distance kWheelRadius = Meters.of(0.04864861);
 
     private static final boolean kInvertLeftSide = false;
     private static final boolean kInvertRightSide = true;
