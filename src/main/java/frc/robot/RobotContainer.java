@@ -10,8 +10,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.RobotController;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,7 +31,6 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterCoordinator;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.shooter.spindexer.Spindexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.Indexer;
 import frc.robot.subsystems.shooter.spindexer.indexer.IndexerIOSim;
@@ -39,10 +38,8 @@ import frc.robot.subsystems.shooter.spindexer.serializer.Serializer;
 import frc.robot.subsystems.shooter.spindexer.serializer.SerializerIOSim;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
-import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
-import frc.robot.subsystems.shooter.hood.HoodIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.util.Telemetry;
@@ -122,7 +119,7 @@ public class RobotContainer {
 
 				hood = new Hood(new HoodIOSim());
 				flywheel = new Flywheel(new FlywheelIOSim());
-				turret = new Turret(new TurretIOTalonFX());
+				turret = new Turret(new TurretIOSim());
 
 				serializer = new Serializer(new SerializerIOSim());
 				indexer = new Indexer(new IndexerIOSim());
@@ -133,8 +130,7 @@ public class RobotContainer {
 					shootWhileMoving
 				);
 
-				superstructure = new Superstructure(shooter);
-				aiming = new Aiming(turret);
+				superstructure = new Superstructure();
 
 				pivot = new Pivot(new PivotIOSim());
 				rollers = new Rollers(new RollersIOSim());
@@ -188,12 +184,8 @@ public class RobotContainer {
 				auto = new Auto();
 				superstructure = new Superstructure();
 
-				shooterCoordinator = new ShooterCoordinator(
-					operatorWantsToFireTrigger,
-					operatorWantsToTrackHubTrigger,
-					operatorWantsToTrackFerryPointTrigger,
-					() -> shouldShootAuto
-				);
+
+				;
 
 				break;
 
@@ -219,7 +211,7 @@ public class RobotContainer {
 
 	private void configureBindings() {
 
-		drivetrain.setDefaultCommand(new JoystickDriveCommand(false));
+		drivetrain.setDefaultCommand(new JoystickDriveCommand());
 		controller.touchpad().onTrue(drivetrain.zeroGyroCommand());
 
 	}

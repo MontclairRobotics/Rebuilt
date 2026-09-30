@@ -3,7 +3,6 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
@@ -25,23 +24,7 @@ public class JoystickDriveCommand extends Command {
 		this.yVelocitySupplier = () -> drivetrain.getStrafeVelocityFromController();
 		this.omegaVelocitySupplier = () -> drivetrain.getOmegaVelocityFromController();
 
-		RobotContainer.xModeTrigger
-			.onTrue(updateDriveMode(DriveMode.XMODE))
-			.onFalse(updateDriveMode(DriveMode.NORMAL));
-
-		RobotContainer.turboTrigger
-			.onTrue(updateDriveMode(DriveMode.TURBO))
-			.onFalse(updateDriveMode(DriveMode.NORMAL));
-
-		RobotContainer.precisionTrigger
-			.onTrue(updateDriveMode(DriveMode.PRECISION))
-			.onFalse(updateDriveMode(DriveMode.NORMAL));
-
 		addRequirements(drivetrain);
-	}
-
-	private Command updateDriveMode(DriveMode driveMode) {
-		return Commands.runOnce(() -> currentDriveMode = driveMode);
 	}
 
 	@Override

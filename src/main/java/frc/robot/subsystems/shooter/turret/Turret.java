@@ -93,7 +93,7 @@ public class Turret extends SubsystemBase {
 	public boolean isSpinningAround() { return isSpinningAround; }
 
 	public boolean hasJoystickInput() {
-		return Math.hypot(RobotContainer.operatorController.getLeftX(), RobotContainer.operatorController.getLeftY()) > 0.2;
+		return false;
 	}
 
 	public void stop() {
@@ -101,8 +101,8 @@ public class Turret extends SubsystemBase {
 	}
 
 	public Angle calculateRobotRelativeAngleManualJoystickAim() {
-		double y = RobotContainer.operatorController.getLeftX();
-		double x = RobotContainer.operatorController.getLeftY();
+		double y = 0;
+		double x = 0;
 
 		// deadband
 		if (Math.hypot(x, y) < 0.2) {

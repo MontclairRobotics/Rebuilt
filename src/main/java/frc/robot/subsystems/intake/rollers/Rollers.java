@@ -1,7 +1,6 @@
 package frc.robot.subsystems.intake.rollers;
 
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -54,7 +53,7 @@ public class Rollers extends SubsystemBase {
 	}
 
 	public void applyJoystickInput() { //Unused open loop
-        double input = -MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
+        double input = 0;
         double voltage = input * 12;
 
         io.setVoltage(voltage);

@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -77,9 +76,7 @@ public class Indexer extends SubsystemBase {
 	}
 
 	public void applyJoystickInput() {
-        double input = -MathUtil.copyDirectionPow(MathUtil.applyDeadband(RobotContainer.driverController.getRightY(), 0.1), 1.5);
-        double voltage = input * 12;
-        io.setVoltage(voltage);
+        double input = 0;
     }
 
     public Command spinDownCommand() {

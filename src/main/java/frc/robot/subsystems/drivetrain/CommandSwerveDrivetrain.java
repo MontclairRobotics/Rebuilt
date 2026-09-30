@@ -560,7 +560,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 	public void periodic() {
 		logCounter++;
 
-		odometryHeading = this.getState().Pose.getRotation();
+		wrappedOdometryHeading = this.getState().Pose.getRotation();
 		fieldRelative = !RobotContainer.controller.L2().getAsBoolean();
 		isRobotAtAngleSetPoint = thetaController.atSetpoint();
 
