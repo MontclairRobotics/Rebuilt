@@ -21,6 +21,10 @@ import edu.wpi.first.wpilibj.RobotBase;
  */
 public final class Constants {
 
+	NamedCommands.registerCommand("shooterAimToHub", Shooter.aimToHubCommand());
+	NamedCommands.registerCommand("shootToHub", RobotContainer.shooter.shootToHubCommand(AngularVelocity.ofBaseUnits(0, RotationsPerSecond))); //TODO: get lookup table command instead
+	NamedCommands.registerCommand("aimToPoint", RobotContainer.shooter.aimToPointCommand(new Translation2d(0.0, 0.0), 0.0));
+	NamedCommands.registerCommand("shootToPoint", RobotContainer.shooter.shootToPointCommand(new Translation2d(0.0, 0.0), 0.0, AngularVelocity.ofBaseUnits(0,RotationsPerSecond)));
 	public static final Mode SIM_MODE = Mode.SIM;
 	public static final Mode CURRENT_MODE = RobotBase.isReal() ? Mode.REAL : SIM_MODE;
 
