@@ -1,0 +1,19 @@
+[project]
+name = "wpilib-log-analysis"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "altair>=6.0.0",
+    "msgpack>=1.1.2",
+    "polars>=1.38.1",
+    "vegafusion>=2.0.3",
+    "vl-convert-python>=1.9.0.post1",
+]
+
+[dependency-groups]
+dev = [
+    "jupyter>=1.1.1",
+    "jupytext>=1.19.1",
+]
