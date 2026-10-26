@@ -7,6 +7,7 @@ package frc.robot.subsystems.vision;
 // at the root directory of this project.
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
@@ -15,12 +16,17 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.vision.LimelightHelpers.RawDetection;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import frc.robot.util.PoseUtils;
 
@@ -83,6 +89,95 @@ public class Vision extends SubsystemBase {
 			);
 		}
 	}
+
+	public RawDetection[] getRawDetections(String name) {
+		return LimelightHelpers.getRawDetections(name);
+	}
+
+	public boolean isFuelVisible(String name) {
+		RawDetection[] detections = getRawDetections(name);
+		for(RawDetection detection : detections) {
+			if(detection.classId == 1) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public int fuelVisible(String name) {
+		int numOfFuel = 0;
+
+		RawDetection[] detections = getRawDetections(name);
+		for(RawDetection detection : detections) {
+			if(detection.classId == 1) {
+				numOfFuel++;
+			}
+		}
+
+		return numOfFuel;
+	}
+
+	public RawDetection[] fuel(String name) {
+		RawDetection[] fuelDetections = new RawDetection[fuelVisible(name)];
+		RawDetection[] detections = getRawDetections(name);
+
+		int i = 0;
+		for(RawDetection detection : detections) {
+			if(detection.classId == 1) {
+				fuelDetections[i] = detection;
+				i++;
+			}
+		}
+
+		return fuelDetections;
+	}
+
+	public double[][] screenFuelLocations(String name) {
+		double[][] positions = new double[fuelVisible(name)][2];
+		int i = 0;
+		RawDetection[] detections = getRawDetections(name);
+		for(RawDetection detection : detections) {
+			if(detection.classId == 1) {
+				positions[i][0] = detection.txnc;
+				positions[i][1] = detection.tync;
+			}
+		}
+
+		return positions;
+	}
+
+	/**
+	 * Returns x y z position of the fuel relative to the robot
+	 * 
+	 * Takes in name
+	 */
+	public Translation2d[] fieldFuelLocations(String name) {
+		double[] distances = new double[fuelVisible(name)];
+		double[][] positions = screenFuelLocations(name);
+		RawDetection[] fuel = fuel(name);
+		Translation2d[] newPositions = new Translation2d[fuelVisible(name)];
+		for(int i = 0; i < distances.length; i++) {
+			distances[i] = Math.sqrt(Math.pow(positions[i][0],2) + Math.pow(positions[i][1],2));
+		}
+		for(int i = 0; i < distances.length; i++) {
+			newPositions[i] = new Translation2d(positions[i][0] + NetworkTableInstance.getDefault().getTable("limelight").getEntry("camerapose_robotspace").getDouble(0), 
+			Math.sqrt(70 / (fuel[i].ta)) + NetworkTableInstance.getDefault().getTable("limelight").getEntry("camerapose_robotspace").getDouble(2)); //70 is the bounding box size when distance = 1
+		}
+
+		return newPositions;
+	}
+
+	public Angle[] angles(String name) {
+		Angle[] angles = new Angle[fuelVisible(name)];
+		Translation2d[] positions = fieldFuelLocations(name);
+		for(int i = 0; i < fuelVisible(name); i++) {
+			angles[i] = Radians.of(Math.asin(positions[i].getY()));
+		}
+
+		return angles;
+	}
+
 
 	/**
 	 * Returns the X angle to the best target, which can be used for simple servoing with vision.
