@@ -5,12 +5,14 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.wpilibj.RobotController;
 
 import static edu.wpi.first.units.Units.Degrees;
@@ -303,14 +305,22 @@ public class RobotContainer {
 			.onTrue(drivetrain.setMaxSpeedsCommand(MetersPerSecond.of(1.25), RotationsPerSecond.of(0.25)))
 			.onFalse(drivetrain.setMaxSpeedsCommand(TunerConstants.kSpeedAt12Volts, RotationsPerSecond.of(1.624)));
 
-		driverController.triangle()
+		/* driverController.triangle()
 			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(0)), false));
 		driverController.square()
 			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(90)), false));
 		driverController.cross()
 			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(180)), false));
 		driverController.circle()
-			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(-90)), false));
+			.onTrue(drivetrain.alignToAngleFieldRelativeCommand(PoseUtils.flipRotAlliance(Rotation2d.fromDegrees(-90)), false));*/
+		
+		if((vision.angles("limelight1"))[0].in(Radians) >= 0.1) { //change limelight1 to actual name of limelight
+			drivetrain.drive(0,0,0.1,false);
+		} else if((vision.angles("limelight1"))[0].in(Radians) <= -0.1) {
+			drivetrain.drive(0,0,-0.1,false);
+		} else {
+			drivetrain.drive(0,0,0,false);
+		}
 
 		// operator
 

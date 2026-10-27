@@ -172,10 +172,54 @@ public class Vision extends SubsystemBase {
 		Angle[] angles = new Angle[fuelVisible(name)];
 		Translation2d[] positions = fieldFuelLocations(name);
 		for(int i = 0; i < fuelVisible(name); i++) {
-			angles[i] = Radians.of(Math.asin(positions[i].getY()));
+			angles[i] = Radians.of(Math.atan(positions[i].getY() / positions[i].getX()));
 		}
 
 		return angles;
+	}
+
+	public Translation2d[] getFilteredPositions(Translation2d[] positions, double minDistance, double maxDistance) {
+		int newSize = positions.length;
+        for(int i = 0; i < positions.length; i++) {
+            if(Math.sqrt(Math.pow(positions[i].getX(),2) + Math.pow(positions[i].getY(),2)) > maxDistance ||
+            Math.sqrt(Math.pow(positions[i].getX(),2) + Math.pow(positions[i].getY(),2)) < minDistance) {
+                newSize--;
+            }
+        }
+
+        Translation2d[] newFuelPositions = new Translation2d[newSize];
+        int j = 0;
+        for(int i = 0; i < positions.length; i++) {
+            if(Math.sqrt(Math.pow(positions[i].getX(),2) + Math.pow(positions[i].getY(),2)) > maxDistance||
+            Math.sqrt(Math.pow(positions[i].getX(),2) + Math.pow(positions[i].getY(),2)) < minDistance) {
+                newFuelPositions[j] = positions[i];
+                j++;
+            }
+        }
+
+		return newFuelPositions;
+	}
+
+	public Angle[] getFilteredAngles(Translation2d[] positions, Angle[] angles, double minDistance, double maxDistance) {
+		int newSize = positions.length;
+        for(int i = 0; i < positions.length; i++) {
+            if(Math.sqrt(Math.pow(positions[i].getX(),2) + Math.pow(positions[i].getY(),2)) > maxDistance ||
+            Math.sqrt(Math.pow(positions[i].getX(),2) + Math.pow(positions[i].getY(),2)) < minDistance) {
+                newSize--;
+            }
+        }
+
+        Angle[] newFuelAngles = new Angle[newSize];
+        int j = 0;
+        for(int i = 0; i < positions.length; i++) {
+            if(Math.sqrt(Math.pow(positions[i].getX(),2) + Math.pow(positions[i].getY(),2)) > maxDistance||
+            Math.sqrt(Math.pow(positions[i].getX(),2) + Math.pow(positions[i].getY(),2)) < minDistance) {
+                newFuelAngles[j] = angles[i];
+                j++;
+            }
+        }
+
+		return newFuelAngles;
 	}
 
 
