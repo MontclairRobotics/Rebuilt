@@ -74,5 +74,4 @@ public class FuelField {
 
         return new Translation2d(Math.sqrt(Math.pow(maxInd * samplingRate + minDistance,2) / (Math.pow(slope,2) + 1)), slope * Math.sqrt(Math.pow(maxInd * samplingRate + minDistance,2) / (Math.pow(slope,2) + 1)));
     }
-    
 }
