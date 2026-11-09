@@ -47,6 +47,7 @@ public class FuelField {
         if(RobotContainer.vision.isFuelVisible(cameraName)) {
             return new Translation2d(0,0);
         }
+        
         double slope; //A simple way to go through the densest area is a line of best fit
         double slopeNumerator = 0;
         double slopeDenom = 0;
@@ -57,11 +58,11 @@ public class FuelField {
         }
 
         slope = slopeNumerator / slopeDenom;
-        double distance; //We want to find a good distance to go. If we go too far we waste time and if we don't go far enough we don't get enough fuel
         
         int[] numsOfFuel = new int[(int) ((maxDistance - minDistance) / samplingRate) - 1];
         for(int i = minDistance; i < maxDistance - samplingRate; i += samplingRate) {
-            numsOfFuel[i] = RobotContainer.vision.getFilteredPositions(this.fuelPositions, minDistance, i + samplingRate).length - RobotContainer.vision.getFilteredPositions(this.fuelPositions, minDistance, i).length;
+            numsOfFuel[i] = RobotContainer.vision.getFilteredPositions(this.fuelPositions, minDistance, i + samplingRate).length
+             - RobotContainer.vision.getFilteredPositions(this.fuelPositions, minDistance, i).length;
         }
 
         int maxInd = 0;
