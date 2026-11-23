@@ -47,7 +47,7 @@ public class FuelField {
         if(RobotContainer.vision.isFuelVisible(cameraName)) {
             return new Translation2d(0,0);
         }
-        
+
         double slope; //A simple way to go through the densest area is a line of best fit
         double slopeNumerator = 0;
         double slopeDenom = 0;
@@ -58,7 +58,7 @@ public class FuelField {
         }
 
         slope = slopeNumerator / slopeDenom;
-        
+
         int[] numsOfFuel = new int[(int) ((maxDistance - minDistance) / samplingRate) - 1];
         for(int i = minDistance; i < maxDistance - samplingRate; i += samplingRate) {
             numsOfFuel[i] = RobotContainer.vision.getFilteredPositions(this.fuelPositions, minDistance, i + samplingRate).length

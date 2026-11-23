@@ -19,8 +19,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -149,7 +151,7 @@ public class Vision extends SubsystemBase {
 
 	/**
 	 * Returns x y z position of the fuel relative to the robot
-	 * 
+	 *
 	 * Takes in name
 	 */
 	public Translation2d[] fieldFuelLocations(String name) {
@@ -157,28 +159,44 @@ public class Vision extends SubsystemBase {
 		double[][] positions = screenFuelLocations(name);
 		RawDetection[] fuel = fuel(name);
 		Translation2d[] newPositions = new Translation2d[fuelVisible(name)];
+
 		for(int i = 0; i < distances.length; i++) {
 			distances[i] = Math.sqrt(Math.pow(positions[i][0],2) + Math.pow(positions[i][1],2));
 		}
+
 		for(int i = 0; i < distances.length; i++) {
-			newPositions[i] = new Translation2d(positions[i][0] + NetworkTableInstance.getDefault().getTable("limelight").getEntry("camerapose_robotspace").getDouble(0), 
+			newPositions[i] = new Translation2d(positions[i][0] + NetworkTableInstance.getDefault().getTable("limelight").getEntry("camerapose_robotspace").getDouble(0),
 			Math.sqrt(70 / (fuel[i].ta)) + NetworkTableInstance.getDefault().getTable("limelight").getEntry("camerapose_robotspace").getDouble(2)); //70 is the bounding box size when distance = 1
 		}
 
 		return newPositions;
 	}
 
-	public Angle[] angles(String name) {
-		Angle[] angles = new Angle[fuelVisible(name)];
-		Translation2d[] positions = fieldFuelLocations(name);
-		for(int i = 0; i < fuelVisible(name); i++) {
-			angles[i] = Radians.of(Math.atan(positions[i].getY() / positions[i].getX()));
+	public static Angle[] angles(String name) {
+		// return new Angle[]{Radians.of(Math.random() * 100)};
+		Angle[] angles = new Angle[1];
+		Translation2d[] positions = new Translation2d[] {new Translation2d(-2,3)};
+		if(positions[0].getX() >= 0) {
+			angles[0] = Radians.of((Math.PI / 2) - Math.atan(positions[0].getY() / positions[0].getX()));
+		} else {
+			angles[0] = Radians.of((-Math.PI / 2) + Math.atan(positions[0].getY() / positions[0].getX()));
 		}
-
 		return angles;
+
+		// Angle[] angles = new Angle[fuelVisible(name)];
+		// Translation2d[] positions = fieldFuelLocations(name);
+		// for(int i = 0; i < fuelVisible(name); i++) {
+		// 	  if(positions[i].getX() >= 0) { 
+		// 		angles[i] = Radians.of(Math.atan(positions[i].getY() / positions[i].getX()));
+		// 	  } else {
+	    // angles[i] = Radians.of(Math.PI - Math.atan(positions[i].getY() / positions[i].getX()));
+		// 	  }
+		// }
+
+		// return angles;
 	}
 
-	public Translation2d[] getFilteredPositions(Translation2d[] positions, double minDistance, double maxDistance) {
+	public static Translation2d[] getFilteredPositions(Translation2d[] positions, double minDistance, double maxDistance) {
 		int newSize = positions.length;
         for(int i = 0; i < positions.length; i++) {
             if(Math.sqrt(Math.pow(positions[i].getX(),2) + Math.pow(positions[i].getY(),2)) > maxDistance ||
@@ -200,7 +218,7 @@ public class Vision extends SubsystemBase {
 		return newFuelPositions;
 	}
 
-	public Angle[] getFilteredAngles(Translation2d[] positions, Angle[] angles, double minDistance, double maxDistance) {
+	public static Angle[] getFilteredAngles(Translation2d[] positions, Angle[] angles, double minDistance, double maxDistance) {
 		int newSize = positions.length;
         for(int i = 0; i < positions.length; i++) {
             if(Math.sqrt(Math.pow(positions[i].getX(),2) + Math.pow(positions[i].getY(),2)) > maxDistance ||

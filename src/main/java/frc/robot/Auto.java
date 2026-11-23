@@ -17,6 +17,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.networktables.BooleanTopic;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringEntry;
@@ -34,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.PivotConstants;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.AllianceManager;
 import frc.robot.util.Elastic;
 import frc.robot.util.Elastic.Notification;
@@ -68,6 +72,10 @@ public class Auto extends SubsystemBase {
 	StringSubscriber stringSub = autoTopic.subscribe("");
 	Alliance prevAlliance = Alliance.Blue;
 
+	DoubleTopic angleTopic = auto.getDoubleTopic("Fuel Angle");
+	DoublePublisher anglePub = angleTopic.publish();
+	DoubleSubscriber angleSub = angleTopic.subscribe(0.0);
+
 	private String prevAutoString = "";
 
 	public void setFeedback(String s, NotificationLevel level) {
@@ -83,6 +91,8 @@ public class Auto extends SubsystemBase {
 		yeetEntry.set(false);
 		feedbackTopic.setRetained(true);
 		feedbackPub.set("Enter auto string");
+		angleTopic.setRetained(true);
+		anglePub.set(0.0);
 		SmartDashboard.putData("Field", field);
 	}
 
@@ -423,6 +433,8 @@ public class Auto extends SubsystemBase {
     }
 
 	public void periodic() {
+		anglePub.set(Vision.angles("limelight 1")[0].baseUnitMagnitude());
+
 		field.setRobotPose(RobotContainer.drivetrain.getRobotPose());
 
 		if(DriverStation.isDisabled()) {
